@@ -1,0 +1,403 @@
+{
+  "dishes": [
+    {
+      "name": "Karnıyarık",
+      "name_en": "Stuffed Eggplant",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "İskender Kebap",
+      "name_en": "Iskender Kebab",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Köfte",
+      "name_en": "Meatballs",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Tavuk Şiş",
+      "name_en": "Chicken Skewer",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Et Sote",
+      "name_en": "Sauteed Meat",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Tavuk Sote",
+      "name_en": "Sauteed Chicken",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Izgara Balık",
+      "name_en": "Grilled Fish",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Hamsi Tava",
+      "name_en": "Fried Anchovies",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Orman Kebabı",
+      "name_en": "Forest Kebab",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Tas Kebabı",
+      "name_en": "Bowl Kebab",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Kadınbudu Köfte",
+      "name_en": "Kadinbudu Meatballs",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Tavuk Döner",
+      "name_en": "Chicken Doner",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Et Döner",
+      "name_en": "Meat Doner",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Fırın Tavuk",
+      "name_en": "Baked Chicken",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Piliç Topkapı",
+      "name_en": "Topkapi Chicken",
+      "category": "meat",
+      "popularity_score": 0.85,
+      "avg_rating": 4.5
+    },
+    {
+      "name": "Kuru Fasulye",
+      "name_en": "Baked Beans",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Nohut",
+      "name_en": "Chickpeas",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Zeytinyağlı Taze Fasulye",
+      "name_en": "Green Beans with Olive Oil",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Zeytinyağlı Enginar",
+      "name_en": "Artichoke with Olive Oil",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Mercimek Köftesi",
+      "name_en": "Lentil Balls",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "İmambayıldı",
+      "name_en": "Imambayildi",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Ispanak Yemeği",
+      "name_en": "Spinach Stew",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Pırasa Yemeği",
+      "name_en": "Leek Stew",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Zeytinyağlı Sarma",
+      "name_en": "Stuffed Vine Leaves",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Sebze Graten",
+      "name_en": "Vegetable Gratin",
+      "category": "vegetarian",
+      "popularity_score": 0.75,
+      "avg_rating": 4.2
+    },
+    {
+      "name": "Mercimek Çorbası",
+      "name_en": "Lentil Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Ezogelin Çorbası",
+      "name_en": "Ezogelin Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Tarhana Çorbası",
+      "name_en": "Tarhana Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Yayla Çorbası",
+      "name_en": "Yayla Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Domates Çorbası",
+      "name_en": "Tomato Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Tavuk Suyu Çorbası",
+      "name_en": "Chicken Broth Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Mantar Çorbası",
+      "name_en": "Mushroom Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Düğün Çorbası",
+      "name_en": "Wedding Soup",
+      "category": "soup",
+      "popularity_score": 0.9,
+      "avg_rating": 4.6
+    },
+    {
+      "name": "Sütlaç",
+      "name_en": "Rice Pudding",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Baklava",
+      "name_en": "Baklava",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Kazandibi",
+      "name_en": "Kazandibi",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Profiterol",
+      "name_en": "Profiterole",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Tavukgöğsü",
+      "name_en": "Chicken Breast Pudding",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Aşure",
+      "name_en": "Ashura",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Kemalpaşa",
+      "name_en": "Kemalpasa",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Revani",
+      "name_en": "Revani",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Güllaç",
+      "name_en": "Gullac",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "İrmik Helvası",
+      "name_en": "Semolina Halva",
+      "category": "dessert",
+      "popularity_score": 0.95,
+      "avg_rating": 4.8
+    },
+    {
+      "name": "Çoban Salata",
+      "name_en": "Shepherd's Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Mevsim Salata",
+      "name_en": "Seasonal Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Gavurdağı Salata",
+      "name_en": "Gavurdagi Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Sezar Salata",
+      "name_en": "Caesar Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Ton Balıklı Salata",
+      "name_en": "Tuna Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Patates Salatası",
+      "name_en": "Potato Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Rus Salatası",
+      "name_en": "Russian Salad",
+      "category": "salad",
+      "popularity_score": 0.65,
+      "avg_rating": 4.0
+    },
+    {
+      "name": "Pirinç Pilavı",
+      "name_en": "Rice",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    },
+    {
+      "name": "Bulgur Pilavı",
+      "name_en": "Bulgur",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    },
+    {
+      "name": "Makarna",
+      "name_en": "Pasta",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    },
+    {
+      "name": "Patates Püresi",
+      "name_en": "Mashed Potatoes",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    },
+    {
+      "name": "Su Böreği",
+      "name_en": "Water Pastry",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    },
+    {
+      "name": "Sigara Böreği",
+      "name_en": "Cheese Roll",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    },
+    {
+      "name": "Patates Kızartması",
+      "name_en": "French Fries",
+      "category": "rice_pasta",
+      "popularity_score": 0.8,
+      "avg_rating": 4.3
+    }
+  ]
+}

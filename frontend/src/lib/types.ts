@@ -1,0 +1,170 @@
+export interface Building {
+  id: string;
+  name: string;
+  code: string;
+  campus: 'south' | 'north';
+  coords: [number, number];
+  floors: number;
+  total_capacity: number;
+  type: string;
+  current_occupancy?: number;
+  occupancy_ratio?: number;
+  energy_profile?: {
+    base_load_kw: number;
+    hvac_coefficient: number;
+    lighting_max_kw: number;
+    t_target: number;
+  };
+  floor_capacities?: number[];
+}
+
+export interface OccupancyByHour {
+  hour: number;
+  occupancy_count: number;
+  occupancy_ratio: number;
+}
+
+export interface OccupancyByFloor {
+  floor: number;
+  hourly_occupancy: OccupancyByHour[];
+}
+
+export interface OccupancyForecast {
+  date?: string;
+  building_id: string;
+  building_name?: string;
+  hourly?: OccupancyByHour[];
+  total_hourly?: OccupancyByHour[];
+  by_floor?: OccupancyByFloor[];
+}
+
+export interface FloorEnergyDetail {
+  floor: number;
+  energy_kwh: number;
+  hvac_kwh: number;
+  lighting_kwh: number;
+  is_active: boolean;
+}
+
+export interface HourlyEnergyForecast {
+  hour: number;
+  total_kwh: number;
+  floor_details: FloorEnergyDetail[];
+}
+
+export interface EnergySaving {
+  kwh_saved: number;
+  cost_saved_tl: number;
+  co2_avoided_kg: number;
+}
+
+export interface EnergyForecast {
+  date?: string;
+  building_id: string;
+  building_name?: string;
+  baseline_kwh: number;
+  optimized_kwh: number;
+  saving_kwh?: number;
+  saving_percent?: number;
+  savings?: EnergySaving;
+  hourly_forecast?: HourlyEnergyForecast[];
+  recommendations?: string[];
+}
+
+export interface FoodForecast {
+  cafeteria_id: string;
+  cafeteria_name: string;
+  baseline_portions: number;
+  predicted_demand: number;
+  recommended_production: number;
+  avoided_waste_portions: number;
+  avoided_waste_kg: number;
+  menu_popularity_factor: number;
+}
+
+export interface ActionItem {
+  id: string;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  type: 'energy' | 'food' | 'space';
+  title: string;
+  time: string;
+  location: string;
+  description: string;
+  impact_value: number;
+  impact_unit: string;
+  icon: string;
+}
+
+export interface LiveWeatherInfo {
+  source: string;
+  temperature: number;
+  humidity: number;
+  rain: boolean;
+  wind_speed: number;
+}
+
+export interface LiveMenuInfo {
+  source: string;
+  date: string;
+  soup: string;
+  main_dish: string;
+  calories: number;
+  vegan_dish: string;
+  sides: string[];
+  options: string[];
+  popularity_multiplier: number;
+}
+
+export interface LiveWindTurbineInfo {
+  source: string;
+  wind_speed_kmh: number;
+  current_power_kw: number;
+  daily_clean_mwh: number;
+  co2_offset_kg: number;
+  campus_electricity_coverage_percent: number;
+}
+
+export interface RealCampusEvent {
+  name: string;
+  building_id: string;
+  location: string;
+  time: string;
+  expected_attendance: number;
+  category: string;
+  impact: string;
+}
+
+export interface DashboardData {
+  date: string;
+  campus_occupancy: number;
+  predicted_energy_mwh: number;
+  food_demand_meals: number;
+  potential_saving_tl: number;
+  co2_avoided_kg: number;
+  buildings: Building[];
+  actions: ActionItem[];
+  occupancy_forecasts?: OccupancyForecast[];
+  energy_forecasts?: EnergyForecast[];
+  food_forecasts?: FoodForecast[];
+  live_weather?: LiveWeatherInfo;
+  live_menu?: LiveMenuInfo;
+  live_wind?: LiveWindTurbineInfo;
+  today_events?: RealCampusEvent[];
+  real_courses_loaded?: number;
+}
+
+export interface ScenarioRequest {
+  scenario_type: 'heatwave' | 'exam_week' | 'event' | 'rain' | 'building_closure' | 'summer_school';
+  params: Record<string, any>;
+}
+
+export interface ScenarioResult {
+  original: DashboardData;
+  modified: DashboardData;
+  changes: {
+    energy_change_percent: number;
+    food_change_percent: number;
+    co2_change_percent: number;
+    cost_change_tl: number;
+  };
+}
