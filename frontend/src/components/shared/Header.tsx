@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { 
   Building2, Compass, Navigation, Zap, Utensils, LayoutDashboard, 
   Cpu, Shuffle, FileText, Users, Bus, GraduationCap, ChevronDown,
-  Wrench, Droplets, Sun, Trophy, Network 
+  Wrench, Droplets, Sun, Trophy, Network, ShieldAlert, Volume2, Server 
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,11 +20,15 @@ export default function Header() {
     { href: '/flow', label: 'Akış & Ring', icon: Navigation, badge: 'Live' },
     { href: '/microgrid', label: 'Mikroşebeke & RES', icon: Zap, badge: '420kW' },
     { href: '/control-room', label: 'SCADA Merkezi', icon: Cpu, badge: 'BMS' },
+    { href: '/anomalies', label: 'AI Anomali', icon: ShieldAlert, badge: 'Radar' },
     { href: '/buildings', label: 'Binalar', icon: Building2 },
     { href: '/scenarios', label: 'Simülatör', icon: Compass },
   ];
 
   const enterpriseSuites = [
+    { href: '/anomalies', label: 'AI Anomali & Olay Radarı', desc: 'Otonom BACnet Müdahale & Kaçak İzolasyonu', icon: ShieldAlert },
+    { href: '/acoustic', label: 'Akustik & Desibel Haritası', desc: 'Canlı dB(A) Seviyeleri ve Web Audio Sentezi', icon: Volume2 },
+    { href: '/integrations', label: 'Saha Protokol Gateway', desc: 'BACnet/IP, Modbus TCP, MQTT & LoRaWAN Köprüsü', icon: Server },
     { href: '/maintenance', label: 'Kestirimci Bakım & Titreşim', desc: 'FFT Rulman Spektrumu & Kalan Ömür (RUL)', icon: Wrench },
     { href: '/water', label: 'Akıllı Su & Yağmur Hasadı', desc: '500 m³ Sarnıç & Akustik Kaçak Tespiti', icon: Droplets },
     { href: '/solar', label: 'Çatı Güneş Santralleri (SPP)', desc: '1.35 MWp Çatı Potansiyeli & Gölge Analizi', icon: Sun },
