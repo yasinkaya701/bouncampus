@@ -1,5 +1,5 @@
 import { DashboardData, ActionItem, Building, EnergyForecast, FoodForecast, OccupancyForecast, ScenarioRequest, ScenarioResult } from './types';
-import { mockDashboardData, mockBuildings, mockActions, mockOccupancy, mockEnergy, mockFood, mockScenarioResult } from './mockData';
+import { realDashboardData, realBuildings, realActions, realOccupancy, realEnergy, realFood, realScenarioResult } from './realData';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -10,35 +10,34 @@ async function fetchWithFallback<T>(endpoint: string, fallback: T): Promise<T> {
     if (!res.ok) throw new Error('API failed');
     return await res.json();
   } catch (err) {
-    console.warn(`API call to ${endpoint} failed, using mock data. Error:`, err);
     return fallback;
   }
 }
 
 export async function getDashboard(date?: string): Promise<DashboardData> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<DashboardData>(`/api/v1/dashboard${query}`, mockDashboardData);
+  return fetchWithFallback<DashboardData>(`/api/v1/dashboard${query}`, realDashboardData);
 }
 
 export async function getOccupancy(date?: string, buildingId?: string): Promise<OccupancyForecast[]> {
   const endpoint = buildingId ? `/api/v1/occupancy/${buildingId}` : '/api/v1/occupancy';
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<OccupancyForecast[]>(`${endpoint}${query}`, mockOccupancy);
+  return fetchWithFallback<OccupancyForecast[]>(`${endpoint}${query}`, realOccupancy);
 }
 
 export async function getEnergy(date?: string): Promise<EnergyForecast[]> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<EnergyForecast[]>(`/api/v1/energy${query}`, mockEnergy);
+  return fetchWithFallback<EnergyForecast[]>(`/api/v1/energy${query}`, realEnergy);
 }
 
 export async function getFood(date?: string): Promise<FoodForecast[]> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<FoodForecast[]>(`/api/v1/food${query}`, mockFood);
+  return fetchWithFallback<FoodForecast[]>(`/api/v1/food${query}`, realFood);
 }
 
 export async function getActions(date?: string): Promise<ActionItem[]> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<ActionItem[]>(`/api/v1/actions${query}`, mockActions);
+  return fetchWithFallback<ActionItem[]>(`/api/v1/actions${query}`, realActions);
 }
 
 export async function simulateScenario(scenario: ScenarioRequest): Promise<ScenarioResult> {
@@ -51,11 +50,10 @@ export async function simulateScenario(scenario: ScenarioRequest): Promise<Scena
     if (!res.ok) throw new Error('API failed');
     return await res.json();
   } catch (err) {
-    console.warn('API call to /api/v1/scenarios/simulate failed, using mock data. Error:', err);
-    return mockScenarioResult;
+    return realScenarioResult;
   }
 }
 
 export async function getBuildings(): Promise<Building[]> {
-  return fetchWithFallback<Building[]>('/api/v1/buildings', mockBuildings);
+  return fetchWithFallback<Building[]>('/api/v1/buildings', realBuildings);
 }

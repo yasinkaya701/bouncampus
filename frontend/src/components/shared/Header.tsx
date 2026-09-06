@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { 
   Building2, Compass, Navigation, Zap, Utensils, LayoutDashboard, 
   Cpu, Shuffle, FileText, Users, Bus, GraduationCap, ChevronDown,
-  Wrench, Droplets, Sun, Trophy, Network, ShieldAlert, Volume2, Server 
+  Wrench, Droplets, Sun, Trophy, Network, ShieldAlert, Volume2, Server, BookOpen 
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -17,6 +17,7 @@ export default function Header() {
 
   const primaryNav = [
     { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/courses', label: 'Dersler & Amfiler', icon: BookOpen, badge: '3.2k' },
     { href: '/flow', label: 'Akış & Ring', icon: Navigation, badge: 'Live' },
     { href: '/microgrid', label: 'Mikroşebeke & RES', icon: Zap, badge: '420kW' },
     { href: '/control-room', label: 'SCADA Merkezi', icon: Cpu, badge: 'BMS' },
@@ -26,6 +27,7 @@ export default function Header() {
   ];
 
   const enterpriseSuites = [
+    { href: '/courses', label: 'OBIKAS Ders & Amfi Motoru', desc: '3.238 Gerçek Boğaziçi Dersi & Amfi Arama', icon: BookOpen },
     { href: '/anomalies', label: 'AI Anomali & Olay Radarı', desc: 'Otonom BACnet Müdahale & Kaçak İzolasyonu', icon: ShieldAlert },
     { href: '/acoustic', label: 'Akustik & Desibel Haritası', desc: 'Canlı dB(A) Seviyeleri ve Web Audio Sentezi', icon: Volume2 },
     { href: '/integrations', label: 'Saha Protokol Gateway', desc: 'BACnet/IP, Modbus TCP, MQTT & LoRaWAN Köprüsü', icon: Server },
