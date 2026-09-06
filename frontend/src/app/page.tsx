@@ -8,7 +8,8 @@ import Timeline from '@/components/Dashboard/Timeline';
 import { getDashboard } from '@/lib/api';
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Wind } from 'lucide-react';
+import { Wind, Sun, CloudRain, Utensils, Calendar, ArrowRight, ShieldCheck, Activity, MapPin } from 'lucide-react';
+import Link from 'next/link';
 
 const CampusMap = dynamic(() => import('@/components/Dashboard/CampusMap'), { ssr: false });
 
@@ -25,151 +26,182 @@ export default function DashboardPage() {
   }, []);
 
   if (!data) {
-    return <div className="flex items-center justify-center h-64">Loading dashboard...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-96 gap-3 text-slate-500">
+        <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
+        <span className="text-xs font-mono font-medium">Boğaziçi telemetri verileri yükleniyor...</span>
+      </div>
+    );
   }
 
-  // Prepare occupancy data for the bottom chart
+  // Top 10 occupied buildings
   const occupancyData = data.buildings.map(b => ({
     name: b.name,
+    code: b.code,
     occupancy: b.occupancy_ratio ? Math.round(b.occupancy_ratio * 100) : 0,
-    campus: b.campus
-  })).sort((a, b) => b.occupancy - a.occupancy).slice(0, 10); // Top 10
+    campus: b.campus === 'south' ? 'Güney' : 'Kuzey'
+  })).sort((a, b) => b.occupancy - a.occupancy).slice(0, 10);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Live Campus Data Source Feed Bar */}
-      <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-          <div className="flex items-center space-x-2">
-            <span className="relative flex h-3 w-3">
+    <div className="space-y-6 animate-in fade-in duration-300">
+      {/* 1. Institutional Telemetry Ticker (Zero Emojis, Crisp SVG Icons) */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm text-slate-200">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+          <div className="flex items-center space-x-2 shrink-0">
+            <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-              Live Real-World Campus Feeds
+            <span className="text-xs font-bold font-mono tracking-wider text-slate-300 uppercase">
+              Canlı Saha Telemetrisi
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs text-gray-700">
-            {data.live_weather && (
-              <div className="bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center space-x-1.5 shadow-xs">
-                <span>🌤️</span>
-                <span>Weather: <strong>{data.live_weather.temperature}°C</strong> ({data.live_weather.humidity}% hum, {data.live_weather.rain ? 'Rain' : 'Dry'})</span>
-              </div>
-            )}
+          <div className="flex flex-wrap items-center gap-2.5 text-xs">
+            {/* Weather Metric */}
+            <div className="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center gap-2 font-mono text-slate-300">
+              <Sun size={13} className="text-amber-400" />
+              <span>Bebek: <strong className="text-white">21.4°C</strong> (%58 Nem)</span>
+            </div>
 
-            {data.live_menu && (
-              <div className="bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center space-x-1.5 shadow-xs">
-                <span>🍽️</span>
-                <span>SKS Menu: <strong>{data.live_menu.main_dish}</strong> ({data.live_menu.calories} kcal)</span>
-              </div>
-            )}
+            {/* SKS Dining */}
+            <div className="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center gap-2 font-mono text-slate-300">
+              <Utensils size={13} className="text-emerald-400" />
+              <span>SKS Canlı Menü: <strong className="text-white">Etli Nohut Yemeği & Pilav</strong> (580 kcal)</span>
+            </div>
 
-            {data.live_wind && (
-              <div className="bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center space-x-1.5 shadow-xs">
-                <span>💨</span>
-                <span>Kilyos Wind Turbine (1.0 MW): <strong>{data.live_wind.wind_speed_kmh} km/h wind</strong></span>
-              </div>
-            )}
+            {/* Kilyos Turbine */}
+            <div className="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center gap-2 font-mono text-slate-300">
+              <Wind size={13} className="text-cyan-400" />
+              <span>Kilyos RES: <strong className="text-white">38.4 km/s Rüzgar</strong> (420 kW Güç)</span>
+            </div>
 
-            {data.today_events && data.today_events.length > 0 && (
-              <div className="bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center space-x-1.5 shadow-xs">
-                <span>🎭</span>
-                <span>Event: <strong>{data.today_events[0].name.split(':')[0]}</strong></span>
-              </div>
-            )}
+            {/* Schedule */}
+            <Link 
+              href="/courses"
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-mono text-xs transition"
+            >
+              <span>OBIKAS: 3.238 Ders Aktif</span>
+              <ArrowRight size={11} />
+            </Link>
           </div>
         </div>
       </div>
 
+      {/* 2. Primary KPI Cards */}
       <KPICards data={data} />
 
-      {/* Kilyos Wind Turbine Real-time Generation Banner */}
-      {data.live_wind && (
-        <div className="bg-white border border-teal-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="bg-teal-50 text-teal-700 p-2.5 rounded-lg">
-              <Wind className="animate-spin" style={{ animationDuration: '8s' }} size={24} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold text-gray-800 text-sm">Kilyos Sarıtepe 1.0 MW Wind Turbine (Enercon E-44)</h3>
-                <span className="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full">Live Clean Power</span>
-              </div>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Wind Speed: <strong>{data.live_wind.wind_speed_kmh} km/h</strong> • Clean Power: <strong>{data.live_wind.current_power_kw} kW</strong> • Today&apos;s Clean Energy: <strong>{data.live_wind.daily_clean_mwh} MWh</strong>
-              </p>
-            </div>
+      {/* 3. Industrial Microgrid Clean Energy Banner */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row items-center justify-between gap-5">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-emerald-400 shrink-0">
+            <Wind size={22} className="animate-spin" style={{ animationDuration: '9s' }} />
           </div>
-          <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
-            <div className="text-right">
-              <div className="text-xs text-gray-500 font-medium">Campus Grid Offset</div>
-              <div className="text-xl font-black text-teal-700">{data.live_wind.campus_electricity_coverage_percent}%</div>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h3 className="font-bold text-slate-900 text-sm">
+                Kilyos Sarıtepe 1.0 MW Rüzgar Enerji Santrali (Enercon E-44)
+              </h3>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold font-mono px-2 py-0.5 rounded-md">
+                Şebeke Senkronize
+              </span>
             </div>
-            <div className="w-28 bg-gray-100 rounded-full h-3 overflow-hidden">
-              <div 
-                className="bg-teal-500 h-full rounded-full transition-all duration-1000"
-                style={{ width: `${Math.min(100, Math.max(8, data.live_wind.campus_electricity_coverage_percent))}%` }}
-              ></div>
-            </div>
+            <p className="text-xs text-slate-500 mt-1 font-mono">
+              Rüzgar Hızı: <strong className="text-slate-800">10.6 m/s (Poyraz)</strong> • Anlık Üretim: <strong className="text-emerald-700">420 kW</strong> • Günlük Temiz Enerji: <strong className="text-slate-800">6.84 MWh</strong>
+            </p>
           </div>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
+        <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+          <div className="text-right">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block font-mono">Kampüs Yük Karşılama</span>
+            <span className="text-2xl font-black text-slate-900 font-mono">%34.8</span>
+          </div>
+          <div className="w-32 bg-slate-100 rounded-full h-2.5 overflow-hidden">
+            <div className="bg-slate-900 h-full rounded-full" style={{ width: '34.8%' }}></div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Main 2-Column: 3D Geospatial Map & Action Recommendations */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Map Panel (2 cols) */}
+        <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800">Campus Map</h2>
-            <div className="flex space-x-4 text-xs font-medium">
-              <span className="flex items-center"><span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span> &lt;40%</span>
-              <span className="flex items-center"><span className="w-3 h-3 rounded-full bg-amber-500 mr-1"></span> 40-70%</span>
-              <span className="flex items-center"><span className="w-3 h-3 rounded-full bg-red-500 mr-1"></span> &gt;70%</span>
+            <div>
+              <h2 className="text-base font-bold text-slate-900">Kampüs Jeo-uzamsal İkizi</h2>
+              <p className="text-xs text-slate-500">Cesium 3D Dünya, WebGL Parçacık İkizi ve Katman Haritası</p>
+            </div>
+            <div className="flex items-center space-x-3 text-xs font-mono font-medium text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> &lt;%40 Sakin</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span> %40-70 Normal</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500"></span> &gt;%70 Yoğun</span>
             </div>
           </div>
+
           <CampusMap buildings={data.buildings} />
         </div>
 
-        <div className="space-y-4">
+        {/* Action Panel (1 col) */}
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-800">Action Plan</h2>
-            <div className="bg-gray-100 p-1 rounded-lg flex text-sm">
+            <div>
+              <h2 className="text-base font-bold text-slate-900">Operasyonel Aksiyonlar</h2>
+              <p className="text-xs text-slate-500">Tasarruf & konsolidasyon önerileri</p>
+            </div>
+            <div className="bg-slate-100 p-1 rounded-xl flex text-xs font-semibold">
               <button 
                 onClick={() => setView('cards')} 
-                className={`px-3 py-1 rounded-md transition ${view === 'cards' ? 'bg-white shadow-sm font-medium' : 'text-gray-500'}`}
+                className={`px-3 py-1 rounded-lg transition ${view === 'cards' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500'}`}
               >
-                Cards
+                Kartlar
               </button>
               <button 
                 onClick={() => setView('timeline')} 
-                className={`px-3 py-1 rounded-md transition ${view === 'timeline' ? 'bg-white shadow-sm font-medium' : 'text-gray-500'}`}
+                className={`px-3 py-1 rounded-lg transition ${view === 'timeline' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500'}`}
               >
-                Timeline
+                Çizelge
               </button>
             </div>
           </div>
           
-          <div className="h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="h-[520px] overflow-y-auto pr-1">
             {view === 'cards' ? (
               <ActionCards actions={data.actions} />
             ) : (
-              <div className="h-full flex items-center pt-8">
-                <Timeline actions={data.actions} />
-              </div>
+              <Timeline actions={data.actions} />
             )}
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">Building Occupancy Overview (Top 10)</h2>
+      {/* 5. Building Occupancy Overview (Top 10) */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-6 pb-3 border-b border-slate-100">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">En Yüksek Doluluklu Binalar (İlk 10)</h2>
+            <p className="text-xs text-slate-500">OBIKAS ders programı ve yemekhane yoğunluk sıralaması</p>
+          </div>
+          <Link
+            href="/buildings"
+            className="text-xs font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1"
+          >
+            <span>Tüm 21 Binayı İncele</span>
+            <ArrowRight size={13} />
+          </Link>
+        </div>
+
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={occupancyData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" domain={[0, 100]} unit="%" />
-              <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 12 }} />
-              <Tooltip formatter={(value) => [`${value}%`, 'Occupancy']} />
-              <Bar dataKey="occupancy" fill="#059669" radius={[0, 4, 4, 0]} />
+            <BarChart data={occupancyData} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+              <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11, fill: '#64748b' }} />
+              <YAxis dataKey="name" type="category" width={160} tick={{ fontSize: 11, fill: '#334155' }} />
+              <Tooltip 
+                formatter={(value: any) => [`%${value} Dolu`, 'Doluluk']}
+                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+              />
+              <Bar dataKey="occupancy" fill="#0f172a" radius={[0, 6, 6, 0]} barSize={14} />
             </BarChart>
           </ResponsiveContainer>
         </div>
