@@ -69,7 +69,7 @@ body {
 
 @layer components {
   .bc-surface {
-    @apply border border-slate-950/10 bg-white/85 shadow-[0_14px_40px_rgba(10,16,32,0.05)] backdrop-blur-sm;
+    @apply border border-slate-950/10 bg-white/[0.85] shadow-[0_14px_40px_rgba(10,16,32,0.05)] backdrop-blur-sm;
   }
 
   .bc-surface-dark {
