@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'BOUNCAMPUS — Campus Intelligence for Boğaziçi',
+    name: 'BOUNCAMPUS — Mission Control for Boğaziçi',
     short_name: 'BOUNCAMPUS',
-    description: 'Source-traceable campus intelligence, decision support and sustainability scenarios for Boğaziçi.',
+    description: 'Source-traceable campus decision intelligence: missions, counterfactuals, human approval and calibration evidence.',
     start_url: '/',
     display: 'standalone',
     background_color: '#f4f5f2',
