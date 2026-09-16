@@ -1,5 +1,6 @@
 'use client';
 
+import type { ComponentType, ReactNode } from 'react';
 import type { DashboardData } from '@/lib/types';
 import { ArrowDownRight, Gauge, Leaf, Sparkles, Utensils, Users, Zap } from 'lucide-react';
 
@@ -8,9 +9,9 @@ type MetricCardProps = {
   value: string;
   unit?: string;
   note: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  icon: ComponentType<{ size?: number; strokeWidth?: number }>;
   dark?: boolean;
-  footer?: React.ReactNode;
+  footer?: ReactNode;
 };
 
 function MetricCard({ label, value, unit, note, icon: Icon, dark = false, footer }: MetricCardProps) {
