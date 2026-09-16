@@ -7,18 +7,21 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import {
   Activity,
   ArrowRight,
+  ArrowUpRight,
   BusFront,
   CalendarDays,
   CheckCircle2,
+  Clock3,
   CloudSun,
   Database,
   ExternalLink,
+  MapPin,
   ShieldAlert,
+  Sparkles,
   Utensils,
 } from 'lucide-react';
 import KPICards from '@/components/Dashboard/KPICards';
 import ActionCards from '@/components/Dashboard/ActionCards';
-import Timeline from '@/components/Dashboard/Timeline';
 import { getDashboard } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
 import type { SourceMeta } from '@/lib/live-sources';
@@ -26,36 +29,45 @@ import type { SourceMeta } from '@/lib/live-sources';
 const CampusMap = dynamic(() => import('@/components/Dashboard/CampusMap'), { ssr: false });
 
 const provenanceLabel: Record<string, string> = {
-  OFFICIAL_LIVE: 'RESMÎ CANLI',
-  OFFICIAL_SNAPSHOT: 'RESMÎ SNAPSHOT',
-  EXTERNAL_LIVE: 'HARİCÎ CANLI',
-  MODEL_ESTIMATE: 'MODEL TAHMİNİ',
-  FALLBACK: 'ERİŞİLEMİYOR',
+  OFFICIAL_LIVE: 'OFFICIAL LIVE',
+  OFFICIAL_SNAPSHOT: 'OFFICIAL SNAPSHOT',
+  EXTERNAL_LIVE: 'EXTERNAL LIVE',
+  MODEL_ESTIMATE: 'MODEL ESTIMATE',
+  FALLBACK: 'UNAVAILABLE',
+};
+
+const provenanceTone: Record<string, string> = {
+  OFFICIAL_LIVE: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  OFFICIAL_SNAPSHOT: 'border-violet-200 bg-violet-50 text-violet-700',
+  EXTERNAL_LIVE: 'border-blue-200 bg-blue-50 text-blue-700',
+  MODEL_ESTIMATE: 'border-violet-200 bg-violet-50 text-violet-700',
+  FALLBACK: 'border-amber-200 bg-amber-50 text-amber-700',
 };
 
 function fmt(value: number | null | undefined, suffix = '') {
   return value == null ? '—' : `${value}${suffix}`;
 }
 
-function SourceBadge({ source }: { source?: SourceMeta }) {
-  const provenance = source?.ok ? source.provenance : 'FALLBACK';
-  const label = provenanceLabel[provenance] ?? provenance;
-  const tone = provenance === 'OFFICIAL_LIVE'
-    ? 'text-emerald-700'
-    : provenance === 'EXTERNAL_LIVE'
-      ? 'text-sky-700'
-      : provenance === 'OFFICIAL_SNAPSHOT'
-        ? 'text-violet-700'
-        : provenance === 'MODEL_ESTIMATE'
-          ? 'text-violet-700'
-          : 'text-amber-700';
+function SourcePill({ source }: { source?: SourceMeta }) {
+  const type = source?.ok ? source.provenance : 'FALLBACK';
+  return (
+    <span className={`bc-chip ${provenanceTone[type] ?? provenanceTone.FALLBACK}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${source?.ok ? 'bg-current' : 'bg-amber-500'}`} />
+      {provenanceLabel[type] ?? type}
+    </span>
+  );
+}
 
-  return <span className={`inline-block mt-3 text-[10px] font-bold font-mono ${tone}`}>{label}</span>;
+function formatDashboardDate(value: string) {
+  try {
+    return new Intl.DateTimeFormat('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Istanbul' }).format(new Date(`${value}T12:00:00+03:00`));
+  } catch {
+    return value;
+  }
 }
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
-  const [view, setView] = useState<'cards' | 'timeline'>('cards');
 
   useEffect(() => {
     getDashboard().then(setData);
@@ -63,161 +75,239 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 gap-3 text-slate-500">
-        <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin" />
-        <span className="text-xs font-mono font-medium">Canlı kampüs kaynakları ve karar modeli yükleniyor...</span>
+      <div className="grid min-h-[66vh] place-items-center">
+        <div className="text-center">
+          <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-slate-300 border-t-[#2f5cff]" />
+          <p className="mt-4 text-xs font-bold text-slate-600">Campus intelligence is coming online</p>
+          <p className="mt-1 font-mono text-[10px] text-slate-400">checking public sources · loading decision models</p>
+        </div>
       </div>
     );
   }
 
-  const occupancyData = data.buildings
-    .map(b => ({ name: b.name, occupancy: Math.round((b.occupancy_ratio ?? 0) * 100) }))
-    .sort((a, b) => b.occupancy - a.occupancy)
-    .slice(0, 10);
-
   const degraded = data.data_quality?.mode === 'DEGRADED';
   const scheduleSource = data.sources?.find(source => source.id === 'boun-course-schedule');
   const calendarSource = data.sources?.find(source => source.id === 'boun-academic-calendar');
+  const healthySources = data.sources?.filter(source => source.ok).length ?? 0;
+  const totalSources = data.sources?.length ?? 0;
+  const primaryAction = data.actions[0];
+  const occupancyData = data.buildings
+    .map(building => ({ name: building.name, occupancy: Math.round((building.occupancy_ratio ?? 0) * 100) }))
+    .sort((a, b) => b.occupancy - a.occupancy)
+    .slice(0, 9);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <section className="bg-slate-950 text-white border border-slate-800 rounded-2xl p-5 shadow-sm">
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+    <div className="space-y-4 md:space-y-5">
+      <section className="bc-surface-dark relative overflow-hidden rounded-[30px] px-5 py-6 text-white sm:px-7 sm:py-7 lg:px-9 lg:py-8">
+        <div className="pointer-events-none absolute -right-20 -top-32 h-80 w-80 rounded-full bg-blue-500/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-40 left-1/3 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
+
+        <div className="relative grid gap-8 xl:grid-cols-[1.55fr_0.8fr] xl:items-end">
           <div>
-            <div className="flex items-center gap-2">
-              {degraded ? <ShieldAlert size={17} className="text-amber-400" /> : <CheckCircle2 size={17} className="text-emerald-400" />}
-              <span className="text-xs font-black tracking-[0.18em] text-slate-300 uppercase">BOUNCAMPUS Data Trust Layer</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bc-chip border-white/10 bg-white/5 text-slate-300">BOUNCAMPUS / LIVE BRIEF</span>
+              <span className={`bc-chip ${degraded ? 'border-amber-400/20 bg-amber-400/10 text-amber-300' : 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300'}`}>
+                {degraded ? <ShieldAlert size={10} /> : <CheckCircle2 size={10} />}
+                {degraded ? 'DEGRADED SOURCES' : 'SOURCE HEALTHY'}
+              </span>
             </div>
-            <p className="text-xs text-slate-400 mt-2 max-w-2xl">
-              Canlı resmî kaynaklar ile model tahminleri ayrı etiketlenir. Doluluk, enerji ve yemek talebi kampüs sensörü ölçümü değil; ders programı ve çevresel girdilerden üretilen karar destek tahminidir.
+
+            <h1 className="mt-7 max-w-4xl text-[38px] font-black leading-[0.98] tracking-[-0.06em] text-white sm:text-[48px] lg:text-[58px]">
+              Kampüsü ölç, tahmin et,
+              <span className="block text-blue-300">doğru anda harekete geç.</span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-[13px] leading-relaxed text-slate-400 sm:text-sm">
+              Boğaziçi&apos;nin public operasyon verilerini tek karar katmanında birleştiriyoruz. Canlı kaynaklar, resmî snapshot&apos;lar ve model tahminleri birbirine karıştırılmadan sunulur.
             </p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-bold text-slate-400">
+              <span className="inline-flex items-center gap-1.5"><CalendarDays size={12} /> {formatDashboardDate(data.date)}</span>
+              <span className="inline-flex items-center gap-1.5"><Database size={12} /> {healthySources}/{totalSources} source checks passing</span>
+              <span className="inline-flex items-center gap-1.5"><Sparkles size={12} /> decision outputs explicitly labeled</span>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 text-[11px] font-mono">
-            <span className="px-2.5 py-1.5 rounded-lg bg-emerald-950 border border-emerald-800 text-emerald-300">
-              {data.data_quality?.official_live_sources ?? 0} resmî canlı kaynak
-            </span>
-            <span className="px-2.5 py-1.5 rounded-lg bg-sky-950 border border-sky-800 text-sky-300">
-              {data.data_quality?.external_live_sources ?? 0} haricî canlı kaynak
-            </span>
-            <span className={`px-2.5 py-1.5 rounded-lg border ${degraded ? 'bg-amber-950 border-amber-800 text-amber-300' : 'bg-slate-900 border-slate-700 text-slate-300'}`}>
-              {degraded ? 'Kısmi kaynak kesintisi' : 'Kaynaklar erişilebilir'}
-            </span>
+
+          <div className="rounded-[24px] border border-white/10 bg-white/[0.055] p-5 backdrop-blur-sm">
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Top decision candidate</span>
+              <span className="rounded-full border border-violet-400/20 bg-violet-400/10 px-2 py-1 text-[8px] font-black tracking-[0.08em] text-violet-200">MODEL</span>
+            </div>
+            {primaryAction ? (
+              <>
+                <h2 className="mt-5 text-xl font-black leading-tight tracking-[-0.035em] text-white">{primaryAction.title}</h2>
+                <p className="mt-3 line-clamp-3 text-[11px] leading-relaxed text-slate-400">{primaryAction.description}</p>
+                <div className="mt-5 flex items-end justify-between gap-4 border-t border-white/10 pt-4">
+                  <div>
+                    <div className="text-[9px] font-bold uppercase tracking-[0.13em] text-slate-500">Modeled impact</div>
+                    <div className="mt-1 font-mono text-2xl font-black tracking-[-0.04em] text-emerald-300">
+                      {primaryAction.impact_value.toLocaleString('tr-TR')}
+                      <span className="ml-1 text-[10px] font-bold text-slate-400">{primaryAction.impact_unit}</span>
+                    </div>
+                  </div>
+                  <div className="text-right text-[9px] font-bold text-slate-500">
+                    <div className="inline-flex items-center gap-1"><Clock3 size={10} /> {primaryAction.time}</div>
+                    <div className="mt-1 inline-flex items-center gap-1"><MapPin size={10} /> {primaryAction.location}</div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="mt-5 text-xs text-slate-400">No decision candidate is currently above the model threshold.</p>
+            )}
           </div>
         </div>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-        <div className="bg-white border border-slate-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><CloudSun size={15} /> Bebek hava</div>
-          <div className="mt-3 text-xl font-black text-slate-900 font-mono">{fmt(data.live_weather?.temperature, '°C')}</div>
-          <p className="text-xs text-slate-500 mt-1">Nem {fmt(data.live_weather?.humidity, '%')} · Rüzgâr {fmt(data.live_weather?.wind_speed, ' km/h')}</p>
-          <SourceBadge source={data.live_weather?.provenance} />
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><Utensils size={15} /> SKS menü</div>
-          <div className="mt-3 text-sm font-black text-slate-900 line-clamp-2">
-            {data.live_menu?.main_dish ?? 'Menü alanı şu anda ayrıştırılamadı'}
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <article className="bc-surface rounded-[24px] p-5">
+          <div className="flex items-center justify-between">
+            <span className="bc-eyebrow">Bebek / weather</span>
+            <CloudSun size={17} className="text-slate-400" />
           </div>
-          <p className="text-xs text-slate-500 mt-1">{data.live_menu?.soup ?? 'Çorba alanı yok'} {data.live_menu?.calories ? `· ${data.live_menu.calories} kcal` : ''}</p>
-          <SourceBadge source={data.live_menu?.provenance} />
-        </div>
+          <div className="mt-6 font-mono text-[32px] font-black leading-none tracking-[-0.05em] text-[#0a1020]">{fmt(data.live_weather?.temperature, '°')}</div>
+          <div className="mt-2 text-[11px] text-slate-500">Nem {fmt(data.live_weather?.humidity, '%')} · Rüzgâr {fmt(data.live_weather?.wind_speed, ' km/h')}</div>
+          <div className="mt-5"><SourcePill source={data.live_weather?.provenance} /></div>
+        </article>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><BusFront size={15} /> Mekik</div>
-          <div className="mt-3 text-xl font-black text-slate-900 font-mono">{data.live_shuttle?.next_departure ?? '—'}</div>
-          <p className="text-xs text-slate-500 mt-1">{data.live_shuttle?.route ?? 'Güney → Kuzey'}</p>
-          <SourceBadge source={data.live_shuttle?.provenance} />
-        </div>
+        <article className="bc-surface rounded-[24px] p-5">
+          <div className="flex items-center justify-between">
+            <span className="bc-eyebrow">SKS / today</span>
+            <Utensils size={16} className="text-slate-400" />
+          </div>
+          <div className="mt-6 line-clamp-2 min-h-[2.8rem] text-[15px] font-black leading-snug tracking-[-0.02em] text-[#0a1020]">
+            {data.live_menu?.main_dish ?? 'Menü ayrıştırılamadı'}
+          </div>
+          <div className="mt-2 line-clamp-1 text-[11px] text-slate-500">{data.live_menu?.soup ?? '—'} {data.live_menu?.calories ? `· ${data.live_menu.calories} kcal` : ''}</div>
+          <div className="mt-5"><SourcePill source={data.live_menu?.provenance} /></div>
+        </article>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><Database size={15} /> Ders programı</div>
-          <div className="mt-3 text-xl font-black text-slate-900 font-mono">{(data.real_courses_loaded ?? 0).toLocaleString('tr-TR')}</div>
-          <p className="text-xs text-slate-500 mt-1">BUIS/ÖBİKAS public schedule snapshot</p>
-          <SourceBadge source={scheduleSource} />
-        </div>
+        <article className="bc-surface rounded-[24px] p-5">
+          <div className="flex items-center justify-between">
+            <span className="bc-eyebrow">Mekik / Güney → Kuzey</span>
+            <BusFront size={17} className="text-slate-400" />
+          </div>
+          <div className="mt-6 font-mono text-[32px] font-black leading-none tracking-[-0.05em] text-[#0a1020]">{data.live_shuttle?.next_departure ?? '—'}</div>
+          <div className="mt-2 text-[11px] text-slate-500">Next published departure</div>
+          <div className="mt-5"><SourcePill source={data.live_shuttle?.provenance} /></div>
+        </article>
+
+        <article className="bc-surface rounded-[24px] p-5">
+          <div className="flex items-center justify-between">
+            <span className="bc-eyebrow">BUIS / schedule</span>
+            <Database size={16} className="text-slate-400" />
+          </div>
+          <div className="mt-6 font-mono text-[32px] font-black leading-none tracking-[-0.05em] text-[#0a1020]">{(data.real_courses_loaded ?? 0).toLocaleString('tr-TR')}</div>
+          <div className="mt-2 text-[11px] text-slate-500">Course records in the current snapshot</div>
+          <div className="mt-5"><SourcePill source={scheduleSource} /></div>
+        </article>
       </section>
 
       <KPICards data={data} />
 
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-3">
-          <div className="flex items-end justify-between gap-4">
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.8fr)_minmax(340px,0.72fr)]">
+        <div className="bc-surface rounded-[28px] p-3 sm:p-4">
+          <div className="flex flex-col gap-3 px-2 pb-4 pt-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Kampüs Operasyon Haritası</h2>
-              <p className="text-xs text-slate-500">Doluluk renkleri ders programı tabanlı model tahminidir; sensör ölçümü değildir.</p>
+              <div className="bc-eyebrow">Spatial intelligence</div>
+              <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Campus operational map</h2>
+              <p className="mt-1 text-[11px] text-slate-500">Building colors visualize schedule-derived utilization, not occupancy sensor measurements.</p>
             </div>
-            <Link href="/buildings" className="text-xs font-bold text-slate-700 flex items-center gap-1">Binalar <ArrowRight size={13} /></Link>
+            <Link href="/buildings" className="bc-focus-ring inline-flex items-center gap-1.5 self-start rounded-full border border-slate-950/10 bg-[#f4f5f2] px-3 py-1.5 text-[10px] font-black text-slate-700 transition hover:bg-white sm:self-auto">
+              Explore buildings <ArrowRight size={11} />
+            </Link>
           </div>
           <CampusMap buildings={data.buildings} />
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
+        <aside className="bc-surface flex min-h-[620px] flex-col rounded-[28px] p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3 border-b border-slate-900/8 pb-4">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Karar Destek Aksiyonları</h2>
-              <p className="text-xs text-slate-500">Uygulamadan önce saha/BMS doğrulaması gerekir.</p>
+              <div className="bc-eyebrow">Decision queue</div>
+              <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">What should happen next?</h2>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">Ranked decision candidates. Field validation is required before execution.</p>
             </div>
-            <div className="bg-slate-100 p-1 rounded-xl flex text-xs font-semibold">
-              <button onClick={() => setView('cards')} className={`px-3 py-1 rounded-lg ${view === 'cards' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500'}`}>Kart</button>
-              <button onClick={() => setView('timeline')} className={`px-3 py-1 rounded-lg ${view === 'timeline' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500'}`}>Çizelge</button>
-            </div>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[13px] bg-[#0b1226] text-white"><Activity size={15} /></span>
           </div>
-          <div className="h-[520px] overflow-y-auto pr-1">
-            {view === 'cards' ? <ActionCards actions={data.actions} /> : <Timeline actions={data.actions} />}
+          <div className="mt-4 flex-1 overflow-y-auto pr-1">
+            <ActionCards actions={data.actions} />
+          </div>
+        </aside>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.55fr)]">
+        <div className="bc-surface rounded-[28px] p-5 sm:p-6">
+          <div className="mb-7 flex items-start justify-between gap-4">
+            <div>
+              <div className="bc-eyebrow">Schedule signal</div>
+              <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Where demand concentrates</h2>
+              <p className="mt-1 text-[11px] text-slate-500">Top buildings by estimated utilization at the evaluation hour.</p>
+            </div>
+            <span className="bc-chip border-violet-200 bg-violet-50 text-violet-700"><Sparkles size={10} /> MODEL</span>
+          </div>
+          <div className="h-[310px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={occupancyData} layout="vertical" margin={{ top: 0, right: 22, left: 12, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="2 6" horizontal={false} stroke="rgba(15,23,42,0.08)" />
+                <XAxis type="number" domain={[0, 100]} unit="%" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                <YAxis dataKey="name" type="category" width={150} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} />
+                <Tooltip cursor={{ fill: 'rgba(47,92,255,0.04)' }} formatter={(value: number) => [`%${value}`, 'Estimated use']} contentStyle={{ borderRadius: '14px', borderColor: 'rgba(15,23,42,0.10)', boxShadow: '0 12px 34px rgba(10,16,32,0.10)', fontSize: '11px' }} />
+                <Bar dataKey="occupancy" fill="#2f5cff" radius={[0, 8, 8, 0]} barSize={11} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bc-surface rounded-[28px] p-5 sm:p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="bc-eyebrow">Academic context</div>
+              <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Calendar pulse</h2>
+            </div>
+            <CalendarDays size={18} className="text-slate-400" />
+          </div>
+          <div className="mt-6 space-y-1">
+            {(data.academic_calendar?.length
+              ? data.academic_calendar
+              : [calendarSource?.ok ? 'Resmî takvim erişilebilir; yapılandırılmış başlık alınamadı.' : 'Akademik takvim kaynağı erişilemiyor.'])
+              .slice(0, 5)
+              .map((item, index) => (
+                <div key={`${item}-${index}`} className="group flex gap-3 rounded-xl px-2 py-3 transition hover:bg-[#f4f5f2]">
+                  <span className="mt-0.5 font-mono text-[9px] font-black text-slate-300">0{index + 1}</span>
+                  <p className="text-[11px] font-semibold leading-relaxed text-slate-600">{item}</p>
+                </div>
+              ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-        <div className="flex items-center justify-between gap-3 mb-6">
+      <section id="sources" className="scroll-mt-28 rounded-[28px] border border-slate-950/10 bg-[#e9ece8]/70 p-5 sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Ders Programından Tahmini Bina Kullanımı</h2>
-            <p className="text-xs text-slate-500">İlk 10 bina · oda kapasitesi ve ders saatlerinden türetilmiştir</p>
+            <div className="bc-eyebrow">Data trust layer</div>
+            <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Every signal has a provenance.</h2>
+            <p className="mt-1 max-w-2xl text-[11px] leading-relaxed text-slate-500">Live public feed, dated official snapshot, external weather or model estimate: the product keeps the boundary visible instead of presenting everything as telemetry.</p>
           </div>
-          <Activity size={18} className="text-slate-500" />
-        </div>
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={occupancyData} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-              <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis dataKey="name" type="category" width={160} tick={{ fontSize: 11, fill: '#334155' }} />
-              <Tooltip formatter={(value: any) => [`%${value}`, 'Tahmini kullanım']} />
-              <Bar dataKey="occupancy" fill="#0f172a" radius={[0, 6, 6, 0]} barSize={14} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-slate-200 rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-4"><CalendarDays size={17} /><h2 className="font-bold text-slate-900">Akademik Takvim Akışı</h2></div>
-          <div className="space-y-2">
-            {(data.academic_calendar?.length ? data.academic_calendar : [calendarSource?.ok ? 'Resmî takvim erişilebilir; yapılandırılmış başlık ayrıştırılamadı.' : 'Akademik takvim kaynağı şu anda erişilemiyor.']).slice(0, 5).map((item, i) => (
-              <div key={`${item}-${i}`} className="text-xs text-slate-600 border-l-2 border-slate-200 pl-3 py-1">{item}</div>
-            ))}
-          </div>
+          <Link href="/api/v1/health" target="_blank" className="bc-focus-ring inline-flex items-center gap-1.5 self-start rounded-full bg-[#0b1226] px-3 py-2 text-[10px] font-black text-white shadow-sm lg:self-auto">
+            Open health endpoint <ArrowUpRight size={11} />
+          </Link>
         </div>
 
-        <div id="sources" className="bg-white border border-slate-200 rounded-2xl p-5 scroll-mt-24">
-          <div className="flex items-center gap-2 mb-4"><Database size={17} /><h2 className="font-bold text-slate-900">Kaynak & Provenance</h2></div>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {(data.sources ?? []).map(source => (
-              <a key={source.id} href={source.url} target={source.url.startsWith('http') ? '_blank' : undefined} rel={source.url.startsWith('http') ? 'noreferrer' : undefined} className="flex items-start justify-between gap-4 p-3 rounded-xl border border-slate-100 hover:border-slate-300 transition">
-                <div>
-                  <div className="text-xs font-bold text-slate-800">{source.label}</div>
-                  <div className="text-[11px] text-slate-500 mt-1">{source.detail}</div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-[9px] font-black font-mono px-2 py-1 rounded ${source.ok ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-800'}`}>
-                    {source.ok ? (provenanceLabel[source.provenance] ?? source.provenance) : 'ERİŞİLEMİYOR'}
-                  </span>
-                  {source.url.startsWith('http') && <ExternalLink size={12} className="text-slate-400" />}
-                </div>
-              </a>
-            ))}
-          </div>
+        <div className="mt-6 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+          {(data.sources ?? []).map(source => (
+            <a
+              key={source.id}
+              href={source.url}
+              target={source.url.startsWith('http') ? '_blank' : undefined}
+              rel={source.url.startsWith('http') ? 'noreferrer' : undefined}
+              className="group rounded-[18px] border border-slate-950/8 bg-white/75 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <SourcePill source={source} />
+                {source.url.startsWith('http') && <ExternalLink size={12} className="mt-1 text-slate-300 transition group-hover:text-slate-600" />}
+              </div>
+              <h3 className="mt-4 text-[12px] font-black leading-snug tracking-[-0.01em] text-[#0a1020]">{source.label}</h3>
+              <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-slate-500">{source.detail}</p>
+            </a>
+          ))}
         </div>
       </section>
     </div>
