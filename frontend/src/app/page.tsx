@@ -21,6 +21,7 @@ import ActionCards from '@/components/Dashboard/ActionCards';
 import Timeline from '@/components/Dashboard/Timeline';
 import { getDashboard } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
+import type { SourceMeta } from '@/lib/live-sources';
 
 const CampusMap = dynamic(() => import('@/components/Dashboard/CampusMap'), { ssr: false });
 
@@ -34,6 +35,22 @@ const provenanceLabel: Record<string, string> = {
 
 function fmt(value: number | null | undefined, suffix = '') {
   return value == null ? '—' : `${value}${suffix}`;
+}
+
+function SourceBadge({ source }: { source?: SourceMeta }) {
+  const provenance = source?.ok ? source.provenance : 'FALLBACK';
+  const label = provenanceLabel[provenance] ?? provenance;
+  const tone = provenance === 'OFFICIAL_LIVE'
+    ? 'text-emerald-700'
+    : provenance === 'EXTERNAL_LIVE'
+      ? 'text-sky-700'
+      : provenance === 'OFFICIAL_SNAPSHOT'
+        ? 'text-violet-700'
+        : provenance === 'MODEL_ESTIMATE'
+          ? 'text-violet-700'
+          : 'text-amber-700';
+
+  return <span className={`inline-block mt-3 text-[10px] font-bold font-mono ${tone}`}>{label}</span>;
 }
 
 export default function DashboardPage() {
@@ -54,14 +71,13 @@ export default function DashboardPage() {
   }
 
   const occupancyData = data.buildings
-    .map(b => ({
-      name: b.name,
-      occupancy: Math.round((b.occupancy_ratio ?? 0) * 100),
-    }))
+    .map(b => ({ name: b.name, occupancy: Math.round((b.occupancy_ratio ?? 0) * 100) }))
     .sort((a, b) => b.occupancy - a.occupancy)
     .slice(0, 10);
 
   const degraded = data.data_quality?.mode === 'DEGRADED';
+  const scheduleSource = data.sources?.find(source => source.id === 'boun-course-schedule');
+  const calendarSource = data.sources?.find(source => source.id === 'boun-academic-calendar');
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -93,38 +109,32 @@ export default function DashboardPage() {
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
         <div className="bg-white border border-slate-200 rounded-2xl p-4">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><CloudSun size={15} /> Bebek hava</div>
-          <div className="mt-3 text-xl font-black text-slate-900 font-mono">
-            {fmt(data.live_weather?.temperature, '°C')}
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Nem {fmt(data.live_weather?.humidity, '%')} · Rüzgâr {fmt(data.live_weather?.wind_speed, ' km/h')}
-          </p>
-          <span className="inline-block mt-3 text-[10px] font-bold font-mono text-sky-700">HARİCÎ CANLI</span>
+          <div className="mt-3 text-xl font-black text-slate-900 font-mono">{fmt(data.live_weather?.temperature, '°C')}</div>
+          <p className="text-xs text-slate-500 mt-1">Nem {fmt(data.live_weather?.humidity, '%')} · Rüzgâr {fmt(data.live_weather?.wind_speed, ' km/h')}</p>
+          <SourceBadge source={data.live_weather?.provenance} />
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><Utensils size={15} /> SKS menü</div>
           <div className="mt-3 text-sm font-black text-slate-900 line-clamp-2">
-            {data.live_menu?.main_dish ?? 'Resmî sayfa erişildi; menü alanı ayrıştırılamadı'}
+            {data.live_menu?.main_dish ?? 'Menü alanı şu anda ayrıştırılamadı'}
           </div>
           <p className="text-xs text-slate-500 mt-1">{data.live_menu?.soup ?? 'Çorba alanı yok'} {data.live_menu?.calories ? `· ${data.live_menu.calories} kcal` : ''}</p>
-          <span className="inline-block mt-3 text-[10px] font-bold font-mono text-emerald-700">RESMÎ CANLI</span>
+          <SourceBadge source={data.live_menu?.provenance} />
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><BusFront size={15} /> Mekik</div>
-          <div className="mt-3 text-xl font-black text-slate-900 font-mono">
-            {data.live_shuttle?.next_departure ?? '—'}
-          </div>
+          <div className="mt-3 text-xl font-black text-slate-900 font-mono">{data.live_shuttle?.next_departure ?? '—'}</div>
           <p className="text-xs text-slate-500 mt-1">{data.live_shuttle?.route ?? 'Güney → Kuzey'}</p>
-          <span className="inline-block mt-3 text-[10px] font-bold font-mono text-emerald-700">RESMÎ CANLI</span>
+          <SourceBadge source={data.live_shuttle?.provenance} />
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase"><Database size={15} /> Ders programı</div>
           <div className="mt-3 text-xl font-black text-slate-900 font-mono">{(data.real_courses_loaded ?? 0).toLocaleString('tr-TR')}</div>
           <p className="text-xs text-slate-500 mt-1">BUIS/ÖBİKAS public schedule snapshot</p>
-          <span className="inline-block mt-3 text-[10px] font-bold font-mono text-violet-700">RESMÎ SNAPSHOT</span>
+          <SourceBadge source={scheduleSource} />
         </div>
       </section>
 
@@ -184,26 +194,26 @@ export default function DashboardPage() {
         <div className="bg-white border border-slate-200 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4"><CalendarDays size={17} /><h2 className="font-bold text-slate-900">Akademik Takvim Akışı</h2></div>
           <div className="space-y-2">
-            {(data.academic_calendar?.length ? data.academic_calendar : ['Resmî takvim erişilebilir; yapılandırılmış başlık ayrıştırılamadı.']).slice(0, 5).map((item, i) => (
+            {(data.academic_calendar?.length ? data.academic_calendar : [calendarSource?.ok ? 'Resmî takvim erişilebilir; yapılandırılmış başlık ayrıştırılamadı.' : 'Akademik takvim kaynağı şu anda erişilemiyor.']).slice(0, 5).map((item, i) => (
               <div key={`${item}-${i}`} className="text-xs text-slate-600 border-l-2 border-slate-200 pl-3 py-1">{item}</div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-5">
+        <div id="sources" className="bg-white border border-slate-200 rounded-2xl p-5 scroll-mt-24">
           <div className="flex items-center gap-2 mb-4"><Database size={17} /><h2 className="font-bold text-slate-900">Kaynak & Provenance</h2></div>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {(data.sources ?? []).map(source => (
-              <a key={source.id} href={source.url} target="_blank" rel="noreferrer" className="flex items-start justify-between gap-4 p-3 rounded-xl border border-slate-100 hover:border-slate-300 transition">
+              <a key={source.id} href={source.url} target={source.url.startsWith('http') ? '_blank' : undefined} rel={source.url.startsWith('http') ? 'noreferrer' : undefined} className="flex items-start justify-between gap-4 p-3 rounded-xl border border-slate-100 hover:border-slate-300 transition">
                 <div>
                   <div className="text-xs font-bold text-slate-800">{source.label}</div>
                   <div className="text-[11px] text-slate-500 mt-1">{source.detail}</div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className={`text-[9px] font-black font-mono px-2 py-1 rounded ${source.ok ? 'bg-slate-100 text-slate-700' : 'bg-amber-100 text-amber-800'}`}>
-                    {provenanceLabel[source.provenance] ?? source.provenance}
+                    {source.ok ? (provenanceLabel[source.provenance] ?? source.provenance) : 'ERİŞİLEMİYOR'}
                   </span>
-                  <ExternalLink size={12} className="text-slate-400" />
+                  {source.url.startsWith('http') && <ExternalLink size={12} className="text-slate-400" />}
                 </div>
               </a>
             ))}
