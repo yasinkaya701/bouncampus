@@ -223,7 +223,7 @@ export async function GET(request: Request) {
     },
     live_menu: {
       source: menu.source.label,
-      date: dateVal,
+      date: menu.date ?? dateVal,
       soup: menu.soup,
       main_dish: menu.main_dish,
       calories: menu.calories,
