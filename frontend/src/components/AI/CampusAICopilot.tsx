@@ -1,276 +1,197 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Bot, Send, X, CheckCircle2, Zap, ArrowRight, CornerDownLeft, RefreshCw, Radio } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Bot, Database, RefreshCw, Send, Sparkles, X } from 'lucide-react';
+import { getDashboard } from '@/lib/api';
+import type { DashboardData } from '@/lib/types';
 
 interface Message {
   id: string;
   sender: 'user' | 'bot';
   text: string;
   timestamp: string;
-  actionPayload?: {
-    type: string;
-    savingsTl: number;
-    kwhSaved: number;
-    protocol: string;
-    bmsStatus: string;
-  };
 }
 
 const QUICK_PROMPTS = [
-  '⚡ Pik saat enerji yükünü tıraşla (Peak-Shaving)',
-  '🍱 Yemekhane 12:30 kuyruk ve porsiyon uyarısı',
-  '📚 Kütüphane boş masa ve çalışma alanı durumu',
-  '🚌 Kuzey-Güney ring otobüs yoğunluk tahmini'
+  'Enerji için bugün hangi aksiyon daha güçlü?',
+  'Yemekhane talebi neye dayanıyor?',
+  'Kampüs doluluğu gerçekten canlı mı?',
+  'Mekik verisinde ne biliyoruz?',
 ];
+
+function clock() {
+  return new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmt(value: number | null | undefined, suffix = '') {
+  return value == null ? 'erişilemiyor' : `${value.toLocaleString('tr-TR')}${suffix}`;
+}
 
 export default function CampusAICopilot() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [dispatchedId, setDispatchedId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'm-init',
       sender: 'bot',
-      text: 'Merhaba! Ben BOUNCAMPUS Yapay Zekâ Enerji & Operasyon Asistanı. 3.238 gerçek OBIKAS dersi, canlı hava durumu ve Kilyos rüzgar türbini verisiyle kampüsü optimize etmeye hazırım. Neyi hesaplayalım?',
-      timestamp: '12:00'
-    }
+      text: 'BOUNCAMPUS karar destek asistanıyım. Resmî/public kaynakları model tahminlerinden ayırırım; bağlı olmayan BMS, POS, sensör veya GPS verisini varmış gibi göstermem.',
+      timestamp: clock(),
+    },
   ]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen) scrollToBottom();
+    if (!isOpen || dashboard) return;
+    getDashboard().then(setDashboard).catch(() => setDashboard(null));
+  }, [isOpen, dashboard]);
+
+  useEffect(() => {
+    if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isOpen]);
 
-  const handleSend = (textToSend?: string) => {
-    const query = textToSend || inputQuery;
-    if (!query.trim()) return;
+  function answer(query: string): string {
+    const lower = query.toLocaleLowerCase('tr-TR');
+    const data = dashboard;
 
-    const userMsg: Message = {
-      id: `u-${Date.now()}`,
-      sender: 'user',
-      text: query,
-      timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-    };
+    if (!data || data.data_quality?.mode === 'DEGRADED') {
+      return 'Canlı dashboard kaynağı şu anda kısmi veya erişilemiyor. Eski demo değerlerini canlı veri gibi kullanmayacağım. `/api/v1/health` üzerinden kaynak durumunu kontrol edebilirsin.';
+    }
 
-    setMessages(prev => [...prev, userMsg]);
-    if (!textToSend) setInputQuery('');
+    if (lower.includes('enerji') || lower.includes('tasarruf') || lower.includes('hvac')) {
+      const best = data.actions.find(action => action.type === 'energy');
+      return [
+        `Bugünkü enerji yükü ${fmt(data.predicted_energy_mwh, ' MWh')} olarak **model tahmini**.` ,
+        best ? `En yüksek öncelikli öneri: ${best.title}. Hesaplanan etki: ${fmt(best.impact_value)} ${best.impact_unit}.` : 'Şu anda enerji aksiyonu üretilemedi.',
+        'Bu değer BMS/sayaç telemetrisi değildir; ders programı snapshot’ı, bina profili ve dış hava girdisinden hesaplanır. Sahaya komut göndermiyorum.',
+      ].join('\n\n');
+    }
+
+    if (lower.includes('yemek') || lower.includes('porsiyon') || lower.includes('menü')) {
+      return [
+        `Resmî SKS sayfasından ayrıştırılan ana yemek: ${data.live_menu?.main_dish ?? 'alan ayrıştırılamadı'}.`,
+        `Öğle talebi ${fmt(data.food_demand_meals, ' porsiyon')} ve bu sayı **model tahmini**; POS satışı değildir. Model ders çıkış akışı ile hava koşulunu kullanır.`,
+        'Hackathon pilotunda en değerli sonraki entegrasyon, anonim 15 dakikalık SKS POS toplamlarıyla bu modeli kalibre etmektir.',
+      ].join('\n\n');
+    }
+
+    if (lower.includes('dolu') || lower.includes('occupancy') || lower.includes('kütüphane') || lower.includes('masa')) {
+      const pct = Math.round(data.campus_occupancy * 100);
+      return [
+        `Gösterilen kampüs kullanım oranı yaklaşık %${pct} ve **canlı sensör ölçümü değildir**.`,
+        `Kaynak: ${(data.real_courses_loaded ?? 0).toLocaleString('tr-TR')} derslik BUIS/ÖBİKAS public schedule snapshot’ı + oda kapasitesi varsayımları.`,
+        'Gerçek zamanlı doluluk için üniversite izniyle anonim Wi‑Fi/AP, turnike veya oda sensörü agregaları gerekir.',
+      ].join('\n\n');
+    }
+
+    if (lower.includes('mekik') || lower.includes('ring') || lower.includes('otobüs') || lower.includes('servis')) {
+      return [
+        `Mekik Bilgi Sistemi’nden ayrıştırılan bir sonraki Güney → Kuzey hareketi: ${data.live_shuttle?.next_departure ?? 'şu anda ayrıştırılamadı'}.`,
+        'Bu **resmî tarife verisidir**, araç GPS konumu veya anlık yolcu sayısı değildir.',
+        'Yoğunluk/frekans optimizasyonu ancak talep verisiyle model tahmini olarak yapılabilir; uygulama otomatik olarak filoya komut göndermez.',
+      ].join('\n\n');
+    }
+
+    if (lower.includes('kaynak') || lower.includes('canlı') || lower.includes('gerçek')) {
+      const official = data.data_quality?.official_live_sources ?? 0;
+      const external = data.data_quality?.external_live_sources ?? 0;
+      return [
+        `Şu anda ${official} resmî canlı Boğaziçi kaynağı ve ${external} haricî canlı kaynak sağlıklı görünüyor.`,
+        'Resmî canlı: SKS menü, Mekik, Akademik Takvim. Resmî snapshot: BUIS/ÖBİKAS ders programı. Haricî canlı: Open‑Meteo.',
+        'Doluluk, enerji, yemek talebi, tasarruf ve CO₂ ise açıkça MODEL TAHMİNİ olarak etiketlenir.',
+      ].join('\n\n');
+    }
+
+    return [
+      'Bu soruyu mevcut veri sözleşmesine göre yanıtlayabilirim.',
+      `Aktif resmî canlı kaynak sayısı: ${data.data_quality?.official_live_sources ?? 0}. Ders snapshot’ında ${(data.real_courses_loaded ?? 0).toLocaleString('tr-TR')} kayıt var.`,
+      'Bir sonucu “canlı sensör verisi” olarak adlandırmadan önce provenance panelindeki kaynağı kontrol ederim.',
+    ].join('\n\n');
+  }
+
+  function handleSend(textToSend?: string) {
+    const query = (textToSend ?? inputQuery).trim();
+    if (!query) return;
+
+    setMessages(prev => [...prev, { id: `u-${Date.now()}`, sender: 'user', text: query, timestamp: clock() }]);
+    setInputQuery('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      let botResponse: Message;
-      const lower = query.toLowerCase();
-
-      if (lower.includes('enerji') || lower.includes('pik') || lower.includes('peak') || lower.includes('klima') || lower.includes('hvac')) {
-        botResponse = {
-          id: `b-${Date.now()}`,
-          sender: 'bot',
-          text: `🔍 **Fiziksel Termodinamik Analiz Tamamlandı:**\n\n• Saat 12:00-14:00 arasında New Hall ve Perkins Hall amfilerinde 1.200+ öğrenci bulunacak.\n• Open-Meteo anlık Bebek sıcaklığı 21.5°C olduğundan, üst katlardaki (Kat 3 ve 4) HVAC setpoint değerini +1.5°C artırarak şebeke pik cezası önlenebilir.\n\nÖnerilen aksiyon onaylanırsa kampüs otomasyon sistemine (BMS) BACnet protokolüyle anında iletilecektir.`,
-          timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-          actionPayload: {
-            type: 'HVAC Night & Peak Setpoint Dispatch',
-            savingsTl: 14200,
-            kwhSaved: 5120,
-            protocol: 'BACnet/IP over UDP (Port 47808)',
-            bmsStatus: 'Ready for Field Push'
-          }
-        };
-      } else if (lower.includes('yemek') || lower.includes('porsiyon') || lower.includes('kuyruk') || lower.includes('kantin')) {
-        botResponse = {
-          id: `b-${Date.now()}`,
-          sender: 'bot',
-          text: `🍽️ **SKS Canlı Yemekhane Akış Raporu:**\n\n• Bugün resmi menü: **Etli Nohut Yemeği (317 kcal) & Melek Pilavı**.\n• Saat 12:15'te New Hall ve Kare Blok'taki derslerin bitişiyle Kuzey Yemekhanesi'nde 633 öğrenci eş zamanlı kuyruğa girecek.\n• **Bekleme Süresi Tahmini:** Kuzey Yemekhanesi: ~16 dakika • Güney Yemekhanesi: ~5 dakika • Orta Kantin: ~7 dakika.\n• **AI Mutfak Önerisi:** Akşam israfını önlemek için 4.200 yerine 3.584 porsiyon hazırlanmalı. 616 porsiyon kurtarılacaktır.`,
-          timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-        };
-      } else if (lower.includes('kütüphane') || lower.includes('masa') || lower.includes('yer') || lower.includes('etüt')) {
-        botResponse = {
-          id: `b-${Date.now()}`,
-          sender: 'bot',
-          text: `📚 **Aptullah Kuran Kütüphanesi Canlı Doluluk Radarı:**\n\n• Toplam 512 çalışma koltuğundan şu anda **382'si aktif (%74 doluluk)**.\n• **Zemin Kat (Grup Çalışma):** %89 Dolu (Yalnızca 8 masa boş)\n• **1. Kat (Süreli Yayınlar):** %62 Dolu (31 masa boş)\n• **2. Kat (Bireysel Sessiz Salon):** %54 Dolu (46 masa boş - **Önerilen Alan**)\n\nAkşam 18:00 sonrası sınav haftası etkisiyle doluluğun %90 üzerine çıkması bekleniyor.`,
-          timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-        };
-      } else if (lower.includes('ring') || lower.includes('otobüs') || lower.includes('servis') || lower.includes('hisarüstü') || lower.includes('bebek')) {
-        botResponse = {
-          id: `b-${Date.now()}`,
-          sender: 'bot',
-          text: `🚌 **Kampüs İçi Ring Servis & Hareketlilik Modeli:**\n\n• Hisarüstü Kuzey Kampüs kapısı ile Bebek Güney Kampüs kapısı arasındaki öğrenci göçü 12:45'te tepe noktaya ulaşacaktır.\n• Tahmini bekleyen öğrenci: ~95 kişi.\n• **Optimizasyon Kararı:** Mevcut 15 dakikalık sefer sıklığı 12:30 - 13:45 arasında **7 dakikaya indirilmelidir** (Ekstra 2 adet elektrikli servis devreye alınmalı). Bekleme süresi 18 dakikadan 6 dakikaya düşer.`,
-          timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-          actionPayload: {
-            type: 'Shuttle Frequency Modulation',
-            savingsTl: 3200,
-            kwhSaved: 480,
-            protocol: 'Fleet MQTT Telemetry v2',
-            bmsStatus: 'Route Schedule Ready'
-          }
-        };
-      } else {
-        botResponse = {
-          id: `b-${Date.now()}`,
-          sender: 'bot',
-          text: `🤖 **Analiz Sonucu:** "${query}" için Boğaziçi OBIKAS veritabanında 3.238 derslik kaydı ve 21 binanın enerji profili tarandı.\n\nSistem şu anda tam optimize durumda çalışıyor: Kilyos Rüzgar Türbini 420 kW temiz güç üretiyor ve kampüs şebeke ofsetini %28.4 seviyesinde tutuyor. Binaların kapatılan üst katları sayesinde bugün 3.420 kWh enerji tasarrufu öngörülmektedir.`,
-          timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-        };
-      }
-
-      setMessages(prev => [...prev, botResponse]);
+    window.setTimeout(() => {
+      setMessages(prev => [...prev, { id: `b-${Date.now()}`, sender: 'bot', text: answer(query), timestamp: clock() }]);
       setIsTyping(false);
-    }, 600);
-  };
-
-  const handleDispatchAction = (actionId: string) => {
-    setDispatchedId(actionId);
-    setTimeout(() => {
-      setDispatchedId(null);
-    }, 4000);
-  };
+    }, 250);
+  }
 
   return (
     <>
-      {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white p-3.5 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group border-2 border-white/20"
-        title="Campus AI Copilot'u Aç"
+        className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-full shadow-2xl hover:bg-slate-800 active:scale-95 transition flex items-center gap-2 border border-slate-700"
+        title="BOUNCAMPUS karar destek asistanını aç"
       >
-        <span className="relative flex h-3.5 w-3.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-200 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-white"></span>
-        </span>
-        <Sparkles size={20} className="animate-pulse" />
-        <span className="font-bold text-xs tracking-wide pr-1 hidden sm:inline">AI Copilot</span>
+        <Sparkles size={18} className="text-emerald-400" />
+        <span className="font-bold text-xs hidden sm:inline">Model Copilot</span>
       </button>
 
-      {/* Slide-out Drawer / Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[92vw] sm:w-[420px] h-[580px] max-h-[82vh] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-300">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white px-4 py-3.5 flex items-center justify-between shadow-md">
-            <div className="flex items-center space-x-2.5">
-              <div className="bg-white/15 p-2 rounded-xl backdrop-blur-xs">
-                <Bot size={20} className="text-emerald-300" />
-              </div>
+        <div className="fixed bottom-24 right-6 z-50 w-[92vw] sm:w-[420px] h-[580px] max-h-[82vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+          <div className="bg-slate-900 text-white px-4 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="bg-slate-800 p-2 rounded-xl border border-slate-700"><Bot size={19} className="text-emerald-400" /></div>
               <div>
-                <h3 className="font-bold text-sm flex items-center gap-1.5">
-                  BOUNCAMPUS AI Copilot
-                  <span className="text-[10px] bg-emerald-500/30 text-emerald-200 px-2 py-0.5 rounded-full font-mono border border-emerald-400/30">
-                    Live
-                  </span>
-                </h3>
-                <p className="text-[11px] text-emerald-100/80">3.238 OBIKAS Dersi • Kilyos RES • BACnet BMS</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-sm">BOUNCAMPUS Model Copilot</h3>
+                  <span className="text-[9px] bg-violet-950 text-violet-300 px-2 py-0.5 rounded font-mono border border-violet-800">KARAR DESTEK</span>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-0.5">Kaynak doğrulamalı · sahaya komut göndermez</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-white/70 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition"
-            >
-              <X size={18} />
-            </button>
+            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white p-1.5"><X size={18} /></button>
           </div>
 
-          {/* Messages Area */}
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-200 flex items-center gap-2 text-[10px] text-slate-600 font-mono">
+            <Database size={12} />
+            <span>{dashboard?.data_quality?.mode === 'LIVE_WITH_MODELS' ? 'Canlı kaynaklar + açık model tahminleri' : 'Kaynak durumu kontrol ediliyor / degraded'}</span>
+          </div>
+
           <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50">
             {messages.map(msg => (
-              <div
-                key={msg.id}
-                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
-              >
-                <div
-                  className={`max-w-[86%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed shadow-2xs ${
-                    msg.sender === 'user'
-                      ? 'bg-emerald-700 text-white rounded-br-xs'
-                      : 'bg-white border border-gray-200 text-gray-800 rounded-bl-xs'
-                  }`}
-                >
-                  <div className="whitespace-pre-line">{msg.text}</div>
-
-                  {/* Dispatchable Action Card */}
-                  {msg.actionPayload && (
-                    <div className="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-gray-800">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-bold text-emerald-900 text-[11px] flex items-center gap-1">
-                          <Zap size={13} className="text-emerald-700" />
-                          {msg.actionPayload.type}
-                        </span>
-                        <span className="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-mono font-bold">
-                          +{msg.actionPayload.kwhSaved} kWh
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-gray-600 font-mono mb-2">
-                        {msg.actionPayload.protocol}
-                      </div>
-                      <button
-                        onClick={() => handleDispatchAction(msg.id)}
-                        disabled={dispatchedId === msg.id}
-                        className={`w-full py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                          dispatchedId === msg.id
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs'
-                        }`}
-                      >
-                        {dispatchedId === msg.id ? (
-                          <>
-                            <CheckCircle2 size={14} />
-                            <span>BACnet Paketi İletildi (200 OK)</span>
-                          </>
-                        ) : (
-                          <>
-                            <Radio size={14} className="animate-pulse" />
-                            <span>Aksiyonu Sahaya İlet (BMS Dispatch)</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
+              <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                <div className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line ${msg.sender === 'user' ? 'bg-slate-900 text-white rounded-br-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm'}`}>
+                  {msg.text}
                 </div>
-                <span className="text-[10px] text-gray-400 mt-1 px-1">{msg.timestamp}</span>
+                <span className="text-[9px] text-slate-400 mt-1 px-1">{msg.timestamp}</span>
               </div>
             ))}
-
             {isTyping && (
-              <div className="flex items-center space-x-2 text-gray-400 text-xs pl-2">
+              <div className="flex items-center gap-2 text-slate-400 text-xs pl-2">
                 <RefreshCw size={12} className="animate-spin text-emerald-600" />
-                <span>BOUN model verisi taranıyor...</span>
+                <span>Kaynak ve model ayrımı kontrol ediliyor...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Prompt Chips */}
-          <div className="px-3 py-2 bg-white border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {QUICK_PROMPTS.map((prompt, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleSend(prompt)}
-                className="whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-medium bg-gray-100 hover:bg-emerald-50 hover:text-emerald-800 text-gray-700 transition border border-gray-200"
-              >
+          <div className="px-3 py-2 bg-white border-t border-slate-100 flex gap-1.5 overflow-x-auto">
+            {QUICK_PROMPTS.map(prompt => (
+              <button key={prompt} onClick={() => handleSend(prompt)} className="whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-medium bg-slate-100 hover:bg-emerald-50 text-slate-700 border border-slate-200">
                 {prompt}
               </button>
             ))}
           </div>
 
-          {/* Input Footer */}
-          <div className="p-3 bg-white border-t border-gray-200 flex items-center space-x-2">
+          <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
             <input
               type="text"
               value={inputQuery}
-              onChange={e => setInputQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="Kampüs hakkında soru sor veya aksiyon emri ver..."
-              className="flex-1 text-xs border border-gray-300 rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:border-transparent"
+              onChange={event => setInputQuery(event.target.value)}
+              onKeyDown={event => event.key === 'Enter' && handleSend()}
+              placeholder="Veri, enerji, yemekhane, doluluk veya mekik sor..."
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-slate-400"
             />
-            <button
-              onClick={() => handleSend()}
-              disabled={!inputQuery.trim()}
-              className="bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white p-2.5 rounded-xl transition shadow-xs"
-            >
-              <Send size={16} />
-            </button>
+            <button onClick={() => handleSend()} className="bg-slate-900 hover:bg-slate-800 text-white p-2.5 rounded-xl"><Send size={15} /></button>
           </div>
         </div>
       )}
