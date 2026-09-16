@@ -43,6 +43,14 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
 ::selection {
   background: rgba(47, 92, 255, 0.18);
   color: var(--ink);
@@ -67,6 +75,10 @@ body {
 
   .bc-focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f5f2];
+  }
+
+  .bc-skip-link {
+    @apply fixed left-4 top-3 z-[100] -translate-y-20 rounded-xl bg-[#0b1226] px-4 py-2 text-xs font-black text-white shadow-xl transition-transform focus:translate-y-0;
   }
 }
 
@@ -103,4 +115,19 @@ body {
 .leaflet-control-zoom a,
 .leaflet-control-attribution {
   border-color: rgba(10, 16, 32, 0.10) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
