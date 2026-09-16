@@ -1,4 +1,5 @@
 import courseSnapshotMeta from '@/data/course_snapshot_meta.json';
+import publicSourceSnapshot from '@/data/public_source_snapshot.json';
 
 export type DataProvenance =
   | 'OFFICIAL_LIVE'
@@ -26,6 +27,7 @@ export interface WeatherFeed {
 }
 
 export interface MenuFeed {
+  date: string | null;
   soup: string | null;
   main_dish: string | null;
   vegan_dish: string | null;
@@ -66,6 +68,18 @@ function source(
   return { id, label, url, provenance, fetched_at: nowIso(), ok, detail };
 }
 
+function staleSnapshotSource(id: string, label: string, url: string, reason: string): SourceMeta {
+  return {
+    id,
+    label,
+    url,
+    provenance: 'OFFICIAL_SNAPSHOT',
+    fetched_at: publicSourceSnapshot.captured_at,
+    ok: false,
+    detail: `Canlı upstream şu anda doğrulanamadı (${reason}). Ürün devamlılığı için ${publicSourceSnapshot.captured_at} tarihli son doğrulanmış resmî public snapshot gösteriliyor; bu veri canlı kabul edilmemelidir.`,
+  };
+}
+
 async function fetchWithTimeout(url: string, revalidateSeconds: number): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5500);
@@ -97,6 +111,12 @@ function fieldValue(html: string, fieldName: string): string | null {
   const re = new RegExp(`${fieldName}[\\s\\S]{0,500}?<a[^>]*>([^<]+)<\\/a>`, 'i');
   const match = html.match(re);
   return match ? cleanHtml(match[1]) : null;
+}
+
+function istanbulDate(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date());
 }
 
 export async function fetchBounWeather(): Promise<WeatherFeed> {
@@ -139,6 +159,17 @@ export async function fetchBounWeather(): Promise<WeatherFeed> {
   }
 }
 
+function menuSnapshot(reason: string): MenuFeed {
+  return {
+    date: publicSourceSnapshot.menu.date,
+    soup: publicSourceSnapshot.menu.soup,
+    main_dish: publicSourceSnapshot.menu.main_dish,
+    vegan_dish: publicSourceSnapshot.menu.vegan_dish,
+    calories: publicSourceSnapshot.menu.calories,
+    source: staleSnapshotSource('boun-sks-menu', 'Boğaziçi Üniversitesi SKS Yemekhane', BOUN_MENU_URL, reason),
+  };
+}
+
 export async function fetchBounMenu(): Promise<MenuFeed> {
   try {
     const res = await fetchWithTimeout(BOUN_MENU_URL, 900);
@@ -152,7 +183,10 @@ export async function fetchBounMenu(): Promise<MenuFeed> {
     const calories = calorieMatch ? Number(calorieMatch[1]) : null;
     const parsed = Boolean(soup || main || vegan || calories);
 
+    if (!parsed) return menuSnapshot('menü alanları ayrıştırılamadı');
+
     return {
+      date: istanbulDate(),
       soup,
       main_dish: main,
       vegan_dish: vegan,
@@ -162,26 +196,36 @@ export async function fetchBounMenu(): Promise<MenuFeed> {
         'Boğaziçi Üniversitesi SKS Yemekhane',
         BOUN_MENU_URL,
         'OFFICIAL_LIVE',
-        parsed,
-        parsed
-          ? 'Resmî SKS sayfasından sunucu tarafında çekildi ve yapılandırılmış menü alanı ayrıştırıldı.'
-          : 'Resmî sayfa erişilebilir ancak menü alanları ayrıştırılamadı; sahte menü değeri üretilmedi.',
+        true,
+        'Resmî SKS sayfasından sunucu tarafında çekildi ve yapılandırılmış menü alanı ayrıştırıldı.',
       ),
     };
   } catch (error) {
-    return {
-      soup: null,
-      main_dish: null,
-      vegan_dish: null,
-      calories: null,
-      source: source('boun-sks-menu', 'Boğaziçi Üniversitesi SKS Yemekhane', BOUN_MENU_URL, 'FALLBACK', false, String(error)),
-    };
+    return menuSnapshot(String(error));
   }
 }
 
 function minutesFromMidnight(value: string): number {
   const [h, m] = value.split(':').map(Number);
   return h * 60 + m;
+}
+
+function nextDepartureFrom(times: string[]): string | null {
+  const istanbulClock = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(new Date());
+  const nowMinutes = minutesFromMidnight(istanbulClock);
+  return times.find(t => minutesFromMidnight(t) >= nowMinutes) ?? null;
+}
+
+function shuttleSnapshot(reason: string): ShuttleFeed {
+  const times = [...publicSourceSnapshot.shuttle.departure_times];
+  return {
+    route: publicSourceSnapshot.shuttle.route,
+    departure_times: times,
+    next_departure: nextDepartureFrom(times),
+    source: staleSnapshotSource('boun-shuttle-guney-kuzey', 'Boğaziçi Üniversitesi Mekik Bilgi Sistemi', BOUN_SHUTTLE_URL, reason),
+  };
 }
 
 export async function fetchBounShuttle(): Promise<ShuttleFeed> {
@@ -193,33 +237,31 @@ export async function fetchBounShuttle(): Promise<ShuttleFeed> {
     const times = Array.from(new Set(html.match(/\b(?:[01]\d|2[0-3]):[0-5]\d(?!:)/g) ?? []))
       .sort((a, b) => minutesFromMidnight(a) - minutesFromMidnight(b));
 
-    const istanbulClock = new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', hour12: false,
-    }).format(new Date());
-    const nowMinutes = minutesFromMidnight(istanbulClock);
-    const nextDeparture = times.find(t => minutesFromMidnight(t) >= nowMinutes) ?? null;
+    if (!times.length) return shuttleSnapshot('hareket saatleri ayrıştırılamadı');
 
     return {
       route,
       departure_times: times,
-      next_departure: nextDeparture,
+      next_departure: nextDepartureFrom(times),
       source: source(
         'boun-shuttle-guney-kuzey',
         'Boğaziçi Üniversitesi Mekik Bilgi Sistemi',
         BOUN_SHUTTLE_URL,
         'OFFICIAL_LIVE',
-        times.length > 0,
-        times.length > 0 ? `${times.length} hareket saati ayrıştırıldı.` : 'Sayfa erişildi ancak hareket saatleri ayrıştırılamadı.',
+        true,
+        `${times.length} hareket saati ayrıştırıldı.`,
       ),
     };
   } catch (error) {
-    return {
-      route,
-      departure_times: [],
-      next_departure: null,
-      source: source('boun-shuttle-guney-kuzey', 'Boğaziçi Üniversitesi Mekik Bilgi Sistemi', BOUN_SHUTTLE_URL, 'FALLBACK', false, String(error)),
-    };
+    return shuttleSnapshot(String(error));
   }
+}
+
+function calendarSnapshot(reason: string): CalendarFeed {
+  return {
+    upcoming: [...publicSourceSnapshot.calendar.upcoming],
+    source: staleSnapshotSource('boun-academic-calendar', 'Boğaziçi Üniversitesi Akademik Takvim', BOUN_CALENDAR_URL, reason),
+  };
 }
 
 export async function fetchBounCalendar(): Promise<CalendarFeed> {
@@ -236,6 +278,8 @@ export async function fetchBounCalendar(): Promise<CalendarFeed> {
       .filter((text, index, array) => array.indexOf(text) === index)
       .slice(0, 6);
 
+    if (!headings.length) return calendarSnapshot('yapılandırılmış etkinlik ayrıştırması boş döndü');
+
     return {
       upcoming: headings,
       source: source(
@@ -243,15 +287,12 @@ export async function fetchBounCalendar(): Promise<CalendarFeed> {
         'Boğaziçi Üniversitesi Akademik Takvim',
         BOUN_CALENDAR_URL,
         'OFFICIAL_LIVE',
-        headings.length > 0,
-        headings.length ? `${headings.length} yaklaşan takvim olayı ayrıştırıldı.` : 'Resmî takvim erişilebilir; yapılandırılmış etkinlik ayrıştırması boş döndü.',
+        true,
+        `${headings.length} yaklaşan takvim olayı ayrıştırıldı.`,
       ),
     };
   } catch (error) {
-    return {
-      upcoming: [],
-      source: source('boun-academic-calendar', 'Boğaziçi Üniversitesi Akademik Takvim', BOUN_CALENDAR_URL, 'FALLBACK', false, String(error)),
-    };
+    return calendarSnapshot(String(error));
   }
 }
 
