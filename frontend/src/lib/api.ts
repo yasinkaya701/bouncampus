@@ -94,6 +94,17 @@ export async function getBuildings(): Promise<Building[]> {
   try {
     return await fetchJson<Building[]>('/api/v1/buildings');
   } catch {
-    return realBuildings.map(({ current_occupancy, occupancy_ratio, ...building }) => building);
+    return realBuildings.map(building => ({
+      id: building.id,
+      name: building.name,
+      code: building.code,
+      campus: building.campus,
+      coords: building.coords,
+      floors: building.floors,
+      total_capacity: building.total_capacity,
+      type: building.type,
+      energy_profile: building.energy_profile,
+      floor_capacities: building.floor_capacities,
+    }));
   }
 }
