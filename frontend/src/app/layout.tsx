@@ -10,11 +10,11 @@ const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: {
-    default: 'BOUNCAMPUS — Campus Intelligence for Boğaziçi',
+    default: 'BOUNCAMPUS — Mission Control for Boğaziçi',
     template: '%s · BOUNCAMPUS',
   },
-  description: 'Boğaziçi public data feeds, transparent forecasting models and operational sustainability decisions in one campus intelligence product.',
-  applicationName: 'BOUNCAMPUS',
+  description: 'A source-traceable decision layer that turns Boğaziçi public data into operational missions, counterfactuals, human approvals and calibration evidence.',
+  applicationName: 'BOUNCAMPUS Mission Control',
   manifest: '/manifest.webmanifest',
 };
 
@@ -39,14 +39,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <div className="max-w-xl text-xs text-slate-500">
                 <div className="mb-1.5 flex items-center gap-2 text-slate-900">
                   <span className="font-black tracking-[-0.02em]">BOUNCAMPUS</span>
-                  <span className="rounded-full border border-slate-900/10 bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-slate-500">HACKATHON BUILD</span>
+                  <span className="rounded-full border border-slate-900/10 bg-white px-2 py-0.5 font-mono text-[9px] font-bold text-slate-500">MISSION CONTROL</span>
                 </div>
-                <p className="leading-relaxed">Boğaziçi Üniversitesi public kaynakları ve açıkça etiketlenmiş karar modelleri. Üniversite BMS, POS, Wi-Fi occupancy veya geçiş sistemlerine bağlı değildir.</p>
+                <p className="leading-relaxed">Boğaziçi public kaynaklarını doğrulanabilir operasyon görevlerine çeviren insan-onaylı karar katmanı. Üniversite BMS, POS, Wi-Fi occupancy veya geçiş sistemlerine bağlı değildir.</p>
               </div>
 
               <div className="flex flex-wrap gap-x-5 gap-y-2 text-[10px] font-black text-slate-500">
+                <Link href="/demo" className="transition hover:text-slate-900">Jury Mode</Link>
                 <Link href="/decisions" className="transition hover:text-slate-900">Decisions</Link>
-                <Link href="/scenarios" className="transition hover:text-slate-900">Scenarios</Link>
+                <Link href="/scenarios" className="transition hover:text-slate-900">Simulate</Link>
                 <Link href="/data" className="transition hover:text-slate-900">Data Trust</Link>
                 <Link href="/lab" className="transition hover:text-slate-900">Prototype Lab</Link>
               </div>
