@@ -4,156 +4,162 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Building2, Compass, Navigation, Zap, Utensils, LayoutDashboard,
-  Cpu, Shuffle, FileText, Users, Bus, GraduationCap, ChevronDown,
-  Wrench, Droplets, Sun, Trophy, Network, ShieldAlert, Volume2, Server, BookOpen,
-  Search, Database, FlaskConical,
+  BookOpen,
+  Building2,
+  ChevronDown,
+  Compass,
+  Database,
+  FlaskConical,
+  LayoutDashboard,
+  Search,
+  Sparkles,
 } from 'lucide-react';
 
 const EXPERIMENTAL_PREFIXES = [
-  '/flow', '/microgrid', '/control-room', '/anomalies', '/rescheduler',
-  '/agent-simulation', '/student', '/solar', '/maintenance', '/acoustic',
-  '/iot-registry', '/integrations', '/esg-reports', '/food-waste', '/water',
-  '/transit', '/league',
+  '/flow', '/microgrid', '/control-room', '/anomalies', '/rescheduler', '/agent-simulation',
+  '/student', '/solar', '/maintenance', '/acoustic', '/iot-registry', '/integrations',
+  '/esg-reports', '/food-waste', '/water', '/transit', '/league',
 ];
+
+const primaryNav = [
+  { href: '/', label: 'Overview', icon: LayoutDashboard },
+  { href: '/buildings', label: 'Campus', icon: Building2 },
+  { href: '/courses', label: 'Courses', icon: BookOpen },
+  { href: '/scenarios', label: 'Scenarios', icon: Compass },
+];
+
+const labModules = [
+  ['Operations', [
+    ['/flow', 'Akış modeli'], ['/rescheduler', 'Amfi konsolidasyonu'], ['/agent-simulation', 'Ajan simülasyonu'], ['/student', 'Öğrenci karar destek'],
+  ]],
+  ['Energy', [
+    ['/microgrid', 'Enerji senaryosu'], ['/control-room', 'Kontrol odası'], ['/solar', 'Çatı GES'], ['/maintenance', 'Kestirimci bakım'],
+  ]],
+  ['Sensing', [
+    ['/anomalies', 'Anomali modeli'], ['/acoustic', 'Akustik harita'], ['/iot-registry', 'IoT tasarımı'], ['/integrations', 'Protokol gateway'],
+  ]],
+  ['Sustainability', [
+    ['/food-waste', 'Gıda israfı'], ['/water', 'Su yönetimi'], ['/transit', 'Mekik & mobilite'], ['/esg-reports', 'Karbon raporu'],
+  ]],
+] as const;
 
 export default function Header() {
   const pathname = usePathname();
-  const [suiteMenuOpen, setSuiteMenuOpen] = useState(false);
+  const [labOpen, setLabOpen] = useState(false);
   const isExperimentalRoute = EXPERIMENTAL_PREFIXES.some(prefix => pathname.startsWith(prefix));
 
-  const primaryNav = [
-    { href: '/', label: 'Genel Bakış', icon: LayoutDashboard },
-    { href: '/courses', label: 'Ders & Amfi', icon: BookOpen },
-    { href: '/flow', label: 'Akış Modeli', icon: Navigation },
-    { href: '/microgrid', label: 'Enerji Senaryosu', icon: Zap },
-    { href: '/control-room', label: 'Kontrol Simülasyonu', icon: Cpu },
-    { href: '/anomalies', label: 'Anomali Modeli', icon: ShieldAlert },
-    { href: '/buildings', label: 'Binalar', icon: Building2 },
-    { href: '/scenarios', label: 'Simülatör', icon: Compass },
-  ];
-
-  const suiteCategories = [
-    {
-      title: 'Akademik & Amfiler',
-      items: [
-        { href: '/courses', label: 'BUIS/ÖBİKAS Ders & Amfi Motoru', desc: 'Resmî ders programı snapshot + tahmini derslik kullanımı', icon: BookOpen },
-        { href: '/rescheduler', label: 'Amfi Konsolidatörü', desc: 'Ders programı üzerinde optimizasyon senaryosu', icon: Shuffle },
-        { href: '/agent-simulation', label: 'Ajanlı Akış Simülatörü', desc: 'Sentetik öğrenci ajanlarıyla kampüs akış senaryosu', icon: Users },
-        { href: '/student', label: 'Öğrenci Karar Destek', desc: 'Model tabanlı çalışma alanı ve yoğunluk önerileri', icon: GraduationCap },
-      ],
-    },
-    {
-      title: 'Enerji & Kontrol Senaryoları',
-      items: [
-        { href: '/control-room', label: 'Kontrol Odası Prototipi', desc: 'BMS entegrasyonuna hazır simülasyon arayüzü; canlı BMS bağlı değil', icon: Cpu },
-        { href: '/microgrid', label: 'Kilyos Rüzgâr Senaryosu', desc: 'Haricî hava verisiyle üretim ve yük senaryosu', icon: Zap },
-        { href: '/solar', label: 'Çatı GES Potansiyeli', desc: 'Güneş üretimi ve gölge senaryosu; saha ölçümü değil', icon: Sun },
-        { href: '/maintenance', label: 'Kestirimci Bakım Prototipi', desc: 'Sentetik titreşim/arıza verisiyle bakım senaryosu', icon: Wrench },
-      ],
-    },
-    {
-      title: 'İzleme & Entegrasyon Prototipleri',
-      items: [
-        { href: '/anomalies', label: 'Anomali Radarı', desc: 'Model tabanlı su/enerji anomali senaryoları', icon: ShieldAlert },
-        { href: '/acoustic', label: 'Akustik Harita', desc: 'Akustik kullanım senaryosu; canlı mikrofon ağı bağlı değil', icon: Volume2 },
-        { href: '/iot-registry', label: 'IoT Entegrasyon Tasarımı', desc: 'BACnet, Modbus ve LoRaWAN için örnek cihaz modeli', icon: Network },
-        { href: '/integrations', label: 'Protokol Gateway Tasarımı', desc: 'Gelecekteki kampüs sistem entegrasyonları için arayüz', icon: Server },
-      ],
-    },
-    {
-      title: 'Sürdürülebilirlik & Kaynaklar',
-      items: [
-        { href: '/esg-reports', label: 'Karbon Raporlama Taslağı', desc: 'ISO 14064 uyum hedefli hesaplama şablonu; sertifika/denetim değildir', icon: FileText },
-        { href: '/food-waste', label: 'Gıda İsrafı Modeli', desc: 'SKS resmî menü + ders akışından talep tahmini', icon: Utensils },
-        { href: '/water', label: 'Su & Yağmur Hasadı Senaryosu', desc: 'Su yönetimi için model tabanlı optimizasyon prototipi', icon: Droplets },
-        { href: '/transit', label: 'Mekik & Mobilite', desc: 'Resmî Mekik tarifesi + model tabanlı talep senaryosu', icon: Bus },
-        { href: '/league', label: 'Yeşil Lig', desc: 'Fakülte sürdürülebilirlik etkileşim prototipi', icon: Trophy },
-      ],
-    },
-  ];
-
   return (
-    <header className="bg-slate-900 border-b border-slate-800 text-slate-100 sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-mono text-sm font-black text-slate-100 group-hover:border-emerald-500 transition">BC</div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-base font-black tracking-tight text-white">BOUNCAMPUS</span>
-                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 border border-violet-800">HACKATHON PROTOTİPİ</span>
+    <>
+      <header className="sticky top-0 z-50 border-b border-slate-950/10 bg-[#f4f5f2]/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] w-full max-w-[1640px] items-center justify-between gap-4 px-4 sm:px-5 md:px-7 lg:px-9">
+          <div className="flex min-w-0 items-center gap-8">
+            <Link href="/" className="group flex shrink-0 items-center gap-3 bc-focus-ring rounded-xl">
+              <div className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#0b1226] text-[11px] font-black tracking-[0.08em] text-white shadow-[0_8px_24px_rgba(11,18,38,0.16)] transition-transform group-hover:-translate-y-0.5">
+                BC
               </div>
-              <span className="block text-[10px] text-slate-400 font-medium tracking-wide">Boğaziçi public data + şeffaf karar modelleri</span>
-            </div>
-          </Link>
+              <div className="hidden sm:block">
+                <div className="flex items-center gap-2">
+                  <span className="text-[15px] font-black tracking-[-0.035em] text-[#0a1020]">BOUNCAMPUS</span>
+                  <span className="rounded-full border border-blue-200 bg-blue-50 px-1.5 py-0.5 font-mono text-[8px] font-extrabold tracking-[0.08em] text-blue-700">BETA</span>
+                </div>
+                <span className="block text-[10px] font-medium tracking-[0.01em] text-slate-500">Campus intelligence for Boğaziçi</span>
+              </div>
+            </Link>
+
+            <nav className="hidden items-center gap-1 lg:flex">
+              {primaryNav.map(link => {
+                const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`bc-focus-ring flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition ${
+                      active ? 'bg-white text-[#0a1020] shadow-sm ring-1 ring-slate-950/10' : 'text-slate-500 hover:bg-white/70 hover:text-slate-900'
+                    }`}
+                  >
+                    <Icon size={13} strokeWidth={2.1} />
+                    {link.label}
+                  </Link>
+                );
+              })}
+
+              <div className="relative ml-1">
+                <button
+                  type="button"
+                  onClick={() => setLabOpen(value => !value)}
+                  className="bc-focus-ring flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-slate-500 transition hover:bg-white/70 hover:text-slate-900"
+                >
+                  <Sparkles size={13} />
+                  Lab
+                  <ChevronDown size={12} className={`transition-transform ${labOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {labOpen && (
+                  <div className="absolute left-0 top-12 w-[660px] rounded-[24px] border border-slate-950/10 bg-[#0b1226] p-5 text-white shadow-[0_24px_80px_rgba(11,18,38,0.24)]">
+                    <div className="mb-4 flex items-start justify-between gap-4 border-b border-white/10 pb-4">
+                      <div>
+                        <p className="text-sm font-black tracking-[-0.02em]">Prototype laboratory</p>
+                        <p className="mt-1 max-w-md text-[11px] leading-relaxed text-slate-400">Pilot-ready product concepts. These modules are simulations until university telemetry integrations are authorized.</p>
+                      </div>
+                      <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 font-mono text-[9px] font-bold text-amber-300">SIMULATION</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+                      {labModules.map(([title, items]) => (
+                        <div key={title}>
+                          <div className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">{title}</div>
+                          <div className="grid gap-1">
+                            {items.map(([href, label]) => (
+                              <Link key={href} href={href} onClick={() => setLabOpen(false)} className="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/7 hover:text-white">
+                                {label}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </nav>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/#sources" className="bc-focus-ring hidden items-center gap-2 rounded-xl border border-slate-950/10 bg-white/75 px-3 py-2 text-[10px] font-bold text-slate-600 shadow-sm transition hover:bg-white md:flex">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-40" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
+              </span>
+              Source-traceable
+            </Link>
+            <Link href="/courses" className="bc-focus-ring flex items-center gap-2 rounded-xl bg-[#0b1226] px-3.5 py-2 text-xs font-bold text-white shadow-[0_8px_24px_rgba(11,18,38,0.14)] transition hover:-translate-y-0.5 hover:bg-[#111a32]">
+              <Search size={13} />
+              <span className="hidden sm:inline">Search campus</span>
+            </Link>
+          </div>
         </div>
 
-        <nav className="hidden xl:flex items-center space-x-1">
+        <div className="mx-auto flex w-full max-w-[1640px] gap-1 overflow-x-auto px-4 pb-2 lg:hidden sm:px-5 md:px-7">
           {primaryNav.map(link => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
+            const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
             return (
-              <Link key={link.href} href={link.href} className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${isActive ? 'bg-slate-800 text-white border border-slate-700 shadow-xs' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'}`}>
-                <Icon size={14} className={isActive ? 'text-emerald-400' : 'text-slate-400'} />
-                <span>{link.label}</span>
+              <Link key={link.href} href={link.href} className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-bold ${active ? 'bg-[#0b1226] text-white' : 'border border-slate-950/10 bg-white/60 text-slate-600'}`}>
+                {link.label}
               </Link>
             );
           })}
-
-          <div className="relative ml-2">
-            <button onClick={() => setSuiteMenuOpen(!suiteMenuOpen)} onBlur={() => setTimeout(() => setSuiteMenuOpen(false), 250)} className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-slate-300 hover:text-white bg-slate-800/80 border border-slate-700 hover:bg-slate-800 transition">
-              <span>Tüm Modüller</span>
-              <ChevronDown size={13} className={`transition duration-200 ${suiteMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {suiteMenuOpen && (
-              <div className="absolute right-0 mt-2 w-[780px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 grid grid-cols-2 gap-6 z-50 animate-in fade-in zoom-in-95 duration-150 text-left">
-                {suiteCategories.map((category, index) => (
-                  <div key={index} className="space-y-2.5">
-                    <h4 className="text-[11px] font-bold font-mono uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-1.5">{category.title}</h4>
-                    <div className="space-y-1.5">
-                      {category.items.map(item => {
-                        const Icon = item.icon;
-                        return (
-                          <Link key={item.href} href={item.href} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/80 transition group">
-                            <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:border-emerald-500"><Icon size={13} className="text-slate-300 group-hover:text-emerald-400" /></div>
-                            <div>
-                              <span className="text-xs font-bold text-white block group-hover:text-emerald-300">{item.label}</span>
-                              <span className="text-[11px] text-slate-400 leading-tight block">{item.desc}</span>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link href="/#sources" className="hidden sm:flex items-center gap-2 bg-slate-800/90 border border-slate-700/80 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-300">
-            <Database size={12} className="text-emerald-400" />
-            <span>Kaynaklar etiketli</span>
-          </Link>
-          <Link href="/courses" className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center gap-1.5">
-            <Search size={13} />
-            <span className="hidden sm:inline">Ders Ara</span>
-          </Link>
         </div>
-      </div>
+      </header>
 
       {isExperimentalRoute && (
-        <div className="border-t border-amber-900/60 bg-amber-950/95 text-amber-100">
-          <div className="container mx-auto px-4 py-2 flex items-center gap-2 text-[11px]">
-            <FlaskConical size={13} className="shrink-0 text-amber-300" />
-            <strong className="font-black">SİMÜLASYON / PROTOTİP:</strong>
-            <span className="text-amber-200/90">Bu modüldeki cihaz, sensör, SCADA/BMS, bakım veya operasyon değerleri saha telemetrisi değildir; canlı kampüs altyapısı henüz bağlı değildir.</span>
+        <div className="border-b border-amber-300/40 bg-[#fff6e8]">
+          <div className="mx-auto flex w-full max-w-[1640px] items-start gap-2 px-4 py-2 text-[10px] leading-relaxed text-amber-950 sm:px-5 md:px-7 lg:px-9">
+            <FlaskConical size={13} className="mt-0.5 shrink-0" />
+            <strong className="shrink-0 font-black">PROTOTYPE MODE</strong>
+            <span className="text-amber-900/75">This module demonstrates a future workflow. Sensor, SCADA/BMS, POS or IoT values shown here are not connected university telemetry.</span>
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
