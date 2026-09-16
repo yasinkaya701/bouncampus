@@ -4,11 +4,14 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/shared/Header';
 import CampusAICopilot from '@/components/AI/CampusAICopilot';
+import { getSiteUrl } from '@/lib/site-url';
 import 'leaflet/dist/leaflet.css';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'BOUNCAMPUS — Mission Control for Boğaziçi',
     template: '%s · BOUNCAMPUS',
@@ -16,6 +19,25 @@ export const metadata: Metadata = {
   description: 'A source-traceable decision layer that turns Boğaziçi public data into operational missions, counterfactuals, human approvals and calibration evidence.',
   applicationName: 'BOUNCAMPUS Mission Control',
   manifest: '/manifest.webmanifest',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'tr_TR',
+    url: '/',
+    siteName: 'BOUNCAMPUS',
+    title: 'BOUNCAMPUS — Campus Mission Control',
+    description: 'The decision layer between campus data and real operations.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BOUNCAMPUS — Campus Mission Control',
+    description: 'The decision layer between campus data and real operations.',
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'BOUNCAMPUS',
+    statusBarStyle: 'black-translucent',
+  },
 };
 
 export const viewport: Viewport = {
