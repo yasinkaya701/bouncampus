@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, ClipboardCheck, Clock3, Gauge, ShieldCheck, Sparkles } from 'lucide-react';
-import ActionCards from '@/components/Dashboard/ActionCards';
+import { ArrowRight, ClipboardCheck, Clock3, Gauge, ShieldCheck } from 'lucide-react';
+import DecisionLedger from '@/components/Decision/DecisionLedger';
 import { getDashboard } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
 
@@ -43,16 +43,16 @@ export default function DecisionsPage() {
         <div className="grid gap-8 px-6 py-7 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8 lg:py-9">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="bc-chip border-blue-300/15 bg-blue-300/10 text-blue-200"><ClipboardCheck size={11} /> DECISION QUEUE</span>
+              <span className="bc-chip border-blue-300/15 bg-blue-300/10 text-blue-200"><ClipboardCheck size={11} /> DECISION LEDGER</span>
               <span className={`bc-chip ${degraded ? 'border-amber-300/20 bg-amber-300/10 text-amber-200' : 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200'}`}>
                 {degraded ? 'DEGRADED INPUTS' : 'INPUTS AVAILABLE'}
               </span>
             </div>
             <h1 className="mt-5 max-w-3xl text-3xl font-black leading-[1.02] tracking-[-0.055em] sm:text-4xl lg:text-[46px]">
-              Turn campus signals into decisions people can verify.
+              Recommendations become auditable human decisions.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-400">
-              Every recommendation is a decision-support candidate, not an automatic command. Source provenance, assumptions and expected model impact remain visible before a human acts.
+              BOUNCAMPUS does not stop at a model card. Every candidate can be reviewed, approved for a pilot or declined while preserving provenance and the human-control boundary.
             </p>
           </div>
 
@@ -75,15 +75,15 @@ export default function DecisionsPage() {
       <section className="grid gap-3 md:grid-cols-3">
         <div className="bc-surface rounded-[22px] p-5">
           <div className="flex items-center gap-2 text-xs font-black text-[#0a1020]"><ShieldCheck size={15} className="text-blue-600" /> Human approval</div>
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">No BMS, kitchen or transport command is dispatched by this product. Recommendations stop at the decision-support boundary.</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">No BMS, kitchen or transport command is dispatched. The ledger records a review state only.</p>
         </div>
         <div className="bc-surface rounded-[22px] p-5">
           <div className="flex items-center gap-2 text-xs font-black text-[#0a1020]"><Gauge size={15} className="text-violet-600" /> Model impact</div>
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Savings, demand and CO₂ values are modeled potential and must not be read as realized meter outcomes.</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Savings, demand and CO₂ remain modeled potential until a real pilot measures an outcome.</p>
         </div>
         <div className="bc-surface rounded-[22px] p-5">
           <div className="flex items-center gap-2 text-xs font-black text-[#0a1020]"><Clock3 size={15} className="text-emerald-600" /> Operating cadence</div>
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Use the queue as a daily operating brief: review inputs, challenge assumptions, approve manually, then record outcomes.</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Review the mission, stress-test it, approve a pilot, then compare real outcomes with the model.</p>
         </div>
       </section>
 
@@ -91,34 +91,31 @@ export default function DecisionsPage() {
         <div>
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <div className="bc-eyebrow">Today&apos;s candidates</div>
-              <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Operational recommendations</h2>
+              <div className="bc-eyebrow">Today&apos;s decision ledger</div>
+              <h2 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Review, approve or decline</h2>
             </div>
-            <Link href="/scenarios" className="bc-focus-ring inline-flex items-center gap-1.5 rounded-full border border-slate-950/10 bg-white px-3 py-2 text-[10px] font-black text-slate-700 shadow-sm">
-              Test a what-if <ArrowRight size={11} />
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/demo" className="bc-focus-ring inline-flex items-center gap-1.5 rounded-full bg-[#2f5cff] px-3 py-2 text-[10px] font-black text-white shadow-sm">
+                Run Jury Mode <ArrowRight size={11} />
+              </Link>
+              <Link href="/scenarios" className="bc-focus-ring inline-flex items-center gap-1.5 rounded-full border border-slate-950/10 bg-white px-3 py-2 text-[10px] font-black text-slate-700 shadow-sm">
+                Stress-test <ArrowRight size={11} />
+              </Link>
+            </div>
           </div>
-          {data.actions.length ? (
-            <ActionCards actions={data.actions} />
-          ) : (
-            <div className="bc-surface rounded-[24px] p-8 text-center">
-              <CheckCircle2 size={24} className="mx-auto text-emerald-600" />
-              <h3 className="mt-3 text-sm font-black text-[#0a1020]">No decision candidates right now</h3>
-              <p className="mt-1 text-[11px] text-slate-500">The product will not fabricate a recommendation when source inputs are unavailable or no rule is triggered.</p>
-            </div>
-          )}
+          <DecisionLedger actions={data.actions} />
         </div>
 
         <aside className="bc-surface-dark h-fit rounded-[26px] p-5 text-white">
           <div className="bc-eyebrow !text-slate-500">Decision protocol</div>
-          <h2 className="mt-2 text-lg font-black tracking-[-0.03em]">Five checks before acting</h2>
+          <h2 className="mt-2 text-lg font-black tracking-[-0.03em]">Five checks before a pilot</h2>
           <div className="mt-5 space-y-4">
             {[
-              ['01', 'Verify source', 'Open the provenance panel and confirm the upstream is healthy.'],
-              ['02', 'Read the boundary', 'Confirm whether the number is live, snapshot or model estimate.'],
-              ['03', 'Challenge assumptions', 'Check schedule, weather and capacity assumptions for the specific day.'],
-              ['04', 'Approve manually', 'A responsible operator decides whether the recommendation is appropriate.'],
-              ['05', 'Measure outcome', 'If implemented, compare actual outcome with the modeled potential.'],
+              ['01', 'Verify source', 'Confirm the upstream source is healthy and current enough for the decision.'],
+              ['02', 'Read the boundary', 'Separate live public data, official snapshots and model estimates.'],
+              ['03', 'Stress-test', 'Run the same decision under weather or demand shocks.'],
+              ['04', 'Approve manually', 'A responsible operator decides whether a pilot is appropriate.'],
+              ['05', 'Measure outcome', 'Compare the observed pilot result with modeled potential.'],
             ].map(([n, title, note]) => (
               <div key={n} className="flex gap-3">
                 <span className="font-mono text-[9px] font-black text-blue-300">{n}</span>
@@ -129,7 +126,7 @@ export default function DecisionsPage() {
               </div>
             ))}
           </div>
-          <Link href="/#sources" className="mt-6 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-300">Inspect provenance <ArrowRight size={11} /></Link>
+          <Link href="/data" className="mt-6 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-300">Audit provenance <ArrowRight size={11} /></Link>
         </aside>
       </section>
     </div>
