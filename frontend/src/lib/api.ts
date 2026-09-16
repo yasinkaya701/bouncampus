@@ -1,5 +1,5 @@
-import { DashboardData, ActionItem, Building, EnergyForecast, FoodForecast, OccupancyForecast, ScenarioRequest, ScenarioResult } from './types';
-import { realBuildings, realActions, realOccupancy, realEnergy, realFood, realScenarioResult } from './realData';
+import type { DashboardData, ActionItem, Building, EnergyForecast, FoodForecast, OccupancyForecast, ScenarioRequest, ScenarioResult } from './types';
+import { realBuildings } from './realData';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -10,11 +10,11 @@ async function fetchJson<T>(endpoint: string): Promise<T> {
   return res.json();
 }
 
-async function fetchWithFallback<T>(endpoint: string, fallback: T): Promise<T> {
+async function fetchArrayOrEmpty<T>(endpoint: string): Promise<T[]> {
   try {
-    return await fetchJson<T>(endpoint);
+    return await fetchJson<T[]>(endpoint);
   } catch {
-    return fallback;
+    return [];
   }
 }
 
@@ -26,11 +26,7 @@ function degradedDashboard(date?: string): DashboardData {
     food_demand_meals: 0,
     potential_saving_tl: 0,
     co2_avoided_kg: 0,
-    buildings: realBuildings.map(building => ({
-      ...building,
-      current_occupancy: 0,
-      occupancy_ratio: 0,
-    })),
+    buildings: realBuildings.map(building => ({ ...building, current_occupancy: 0, occupancy_ratio: 0 })),
     actions: [],
     sources: [],
     data_quality: {
@@ -56,38 +52,39 @@ export async function getDashboard(date?: string): Promise<DashboardData> {
 export async function getOccupancy(date?: string, buildingId?: string): Promise<OccupancyForecast[]> {
   const endpoint = buildingId ? `/api/v1/occupancy/${buildingId}` : '/api/v1/occupancy';
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<OccupancyForecast[]>(`${endpoint}${query}`, realOccupancy);
+  return fetchArrayOrEmpty<OccupancyForecast>(`${endpoint}${query}`);
 }
 
 export async function getEnergy(date?: string): Promise<EnergyForecast[]> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<EnergyForecast[]>(`/api/v1/energy${query}`, realEnergy);
+  return fetchArrayOrEmpty<EnergyForecast>(`/api/v1/energy${query}`);
 }
 
 export async function getFood(date?: string): Promise<FoodForecast[]> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<FoodForecast[]>(`/api/v1/food${query}`, realFood);
+  return fetchArrayOrEmpty<FoodForecast>(`/api/v1/food${query}`);
 }
 
 export async function getActions(date?: string): Promise<ActionItem[]> {
   const query = date ? `?date_val=${date}` : '';
-  return fetchWithFallback<ActionItem[]>(`/api/v1/actions${query}`, realActions);
+  return fetchArrayOrEmpty<ActionItem>(`/api/v1/actions${query}`);
 }
 
 export async function simulateScenario(scenario: ScenarioRequest): Promise<ScenarioResult> {
-  try {
-    const res = await fetch(`${API_URL}/api/v1/scenarios/simulate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(scenario),
-    });
-    if (!res.ok) throw new Error('API failed');
-    return await res.json();
-  } catch {
-    return realScenarioResult;
-  }
+  const res = await fetch(`${API_URL}/api/v1/scenarios/simulate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(scenario),
+  });
+  if (!res.ok) throw new Error(`Scenario API ${res.status}`);
+  return res.json();
 }
 
 export async function getBuildings(): Promise<Building[]> {
-  return fetchWithFallback<Building[]>('/api/v1/buildings', realBuildings);
+  try {
+    return await fetchJson<Building[]>('/api/v1/buildings');
+  } catch {
+    // Building geometry/capacity is static repository metadata, not live telemetry.
+    return realBuildings.map(({ current_occupancy, occupancy_ratio, ...building }) => building);
+  }
 }
