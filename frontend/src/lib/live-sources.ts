@@ -1,0 +1,256 @@
+export type DataProvenance =
+  | 'OFFICIAL_LIVE'
+  | 'OFFICIAL_SNAPSHOT'
+  | 'EXTERNAL_LIVE'
+  | 'MODEL_ESTIMATE'
+  | 'FALLBACK';
+
+export interface SourceMeta {
+  id: string;
+  label: string;
+  url: string;
+  provenance: DataProvenance;
+  fetched_at: string;
+  ok: boolean;
+  detail?: string;
+}
+
+export interface WeatherFeed {
+  temperature: number | null;
+  humidity: number | null;
+  rain: boolean | null;
+  wind_speed_kmh: number | null;
+  source: SourceMeta;
+}
+
+export interface MenuFeed {
+  soup: string | null;
+  main_dish: string | null;
+  vegan_dish: string | null;
+  calories: number | null;
+  source: SourceMeta;
+}
+
+export interface ShuttleFeed {
+  route: string;
+  departure_times: string[];
+  next_departure: string | null;
+  source: SourceMeta;
+}
+
+export interface CalendarFeed {
+  upcoming: string[];
+  source: SourceMeta;
+}
+
+const BOUN_MENU_URL = 'https://yemekhane.bogazici.edu.tr';
+const BOUN_CALENDAR_URL = 'https://akademiktakvim.bogazici.edu.tr/';
+const BOUN_SHUTTLE_URL = 'https://mekik.bogazici.edu.tr/route.php?id=12&lang=tr';
+const OPEN_METEO_URL =
+  'https://api.open-meteo.com/v1/forecast?latitude=41.0833&longitude=29.0508&current=temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m&timezone=Europe%2FIstanbul';
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function source(
+  id: string,
+  label: string,
+  url: string,
+  provenance: DataProvenance,
+  ok: boolean,
+  detail?: string,
+): SourceMeta {
+  return { id, label, url, provenance, fetched_at: nowIso(), ok, detail };
+}
+
+async function fetchWithTimeout(url: string, revalidateSeconds: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5500);
+  try {
+    return await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'BOUNCAMPUS-Hackathon/1.0 (+public-data)' },
+      next: { revalidate: revalidateSeconds },
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function cleanHtml(value: string): string {
+  return value
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&#039;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function fieldValue(html: string, fieldName: string): string | null {
+  const re = new RegExp(`${fieldName}[\\s\\S]{0,500}?<a[^>]*>([^<]+)<\\/a>`, 'i');
+  const match = html.match(re);
+  return match ? cleanHtml(match[1]) : null;
+}
+
+export async function fetchBounWeather(): Promise<WeatherFeed> {
+  try {
+    const res = await fetchWithTimeout(OPEN_METEO_URL, 300);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const current = json.current ?? {};
+    return {
+      temperature: Number.isFinite(current.temperature_2m) ? current.temperature_2m : null,
+      humidity: Number.isFinite(current.relative_humidity_2m) ? current.relative_humidity_2m : null,
+      rain: typeof current.rain === 'number' || typeof current.precipitation === 'number'
+        ? (current.rain ?? 0) > 0.1 || (current.precipitation ?? 0) > 0.1
+        : null,
+      wind_speed_kmh: Number.isFinite(current.wind_speed_10m) ? current.wind_speed_10m : null,
+      source: source(
+        'weather-bebek',
+        'Open-Meteo — Boğaziçi Bebek koordinatları',
+        OPEN_METEO_URL,
+        'EXTERNAL_LIVE',
+        true,
+        'Üniversite sensörü değildir; kampüs koordinatına ait harici meteoroloji verisidir.',
+      ),
+    };
+  } catch (error) {
+    return {
+      temperature: null,
+      humidity: null,
+      rain: null,
+      wind_speed_kmh: null,
+      source: source('weather-bebek', 'Open-Meteo', OPEN_METEO_URL, 'FALLBACK', false, String(error)),
+    };
+  }
+}
+
+export async function fetchBounMenu(): Promise<MenuFeed> {
+  try {
+    const res = await fetchWithTimeout(BOUN_MENU_URL, 900);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+
+    const soup = fieldValue(html, 'field-ccorba');
+    const main = fieldValue(html, 'field-anaa-yemek');
+    const vegan = fieldValue(html, 'field-vejetarien');
+    const calorieMatch = html.match(/field-kalori-miktar-6[\s\S]{0,500}?([0-9]{2,4})\s*kcal/i);
+    const calories = calorieMatch ? Number(calorieMatch[1]) : null;
+    const parsed = Boolean(soup || main || vegan || calories);
+
+    return {
+      soup,
+      main_dish: main,
+      vegan_dish: vegan,
+      calories,
+      source: source(
+        'boun-sks-menu',
+        'Boğaziçi Üniversitesi SKS Yemekhane',
+        BOUN_MENU_URL,
+        'OFFICIAL_LIVE',
+        true,
+        parsed
+          ? 'Resmî SKS sayfasından sunucu tarafında çekildi.'
+          : 'Resmî sayfa erişilebilir ancak HTML alanları ayrıştırılamadı; sahte menü değeri üretilmedi.',
+      ),
+    };
+  } catch (error) {
+    return {
+      soup: null,
+      main_dish: null,
+      vegan_dish: null,
+      calories: null,
+      source: source('boun-sks-menu', 'Boğaziçi Üniversitesi SKS Yemekhane', BOUN_MENU_URL, 'FALLBACK', false, String(error)),
+    };
+  }
+}
+
+function minutesFromMidnight(value: string): number {
+  const [h, m] = value.split(':').map(Number);
+  return h * 60 + m;
+}
+
+export async function fetchBounShuttle(): Promise<ShuttleFeed> {
+  const route = 'Güney Meydan → Kuzey Kampüs';
+  try {
+    const res = await fetchWithTimeout(BOUN_SHUTTLE_URL, 300);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    const times = Array.from(new Set(html.match(/\b(?:[01]\d|2[0-3]):[0-5]\d\b/g) ?? []))
+      .sort((a, b) => minutesFromMidnight(a) - minutesFromMidnight(b));
+
+    const istanbulClock = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', hour12: false,
+    }).format(new Date());
+    const nowMinutes = minutesFromMidnight(istanbulClock);
+    const nextDeparture = times.find(t => minutesFromMidnight(t) >= nowMinutes) ?? null;
+
+    return {
+      route,
+      departure_times: times,
+      next_departure: nextDeparture,
+      source: source(
+        'boun-shuttle-guney-kuzey',
+        'Boğaziçi Üniversitesi Mekik Bilgi Sistemi',
+        BOUN_SHUTTLE_URL,
+        'OFFICIAL_LIVE',
+        times.length > 0,
+        times.length > 0 ? `${times.length} hareket saati ayrıştırıldı.` : 'Sayfa erişildi ancak hareket saatleri ayrıştırılamadı.',
+      ),
+    };
+  } catch (error) {
+    return {
+      route,
+      departure_times: [],
+      next_departure: null,
+      source: source('boun-shuttle-guney-kuzey', 'Boğaziçi Üniversitesi Mekik Bilgi Sistemi', BOUN_SHUTTLE_URL, 'FALLBACK', false, String(error)),
+    };
+  }
+}
+
+export async function fetchBounCalendar(): Promise<CalendarFeed> {
+  try {
+    const res = await fetchWithTimeout(BOUN_CALENDAR_URL, 900);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    const headings = Array.from(html.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/gi))
+      .map(match => cleanHtml(match[1]))
+      .filter(text => text.length >= 8 && text.length <= 180)
+      .filter((text, index, array) => array.indexOf(text) === index)
+      .slice(0, 6);
+
+    return {
+      upcoming: headings,
+      source: source(
+        'boun-academic-calendar',
+        'Boğaziçi Üniversitesi Akademik Takvim',
+        BOUN_CALENDAR_URL,
+        'OFFICIAL_LIVE',
+        true,
+        headings.length ? `${headings.length} yaklaşan başlık ayrıştırıldı.` : 'Resmî takvim erişilebilir; başlık ayrıştırması boş döndü.',
+      ),
+    };
+  } catch (error) {
+    return {
+      upcoming: [],
+      source: source('boun-academic-calendar', 'Boğaziçi Üniversitesi Akademik Takvim', BOUN_CALENDAR_URL, 'FALLBACK', false, String(error)),
+    };
+  }
+}
+
+export function courseScheduleSnapshotSource(courseCount: number): SourceMeta {
+  return {
+    id: 'boun-course-schedule',
+    label: 'Boğaziçi BUIS/ÖBİKAS public course schedule snapshot',
+    url: 'https://registration.bogazici.edu.tr/BUIS/General/schedule.aspx',
+    provenance: 'OFFICIAL_SNAPSHOT',
+    fetched_at: '2026-09-06T23:44:48.000Z',
+    ok: courseCount > 0,
+    detail: `${courseCount.toLocaleString('tr-TR')} ders yerel snapshot içinde. Bu kaynak canlı sensör/öğrenci sayımı değildir.`,
+  };
+}
