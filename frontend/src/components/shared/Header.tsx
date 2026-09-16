@@ -12,9 +12,11 @@ import {
   Database,
   FlaskConical,
   LayoutDashboard,
-  Search,
+  Play,
   Sparkles,
+  Trophy,
 } from 'lucide-react';
+import MissionSpotlight from '@/components/Dashboard/MissionSpotlight';
 
 const EXPERIMENTAL_PREFIXES = [
   '/flow', '/microgrid', '/control-room', '/anomalies', '/rescheduler', '/agent-simulation',
@@ -23,12 +25,12 @@ const EXPERIMENTAL_PREFIXES = [
 ];
 
 const primaryNav = [
-  { href: '/', label: 'Overview', icon: LayoutDashboard },
+  { href: '/', label: 'Mission', icon: LayoutDashboard },
   { href: '/buildings', label: 'Campus', icon: Building2 },
-  { href: '/courses', label: 'Courses', icon: BookOpen },
+  { href: '/courses', label: 'Schedule', icon: BookOpen },
   { href: '/decisions', label: 'Decisions', icon: CheckSquare2 },
-  { href: '/scenarios', label: 'Scenarios', icon: Compass },
-  { href: '/data', label: 'Data Trust', icon: Database },
+  { href: '/scenarios', label: 'Simulate', icon: Compass },
+  { href: '/data', label: 'Trust', icon: Database },
 ];
 
 const labModules = [
@@ -51,6 +53,7 @@ export default function Header() {
   const [labOpen, setLabOpen] = useState(false);
   const isExperimentalRoute = EXPERIMENTAL_PREFIXES.some(prefix => pathname.startsWith(prefix));
   const labActive = pathname === '/lab' || isExperimentalRoute;
+  const demoActive = pathname === '/demo';
 
   return (
     <>
@@ -62,9 +65,9 @@ export default function Header() {
               <div className="hidden sm:block">
                 <div className="flex items-center gap-2">
                   <span className="text-[15px] font-black tracking-[-0.035em] text-[#0a1020]">BOUNCAMPUS</span>
-                  <span className="rounded-full border border-blue-200 bg-blue-50 px-1.5 py-0.5 font-mono text-[8px] font-extrabold tracking-[0.08em] text-blue-700">BETA</span>
+                  <span className="rounded-full border border-blue-200 bg-blue-50 px-1.5 py-0.5 font-mono text-[8px] font-extrabold tracking-[0.08em] text-blue-700">MISSION CONTROL</span>
                 </div>
-                <span className="block text-[10px] font-medium tracking-[0.01em] text-slate-500">Campus intelligence for Boğaziçi</span>
+                <span className="block text-[10px] font-medium tracking-[0.01em] text-slate-500">Decision intelligence for Boğaziçi</span>
               </div>
             </Link>
 
@@ -121,13 +124,14 @@ export default function Header() {
               <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-40" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" /></span>
               Source-traceable
             </Link>
-            <Link href="/courses" className="bc-focus-ring flex items-center gap-2 rounded-xl bg-[#0b1226] px-3.5 py-2 text-xs font-bold text-white shadow-[0_8px_24px_rgba(11,18,38,0.14)] transition hover:-translate-y-0.5 hover:bg-[#111a32]">
-              <Search size={13} /><span className="hidden sm:inline">Search campus</span>
+            <Link href="/demo" className={`bc-focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-black text-white shadow-[0_8px_24px_rgba(47,92,255,0.18)] transition hover:-translate-y-0.5 ${demoActive ? 'bg-blue-700' : 'bg-[#2f5cff] hover:bg-blue-700'}`}>
+              <Trophy size={13} /><span className="hidden sm:inline">Jury Mode</span><Play size={10} fill="currentColor" />
             </Link>
           </div>
         </div>
 
         <div className="mx-auto flex w-full max-w-[1640px] gap-1 overflow-x-auto px-4 pb-2 xl:hidden sm:px-5 md:px-7">
+          <Link href="/demo" className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-black ${demoActive ? 'bg-[#2f5cff] text-white' : 'border border-blue-200 bg-blue-50 text-blue-700'}`}>🏆 Jury Mode</Link>
           {primaryNav.map(link => {
             const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
             return <Link key={link.href} href={link.href} className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-bold ${active ? 'bg-[#0b1226] text-white' : 'border border-slate-950/10 bg-white/60 text-slate-600'}`}>{link.label}</Link>;
@@ -135,6 +139,12 @@ export default function Header() {
           <Link href="/lab" className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-bold ${labActive ? 'bg-[#0b1226] text-white' : 'border border-slate-950/10 bg-white/60 text-slate-600'}`}>Lab</Link>
         </div>
       </header>
+
+      {pathname === '/' && (
+        <div className="mx-auto w-full max-w-[1640px] px-3 pt-4 sm:px-5 md:px-7 lg:px-9 lg:pt-6">
+          <MissionSpotlight />
+        </div>
+      )}
 
       {isExperimentalRoute && (
         <div className="border-b border-amber-300/40 bg-[#fff6e8]">
