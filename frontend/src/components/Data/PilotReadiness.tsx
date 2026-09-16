@@ -38,6 +38,29 @@ const phases = [
   ['Week 4', 'Outcome proof', 'Capture realized impact, model error and operator feedback in the decision ledger.'],
 ];
 
+const successGates = [
+  {
+    metric: 'Occupancy model error',
+    target: '≤ 20% MAPE',
+    evidence: 'Aggregate measured occupancy vs schedule-derived utilization during pilot windows.',
+  },
+  {
+    metric: 'Energy intervention',
+    target: 'Measured positive savings',
+    evidence: 'Weather-normalized smart-meter baseline vs human-approved consolidation pilot.',
+  },
+  {
+    metric: 'Food-demand model',
+    target: '≤ 15% MAPE',
+    evidence: 'Predicted lunch demand vs anonymized POS totals by time bucket.',
+  },
+  {
+    metric: 'Operator usefulness',
+    target: '≥ 70% accepted/useful',
+    evidence: 'Decision-ledger review outcome and short operator feedback for surfaced missions.',
+  },
+];
+
 export default function PilotReadiness() {
   return (
     <section className="space-y-4">
@@ -98,6 +121,27 @@ export default function PilotReadiness() {
             </div>
             <a href="/demo" className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-700">See the full decision loop <ArrowRight size={11} /></a>
           </div>
+        </div>
+      </div>
+
+      <div className="bc-surface rounded-[28px] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="bc-eyebrow">Pilot success gates</div>
+            <h3 className="mt-1 text-xl font-black tracking-[-0.035em] text-[#0a1020]">Winning the pilot means beating measurable thresholds.</h3>
+            <p className="mt-2 max-w-3xl text-[10px] leading-relaxed text-slate-500">These are proposed validation targets for a university pilot, not claimed current performance. They turn the next phase into a falsifiable experiment instead of a vague deployment promise.</p>
+          </div>
+          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 font-mono text-[9px] font-black text-emerald-700">MEASURE → ACCEPT / REJECT</span>
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {successGates.map(gate => (
+            <article key={gate.metric} className="rounded-[20px] border border-slate-950/8 bg-[#f7f8f5] p-4">
+              <div className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-400">{gate.metric}</div>
+              <div className="mt-2 font-mono text-xl font-black tracking-[-0.035em] text-[#0a1020]">{gate.target}</div>
+              <p className="mt-3 text-[9px] leading-relaxed text-slate-500">{gate.evidence}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
