@@ -1,4 +1,5 @@
 import type { DashboardData, ActionItem, Building, EnergyForecast, FoodForecast, OccupancyForecast, ScenarioRequest, ScenarioResult } from './types';
+import type { MissionBrief } from './mission-types';
 import { realBuildings } from './realData';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
@@ -49,6 +50,15 @@ export async function getDashboard(date?: string): Promise<DashboardData> {
   }
 }
 
+export async function getMissionBrief(date?: string): Promise<MissionBrief | null> {
+  const query = date ? `?date_val=${date}` : '';
+  try {
+    return await fetchJson<MissionBrief>(`/api/v1/brief${query}`);
+  } catch {
+    return null;
+  }
+}
+
 export async function getOccupancy(date?: string, buildingId?: string): Promise<OccupancyForecast[]> {
   const endpoint = buildingId ? `/api/v1/occupancy/${buildingId}` : '/api/v1/occupancy';
   const query = date ? `?date_val=${date}` : '';
@@ -84,7 +94,6 @@ export async function getBuildings(): Promise<Building[]> {
   try {
     return await fetchJson<Building[]>('/api/v1/buildings');
   } catch {
-    // Building geometry/capacity is static repository metadata, not live telemetry.
     return realBuildings.map(({ current_occupancy, occupancy_ratio, ...building }) => building);
   }
 }
