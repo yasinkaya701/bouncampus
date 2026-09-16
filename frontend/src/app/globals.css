@@ -3,20 +3,104 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 15, 23, 42;
-  --background-color: #f8fafc;
+  --canvas: #f4f5f2;
+  --canvas-strong: #eceeea;
+  --surface: #fbfcfa;
+  --surface-strong: #ffffff;
+  --ink: #0a1020;
+  --ink-soft: #465065;
+  --line: rgba(10, 16, 32, 0.10);
+  --line-strong: rgba(10, 16, 32, 0.16);
+  --navy: #0b1226;
+  --navy-2: #111a32;
+  --blue: #2f5cff;
+  --blue-soft: #e8edff;
+  --green: #12805c;
+  --green-soft: #e5f4ee;
+  --amber: #b96b13;
+  --amber-soft: #fff1dc;
+  --red: #c54848;
+  --red-soft: #fde9e9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--canvas);
+  scroll-behavior: smooth;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background-color: var(--background-color);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% -8%, rgba(47, 92, 255, 0.10), transparent 28rem),
+    radial-gradient(circle at 92% 4%, rgba(18, 128, 92, 0.07), transparent 26rem),
+    var(--canvas);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Leaflet fix for Next.js */
+::selection {
+  background: rgba(47, 92, 255, 0.18);
+  color: var(--ink);
+}
+
+@layer components {
+  .bc-surface {
+    @apply bg-white/90 border border-slate-900/10 shadow-[0_1px_2px_rgba(10,16,32,0.04),0_14px_38px_rgba(10,16,32,0.035)];
+  }
+
+  .bc-surface-dark {
+    @apply bg-[#0b1226] border border-white/10 shadow-[0_18px_48px_rgba(8,14,30,0.18)];
+  }
+
+  .bc-eyebrow {
+    @apply text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-500;
+  }
+
+  .bc-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wide;
+  }
+
+  .bc-focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f5f2];
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.20);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.34);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 0;
+  background: #dfe4e7;
+  font-family: inherit;
+}
+
+.leaflet-control-zoom a,
+.leaflet-control-attribution {
+  border-color: rgba(10, 16, 32, 0.10) !important;
 }
