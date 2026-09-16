@@ -1,82 +1,96 @@
 'use client';
 
-import { DashboardData } from '@/lib/types';
-import { Users, Zap, Utensils, TrendingDown, Leaf, Activity } from 'lucide-react';
+import type { DashboardData } from '@/lib/types';
+import { ArrowDownRight, Gauge, Leaf, Sparkles, Utensils, Users, Zap } from 'lucide-react';
+
+type MetricCardProps = {
+  label: string;
+  value: string;
+  unit?: string;
+  note: string;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  dark?: boolean;
+  footer?: React.ReactNode;
+};
+
+function MetricCard({ label, value, unit, note, icon: Icon, dark = false, footer }: MetricCardProps) {
+  return (
+    <article className={`group relative overflow-hidden rounded-[24px] p-5 transition duration-300 hover:-translate-y-0.5 ${dark ? 'bc-surface-dark text-white' : 'bc-surface text-[#0a1020]'}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className={`bc-eyebrow ${dark ? '!text-slate-500' : ''}`}>{label}</div>
+          <div className="mt-5 flex items-baseline gap-1.5">
+            <span className="font-mono text-[34px] font-black leading-none tracking-[-0.055em]">{value}</span>
+            {unit && <span className={`font-mono text-xs font-bold ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{unit}</span>}
+          </div>
+        </div>
+        <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border ${dark ? 'border-white/10 bg-white/5 text-blue-300' : 'border-slate-950/10 bg-[#f4f5f2] text-slate-700'}`}>
+          <Icon size={17} strokeWidth={2} />
+        </div>
+      </div>
+      <p className={`mt-4 min-h-10 text-[11px] leading-relaxed ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{note}</p>
+      <div className="mt-4 border-t border-current/10 pt-3">{footer}</div>
+    </article>
+  );
+}
 
 export default function KPICards({ data }: { data: DashboardData }) {
-  const occupancyPct = data.campus_occupancy <= 1
-    ? Math.round(data.campus_occupancy * 100)
-    : Math.round(data.campus_occupancy);
+  const occupancyPct = Math.round((data.campus_occupancy <= 1 ? data.campus_occupancy : data.campus_occupancy / 100) * 100);
 
-  const ModelTag = () => (
-    <span className="text-[9px] font-black font-mono px-1.5 py-0.5 rounded bg-violet-50 text-violet-700 border border-violet-200">
-      MODEL TAHMİNİ
+  const modelTag = (
+    <span className="bc-chip border-violet-200 bg-violet-50 text-violet-700">
+      <Sparkles size={10} /> MODEL ESTIMATE
     </span>
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold text-slate-500 tracking-wide uppercase">Ders Kaynaklı Kullanım</span>
-          <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700"><Users size={16} /></div>
-        </div>
-        <div className="mt-4">
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 font-mono tracking-tight">%{occupancyPct}</span>
-            <ModelTag />
+    <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <MetricCard
+        label="Schedule-derived use"
+        value={`${occupancyPct}%`}
+        note="Ders programındaki oda ve saatler üzerinden kapasite tabanlı anlık kullanım tahmini."
+        icon={Users}
+        footer={
+          <div className="flex items-center justify-between gap-3">
+            {modelTag}
+            <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-[#2f5cff]" style={{ width: `${Math.max(4, Math.min(100, occupancyPct))}%` }} />
+            </div>
           </div>
-          <p className="text-xs text-slate-500 mt-2">BUIS/ÖBİKAS oda-saat snapshot&apos;ından kapasite tabanlı tahmin</p>
-          <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className={`h-full rounded-full ${occupancyPct > 70 ? 'bg-rose-500' : occupancyPct > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, occupancyPct)}%` }} />
-          </div>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-500 tracking-wide uppercase">Günlük Enerji Yükü</span>
-          <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700"><Zap size={16} /></div>
-        </div>
-        <div className="mt-4">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-3xl font-black text-slate-900 font-mono tracking-tight">{data.predicted_energy_mwh}</span>
-            <span className="text-sm font-bold text-slate-500 font-mono">MWh</span>
-          </div>
-          <div className="mt-2"><ModelTag /></div>
-          <p className="text-xs text-slate-500 mt-2 flex items-center gap-1"><Activity size={13} /> Bina profili + hava + tahmini kullanım; BMS sayaç değeri değil</p>
-        </div>
-      </div>
+      <MetricCard
+        label="Daily energy load"
+        value={data.predicted_energy_mwh.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}
+        unit="MWh"
+        note="Bina profili, tahmini kullanım ve dış hava ile hesaplanan physics-lite yük modeli."
+        icon={Zap}
+        footer={<div className="flex items-center justify-between">{modelTag}<Gauge size={14} className="text-slate-400" /></div>}
+      />
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-500 tracking-wide uppercase">Öğle Talebi</span>
-          <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700"><Utensils size={16} /></div>
-        </div>
-        <div className="mt-4">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-3xl font-black text-slate-900 font-mono tracking-tight">{data.food_demand_meals.toLocaleString('tr-TR')}</span>
-            <span className="text-sm font-bold text-slate-500 font-mono">porsiyon</span>
-          </div>
-          <div className="mt-2"><ModelTag /></div>
-          <p className="text-xs text-slate-500 mt-2">Ders çıkış akışı + yağış etkisi; POS satış sayımı değil</p>
-        </div>
-      </div>
+      <MetricCard
+        label="Lunch demand"
+        value={data.food_demand_meals.toLocaleString('tr-TR')}
+        unit="porsiyon"
+        note="Öğle saatindeki ders çıkış akışı ve hava koşullarından türetilen üretim planlama girdisi."
+        icon={Utensils}
+        footer={modelTag}
+      />
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between text-white">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-400 tracking-wide uppercase">Optimizasyon Potansiyeli</span>
-          <div className="w-8 h-8 rounded-xl bg-emerald-950 border border-emerald-800 flex items-center justify-center text-emerald-400"><TrendingDown size={16} /></div>
-        </div>
-        <div className="mt-4">
-          <div className="text-3xl font-black text-emerald-400 font-mono tracking-tight">₺{data.potential_saving_tl.toLocaleString('tr-TR')}</div>
-          <span className="inline-block mt-2 text-[9px] font-black font-mono px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 border border-violet-800">MODEL TAHMİNİ</span>
-          <div className="flex items-center gap-1.5 text-xs text-slate-300 mt-2">
-            <Leaf size={13} className="text-emerald-400" />
-            <span><strong>{data.co2_avoided_kg.toLocaleString('tr-TR')} kg</strong> CO₂e model karşılığı</span>
+      <MetricCard
+        label="Decision potential"
+        value={`₺${data.potential_saving_tl.toLocaleString('tr-TR')}`}
+        note="Optimizasyon senaryosunun parasal potansiyeli; uygulanmış tasarruf veya sayaç ölçümü değildir."
+        icon={ArrowDownRight}
+        dark
+        footer={
+          <div className="flex items-center justify-between gap-3">
+            <span className="bc-chip border-white/10 bg-white/5 text-violet-200"><Sparkles size={10} /> MODEL</span>
+            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-300"><Leaf size={11} /> {data.co2_avoided_kg.toLocaleString('tr-TR')} kg CO₂e</span>
           </div>
-        </div>
-      </div>
-    </div>
+        }
+      />
+    </section>
   );
 }
