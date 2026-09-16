@@ -1,102 +1,215 @@
-# BOUNCAMPUS — Pitch Script
+# BOUNCAMPUS — Hackathon Pitch
 
-## Opening (30 seconds)
+## One sentence
 
-> "A university campus knows tomorrow's timetable, weather, and events — yet many campus resources are still operated reactively."
->
-> "Every day, buildings are heated for empty floors. Cafeterias prepare meals that end up as waste. Study spaces sit idle while others overflow."
->
-> "What if the campus could know tomorrow's demand — before tomorrow happens?"
+> **BOUNCAMPUS is the decision layer between campus public data and real operations.**
 
-## Introduce BOUNCAMPUS (30 seconds)
-
-> "Meet BOUNCAMPUS — a predictive campus sustainability platform."
->
-> "BOUNCAMPUS uses one core intelligence: **occupancy forecasting**. We predict where and when people will be on campus tomorrow. Then we use that prediction to optimize two critical resources: **energy** and **food**."
->
-> "Built for Boğaziçi University — 16,000 students, 21 buildings, 2 campuses."
-
-## How It Works (60 seconds)
-
-> "The system works in three layers:"
->
-> 1. **Occupancy Intelligence** — Our XGBoost model predicts hourly building occupancy using timetable data, weather, events, and historical patterns.
->
-> 2. **Optimization Engine** — OR-Tools solves a building consolidation problem: which floors need to be active? How many meals should be prepared?
->
-> 3. **Campus Action Engine** — All recommendations are ranked by impact and delivered as actionable cards.
-
-*[Show architecture diagram]*
-
-## Demo (3-4 minutes)
-
-### Demo Flow:
-1. Show dashboard overview (KPIs, map)
-2. Click on a building → show hourly occupancy forecast
-3. Show action cards → explain a HIGH IMPACT recommendation
-4. Run scenario simulator:
-   - "What if tomorrow is exam week?"
-   - Show before/after comparison
-5. Show impact metrics
-
-### Key Demo Moments:
-- Map zooms into Kuzey Kampüs, Kare Blok glows red at 10:00, green at 18:00
-- Action card: "Kare Blok floors 3-5 can enter eco mode after 18:00 → Save 184 kWh"
-- Scenario: Exam week → campus occupancy +35%, energy +22%, food +21%
-- System automatically updates the action plan
-
-## Impact (30 seconds)
-
-> "For Boğaziçi University, our model estimates daily potential:"
->
-> | Metric | Impact |
-> |--------|--------|
-> | Energy saved | ~800 kWh/day |
-> | CO₂ avoided | ~376 kg/day |
-> | Food waste avoided | ~68 kg/day |
-> | Cost saved | ~₺14,820/day |
->
-> "That's **~₺5.4M** and **137 tonnes of CO₂** per year."
-
-## Why This Is Different (30 seconds)
-
-> "Boğaziçi already has motion sensors and automated lights. That's reactive automation."
->
-> "BOUNCAMPUS is the **predictive layer** that sits on top. It doesn't replace existing systems — it makes them smarter by knowing demand before it happens."
->
-> "And the same intelligence layer can extend to:"
-
-```
-Occupancy Intelligence
-    ↓
-Energy | Food | Mobility | Water | Waste | Cleaning | Space
-```
-
-## Close (15 seconds)
-
-> "We built BOUNCAMPUS to work with existing campus data — timetables, weather, POS systems. No new hardware needed."
->
-> "Predict campus demand. Optimize campus resources. Act before waste happens."
->
-> "BOUNCAMPUS."
+It turns disconnected Boğaziçi signals into a source-traceable operational mission, stress-tests that mission, keeps a human approval gate, and learns from pilot outcomes.
 
 ---
 
-## Q&A Preparation
+## Opening — 20 seconds
 
-### Likely Questions
+> Boğaziçi already publishes useful operational context: the course schedule, cafeteria menu, shuttle timetable and academic calendar. Weather is available too.
+>
+> The problem is not that there is zero data. The problem is that these signals live in separate systems and none of them answers one operational question:
+>
+> **What should the campus do differently today?**
 
-**Q: How accurate is your occupancy prediction?**
-A: On synthetic data, XGBoost achieves ~85% R² for next-day prediction. With real campus data integration (BMS, card swipe), accuracy would improve significantly.
+---
 
-**Q: Why not use deep learning?**
-A: For structured tabular data with clear features (schedule, weather, calendar), gradient boosting outperforms neural networks. It's also more interpretable — we can show which features drive predictions.
+## Product — 25 seconds
 
-**Q: How would you handle privacy?**
-A: We never track individuals. All data is aggregated at building/floor level. Food preferences use anonymized hash IDs. The system only needs "how many people" not "which people."
+> BOUNCAMPUS is Mission Control for campus operations.
+>
+> It fuses source-traceable public signals with transparent demand and energy models, then creates one human-reviewable mission with:
+>
+> - why now;
+> - where and when;
+> - evidence;
+> - confidence;
+> - modeled impact;
+> - and a clear human-control boundary.
 
-**Q: What's the data integration effort for a real deployment?**
-A: We need 3 data sources: (1) timetable/course registration, (2) weather API (free), (3) cafeteria POS. BMS integration is optional but improves energy model accuracy. Timeline: 2-4 weeks.
+The product never upgrades a model estimate into “live sensor data.”
 
-**Q: Why OR-Tools instead of simple rules?**
-A: Building consolidation is a combinatorial optimization problem. With 21 buildings × 4-6 floors, there are millions of possible configurations. OR-Tools finds the mathematically optimal solution in milliseconds.
+---
+
+## The product loop
+
+```text
+SENSE → DECIDE → STRESS-TEST → HUMAN APPROVAL → PILOT → LEARN
+```
+
+### 1. Sense
+
+Current product inputs:
+
+- Boğaziçi SKS public menu;
+- Boğaziçi Mekik public timetable;
+- Boğaziçi Academic Calendar;
+- dated official-source BUIS/ÖBİKAS course schedule snapshot;
+- Open-Meteo weather at Bebek campus coordinates.
+
+### 2. Decide
+
+The Mission Brief converts the current campus state into one inspectable recommendation with confidence and evidence.
+
+Machine-readable endpoint:
+
+```text
+GET /api/v1/brief
+```
+
+### 3. Stress-test
+
+Before a human acts, the same live product baseline can be recomputed under counterfactuals such as:
+
+- heavy rain;
+- heatwave;
+- exam week;
+- event load;
+- building closure.
+
+### 4. Human approval
+
+The model cannot dispatch a BMS, kitchen, transport or IoT command.
+
+The decision ledger records only a review state:
+
+- REVIEW
+- APPROVED_FOR_PILOT
+- DECLINED
+
+### 5. Pilot
+
+A real-world action happens only after field verification and an accountable operator decision.
+
+### 6. Learn
+
+The Outcome Loop accepts an observed pilot result and compares it with modeled potential, creating calibration evidence for the next decision.
+
+---
+
+## 90-second demo
+
+Open `/demo`.
+
+### Screen 1 — Signal fusion
+
+Show the four evidence cards and source readiness.
+
+Say:
+
+> Every signal has provenance and freshness. If a public page fails, BOUNCAMPUS can show a dated last-known-good official snapshot for continuity, but the product becomes degraded rather than pretending that snapshot is live.
+
+### Screen 2 — Decision
+
+Show the current Mission Brief.
+
+Point to:
+
+- confidence;
+- why now;
+- location and operating window;
+- modeled impact;
+- human guardrail.
+
+### Screen 3 — Stress test
+
+Run Heavy Rain or Heatwave 38°C.
+
+Say:
+
+> This starts from the current BOUNCAMPUS baseline; it is not a canned before/after slide.
+
+### Screen 4 — Human approval
+
+Click **Approve for pilot review**.
+
+Say:
+
+> Approval creates a decision receipt. It does not send a field command.
+
+Then open `/decisions` and show the Outcome Loop:
+
+> After a real pilot we enter the measured result, calculate model error and improve the next mission.
+
+---
+
+## Why this can become a real university product
+
+BOUNCAMPUS does not require replacing existing university software.
+
+It can begin as a read-only layer above current systems.
+
+Highest-value production calibration feeds:
+
+1. anonymous occupancy aggregates;
+2. building/floor smart-meter totals;
+3. anonymized cafeteria POS totals by time bucket;
+4. shuttle AVL/GPS.
+
+No raw student identity is necessary for the core optimization loop.
+
+---
+
+## 30-day pilot
+
+| Week | Goal |
+|---|---|
+| 1 | Read-only aggregate integrations |
+| 2 | Model calibration against measured data |
+| 3 | Small human-approved operator pilot |
+| 4 | Outcome proof and operator feedback |
+
+Proposed validation gates — **targets, not current claims**:
+
+- occupancy model: ≤20% MAPE;
+- food-demand model: ≤15% MAPE;
+- energy pilot: measured positive savings under a qualifying intervention;
+- operator usefulness: ≥70% of surfaced missions accepted or rated useful.
+
+---
+
+## Why this is defensible
+
+The moat is not “we trained one model.”
+
+It is the system around decisions:
+
+- Boğaziçi-specific source adapters;
+- provenance and freshness contract;
+- graceful degradation without fake live data;
+- schedule-to-space demand model;
+- mission ranking and confidence;
+- counterfactual stress testing;
+- human approval ledger;
+- outcome calibration loop;
+- privacy-safe pilot integration pattern.
+
+---
+
+## Truth boundary
+
+Today BOUNCAMPUS **does not claim** direct access to:
+
+- BMS;
+- smart meters;
+- turnstiles;
+- Wi-Fi occupancy;
+- cafeteria POS;
+- shuttle GPS;
+- live IoT telemetry.
+
+Occupancy, energy, food demand, savings and CO₂ values are model estimates until calibrated against authorized operational data.
+
+---
+
+## Closing — 15 seconds
+
+> Universities do not need another dashboard telling them what already happened.
+>
+> They need a decision layer that turns fragmented signals into an action a human can understand, challenge, test and measure.
+>
+> **BOUNCAMPUS: Sense. Decide. Pilot. Learn.**
