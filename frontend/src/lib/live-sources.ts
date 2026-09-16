@@ -1,3 +1,5 @@
+import courseSnapshotMeta from '@/data/course_snapshot_meta.json';
+
 export type DataProvenance =
   | 'OFFICIAL_LIVE'
   | 'OFFICIAL_SNAPSHOT'
@@ -225,9 +227,12 @@ export async function fetchBounCalendar(): Promise<CalendarFeed> {
     const res = await fetchWithTimeout(BOUN_CALENDAR_URL, 900);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
+    const generic = new Set(['Gelecek Etkinlikler', 'Yakın Zamanda Gerçekleşecek Etkinlikler']);
     const headings = Array.from(html.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/gi))
       .map(match => cleanHtml(match[1]))
-      .filter(text => text.length >= 8 && text.length <= 180)
+      .filter(text => text.length >= 8 && text.length <= 220)
+      .filter(text => !generic.has(text))
+      .filter(text => !/^(Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+20\d{2}$/i.test(text))
       .filter((text, index, array) => array.indexOf(text) === index)
       .slice(0, 6);
 
@@ -239,7 +244,7 @@ export async function fetchBounCalendar(): Promise<CalendarFeed> {
         BOUN_CALENDAR_URL,
         'OFFICIAL_LIVE',
         headings.length > 0,
-        headings.length ? `${headings.length} takvim başlığı ayrıştırıldı.` : 'Resmî takvim erişilebilir; yapılandırılmış başlık ayrıştırması boş döndü.',
+        headings.length ? `${headings.length} yaklaşan takvim olayı ayrıştırıldı.` : 'Resmî takvim erişilebilir; yapılandırılmış etkinlik ayrıştırması boş döndü.',
       ),
     };
   } catch (error) {
@@ -251,13 +256,22 @@ export async function fetchBounCalendar(): Promise<CalendarFeed> {
 }
 
 export function courseScheduleSnapshotSource(courseCount: number): SourceMeta {
+  const capturedAt = new Date(courseSnapshotMeta.captured_at).getTime();
+  const refreshRequiredAfter = new Date(courseSnapshotMeta.refresh_required_after).getTime();
+  const now = Date.now();
+  const mustHavePostAddDropCapture = now > refreshRequiredAfter;
+  const isFreshEnough = !mustHavePostAddDropCapture || capturedAt > refreshRequiredAfter;
+  const ok = courseCount > 0 && isFreshEnough;
+
   return {
     id: 'boun-course-schedule',
-    label: 'Boğaziçi BUIS/ÖBİKAS public course schedule snapshot',
-    url: 'https://registration.bogazici.edu.tr/BUIS/General/schedule.aspx',
+    label: `Boğaziçi BUIS/ÖBİKAS public course schedule snapshot (${courseSnapshotMeta.term})`,
+    url: courseSnapshotMeta.source_url,
     provenance: 'OFFICIAL_SNAPSHOT',
-    fetched_at: '2026-09-06T23:44:48.000Z',
-    ok: courseCount > 0,
-    detail: `${courseCount.toLocaleString('tr-TR')} ders yerel snapshot içinde. Bu kaynak canlı sensör/öğrenci sayımı değildir.`,
+    fetched_at: courseSnapshotMeta.captured_at,
+    ok,
+    detail: ok
+      ? `${courseCount.toLocaleString('tr-TR')} ders yerel snapshot içinde. Bu kaynak canlı sensör/öğrenci sayımı değildir. Add/drop sonrası yeniden yakalama release gate'idir.`
+      : `${courseCount.toLocaleString('tr-TR')} ders var ancak snapshot add/drop sonrasındaki 30 Eylül 2026 tazelik kapısını geçmiyor. Hackathon release öncesi resmî schedule kaynağından yenilenmelidir.`,
   };
 }
