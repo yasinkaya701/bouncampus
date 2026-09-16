@@ -46,11 +46,16 @@ function fmt(value: number | null | undefined, suffix = '') {
 }
 
 function SourcePill({ source }: { source?: SourceMeta }) {
-  const type = source?.ok ? source.provenance : 'FALLBACK';
+  const type = source?.ok ? source.provenance : source?.provenance === 'OFFICIAL_SNAPSHOT' ? 'OFFICIAL_SNAPSHOT' : 'FALLBACK';
+  const label = source?.ok
+    ? (provenanceLabel[type] ?? type)
+    : source?.provenance === 'OFFICIAL_SNAPSHOT'
+      ? 'STALE SNAPSHOT'
+      : 'UNAVAILABLE';
   return (
     <span className={`bc-chip ${provenanceTone[type] ?? provenanceTone.FALLBACK}`}>
       <span className={`h-1.5 w-1.5 rounded-full ${source?.ok ? 'bg-current' : 'bg-amber-500'}`} />
-      {provenanceLabel[type] ?? type}
+      {label}
     </span>
   );
 }
@@ -156,7 +161,7 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="2 6" horizontal={false} stroke="rgba(15,23,42,0.08)" />
                 <XAxis type="number" domain={[0, 100]} unit="%" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                 <YAxis dataKey="name" type="category" width={150} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} />
-                <Tooltip cursor={{ fill: 'rgba(47,92,255,0.04)' }} formatter={(value: number) => [`%${value}`, 'Estimated use']} contentStyle={{ borderRadius: '14px', borderColor: 'rgba(15,23,42,0.10)', boxShadow: '0 12px 34px rgba(10,16,32,0.10)', fontSize: '11px' }} />
+                <Tooltip cursor={{ fill: 'rgba(47,92,255,0.04)' }} formatter={value => [`%${value}`, 'Estimated use']} contentStyle={{ borderRadius: '14px', borderColor: 'rgba(15,23,42,0.10)', boxShadow: '0 12px 34px rgba(10,16,32,0.10)', fontSize: '11px' }} />
                 <Bar dataKey="occupancy" fill="#2f5cff" radius={[0, 8, 8, 0]} barSize={11} />
               </BarChart>
             </ResponsiveContainer>
