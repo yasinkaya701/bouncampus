@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import campusConfig from '@/data/campus_config.json';
 import realCourses from '@/data/real_boun_courses.json';
+import type { ActionItem } from '@/lib/types';
 import {
   courseScheduleSnapshotSource,
   fetchBounCalendar,
@@ -70,7 +71,7 @@ function modelSource(id: string, label: string, detail: string): SourceMeta {
   return {
     id,
     label,
-    url: 'https://github.com/yasinkaya701/bouncampus',
+    url: '/',
     provenance: 'MODEL_ESTIMATE',
     fetched_at: new Date().toISOString(),
     ok: true,
@@ -168,10 +169,10 @@ export async function GET(request: Request) {
     .sort((a, b) => b.savedKwh - a.savedKwh)
     .slice(0, 2);
 
-  const actions = candidates.map((item, index) => ({
+  const actions: ActionItem[] = candidates.map((item, index) => ({
     id: `energy-${item.id}`,
-    priority: index === 0 ? 'HIGH' as const : 'MEDIUM' as const,
-    type: 'energy' as const,
+    priority: index === 0 ? 'HIGH' : 'MEDIUM',
+    type: 'energy',
     title: `${item.name}: düşük kullanım konsolidasyonu`,
     time: '18:00 - 22:00',
     location: item.name,
@@ -179,14 +180,14 @@ export async function GET(request: Request) {
     impact_value: Math.round(item.savedKwh),
     impact_unit: 'kWh model potansiyeli',
     icon: 'Zap',
-    provenance: 'MODEL_ESTIMATE' as const,
+    provenance: 'MODEL_ESTIMATE',
   }));
 
   if (foodDemandMeals > 0) {
     actions.push({
       id: 'food-demand-plan',
-      priority: 'MEDIUM' as const,
-      type: 'food' as const,
+      priority: 'MEDIUM',
+      type: 'food',
       title: menu.main_dish ? `${menu.main_dish}: üretim planını talep tahminiyle doğrula` : 'Yemekhane üretim planını talep tahminiyle doğrula',
       time: '10:30 - 13:30',
       location: 'Kuzey + Güney Yemekhaneleri',
@@ -194,7 +195,7 @@ export async function GET(request: Request) {
       impact_value: foodDemandMeals,
       impact_unit: 'porsiyon talep tahmini',
       icon: 'Utensils',
-      provenance: 'MODEL_ESTIMATE' as const,
+      provenance: 'MODEL_ESTIMATE',
     });
   }
 
