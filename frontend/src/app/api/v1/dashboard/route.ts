@@ -169,7 +169,7 @@ export async function GET(request: Request) {
     .sort((a, b) => b.savedKwh - a.savedKwh)
     .slice(0, 2);
 
-  const actions: ActionItem[] = candidates.map((item, index) => ({
+  const actions = candidates.map((item, index): ActionItem => ({
     id: `energy-${item.id}`,
     priority: index === 0 ? 'HIGH' : 'MEDIUM',
     type: 'energy',
