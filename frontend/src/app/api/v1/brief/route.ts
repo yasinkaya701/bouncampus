@@ -24,7 +24,7 @@ function confidenceFor(data: DashboardData) {
     return 0;
   });
 
-  const raw = weighted.reduce((sum, value) => sum + value, 0) / sources.length;
+  const raw = weighted.reduce<number>((sum, value) => sum + value, 0) / sources.length;
   const score = Math.max(20, Math.min(95, Math.round(raw * 100)));
   if (score >= 80) return { score, label: 'HIGH' as const };
   if (score >= 55) return { score, label: 'MEDIUM' as const };
