@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Box, ExternalLink, Globe2, Map as MapIcon, MapPin } from 'lucide-react';
 import type { Building } from '@/lib/types';
 import { useLocale } from '@/lib/i18n';
+import { presentBuilding } from '@/lib/campus-directory';
 
 const CampusCesiumMap = dynamic(() => import('./CampusCesiumMap'), { ssr: false, loading: () => <MapLoading /> });
 const CampusMap3D = dynamic(() => import('./CampusMap3D'), { ssr: false, loading: () => <MapLoading /> });
@@ -38,8 +39,10 @@ type CampusFocus = 'all' | 'south' | 'north';
 type TileType = keyof typeof TILE_LAYERS;
 type LiveLocation = { id: string; coords: [number, number]; matched_name: string; osm_url: string; source: string };
 
+type PositionedBuilding = Building & { liveLocation?: LiveLocation };
+
 export default function CampusMap({ buildings }: { buildings: Building[] }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const [mounted, setMounted] = useState(false);
   const [mapMode, setMapMode] = useState<MapMode>('2d');
   const [tileType, setTileType] = useState<TileType>('street');
@@ -52,18 +55,21 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
   useEffect(() => {
     fetch('/api/v1/building-locations', { cache: 'no-store' })
       .then(response => response.ok ? response.json() : Promise.reject(new Error('location source')))
-      .then((payload: { locations?: LiveLocation[] }) => {
-        const indexed = Object.fromEntries((payload.locations ?? []).map(location => [location.id, location]));
-        setLocations(indexed);
-      })
+      .then((payload: { locations?: LiveLocation[] }) => setLocations(Object.fromEntries((payload.locations ?? []).map(location => [location.id, location]))))
       .catch(() => setLocations({}));
   }, []);
 
-  const positionedBuildings = useMemo(() => buildings.map(building => ({
-    ...building,
-    coords: locations[building.id]?.coords ?? building.coords,
-    liveLocation: locations[building.id],
-  })), [buildings, locations]);
+  const positionedBuildings = useMemo<PositionedBuilding[]>(() => buildings.map(building => {
+    const location = locations[building.id];
+    const display = presentBuilding(building, locale);
+    return {
+      ...building,
+      name: display.name,
+      code: display.code,
+      coords: location?.coords ?? building.coords,
+      liveLocation: location,
+    };
+  }), [buildings, locale, locations]);
 
   const focusCampus = (next: CampusFocus) => {
     setFocus(next);
@@ -122,28 +128,11 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
             {positionedBuildings.map(building => {
               const verified = Boolean(building.liveLocation);
               return (
-                <CircleMarker
-                  key={building.id}
-                  center={building.coords}
-                  pathOptions={{ fillColor: verified ? getColor(building.occupancy_ratio) : '#f8fafc', color: verified ? '#ffffff' : '#b45309', weight: verified ? 2 : 2.5, fillOpacity: verified ? 0.9 : 0.9 }}
-                  radius={verified ? 8 : 6}
-                >
+                <CircleMarker key={building.id} center={building.coords} pathOptions={{ fillColor: verified ? getColor(building.occupancy_ratio) : '#f8fafc', color: verified ? '#ffffff' : '#b45309', weight: verified ? 2 : 2.5, fillOpacity: 0.9 }} radius={verified ? 8 : 6}>
                   <Popup>
                     <div className="min-w-[220px] p-1 font-sans">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-sm font-black text-slate-950">{building.name}</div>
-                          <div className="mt-1 text-[10px] font-semibold text-slate-500">{building.campus === 'south' ? t('Güney Kampüs', 'South Campus') : t('Kuzey Kampüs', 'North Campus')}</div>
-                        </div>
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-black text-slate-500">{building.code}</span>
-                      </div>
-                      <div className="mt-3 border-t border-slate-200 pt-3 text-[10px] leading-4 text-slate-500">
-                        {verified ? (
-                          <><div className="flex items-center gap-1.5 font-bold text-emerald-700"><MapPin size={10} /> {t('Konum OpenStreetMap üzerinden eşleştirildi', 'Location matched from OpenStreetMap')}</div><a href={building.liveLocation?.osm_url} target="_blank" rel="noreferrer" className="mt-1.5 inline-flex items-center gap-1 text-slate-500 underline underline-offset-2">{t('Kaydı aç', 'Open source')} <ExternalLink size={9} /></a></>
-                        ) : (
-                          <div className="font-semibold text-amber-700">{t('Kesin OSM eşleşmesi bulunamadı; yedek kampüs konumu gösteriliyor.', 'No exact OSM match was found; the fallback campus position is shown.')}</div>
-                        )}
-                      </div>
+                      <div className="flex items-start justify-between gap-3"><div><div className="text-sm font-black text-slate-950">{building.name}</div><div className="mt-1 text-[10px] font-semibold text-slate-500">{building.campus === 'south' ? t('Güney Kampüs', 'South Campus') : t('Kuzey Kampüs', 'North Campus')}</div></div><span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-black text-slate-500">{building.code}</span></div>
+                      <div className="mt-3 border-t border-slate-200 pt-3 text-[10px] leading-4 text-slate-500">{verified ? <><div className="flex items-center gap-1.5 font-bold text-emerald-700"><MapPin size={10} /> {t('Konum OpenStreetMap üzerinden eşleştirildi', 'Location matched from OpenStreetMap')}</div><a href={building.liveLocation?.osm_url} target="_blank" rel="noreferrer" className="mt-1.5 inline-flex items-center gap-1 text-slate-500 underline underline-offset-2">{t('Kaydı aç', 'Open source')} <ExternalLink size={9} /></a></> : <div className="font-semibold text-amber-700">{t('Kesin OSM eşleşmesi bulunamadı; yedek kampüs konumu gösteriliyor.', 'No exact OSM match was found; the fallback campus position is shown.')}</div>}</div>
                       <div className="mt-3 text-[9px] text-slate-400">{t('Kullanım rengi ders programı tabanlı modeldir; canlı kişi sayacı değildir.', 'Utilization color is schedule-derived; it is not a live people counter.')}</div>
                       <Link href={`/buildings/${building.id}`} className="mt-3 flex items-center justify-between rounded-lg bg-[#102a43] px-3 py-2 text-[10px] font-bold text-white">{t('Bina detayını aç', 'Open building detail')} <span>→</span></Link>
                     </div>
@@ -152,9 +141,7 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
               );
             })}
           </MapContainer>
-          <div className="pointer-events-none absolute bottom-3 left-3 z-[500] rounded-md border border-slate-900/10 bg-white/90 px-2.5 py-1.5 text-[9px] font-semibold text-slate-600 backdrop-blur">
-            {t('Dolu: OSM eşleşmesi · Turuncu çerçeve: yedek konum', 'Filled: OSM match · Amber outline: fallback position')}
-          </div>
+          <div className="pointer-events-none absolute bottom-3 left-3 z-[500] rounded-md border border-slate-900/10 bg-white/90 px-2.5 py-1.5 text-[9px] font-semibold text-slate-600 backdrop-blur">{t('Dolu: OSM eşleşmesi · Turuncu çerçeve: yedek konum', 'Filled: OSM match · Amber outline: fallback position')}</div>
         </div>
       )}
     </div>

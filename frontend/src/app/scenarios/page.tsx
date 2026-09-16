@@ -1,53 +1,49 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, FlaskConical, Sparkles } from 'lucide-react';
-import Simulator from '@/components/Scenario/Simulator';
-import ComparisonView from '@/components/Scenario/ComparisonView';
+import { AlertTriangle, Play } from 'lucide-react';
 import { simulateScenario } from '@/lib/api';
 import type { ScenarioRequest, ScenarioResult } from '@/lib/types';
+import { useLocale } from '@/lib/i18n';
+
+const SCENARIOS: Array<{ type: ScenarioRequest['scenario_type']; tr: string; en: string; trn: string; enn: string }> = [
+  { type: 'heatwave', tr: 'Sıcak hava dalgası', en: 'Heatwave', trn: 'Soğutma yükü ve kullanım davranışı şoku', enn: 'Cooling-load and usage shock' },
+  { type: 'exam_week', tr: 'Sınav haftası', en: 'Exam week', trn: 'Daha uzun bina ve çalışma alanı kullanımı', enn: 'Longer building and study-space use' },
+  { type: 'event', tr: 'Büyük etkinlik', en: 'Large event', trn: 'Yerel talep ve yaya akışı artışı', enn: 'Local demand and footfall increase' },
+  { type: 'rain', tr: 'Yağış', en: 'Rain', trn: 'İç mekân talebi ve ulaşım etkisi', enn: 'Indoor-demand and mobility effect' },
+  { type: 'building_closure', tr: 'Bina kapanışı', en: 'Building closure', trn: 'Talebin diğer alanlara kayması', enn: 'Demand displaced to other spaces' },
+  { type: 'summer_school', tr: 'Yaz okulu', en: 'Summer school', trn: 'Düşük yoğunluklu dönem senaryosu', enn: 'Lower-density term scenario' },
+];
 
 export default function ScenariosPage() {
+  const { locale, t } = useLocale();
+  const [selected, setSelected] = useState<ScenarioRequest['scenario_type']>('heatwave');
   const [result, setResult] = useState<ScenarioResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleRun = async (request: ScenarioRequest) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await simulateScenario(request);
-      setResult(response);
-    } catch {
-      setResult(null);
-      setError('Scenario service is unavailable. No cached demo result was substituted.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  async function run() {
+    setLoading(true); setError(null);
+    try { setResult(await simulateScenario({ scenario_type: selected, params: {} })); }
+    catch { setResult(null); setError(t('Senaryo servisine ulaşılamadı; demo sonucu uydurulmadı.', 'Scenario service is unavailable; no demo result was substituted.')); }
+    finally { setLoading(false); }
+  }
 
   return (
-    <div className="space-y-4 md:space-y-5">
-      <section className="bc-surface-dark relative overflow-hidden rounded-[30px] px-5 py-7 text-white sm:px-7 lg:px-9 lg:py-9">
-        <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl" />
-        <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="flex flex-wrap items-center gap-2"><span className="bc-chip border-violet-400/20 bg-violet-400/10 text-violet-200"><FlaskConical size={10} /> COUNTERFACTUAL LAB</span><span className="bc-chip border-white/10 bg-white/5 text-slate-300"><Sparkles size={10} /> MODEL OUTPUT</span></div>
-            <h1 className="mt-6 text-[38px] font-black leading-[0.98] tracking-[-0.055em] sm:text-[48px]">What if campus<br /><span className="text-violet-300">behaved differently tomorrow?</span></h1>
-            <p className="mt-4 max-w-2xl text-[12px] leading-relaxed text-slate-400">Heatwave, exam week, event or closure gibi şokları güvenli bir model alanında test et. Sonuçlar karşılaştırmalı karar desteğidir; canlı operasyon sonucu veya otomatik saha komutu değildir.</p>
-          </div>
-          <div className="max-w-sm rounded-[20px] border border-white/10 bg-white/5 p-4 text-[10px] leading-relaxed text-slate-400"><strong className="mb-1 block text-[9px] uppercase tracking-[0.15em] text-slate-500">Truth boundary</strong>Scenario service çalışmazsa uygulama eski demo değerine dönmez. Hata görünür kalır ve sonuç paneli boş bırakılır.</div>
-        </div>
-      </section>
+    <div className="space-y-7">
+      <section className="border-b border-slate-900/10 pb-7"><div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{t('Karşı-olgusal model', 'Counterfactual model')}</div><h1 className="mt-3 text-[38px] font-black tracking-[-0.055em] text-slate-950 sm:text-[48px]">{t('Senaryolar', 'Scenarios')}</h1><p className="mt-3 max-w-2xl text-[12px] leading-6 text-slate-500">{t('Kampüs davranışını değiştirmeden önce “ne olurdu?” sorusunu model alanında test et. Sonuçlar operasyon gerçeği değil karar desteğidir.', 'Test “what if?” questions in a model space before changing campus operations. Results are decision support, not observed operational truth.')}</p></section>
 
-      {error && (
-        <div className="flex items-start gap-3 rounded-[18px] border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900"><AlertTriangle size={15} className="mt-0.5 shrink-0" /><div><div className="text-[10px] font-black uppercase tracking-[0.12em]">Scenario unavailable</div><div className="mt-1 text-[10px] leading-relaxed text-amber-800">{error}</div></div></div>
-      )}
+      {error && <div className="flex items-start gap-2 border border-amber-200 bg-amber-50 p-3 text-[10px] text-amber-900"><AlertTriangle size={14} /> {error}</div>}
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(330px,0.68fr)_minmax(0,1.32fr)] xl:items-stretch">
-        <Simulator onRunScenario={handleRun} isLoading={isLoading} />
-        <ComparisonView result={result} />
+      <section className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
+        <div><div className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{t('Senaryo seç', 'Choose scenario')}</div><div className="mt-3 divide-y divide-slate-900/8 border-y border-slate-900/10 bg-white">{SCENARIOS.map(item => <button key={item.type} type="button" onClick={() => setSelected(item.type)} className={`block w-full px-4 py-3 text-left ${selected === item.type ? 'bg-slate-50' : ''}`}><div className="flex items-center justify-between gap-3"><span className="text-[12px] font-black text-slate-900">{locale === 'tr' ? item.tr : item.en}</span>{selected === item.type && <span className="h-2 w-2 rounded-full bg-[#173f67]" />}</div><div className="mt-1 text-[9px] text-slate-500">{locale === 'tr' ? item.trn : item.enn}</div></button>)}</div><button type="button" disabled={loading} onClick={run} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#102a43] px-4 py-3 text-[11px] font-black text-white disabled:opacity-50"><Play size={12} fill="currentColor" /> {loading ? t('Hesaplanıyor…', 'Running…') : t('Senaryoyu çalıştır', 'Run scenario')}</button></div>
+
+        <div className="border-t border-slate-900/10 pt-4 lg:border-l lg:border-t-0 lg:pl-6"><div className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{t('Karşılaştırma', 'Comparison')}</div>{result ? <div className="mt-4 grid gap-3 sm:grid-cols-2"><Metric label={t('Enerji değişimi', 'Energy change')} value={`${result.changes.energy_change_percent > 0 ? '+' : ''}${result.changes.energy_change_percent.toFixed(1)}%`} /><Metric label={t('Yemek talebi', 'Food demand')} value={`${result.changes.food_change_percent > 0 ? '+' : ''}${result.changes.food_change_percent.toFixed(1)}%`} /><Metric label={t('CO₂ değişimi', 'CO₂ change')} value={`${result.changes.co2_change_percent > 0 ? '+' : ''}${result.changes.co2_change_percent.toFixed(1)}%`} /><Metric label={t('Maliyet farkı', 'Cost delta')} value={`${result.changes.cost_change_tl.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} TL`} /></div> : <div className="mt-4 grid min-h-[260px] place-items-center border border-dashed border-slate-300 bg-white p-6 text-center text-[11px] leading-5 text-slate-400">{t('Bir senaryo seçip çalıştırdığında değişimler burada görünür.', 'Run a scenario to see the modeled deltas here.')}</div>}<p className="mt-4 text-[9px] leading-4 text-slate-400">{t('Bu değerler model çıktısıdır; gerçek sayaç, POS veya sensör ölçümü değildir.', 'These values are model outputs, not meter, POS or sensor measurements.')}</p></div>
       </section>
     </div>
   );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return <div className="border-t border-slate-900/10 py-4"><div className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-400">{label}</div><div className="mt-2 font-mono text-2xl font-black tracking-[-0.04em] text-slate-900">{value}</div></div>;
 }
