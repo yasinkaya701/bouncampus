@@ -103,20 +103,27 @@ export async function fetchBounWeather(): Promise<WeatherFeed> {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     const current = json.current ?? {};
+    const temperature = Number.isFinite(current.temperature_2m) ? current.temperature_2m : null;
+    const humidity = Number.isFinite(current.relative_humidity_2m) ? current.relative_humidity_2m : null;
+    const windSpeed = Number.isFinite(current.wind_speed_10m) ? current.wind_speed_10m : null;
+    const parsed = temperature !== null && humidity !== null && windSpeed !== null;
+
     return {
-      temperature: Number.isFinite(current.temperature_2m) ? current.temperature_2m : null,
-      humidity: Number.isFinite(current.relative_humidity_2m) ? current.relative_humidity_2m : null,
+      temperature,
+      humidity,
       rain: typeof current.rain === 'number' || typeof current.precipitation === 'number'
         ? (current.rain ?? 0) > 0.1 || (current.precipitation ?? 0) > 0.1
         : null,
-      wind_speed_kmh: Number.isFinite(current.wind_speed_10m) ? current.wind_speed_10m : null,
+      wind_speed_kmh: windSpeed,
       source: source(
         'weather-bebek',
         'Open-Meteo — Boğaziçi Bebek koordinatları',
         OPEN_METEO_URL,
         'EXTERNAL_LIVE',
-        true,
-        'Üniversite sensörü değildir; kampüs koordinatına ait harici meteoroloji verisidir.',
+        parsed,
+        parsed
+          ? 'Üniversite sensörü değildir; kampüs koordinatına ait haricî meteoroloji verisidir.'
+          : 'Haricî kaynak erişildi ancak beklenen current hava alanları ayrıştırılamadı.',
       ),
     };
   } catch (error) {
@@ -153,10 +160,10 @@ export async function fetchBounMenu(): Promise<MenuFeed> {
         'Boğaziçi Üniversitesi SKS Yemekhane',
         BOUN_MENU_URL,
         'OFFICIAL_LIVE',
-        true,
+        parsed,
         parsed
-          ? 'Resmî SKS sayfasından sunucu tarafında çekildi.'
-          : 'Resmî sayfa erişilebilir ancak HTML alanları ayrıştırılamadı; sahte menü değeri üretilmedi.',
+          ? 'Resmî SKS sayfasından sunucu tarafında çekildi ve yapılandırılmış menü alanı ayrıştırıldı.'
+          : 'Resmî sayfa erişilebilir ancak menü alanları ayrıştırılamadı; sahte menü değeri üretilmedi.',
       ),
     };
   } catch (error) {
@@ -181,7 +188,7 @@ export async function fetchBounShuttle(): Promise<ShuttleFeed> {
     const res = await fetchWithTimeout(BOUN_SHUTTLE_URL, 300);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
-    const times = Array.from(new Set(html.match(/\b(?:[01]\d|2[0-3]):[0-5]\d\b/g) ?? []))
+    const times = Array.from(new Set(html.match(/\b(?:[01]\d|2[0-3]):[0-5]\d(?!:)/g) ?? []))
       .sort((a, b) => minutesFromMidnight(a) - minutesFromMidnight(b));
 
     const istanbulClock = new Intl.DateTimeFormat('en-GB', {
@@ -231,8 +238,8 @@ export async function fetchBounCalendar(): Promise<CalendarFeed> {
         'Boğaziçi Üniversitesi Akademik Takvim',
         BOUN_CALENDAR_URL,
         'OFFICIAL_LIVE',
-        true,
-        headings.length ? `${headings.length} yaklaşan başlık ayrıştırıldı.` : 'Resmî takvim erişilebilir; başlık ayrıştırması boş döndü.',
+        headings.length > 0,
+        headings.length ? `${headings.length} takvim başlığı ayrıştırıldı.` : 'Resmî takvim erişilebilir; yapılandırılmış başlık ayrıştırması boş döndü.',
       ),
     };
   } catch (error) {
