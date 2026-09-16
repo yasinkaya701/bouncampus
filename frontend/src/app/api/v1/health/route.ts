@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server';
-import { fetchBounCalendar, fetchBounMenu, fetchBounShuttle, fetchBounWeather } from '@/lib/live-sources';
+import realCourses from '@/data/real_boun_courses.json';
+import {
+  courseScheduleSnapshotSource,
+  fetchBounCalendar,
+  fetchBounMenu,
+  fetchBounShuttle,
+  fetchBounWeather,
+} from '@/lib/live-sources';
 
 export async function GET() {
   const startedAt = Date.now();
@@ -10,7 +17,11 @@ export async function GET() {
     fetchBounWeather(),
   ]);
 
-  const sources = feeds.map(feed => feed.source);
+  const courseCount = Object.keys(realCourses as Record<string, unknown>).length;
+  const sources = [
+    ...feeds.map(feed => feed.source),
+    courseScheduleSnapshotSource(courseCount),
+  ];
   const failed = sources.filter(source => !source.ok);
 
   return NextResponse.json({
