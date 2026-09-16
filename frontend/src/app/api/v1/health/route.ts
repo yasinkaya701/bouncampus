@@ -8,6 +8,8 @@ import {
   fetchBounWeather,
 } from '@/lib/live-sources';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const startedAt = Date.now();
   const feeds = await Promise.all([
@@ -32,5 +34,6 @@ export async function GET() {
     failed_source_ids: failed.map(source => source.id),
   }, {
     status: failed.length === sources.length ? 503 : 200,
+    headers: { 'Cache-Control': 'no-store' },
   });
 }
