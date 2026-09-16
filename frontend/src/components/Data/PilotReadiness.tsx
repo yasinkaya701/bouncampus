@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ArrowRight, CheckCircle2, LockKeyhole, PlugZap, Radar, Target } from 'lucide-react';
 
 const integrations = [
@@ -119,7 +120,7 @@ export default function PilotReadiness() {
                 </div>
               ))}
             </div>
-            <a href="/demo" className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-700">See the full decision loop <ArrowRight size={11} /></a>
+            <Link href="/demo" className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-700">See the full decision loop <ArrowRight size={11} /></Link>
           </div>
         </div>
       </div>
