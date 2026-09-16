@@ -1,6 +1,7 @@
 'use client';
 
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import type { DashboardData } from '@/lib/types';
 import { ArrowDownRight, Gauge, Leaf, Sparkles, Utensils, Users, Zap } from 'lucide-react';
 
@@ -9,7 +10,7 @@ type MetricCardProps = {
   value: string;
   unit?: string;
   note: string;
-  icon: ComponentType<{ size?: number; strokeWidth?: number }>;
+  icon: LucideIcon;
   dark?: boolean;
   footer?: ReactNode;
 };
