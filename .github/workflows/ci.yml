@@ -32,9 +32,10 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64, bouncampus]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Set up Python 3.11
+        run: |
+          uv venv --python 3.11 "$RUNNER_TEMP/bouncampus-python"
+          echo "$RUNNER_TEMP/bouncampus-python/bin" >> "$GITHUB_PATH"
       - name: Compile backend Python
         run: python -m compileall -q backend/app
       - name: Validate critical JSON datasets
