@@ -1,13 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/shared/Header';
 import CampusAICopilot from '@/components/AI/CampusAICopilot';
 import { getSiteUrl } from '@/lib/site-url';
 import 'leaflet/dist/leaflet.css';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
@@ -48,7 +46,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="tr">
-      <body className={`${inter.className} min-h-screen text-[#0a1020]`}>
+      <body className="min-h-screen text-[#0a1020]">
         <a href="#main-content" className="bc-skip-link">Skip to main content</a>
         <Header />
         <main id="main-content" className="mx-auto w-full max-w-[1640px] flex-1 px-3 pb-16 pt-4 sm:px-5 md:px-7 lg:px-9 lg:pt-6">
