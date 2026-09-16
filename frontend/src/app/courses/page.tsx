@@ -1,13 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import Header from '@/components/shared/Header';
-import realCoursesData from '@/data/real_boun_courses.json';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { 
-  BookOpen, Search, Filter, Calendar, MapPin, Clock, 
-  GraduationCap, Award, Building2, User, ChevronRight, Zap
-} from 'lucide-react';
+import realCoursesData from '@/data/real_boun_courses.json';
+import { ArrowRight, BookOpen, Building2, ChevronLeft, ChevronRight, Clock3, Database, MapPin, Search, UserRound } from 'lucide-react';
 
 interface CourseItem {
   code: string;
@@ -20,38 +16,49 @@ interface CourseItem {
   rooms?: string[];
 }
 
-const DAY_LABELS: Record<string, string> = {
-  'M': 'Pazartesi',
-  'T': 'Salı',
-  'W': 'Çarşamba',
-  'Th': 'Perşembe',
-  'F': 'Cuma',
-  'St': 'Cumartesi'
-};
+const DAY_LABELS: Record<string, string> = { M: 'Pzt', T: 'Sal', W: 'Çar', Th: 'Per', F: 'Cum', St: 'Cmt' };
+const SLOT_TO_HOUR: Record<number, number> = { 1: 9, 2: 10, 3: 11, 4: 12, 5: 13, 6: 14, 7: 15, 8: 16, 9: 17, 10: 18, 11: 19, 12: 20, 13: 21 };
 
 const BUILDING_MAP: Record<string, { id: string; name: string; campus: 'south' | 'north' }> = {
-  'TB': { id: 'B-SOUTH-TB', name: 'Anderson Hall', campus: 'south' },
+  TB: { id: 'B-SOUTH-TB', name: 'Anderson Hall', campus: 'south' },
   'İB': { id: 'B-SOUTH-IB', name: 'Washburn Hall', campus: 'south' },
-  'IB': { id: 'B-SOUTH-IB', name: 'Washburn Hall', campus: 'south' },
-  'M': { id: 'B-SOUTH-M', name: 'Perkins Hall', campus: 'south' },
-  'ALH': { id: 'B-SOUTH-ALH', name: 'Albert Long Hall', campus: 'south' },
-  'GH': { id: 'B-SOUTH-GH', name: 'Gates Hall', campus: 'south' },
-  'HH': { id: 'B-SOUTH-HH', name: 'Hamlin Hall', campus: 'south' },
-  'OFB': { id: 'B-SOUTH-OFB', name: 'Dodge Hall (ÖFB)', campus: 'south' },
-  'ÖFB': { id: 'B-SOUTH-OFB', name: 'Dodge Hall (ÖFB)', campus: 'south' },
-  'NB': { id: 'B-SOUTH-NB', name: 'Natuk Birkan', campus: 'south' },
-  'JF': { id: 'B-SOUTH-JF', name: 'John Freely', campus: 'south' },
-  'KB': { id: 'B-NORTH-KB', name: 'Kare Blok', campus: 'north' },
-  'NH': { id: 'B-NORTH-NH', name: 'New Hall', campus: 'north' },
-  'LIB': { id: 'B-NORTH-LIB', name: 'Aptullah Kuran Kütüphanesi', campus: 'north' },
-  'BM': { id: 'B-NORTH-BM', name: 'Bilgisayar Müh.', campus: 'north' },
-  'EF': { id: 'B-NORTH-EF', name: 'Eğitim Fakültesi', campus: 'north' },
-  'YD': { id: 'B-NORTH-YD', name: 'YADYOK', campus: 'north' },
-  'ETA': { id: 'B-NORTH-ETA', name: 'ETA-B Blok', campus: 'north' },
-  'ET': { id: 'B-NORTH-ETA', name: 'ETA-B Blok', campus: 'north' },
-  'KP': { id: 'B-NORTH-KP', name: 'Teknopark', campus: 'north' },
-  'SBU': { id: 'B-NORTH-SBU', name: 'SineBU', campus: 'north' },
+  IB: { id: 'B-SOUTH-IB', name: 'Washburn Hall', campus: 'south' },
+  M: { id: 'B-SOUTH-M', name: 'Perkins Hall', campus: 'south' },
+  ALH: { id: 'B-SOUTH-ALH', name: 'Albert Long Hall', campus: 'south' },
+  GH: { id: 'B-SOUTH-GH', name: 'Gates Hall', campus: 'south' },
+  HH: { id: 'B-SOUTH-HH', name: 'Hamlin Hall', campus: 'south' },
+  OFB: { id: 'B-SOUTH-OFB', name: 'Dodge Hall', campus: 'south' },
+  'ÖFB': { id: 'B-SOUTH-OFB', name: 'Dodge Hall', campus: 'south' },
+  NB: { id: 'B-SOUTH-NB', name: 'Natuk Birkan', campus: 'south' },
+  JF: { id: 'B-SOUTH-JF', name: 'John Freely', campus: 'south' },
+  KB: { id: 'B-NORTH-KB', name: 'Kare Blok', campus: 'north' },
+  NH: { id: 'B-NORTH-NH', name: 'New Hall', campus: 'north' },
+  LIB: { id: 'B-NORTH-LIB', name: 'Aptullah Kuran Library', campus: 'north' },
+  BM: { id: 'B-NORTH-BM', name: 'Computer Engineering', campus: 'north' },
+  EF: { id: 'B-NORTH-EF', name: 'Faculty of Education', campus: 'north' },
+  YD: { id: 'B-NORTH-YD', name: 'YADYOK', campus: 'north' },
+  ETA: { id: 'B-NORTH-ETA', name: 'ETA-B', campus: 'north' },
+  ET: { id: 'B-NORTH-ETA', name: 'ETA-B', campus: 'north' },
+  KP: { id: 'B-NORTH-KP', name: 'Kuzey Park', campus: 'north' },
+  SBU: { id: 'B-NORTH-SBU', name: 'SineBU', campus: 'north' },
 };
+
+function roomBuilding(room?: string) {
+  const prefix = room?.trim().match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/)?.[1]?.toUpperCase();
+  return prefix ? BUILDING_MAP[prefix] : undefined;
+}
+
+function scheduleText(course: CourseItem) {
+  const days = course.days ?? [];
+  const hours = course.hours ?? [];
+  return days
+    .map((day, index) => {
+      const slot = hours[index];
+      const hour = SLOT_TO_HOUR[slot] ?? slot;
+      return `${DAY_LABELS[day] ?? day} ${String(hour ?? '—').padStart(2, '0')}:00`;
+    })
+    .join(' · ') || 'Schedule unavailable';
+}
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,280 +66,155 @@ export default function CoursesPage() {
   const [selectedDay, setSelectedDay] = useState('ALL');
   const [selectedCampus, setSelectedCampus] = useState<'ALL' | 'south' | 'north'>('ALL');
   const [page, setPage] = useState(1);
-  const pageSize = 30;
+  const pageSize = 24;
 
-  // Convert dictionary of courses to array
-  const allCourses: CourseItem[] = useMemo(() => {
-    return Object.values(realCoursesData as unknown as Record<string, CourseItem>);
-  }, []);
+  const allCourses = useMemo(() => Object.values(realCoursesData as unknown as Record<string, CourseItem>), []);
 
-  // Extract list of all unique departments from codes (e.g. CMPE from CMPE 150.01)
   const departments = useMemo(() => {
     const set = new Set<string>();
-    allCourses.forEach(c => {
-      const match = c.code.match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/);
-      if (match) set.add(match[1].toUpperCase());
+    allCourses.forEach(course => {
+      const prefix = course.code.match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/)?.[1];
+      if (prefix) set.add(prefix.toUpperCase());
     });
     return Array.from(set).sort();
   }, [allCourses]);
 
-  // Filter courses
   const filteredCourses = useMemo(() => {
-    const term = searchTerm.toLowerCase().trim();
-
+    const term = searchTerm.toLocaleLowerCase('tr-TR').trim();
     return allCourses.filter(course => {
-      // Dept filter
-      if (selectedDept !== 'ALL') {
-        const match = course.code.match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/);
-        if (!match || match[1].toUpperCase() !== selectedDept) return false;
-      }
-
-      // Day filter
-      if (selectedDay !== 'ALL') {
-        if (!course.days || !course.days.includes(selectedDay)) return false;
-      }
-
-      // Search term
-      if (term) {
-        const matchesCode = course.code.toLowerCase().includes(term);
-        const matchesName = course.name.toLowerCase().includes(term);
-        const matchesInstructor = (course.instructor || '').toLowerCase().includes(term);
-        const matchesRoom = (course.rooms || []).some(r => r.toLowerCase().includes(term));
-        if (!matchesCode && !matchesName && !matchesInstructor && !matchesRoom) return false;
-      }
-
-      // Campus filter
+      const dept = course.code.match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/)?.[1]?.toUpperCase();
+      if (selectedDept !== 'ALL' && dept !== selectedDept) return false;
+      if (selectedDay !== 'ALL' && !(course.days ?? []).includes(selectedDay)) return false;
       if (selectedCampus !== 'ALL') {
-        const hasCampusRoom = (course.rooms || []).some(r => {
-          const m = r.match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/);
-          if (m && BUILDING_MAP[m[1].toUpperCase()]) {
-            return BUILDING_MAP[m[1].toUpperCase()].campus === selectedCampus;
-          }
-          return false;
-        });
-        if (!hasCampusRoom) return false;
+        const match = (course.rooms ?? []).some(room => roomBuilding(room)?.campus === selectedCampus);
+        if (!match) return false;
       }
-
-      return true;
+      if (!term) return true;
+      return [course.code, course.name, course.instructor ?? '', ...(course.rooms ?? [])]
+        .some(value => value.toLocaleLowerCase('tr-TR').includes(term));
     });
   }, [allCourses, searchTerm, selectedDept, selectedDay, selectedCampus]);
 
-  const totalPages = Math.ceil(filteredCourses.length / pageSize);
+  const totalPages = Math.max(1, Math.ceil(filteredCourses.length / pageSize));
   const paginatedCourses = filteredCourses.slice((page - 1) * pageSize, page * pageSize);
 
+  const resetPage = () => setPage(1);
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Header />
-
-      <main className="flex-1 container mx-auto px-4 py-8 space-y-6">
-        {/* Header Title */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold flex items-center gap-1.5 border border-emerald-500/30">
-                <BookOpen size={13} className="text-emerald-400" />
-                OBIKAS CANLI VERİ TABANI
-              </span>
-              <span className="text-xs text-slate-400 font-mono">3.238 Gerçek Boğaziçi Dersi & Amfisi</span>
+    <div className="space-y-4 md:space-y-5">
+      <section className="bc-surface-dark relative overflow-hidden rounded-[30px] px-5 py-7 text-white sm:px-7 lg:px-9 lg:py-9">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-blue-500/15 blur-3xl" />
+        <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bc-chip border-violet-400/20 bg-violet-400/10 text-violet-200"><Database size={10} /> OFFICIAL SNAPSHOT</span>
+              <span className="font-mono text-[9px] font-bold text-slate-500">BUIS / ÖBİKAS PUBLIC COURSE SCHEDULE</span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-white tracking-tight">
-              Boğaziçi Ders, Amfi & Doluluk Arama Motoru
-            </h1>
-            <p className="text-sm text-slate-400 mt-1">
-              Ders koduna, amfiye, öğretim üyesine veya bölüme göre canlı arama yapın; derslik doluluk ve enerji yüklerini inceleyin.
-            </p>
+            <h1 className="mt-6 text-[38px] font-black leading-[0.98] tracking-[-0.055em] sm:text-[48px]">Find any course.<br /><span className="text-blue-300">See where campus demand begins.</span></h1>
+            <p className="mt-4 max-w-2xl text-[12px] leading-relaxed text-slate-400">Ders, öğretim üyesi ve oda kayıtlarını resmî kaynaklı schedule snapshot üzerinden ara. Bu sayfa canlı öğrenci sayımı değil; kampüs kullanım modelinin akademik sinyal katmanıdır.</p>
           </div>
-
-          <div className="bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-2xl flex items-center gap-4 text-center">
-            <div>
-              <span className="text-[10px] text-slate-400 font-mono block">Toplam Ders</span>
-              <span className="text-xl font-black text-emerald-400 font-mono">{allCourses.length}</span>
+          <div className="grid grid-cols-2 gap-2 sm:min-w-[300px]">
+            <div className="rounded-[18px] border border-white/10 bg-white/5 p-4">
+              <div className="text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">Snapshot</div>
+              <div className="mt-2 font-mono text-2xl font-black tracking-[-0.04em] text-white">{allCourses.length.toLocaleString('tr-TR')}</div>
+              <div className="mt-1 text-[10px] text-slate-500">course records</div>
             </div>
-            <div className="w-px h-8 bg-slate-800"></div>
-            <div>
-              <span className="text-[10px] text-slate-400 font-mono block">Filtrelenen</span>
-              <span className="text-xl font-black text-white font-mono">{filteredCourses.length}</span>
+            <div className="rounded-[18px] border border-white/10 bg-white/5 p-4">
+              <div className="text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">Current view</div>
+              <div className="mt-2 font-mono text-2xl font-black tracking-[-0.04em] text-blue-300">{filteredCourses.length.toLocaleString('tr-TR')}</div>
+              <div className="mt-1 text-[10px] text-slate-500">matching records</div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Search & Filter Bar */}
-        <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-xl space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Search Input */}
-            <div className="flex-1 min-w-[260px] relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Ders kodu (CMPE 150), ders adı, hoca veya amfi (NH 101, M 1100)..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
-              />
-            </div>
+      <section className="bc-surface sticky top-[72px] z-30 rounded-[24px] p-3 sm:p-4">
+        <div className="grid gap-2 lg:grid-cols-[minmax(280px,1fr)_170px_160px_auto]">
+          <label className="relative block">
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              value={searchTerm}
+              onChange={event => { setSearchTerm(event.target.value); resetPage(); }}
+              placeholder="CMPE 150, instructor, NH 101…"
+              className="bc-focus-ring w-full rounded-[14px] border border-slate-950/10 bg-[#f4f5f2] py-2.5 pl-10 pr-3 text-[11px] font-semibold text-slate-800 placeholder:text-slate-400"
+            />
+          </label>
 
-            {/* Department Selector */}
-            <select
-              value={selectedDept}
-              onChange={(e) => {
-                setSelectedDept(e.target.value);
-                setPage(1);
-              }}
-              className="bg-slate-950 border border-slate-800 text-xs text-slate-200 px-3 py-2.5 rounded-xl outline-none focus:border-emerald-500 font-mono"
-            >
-              <option value="ALL">Tüm Bölümler ({departments.length})</option>
-              {departments.map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
+          <select value={selectedDept} onChange={event => { setSelectedDept(event.target.value); resetPage(); }} className="bc-focus-ring rounded-[14px] border border-slate-950/10 bg-white px-3 py-2.5 text-[10px] font-bold text-slate-600">
+            <option value="ALL">All departments</option>
+            {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
+          </select>
 
-            {/* Day Selector */}
-            <select
-              value={selectedDay}
-              onChange={(e) => {
-                setSelectedDay(e.target.value);
-                setPage(1);
-              }}
-              className="bg-slate-950 border border-slate-800 text-xs text-slate-200 px-3 py-2.5 rounded-xl outline-none focus:border-emerald-500"
-            >
-              <option value="ALL">Tüm Günler</option>
-              <option value="M">Pazartesi</option>
-              <option value="T">Salı</option>
-              <option value="W">Çarşamba</option>
-              <option value="Th">Perşembe</option>
-              <option value="F">Cuma</option>
-            </select>
+          <select value={selectedDay} onChange={event => { setSelectedDay(event.target.value); resetPage(); }} className="bc-focus-ring rounded-[14px] border border-slate-950/10 bg-white px-3 py-2.5 text-[10px] font-bold text-slate-600">
+            <option value="ALL">Any day</option>
+            <option value="M">Pazartesi</option><option value="T">Salı</option><option value="W">Çarşamba</option><option value="Th">Perşembe</option><option value="F">Cuma</option>
+          </select>
 
-            {/* Campus Selector */}
-            <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-              <button
-                onClick={() => { setSelectedCampus('ALL'); setPage(1); }}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition ${selectedCampus === 'ALL' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
-              >
-                Tümü
+          <div className="flex rounded-[14px] border border-slate-950/10 bg-[#f4f5f2] p-1">
+            {(['ALL', 'south', 'north'] as const).map(campus => (
+              <button key={campus} type="button" onClick={() => { setSelectedCampus(campus); resetPage(); }} className={`bc-focus-ring rounded-[10px] px-3 py-1.5 text-[9px] font-black transition ${selectedCampus === campus ? 'bg-[#0b1226] text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
+                {campus === 'ALL' ? 'All' : campus === 'south' ? 'Güney' : 'Kuzey'}
               </button>
-              <button
-                onClick={() => { setSelectedCampus('south'); setPage(1); }}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition ${selectedCampus === 'south' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
-              >
-                Güney
-              </button>
-              <button
-                onClick={() => { setSelectedCampus('north'); setPage(1); }}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition ${selectedCampus === 'north' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
-              >
-                Kuzey
-              </button>
-            </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Results List */}
-        <div className="space-y-3">
-          {paginatedCourses.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400">
-              <BookOpen size={36} className="mx-auto text-slate-600 mb-3" />
-              <p className="font-bold text-base text-white">Aramanızla eşleşen Boğaziçi dersi bulunamadı.</p>
-              <p className="text-xs text-slate-500 mt-1">Filtreleri temizleyerek tekrar deneyin.</p>
-            </div>
-          ) : (
-            paginatedCourses.map((c, idx) => {
-              const mainRoom = (c.rooms && c.rooms[0]) ? c.rooms[0].trim() : 'Amfi Belirlenmedi';
-              const roomPrefix = mainRoom.match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/);
-              const bldgInfo = roomPrefix ? BUILDING_MAP[roomPrefix[1].toUpperCase()] : null;
-
-              return (
-                <div 
-                  key={`${c.code}-${idx}`}
-                  className="bg-slate-900/60 hover:bg-slate-900/95 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-4 transition shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-md"
-                >
-                  {/* Left: Code, Title & Instructor */}
-                  <div className="space-y-1 md:max-w-[48%]">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800/80 font-mono text-xs font-black">
-                        {c.code}
-                      </span>
-                      <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">
-                        {c.credits} Kredi • {c.ects || 5.0} AKTS
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-sm text-white">{c.name}</h3>
-                    <p className="text-xs text-slate-400 flex items-center gap-1">
-                      <User size={12} className="text-slate-500" />
-                      <span>{c.instructor || 'Öğretim Üyesi Belirtilmedi'}</span>
-                    </p>
+      <section className="space-y-2">
+        {paginatedCourses.length === 0 ? (
+          <div className="bc-surface rounded-[26px] p-12 text-center">
+            <BookOpen size={28} className="mx-auto text-slate-300" />
+            <h2 className="mt-4 text-sm font-black text-slate-800">No course matches this view.</h2>
+            <p className="mt-1 text-[11px] text-slate-500">Search term or filters can be broadened.</p>
+          </div>
+        ) : paginatedCourses.map((course, index) => {
+          const mainRoom = course.rooms?.[0];
+          const building = roomBuilding(mainRoom);
+          return (
+            <article key={`${course.code}-${index}`} className="bc-surface group rounded-[22px] p-4 transition duration-200 hover:-translate-y-0.5 hover:border-slate-950/15 hover:shadow-[0_12px_34px_rgba(10,16,32,0.06)] sm:p-5">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.8fr)_auto] lg:items-center">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-lg bg-[#0b1226] px-2 py-1 font-mono text-[10px] font-black text-white">{course.code}</span>
+                    <span className="font-mono text-[9px] font-bold text-slate-400">{course.credits} CR · {course.ects || 5} ECTS</span>
                   </div>
+                  <h2 className="mt-2 text-[14px] font-black leading-snug tracking-[-0.02em] text-[#0a1020]">{course.name}</h2>
+                  <div className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold text-slate-500"><UserRound size={11} /> {course.instructor || 'Instructor not listed'}</div>
+                </div>
 
-                  {/* Middle: Schedule & Amfi */}
-                  <div className="flex flex-wrap items-center gap-4 text-xs">
-                    <div className="bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 font-mono">
-                      <span className="text-slate-500 text-[10px] block flex items-center gap-1">
-                        <Clock size={11} /> Ders Saatleri
-                      </span>
-                      <span className="text-slate-200 font-bold">
-                        {(c.days || []).map((d, i) => `${DAY_LABELS[d] || d} ${(c.hours || [])[i] || ''}:00`).join(', ') || 'Saat Belirtilmedi'}
-                      </span>
-                    </div>
-
-                    <div className="bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 font-mono">
-                      <span className="text-slate-500 text-[10px] block flex items-center gap-1">
-                        <MapPin size={11} /> Derslik / Amfi
-                      </span>
-                      <span className="text-emerald-400 font-bold">
-                        {(c.rooms || []).join(', ') || 'Online / Belirtilmedi'}
-                      </span>
-                    </div>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  <div className="rounded-[14px] bg-[#f4f5f2] p-3">
+                    <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-[0.14em] text-slate-400"><Clock3 size={9} /> Schedule</div>
+                    <div className="mt-1.5 text-[10px] font-bold leading-relaxed text-slate-700">{scheduleText(course)}</div>
                   </div>
-
-                  {/* Right: Building Link & Details */}
-                  <div>
-                    {bldgInfo ? (
-                      <Link
-                        href={`/buildings/${bldgInfo.id}`}
-                        className="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-xs whitespace-nowrap"
-                      >
-                        <Building2 size={13} />
-                        <span>{bldgInfo.name}</span>
-                        <ChevronRight size={13} />
-                      </Link>
-                    ) : (
-                      <span className="text-xs text-slate-500 italic">Genel Kampüs</span>
-                    )}
+                  <div className="rounded-[14px] bg-[#f4f5f2] p-3">
+                    <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-[0.14em] text-slate-400"><MapPin size={9} /> Room</div>
+                    <div className="mt-1.5 text-[10px] font-bold leading-relaxed text-slate-700">{(course.rooms ?? []).join(' · ') || 'Room not listed'}</div>
                   </div>
                 </div>
-              );
-            })
-          )}
-        </div>
 
-        {/* Pagination Bar */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs text-slate-400">
-            <span>
-              Sayfa <strong className="text-white">{page}</strong> / {totalPages} ({filteredCourses.length} ders)
-            </span>
-            <div className="flex items-center space-x-2">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800 transition"
-              >
-                &larr; Önceki
-              </button>
-              <button
-                disabled={page === totalPages}
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800 transition"
-              >
-                Sonraki &rarr;
-              </button>
-            </div>
+                <div className="flex justify-end">
+                  {building ? (
+                    <Link href={`/buildings/${building.id}`} className="bc-focus-ring inline-flex items-center gap-2 rounded-[13px] border border-slate-950/10 bg-white px-3 py-2 text-[10px] font-black text-slate-700 transition group-hover:bg-[#0b1226] group-hover:text-white">
+                      <Building2 size={12} /> {building.name} <ArrowRight size={11} />
+                    </Link>
+                  ) : <span className="text-[9px] font-bold text-slate-400">No mapped building</span>}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      {totalPages > 1 && (
+        <section className="flex flex-col gap-3 rounded-[20px] border border-slate-950/10 bg-white/60 px-4 py-3 text-[10px] sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-bold text-slate-500">Page <strong className="text-slate-900">{page}</strong> of {totalPages} · {filteredCourses.length.toLocaleString('tr-TR')} results</span>
+          <div className="flex gap-2">
+            <button type="button" disabled={page === 1} onClick={() => setPage(value => Math.max(1, value - 1))} className="bc-focus-ring inline-flex items-center gap-1 rounded-xl border border-slate-950/10 bg-white px-3 py-2 font-black text-slate-600 disabled:cursor-not-allowed disabled:opacity-35"><ChevronLeft size={11} /> Previous</button>
+            <button type="button" disabled={page === totalPages} onClick={() => setPage(value => Math.min(totalPages, value + 1))} className="bc-focus-ring inline-flex items-center gap-1 rounded-xl bg-[#0b1226] px-3 py-2 font-black text-white disabled:cursor-not-allowed disabled:opacity-35">Next <ChevronRight size={11} /></button>
           </div>
-        )}
-      </main>
+        </section>
+      )}
     </div>
   );
 }

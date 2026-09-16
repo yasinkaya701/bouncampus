@@ -1,3 +1,5 @@
+import type { SourceMeta } from './live-sources';
+
 export interface Building {
   id: string;
   name: string;
@@ -93,35 +95,46 @@ export interface ActionItem {
   impact_value: number;
   impact_unit: string;
   icon: string;
+  provenance?: 'MODEL_ESTIMATE' | 'OFFICIAL_LIVE' | 'OFFICIAL_SNAPSHOT';
 }
 
 export interface LiveWeatherInfo {
   source: string;
-  temperature: number;
-  humidity: number;
-  rain: boolean;
-  wind_speed: number;
+  temperature: number | null;
+  humidity: number | null;
+  rain: boolean | null;
+  wind_speed: number | null;
+  provenance?: SourceMeta;
 }
 
 export interface LiveMenuInfo {
   source: string;
   date: string;
-  soup: string;
-  main_dish: string;
-  calories: number;
-  vegan_dish: string;
+  soup: string | null;
+  main_dish: string | null;
+  calories: number | null;
+  vegan_dish: string | null;
   sides: string[];
   options: string[];
   popularity_multiplier: number;
+  provenance?: SourceMeta;
 }
 
 export interface LiveWindTurbineInfo {
   source: string;
-  wind_speed_kmh: number;
-  current_power_kw: number;
-  daily_clean_mwh: number;
-  co2_offset_kg: number;
-  campus_electricity_coverage_percent: number;
+  wind_speed_kmh: number | null;
+  current_power_kw: number | null;
+  daily_clean_mwh: number | null;
+  co2_offset_kg: number | null;
+  campus_electricity_coverage_percent: number | null;
+  provenance?: SourceMeta;
+}
+
+export interface LiveShuttleInfo {
+  route: string;
+  departure_times: string[];
+  next_departure: string | null;
+  provenance: SourceMeta;
 }
 
 export interface RealCampusEvent {
@@ -132,6 +145,15 @@ export interface RealCampusEvent {
   expected_attendance: number;
   category: string;
   impact: string;
+}
+
+export interface DataQualitySummary {
+  mode: 'LIVE_WITH_MODELS' | 'DEGRADED';
+  official_live_sources: number;
+  external_live_sources: number;
+  model_estimates: string[];
+  unavailable_sources: string[];
+  note: string;
 }
 
 export interface DashboardData {
@@ -149,8 +171,12 @@ export interface DashboardData {
   live_weather?: LiveWeatherInfo;
   live_menu?: LiveMenuInfo;
   live_wind?: LiveWindTurbineInfo;
+  live_shuttle?: LiveShuttleInfo;
   today_events?: RealCampusEvent[];
+  academic_calendar?: string[];
   real_courses_loaded?: number;
+  sources?: SourceMeta[];
+  data_quality?: DataQualitySummary;
 }
 
 export interface ScenarioRequest {

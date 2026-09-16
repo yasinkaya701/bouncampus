@@ -1,250 +1,177 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
-import { Building } from '@/lib/types';
-import Link from 'next/link';
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet';
 import dynamic from 'next/dynamic';
-import { Layers, Box, Globe, Compass } from 'lucide-react';
+import Link from 'next/link';
+import { Box, Globe2, Layers3, Map as MapIcon, Sparkles } from 'lucide-react';
+import type { Building } from '@/lib/types';
 
-// Dynamic import for CesiumJS real geospatial 3D globe component
 const CampusCesiumMap = dynamic(() => import('./CampusCesiumMap'), {
   ssr: false,
-  loading: () => (
-    <div className="h-[480px] w-full bg-slate-950 rounded-xl flex flex-col items-center justify-center text-slate-300 gap-3 border border-slate-800">
-      <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-      <div className="text-center">
-        <p className="text-sm font-semibold text-white">CesiumJS Gerçek 3D Küre Yükleniyor...</p>
-        <p className="text-xs text-slate-400 mt-0.5">ArcGIS Uydu Dokuları & Boğaziçi 3D Binaları Hazırlanıyor</p>
-      </div>
-    </div>
-  )
+  loading: () => <MapLoading label="3D globe is loading" />,
 });
 
-// Dynamic import for 3D Three.js component to avoid SSR issues
 const CampusMap3D = dynamic(() => import('./CampusMap3D'), {
   ssr: false,
-  loading: () => (
-    <div className="h-[460px] w-full bg-slate-900 rounded-xl flex flex-col items-center justify-center text-gray-400 gap-2">
-      <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-      <span className="text-xs">3D Dijital İkiz Yükleniyor...</span>
-    </div>
-  )
+  loading: () => <MapLoading label="Digital twin is loading" />,
 });
 
-function getColor(occupancyRatio: number | undefined) {
-  if (occupancyRatio === undefined) return '#9ca3af'; // gray
-  if (occupancyRatio < 0.4) return '#10b981'; // green
-  if (occupancyRatio <= 0.7) return '#f59e0b'; // yellow
-  return '#ef4444'; // red
+function MapLoading({ label }: { label: string }) {
+  return (
+    <div className="grid h-[520px] w-full place-items-center rounded-[20px] bg-[#0b1226] text-white">
+      <div className="text-center">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-blue-300" />
+        <p className="mt-3 text-xs font-bold">{label}</p>
+        <p className="mt-1 font-mono text-[9px] text-slate-500">preparing campus geometry</p>
+      </div>
+    </div>
+  );
+}
+
+function getColor(occupancyRatio?: number) {
+  if (occupancyRatio == null) return '#94a3b8';
+  if (occupancyRatio < 0.4) return '#12805c';
+  if (occupancyRatio <= 0.7) return '#b96b13';
+  return '#c54848';
 }
 
 function MapViewController({ focusCoords, zoom }: { focusCoords: [number, number]; zoom: number }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(focusCoords, zoom, { duration: 1.2 });
+    map.flyTo(focusCoords, zoom, { duration: 0.9 });
   }, [focusCoords, zoom, map]);
   return null;
 }
 
 const TILE_LAYERS = {
-  osm: {
-    name: 'Cadde Haritası',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; OpenStreetMap contributors'
-  },
   satellite: {
-    name: 'Uydu 3D Görünüm',
+    label: 'Satellite',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    attribution: 'Tiles © Esri',
+  },
+  street: {
+    label: 'Street',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '© OpenStreetMap contributors',
   },
   dark: {
-    name: 'Gece Modu',
+    label: 'Dark',
     url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CartoDB'
-  }
-};
+    attribution: '© CARTO',
+  },
+} as const;
+
+type MapMode = '2d' | 'cesium' | '3d';
+type CampusFocus = 'all' | 'south' | 'north';
+type TileType = keyof typeof TILE_LAYERS;
 
 export default function CampusMap({ buildings }: { buildings: Building[] }) {
   const [mounted, setMounted] = useState(false);
-  const [mapMode, setMapMode] = useState<'cesium' | '3d' | '2d'>('cesium'); // Default to Cesium real 3D Globe!
-  const [tileType, setTileType] = useState<'osm' | 'satellite' | 'dark'>('satellite');
-  const [mapCenter, setMapCenter] = useState<[number, number]>([41.0850, 29.0475]);
+  const [mapMode, setMapMode] = useState<MapMode>('2d');
+  const [tileType, setTileType] = useState<TileType>('satellite');
+  const [focus, setFocus] = useState<CampusFocus>('all');
+  const [mapCenter, setMapCenter] = useState<[number, number]>([41.085, 29.0475]);
   const [zoomLevel, setZoomLevel] = useState(16);
-  const [activeCampus, setActiveCampus] = useState<'all' | 'south' | 'north'>('all');
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  const handleFocus = (campus: 'all' | 'south' | 'north') => {
-    setActiveCampus(campus);
-    if (campus === 'south') {
+  const focusCampus = (next: CampusFocus) => {
+    setFocus(next);
+    if (next === 'south') {
       setMapCenter([41.0833, 29.0508]);
       setZoomLevel(17);
-    } else if (campus === 'north') {
+    } else if (next === 'north') {
       setMapCenter([41.0867, 29.0442]);
       setZoomLevel(17);
     } else {
-      setMapCenter([41.0850, 29.0475]);
+      setMapCenter([41.085, 29.0475]);
       setZoomLevel(16);
     }
   };
 
-  if (!mounted) {
-    return (
-      <div className="h-[460px] w-full bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
-        Kampüs haritası yükleniyor...
-      </div>
-    );
-  }
+  if (!mounted) return <MapLoading label="Campus map is loading" />;
 
   return (
-    <div className="space-y-3">
-      {/* Top Map Control Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {/* Left: View Mode Toggle (Cesium vs Three.js 3D vs 2D) */}
-        <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-xl shadow-xs border border-gray-200">
-          <button
-            onClick={() => setMapMode('cesium')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${mapMode === 'cesium' ? 'bg-white text-indigo-700 shadow-xs border border-indigo-100' : 'text-gray-600 hover:text-gray-900'}`}
-          >
-            <Globe size={14} className={mapMode === 'cesium' ? 'text-indigo-600' : ''} />
-            <span>Cesium Gerçek 3D Küre</span>
-            <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[9px] px-1.5 py-0.2 rounded-full font-extrabold uppercase tracking-wider">CESIUM</span>
+    <div>
+      <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex w-fit items-center gap-1 rounded-[14px] border border-slate-950/10 bg-[#f4f5f2] p-1">
+          <button type="button" onClick={() => setMapMode('2d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[10px] font-black transition ${mapMode === '2d' ? 'bg-white text-[#0a1020] shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
+            <MapIcon size={11} /> Map
           </button>
-          <button
-            onClick={() => setMapMode('3d')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${mapMode === '3d' ? 'bg-white text-emerald-800 shadow-xs border border-emerald-100' : 'text-gray-600 hover:text-gray-900'}`}
-          >
-            <Box size={14} className={mapMode === '3d' ? 'text-emerald-600' : ''} />
-            <span>Three.js İkiz</span>
-            <span className="bg-emerald-100 text-emerald-800 text-[9px] px-1.5 py-0.2 rounded-full font-bold">WEBGL</span>
+          <button type="button" onClick={() => setMapMode('cesium')} className={`bc-focus-ring flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[10px] font-black transition ${mapMode === 'cesium' ? 'bg-white text-[#0a1020] shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
+            <Globe2 size={11} /> Globe
           </button>
-          <button
-            onClick={() => setMapMode('2d')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${mapMode === '2d' ? 'bg-white text-emerald-800 shadow-xs border border-emerald-100' : 'text-gray-600 hover:text-gray-900'}`}
-          >
-            <Layers size={14} />
-            <span>2D Katman</span>
+          <button type="button" onClick={() => setMapMode('3d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[10px] font-black transition ${mapMode === '3d' ? 'bg-white text-[#0a1020] shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
+            <Box size={11} /> Twin
           </button>
         </div>
 
-        {/* Right: Mode specific sub-controls */}
-        {mapMode === '2d' ? (
-          <div className="flex items-center space-x-2">
-            {/* Campus Quick Focus */}
-            <div className="flex items-center space-x-1 bg-gray-50 p-0.5 rounded-lg border border-gray-200">
-              <button
-                onClick={() => handleFocus('all')}
-                className={`px-2 py-1 rounded text-xs font-medium transition ${activeCampus === 'all' ? 'bg-emerald-700 text-white' : 'text-gray-600 hover:bg-gray-200'}`}
-              >
-                Tümü
-              </button>
-              <button
-                onClick={() => handleFocus('south')}
-                className={`px-2 py-1 rounded text-xs font-medium transition ${activeCampus === 'south' ? 'bg-emerald-700 text-white' : 'text-gray-600 hover:bg-gray-200'}`}
-              >
-                Güney (Bebek)
-              </button>
-              <button
-                onClick={() => handleFocus('north')}
-                className={`px-2 py-1 rounded text-xs font-medium transition ${activeCampus === 'north' ? 'bg-emerald-700 text-white' : 'text-gray-600 hover:bg-gray-200'}`}
-              >
-                Kuzey (Hisarüstü)
-              </button>
-            </div>
-
-            {/* Tile Layer Selector */}
-            <div className="flex items-center space-x-1 bg-gray-50 p-0.5 rounded-lg border border-gray-200">
-              <button
-                onClick={() => setTileType('satellite')}
-                className={`px-2 py-1 rounded text-xs font-medium transition ${tileType === 'satellite' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-200'}`}
-              >
-                🛰️ Uydu
-              </button>
-              <button
-                onClick={() => setTileType('osm')}
-                className={`px-2 py-1 rounded text-xs font-medium transition ${tileType === 'osm' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-200'}`}
-              >
-                🗺️ Cadde
-              </button>
-              <button
-                onClick={() => setTileType('dark')}
-                className={`px-2 py-1 rounded text-xs font-medium transition ${tileType === 'dark' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-200'}`}
-              >
-                🌙 Gece
-              </button>
-            </div>
-          </div>
-        ) : mapMode === 'cesium' ? (
-          <div className="text-xs text-indigo-700 font-medium flex items-center gap-1.5 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
-            <span className="inline-block w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            <span>CesiumJS Küre • ArcGIS Uydu • 21 Boğaziçi 3D Binası • 360° Drone Uçuşu</span>
-          </div>
-        ) : (
-          <div className="text-xs text-gray-500 flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-200">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Canlı 3D WebGL Motoru • 21 Bina • Gerçek Kat & Doluluk Yükseklikleri</span>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {mapMode === '2d' ? (
+            <>
+              <div className="flex items-center gap-1 rounded-[13px] border border-slate-950/10 bg-white p-1">
+                {(['all', 'south', 'north'] as const).map(item => (
+                  <button key={item} type="button" onClick={() => focusCampus(item)} className={`bc-focus-ring rounded-[9px] px-2.5 py-1 text-[9px] font-black transition ${focus === item ? 'bg-[#0b1226] text-white' : 'text-slate-500 hover:bg-[#f4f5f2]'}`}>
+                    {item === 'all' ? 'All' : item === 'south' ? 'Güney' : 'Kuzey'}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1 rounded-[13px] border border-slate-950/10 bg-white p-1">
+                {(['satellite', 'street', 'dark'] as const).map(item => (
+                  <button key={item} type="button" onClick={() => setTileType(item)} className={`bc-focus-ring rounded-[9px] px-2.5 py-1 text-[9px] font-black transition ${tileType === item ? 'bg-blue-50 text-blue-700' : 'text-slate-500 hover:bg-[#f4f5f2]'}`}>
+                    {TILE_LAYERS[item].label}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <span className="bc-chip border-violet-200 bg-violet-50 text-violet-700"><Sparkles size={10} /> VISUALIZATION MODE</span>
+          )}
+        </div>
       </div>
 
-      {/* Main Map Display (Cesium, Three.js 3D, or 2D) */}
       {mapMode === 'cesium' ? (
-        <CampusCesiumMap buildings={buildings} />
+        <div className="overflow-hidden rounded-[20px]"><CampusCesiumMap buildings={buildings} /></div>
       ) : mapMode === '3d' ? (
-        <CampusMap3D buildings={buildings} />
+        <div className="overflow-hidden rounded-[20px]"><CampusMap3D buildings={buildings} /></div>
       ) : (
-        <div className="h-[460px] w-full rounded-xl overflow-hidden border border-gray-200 shadow-sm relative z-0">
-          <MapContainer 
-            center={mapCenter} 
-            zoom={zoomLevel} 
-            style={{ height: '100%', width: '100%' }}
-          >
+        <div className="relative h-[520px] w-full overflow-hidden rounded-[20px] border border-slate-950/10 bg-slate-200 shadow-inner">
+          <MapContainer center={mapCenter} zoom={zoomLevel} style={{ height: '100%', width: '100%' }}>
             <MapViewController focusCoords={mapCenter} zoom={zoomLevel} />
-            <TileLayer
-              attribution={TILE_LAYERS[tileType].attribution}
-              url={TILE_LAYERS[tileType].url}
-            />
-            {buildings.map(b => (
+            <TileLayer attribution={TILE_LAYERS[tileType].attribution} url={TILE_LAYERS[tileType].url} />
+            {buildings.map(building => (
               <CircleMarker
-                key={b.id}
-                center={b.coords}
-                pathOptions={{ 
-                  fillColor: getColor(b.occupancy_ratio), 
-                  color: getColor(b.occupancy_ratio),
-                  weight: 3,
-                  fillOpacity: 0.8
-                }}
-                radius={11}
+                key={building.id}
+                center={building.coords}
+                pathOptions={{ fillColor: getColor(building.occupancy_ratio), color: '#ffffff', weight: 2, fillOpacity: 0.92 }}
+                radius={9}
               >
                 <Popup>
-                  <div className="p-1 min-w-[190px]">
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <h3 className="font-bold text-sm text-gray-900">{b.name}</h3>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{b.code}</span>
+                  <div className="min-w-[210px] p-1 font-sans">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-black text-slate-900">{building.name}</div>
+                        <div className="mt-0.5 text-[10px] font-semibold text-slate-500">{building.campus === 'south' ? 'Güney' : 'Kuzey'} Campus · {building.floors} floors</div>
+                      </div>
+                      <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-black text-slate-500">{building.code}</span>
                     </div>
-                    <p className="text-xs text-gray-600 mb-2">
-                      {b.campus === 'south' ? 'Güney' : 'Kuzey'} Kampüs • {b.floors} Kat • {b.type}
-                    </p>
-                    <div className="flex justify-between items-center mb-3 bg-gray-50 p-2 rounded">
-                      <span className="text-xs text-gray-600 font-medium">Doluluk Oranı:</span>
-                      <span className="text-xs font-bold" style={{ color: getColor(b.occupancy_ratio) }}>
-                        %{b.occupancy_ratio ? Math.round(b.occupancy_ratio * 100) : 0} Dolu ({b.current_occupancy || 0} Kişi)
-                      </span>
+                    <div className="mt-3 rounded-lg bg-slate-50 p-2.5">
+                      <div className="text-[9px] font-black uppercase tracking-wider text-slate-400">Schedule-derived use</div>
+                      <div className="mt-1 font-mono text-lg font-black" style={{ color: getColor(building.occupancy_ratio) }}>%{Math.round((building.occupancy_ratio ?? 0) * 100)}</div>
+                      <div className="text-[9px] text-slate-400">Model estimate · not a people counter</div>
                     </div>
-                    <Link 
-                      href={`/buildings/${b.id}`} 
-                      className="text-xs bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-md block text-center hover:bg-emerald-800 transition shadow-xs"
-                    >
-                      Bina ve Kat Detayı &rarr;
+                    <Link href={`/buildings/${building.id}`} className="mt-3 flex items-center justify-between rounded-lg bg-[#0b1226] px-3 py-2 text-[10px] font-black text-white">
+                      Building detail <span>→</span>
                     </Link>
                   </div>
                 </Popup>
               </CircleMarker>
             ))}
           </MapContainer>
+          <div className="pointer-events-none absolute bottom-3 left-3 z-[500] flex items-center gap-2 rounded-full border border-white/30 bg-[#0b1226]/85 px-3 py-1.5 text-[9px] font-bold text-white backdrop-blur-md">
+            <Layers3 size={10} /> schedule-derived utilization layer
+          </div>
         </div>
       )}
     </div>

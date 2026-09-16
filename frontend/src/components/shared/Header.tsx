@@ -1,183 +1,150 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Building2, Compass, Navigation, Zap, Utensils, LayoutDashboard, 
-  Cpu, Shuffle, FileText, Users, Bus, GraduationCap, ChevronDown,
-  Wrench, Droplets, Sun, Trophy, Network, ShieldAlert, Volume2, Server, BookOpen,
-  Activity, Search
+import {
+  BookOpen,
+  Building2,
+  CheckSquare2,
+  ChevronDown,
+  Compass,
+  Database,
+  FlaskConical,
+  LayoutDashboard,
+  Search,
+  Sparkles,
 } from 'lucide-react';
+
+const EXPERIMENTAL_PREFIXES = [
+  '/flow', '/microgrid', '/control-room', '/anomalies', '/rescheduler', '/agent-simulation',
+  '/student', '/solar', '/maintenance', '/acoustic', '/iot-registry', '/integrations',
+  '/esg-reports', '/food-waste', '/water', '/transit', '/league',
+];
+
+const primaryNav = [
+  { href: '/', label: 'Overview', icon: LayoutDashboard },
+  { href: '/buildings', label: 'Campus', icon: Building2 },
+  { href: '/courses', label: 'Courses', icon: BookOpen },
+  { href: '/decisions', label: 'Decisions', icon: CheckSquare2 },
+  { href: '/scenarios', label: 'Scenarios', icon: Compass },
+  { href: '/data', label: 'Data Trust', icon: Database },
+];
+
+const labModules = [
+  ['Operations', [
+    ['/flow', 'Akış modeli'], ['/rescheduler', 'Amfi konsolidasyonu'], ['/agent-simulation', 'Ajan simülasyonu'], ['/student', 'Öğrenci karar destek'],
+  ]],
+  ['Energy', [
+    ['/microgrid', 'Enerji senaryosu'], ['/control-room', 'Kontrol odası'], ['/solar', 'Çatı GES'], ['/maintenance', 'Kestirimci bakım'],
+  ]],
+  ['Sensing', [
+    ['/anomalies', 'Anomali modeli'], ['/acoustic', 'Akustik harita'], ['/iot-registry', 'IoT tasarımı'], ['/integrations', 'Protokol gateway'],
+  ]],
+  ['Sustainability', [
+    ['/food-waste', 'Gıda israfı'], ['/water', 'Su yönetimi'], ['/transit', 'Mekik & mobilite'], ['/esg-reports', 'Karbon raporu'],
+  ]],
+] as const;
 
 export default function Header() {
   const pathname = usePathname();
-  const [suiteMenuOpen, setSuiteMenuOpen] = useState(false);
-
-  const primaryNav = [
-    { href: '/', label: 'Genel Bakış', icon: LayoutDashboard },
-    { href: '/courses', label: 'Ders & Amfi', icon: BookOpen },
-    { href: '/flow', label: 'İnsan Akışı', icon: Navigation },
-    { href: '/microgrid', label: 'Mikroşebeke', icon: Zap },
-    { href: '/control-room', label: 'SCADA', icon: Cpu },
-    { href: '/anomalies', label: 'Anomali', icon: ShieldAlert },
-    { href: '/buildings', label: 'Binalar', icon: Building2 },
-    { href: '/scenarios', label: 'Simülatör', icon: Compass },
-  ];
-
-  const suiteCategories = [
-    {
-      title: 'Akademik & Amfiler',
-      items: [
-        { href: '/courses', label: 'OBIKAS Ders & Amfi Motoru', desc: '3.238 ders programı & canlı derslik doluluğu', icon: BookOpen },
-        { href: '/rescheduler', label: 'Amfi Konsolidatörü', desc: 'MIP algoritmasıyla kat kapatma & ders taşıma', icon: Shuffle },
-        { href: '/agent-simulation', label: 'Ajanlı Akış Simülatörü', desc: '450+ otonom öğrencinin kampüs içi göçü', icon: Users },
-        { href: '/student', label: 'Öğrenci Çalışma Portalı', desc: 'Sakin kütüphane masaları & yemekhane oylama', icon: GraduationCap },
-      ]
-    },
-    {
-      title: 'Enerji, Şebeke & SCADA',
-      items: [
-        { href: '/control-room', label: 'SCADA & Dijital İkiz', desc: 'Canlı BMS şematikleri ve trafo telemetrisi', icon: Cpu },
-        { href: '/microgrid', label: 'Kilyos RES & Mikroşebeke', desc: '1.0 MW rüzgar türbini ve 2.0 MWh BESS', icon: Zap },
-        { href: '/solar', label: 'Çatı GES Potansiyeli', desc: '1.35 MWp güneş enerjisi ve gölge simülasyonu', icon: Sun },
-        { href: '/maintenance', label: 'Kestirimci Bakım & FFT', desc: 'Rulman titreşim spektrumu ve kalan ömür', icon: Wrench },
-      ]
-    },
-    {
-      title: 'Otonom İzleme & Saha Ağları',
-      items: [
-        { href: '/anomalies', label: 'AI Anomali Radarı', desc: 'Otomatik su/elektrik kaçak izolasyonu', icon: ShieldAlert },
-        { href: '/acoustic', label: 'Akustik Desibel Haritası', desc: 'Kütüphane sessiz katları ve ses sentezi', icon: Volume2 },
-        { href: '/iot-registry', label: 'IoT Cihaz Envanteri', desc: '148 adet BACnet, Modbus ve LoRaWAN düğümü', icon: Network },
-        { href: '/integrations', label: 'Protokol Gateway', desc: 'Endüstriyel ağ köprüsü ve paket dinleyici', icon: Server },
-      ]
-    },
-    {
-      title: 'Sürdürülebilirlik & Kaynaklar',
-      items: [
-        { href: '/esg-reports', label: 'ISO 14064 ESG Karbon Raporu', desc: 'Kapsam 1/2/3 kurumsal sera gazı denetimi', icon: FileText },
-        { href: '/food-waste', label: 'Sıfır Atık Mutfak', desc: 'SKS yemek porsiyon optimizasyonu', icon: Utensils },
-        { href: '/water', label: 'Akıllı Su & Yağmur Hasadı', desc: '500 m³ tarihi sarnıç ve akustik dinleme', icon: Droplets },
-        { href: '/transit', label: 'Elektrikli Ring Filosu', desc: 'Bebek yokuşu rejeneratif fren enerjisi', icon: Bus },
-        { href: '/league', label: 'Fakülteler Arası Yeşil Lig', desc: 'Aylık fakülte sürdürülebilirlik yarışı', icon: Trophy },
-      ]
-    }
-  ];
+  const [labOpen, setLabOpen] = useState(false);
+  const isExperimentalRoute = EXPERIMENTAL_PREFIXES.some(prefix => pathname.startsWith(prefix));
+  const labActive = pathname === '/lab' || isExperimentalRoute;
 
   return (
-    <header className="bg-slate-900 border-b border-slate-800 text-slate-100 sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Institutional Brand Identity */}
-        <div className="flex items-center space-x-3">
-          <Link href="/" className="flex items-center gap-3 group">
-            {/* Boğaziçi Emblem */}
-            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-serif text-lg font-black text-slate-100 group-hover:border-emerald-500 transition">
-              BÜ
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-base font-black tracking-tight text-white font-sans">
-                  BOUNCAMPUS
-                </span>
-                <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                  v4.2
-                </span>
+    <>
+      <header className="sticky top-0 z-50 border-b border-slate-950/10 bg-[#f4f5f2]/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] w-full max-w-[1640px] items-center justify-between gap-4 px-4 sm:px-5 md:px-7 lg:px-9">
+          <div className="flex min-w-0 items-center gap-7">
+            <Link href="/" className="group flex shrink-0 items-center gap-3 bc-focus-ring rounded-xl">
+              <div className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#0b1226] text-[11px] font-black tracking-[0.08em] text-white shadow-[0_8px_24px_rgba(11,18,38,0.16)] transition-transform group-hover:-translate-y-0.5">BC</div>
+              <div className="hidden sm:block">
+                <div className="flex items-center gap-2">
+                  <span className="text-[15px] font-black tracking-[-0.035em] text-[#0a1020]">BOUNCAMPUS</span>
+                  <span className="rounded-full border border-blue-200 bg-blue-50 px-1.5 py-0.5 font-mono text-[8px] font-extrabold tracking-[0.08em] text-blue-700">BETA</span>
+                </div>
+                <span className="block text-[10px] font-medium tracking-[0.01em] text-slate-500">Campus intelligence for Boğaziçi</span>
               </div>
-              <span className="block text-[10px] text-slate-400 font-medium tracking-wide">
-                Boğaziçi Üniversitesi Dijital İkiz & Karar Destek
-              </span>
-            </div>
-          </Link>
-        </div>
+            </Link>
 
-        {/* Primary Nav Links */}
-        <nav className="hidden xl:flex items-center space-x-1">
-          {primaryNav.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
-                  isActive
-                    ? 'bg-slate-800 text-white border border-slate-700 shadow-xs'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Icon size={14} className={isActive ? 'text-emerald-400' : 'text-slate-400'} />
-                <span>{link.label}</span>
-              </Link>
-            );
-          })}
+            <nav className="hidden items-center gap-1 xl:flex">
+              {primaryNav.map(link => {
+                const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+                const Icon = link.icon;
+                return (
+                  <Link key={link.href} href={link.href} className={`bc-focus-ring flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-[11px] font-bold transition ${active ? 'bg-white text-[#0a1020] shadow-sm ring-1 ring-slate-950/10' : 'text-slate-500 hover:bg-white/70 hover:text-slate-900'}`}>
+                    <Icon size={12} strokeWidth={2.1} />{link.label}
+                  </Link>
+                );
+              })}
 
-          {/* Institutional Megamenu Dropdown */}
-          <div className="relative ml-2">
-            <button
-              onClick={() => setSuiteMenuOpen(!suiteMenuOpen)}
-              onBlur={() => setTimeout(() => setSuiteMenuOpen(false), 250)}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-slate-300 hover:text-white bg-slate-800/80 border border-slate-700 hover:bg-slate-800 transition"
-            >
-              <span>Tüm Modüller</span>
-              <ChevronDown size={13} className={`transition duration-200 ${suiteMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
+              <div className="relative ml-1">
+                <div className="flex items-center">
+                  <Link href="/lab" className={`bc-focus-ring flex items-center gap-1.5 rounded-l-xl px-2.5 py-2 text-[11px] font-bold transition ${labActive ? 'bg-white text-[#0a1020] shadow-sm ring-1 ring-slate-950/10' : 'text-slate-500 hover:bg-white/70 hover:text-slate-900'}`}>
+                    <Sparkles size={12} /> Lab
+                  </Link>
+                  <button type="button" onClick={() => setLabOpen(value => !value)} className={`bc-focus-ring rounded-r-xl border-l border-slate-950/8 px-1.5 py-2.5 text-slate-500 transition hover:bg-white/70 hover:text-slate-900 ${labActive ? 'bg-white shadow-sm ring-1 ring-slate-950/10' : ''}`} aria-label="Open prototype lab menu">
+                    <ChevronDown size={11} className={`transition-transform ${labOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
 
-            {/* Megamenu Panel */}
-            {suiteMenuOpen && (
-              <div className="absolute right-0 mt-2 w-[780px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 grid grid-cols-2 gap-6 z-50 animate-in fade-in zoom-in-95 duration-150 text-left">
-                {suiteCategories.map((cat, idx) => (
-                  <div key={idx} className="space-y-2.5">
-                    <h4 className="text-[11px] font-bold font-mono uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-1.5">
-                      {cat.title}
-                    </h4>
-                    <div className="space-y-1.5">
-                      {cat.items.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/80 transition group"
-                          >
-                            <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:border-emerald-500">
-                              <Icon size={13} className="text-slate-300 group-hover:text-emerald-400" />
-                            </div>
-                            <div>
-                              <span className="text-xs font-bold text-white block group-hover:text-emerald-300">
-                                {item.label}
-                              </span>
-                              <span className="text-[11px] text-slate-400 leading-tight block">
-                                {item.desc}
-                              </span>
-                            </div>
-                          </Link>
-                        );
-                      })}
+                {labOpen && (
+                  <div className="absolute right-0 top-12 w-[660px] rounded-[24px] border border-slate-950/10 bg-[#0b1226] p-5 text-white shadow-[0_24px_80px_rgba(11,18,38,0.24)]">
+                    <div className="mb-4 flex items-start justify-between gap-4 border-b border-white/10 pb-4">
+                      <div>
+                        <p className="text-sm font-black tracking-[-0.02em]">Prototype laboratory</p>
+                        <p className="mt-1 max-w-md text-[11px] leading-relaxed text-slate-400">Future workflows stay outside the core product until their university data integrations are authorized and validated.</p>
+                      </div>
+                      <Link href="/lab" onClick={() => setLabOpen(false)} className="rounded-full border border-blue-300/20 bg-blue-300/10 px-2.5 py-1 font-mono text-[9px] font-bold text-blue-200">OPEN LAB</Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+                      {labModules.map(([title, items]) => (
+                        <div key={title}>
+                          <div className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">{title}</div>
+                          <div className="grid gap-1">
+                            {items.map(([href, label]) => (
+                              <Link key={href} href={href} onClick={() => setLabOpen(false)} className="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/7 hover:text-white">{label}</Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-        </nav>
-
-        {/* Right Status Badge */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-800/90 border border-slate-700/80 px-3 py-1.5 rounded-xl text-xs font-mono text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>SCADA LAN: Nominal</span>
+            </nav>
           </div>
 
-          <Link
-            href="/courses"
-            className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center gap-1.5"
-          >
-            <Search size={13} />
-            <span className="hidden sm:inline">Ders Ara</span>
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/data" className="bc-focus-ring hidden items-center gap-2 rounded-xl border border-slate-950/10 bg-white/75 px-3 py-2 text-[10px] font-bold text-slate-600 shadow-sm transition hover:bg-white md:flex">
+              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-40" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" /></span>
+              Source-traceable
+            </Link>
+            <Link href="/courses" className="bc-focus-ring flex items-center gap-2 rounded-xl bg-[#0b1226] px-3.5 py-2 text-xs font-bold text-white shadow-[0_8px_24px_rgba(11,18,38,0.14)] transition hover:-translate-y-0.5 hover:bg-[#111a32]">
+              <Search size={13} /><span className="hidden sm:inline">Search campus</span>
+            </Link>
+          </div>
         </div>
-      </div>
-    </header>
+
+        <div className="mx-auto flex w-full max-w-[1640px] gap-1 overflow-x-auto px-4 pb-2 xl:hidden sm:px-5 md:px-7">
+          {primaryNav.map(link => {
+            const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+            return <Link key={link.href} href={link.href} className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-bold ${active ? 'bg-[#0b1226] text-white' : 'border border-slate-950/10 bg-white/60 text-slate-600'}`}>{link.label}</Link>;
+          })}
+          <Link href="/lab" className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-bold ${labActive ? 'bg-[#0b1226] text-white' : 'border border-slate-950/10 bg-white/60 text-slate-600'}`}>Lab</Link>
+        </div>
+      </header>
+
+      {isExperimentalRoute && (
+        <div className="border-b border-amber-300/40 bg-[#fff6e8]">
+          <div className="mx-auto flex w-full max-w-[1640px] items-start gap-2 px-4 py-2 text-[10px] leading-relaxed text-amber-950 sm:px-5 md:px-7 lg:px-9">
+            <FlaskConical size={13} className="mt-0.5 shrink-0" />
+            <strong className="shrink-0 font-black">PROTOTYPE MODE</strong>
+            <span className="text-amber-900/75">This module demonstrates a future workflow. Sensor, SCADA/BMS, POS or IoT values shown here are not connected university telemetry.</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

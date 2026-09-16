@@ -1,78 +1,89 @@
 import { NextResponse } from 'next/server';
+import type { DashboardData, ScenarioRequest, ScenarioResult } from '@/lib/types';
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const scenarioType = body.scenario_type || 'heatwave';
-    const params = body.params || {};
+    const scenario = await request.json() as ScenarioRequest;
+    const dashboardUrl = new URL('/api/v1/dashboard', request.url);
+    const dashboardResponse = await fetch(dashboardUrl, { cache: 'no-store' });
+    if (!dashboardResponse.ok) throw new Error(`dashboard ${dashboardResponse.status}`);
 
-    let energyDelta = 0;
-    let occDelta = 0;
-    let foodDelta = 0;
-    const insights: string[] = [];
+    const original = await dashboardResponse.json() as DashboardData;
+    const temp = Number(scenario.params?.temp ?? 35);
+    const eventSize = Number(scenario.params?.eventSize ?? 500);
 
-    if (scenarioType === 'heatwave') {
-      const temp = params.temperature || 38;
-      energyDelta = Math.round((temp - 22) * 4.2);
-      occDelta = -12;
-      foodDelta = -8;
-      insights.push(`Extreme heatwave (${temp}°C): HVAC cooling load spikes by +${energyDelta}%. Outdoor transit shifts to air-conditioned halls.`);
-    } else if (scenarioType === 'exam_week') {
-      occDelta = 35;
-      energyDelta = 22;
-      foodDelta = 25;
-      insights.push('Midterm & Final exams: Campus attendance surges by +35%. Aptullah Kuran Library operating at 100% capacity 24/7.');
-    } else if (scenarioType === 'event') {
-      occDelta = 25;
-      energyDelta = 18;
-      foodDelta = 30;
-      insights.push('Major Campus Festival / Conference: +1,000 visitors at Albert Long Hall and South Square.');
-    } else if (scenarioType === 'rain') {
-      occDelta = 10;
-      energyDelta = 8;
-      foodDelta = 15;
-      insights.push('Heavy Istanbul rain: Students remain indoors; cafeteria and canteen loads increase by +15%.');
-    } else if (scenarioType === 'building_closure') {
-      occDelta = -15;
-      energyDelta = -28;
-      insights.push('Temporary building maintenance: Occupants redistributed to adjacent faculty blocks.');
-    } else {
-      occDelta = -60;
-      energyDelta = -55;
-      foodDelta = -70;
-      insights.push('Summer term: Low campus footprint; consolidation to North Campus recommended.');
+    let energyChangePercent = 0;
+    let foodChangePercent = 0;
+    let occupancyChangePercent = 0;
+
+    switch (scenario.scenario_type) {
+      case 'heatwave':
+        energyChangePercent = Math.round(Math.max(0, temp - 22) * 3.2);
+        foodChangePercent = -5;
+        occupancyChangePercent = -8;
+        break;
+      case 'exam_week':
+        energyChangePercent = 16;
+        foodChangePercent = 20;
+        occupancyChangePercent = 28;
+        break;
+      case 'event': {
+        const eventFactor = clamp(eventSize / 1000, 0.25, 2);
+        energyChangePercent = Math.round(8 * eventFactor);
+        foodChangePercent = Math.round(16 * eventFactor);
+        occupancyChangePercent = Math.round(12 * eventFactor);
+        break;
+      }
+      case 'rain':
+        energyChangePercent = 7;
+        foodChangePercent = 10;
+        occupancyChangePercent = 5;
+        break;
+      case 'building_closure':
+        energyChangePercent = -12;
+        foodChangePercent = 0;
+        occupancyChangePercent = -8;
+        break;
+      case 'summer_school':
+        energyChangePercent = -42;
+        foodChangePercent = -55;
+        occupancyChangePercent = -50;
+        break;
+      default:
+        break;
     }
 
-    const comparisons = [
-      {
-        metric: 'Campus Energy Demand',
-        baseline_value: 11.4,
-        scenario_value: Math.round((11.4 * (1 + energyDelta / 100)) * 10) / 10,
-        diff: Math.round((11.4 * (energyDelta / 100)) * 10) / 10,
-        diff_percent: energyDelta
-      },
-      {
-        metric: 'Cafeteria Meal Preparation',
-        baseline_value: 3580,
-        scenario_value: Math.round(3580 * (1 + foodDelta / 100)),
-        diff: Math.round(3580 * (foodDelta / 100)),
-        diff_percent: foodDelta
-      },
-      {
-        metric: 'Peak Campus Population',
-        baseline_value: 6250,
-        scenario_value: Math.round(6250 * (1 + occDelta / 100)),
-        diff: Math.round(6250 * (occDelta / 100)),
-        diff_percent: occDelta
-      }
-    ];
+    const modified: DashboardData = {
+      ...original,
+      campus_occupancy: clamp(original.campus_occupancy * (1 + occupancyChangePercent / 100), 0, 1),
+      predicted_energy_mwh: Math.max(0, Math.round(original.predicted_energy_mwh * (1 + energyChangePercent / 100) * 10) / 10),
+      food_demand_meals: Math.max(0, Math.round(original.food_demand_meals * (1 + foodChangePercent / 100))),
+      potential_saving_tl: Math.max(0, Math.round(original.potential_saving_tl * (1 + Math.max(energyChangePercent, 0) / 100))),
+      co2_avoided_kg: Math.max(0, Math.round(original.co2_avoided_kg * (1 + Math.max(energyChangePercent, 0) / 100))),
+      data_quality: original.data_quality ? {
+        ...original.data_quality,
+        model_estimates: Array.from(new Set([...original.data_quality.model_estimates, 'scenario counterfactual'])),
+        note: `${original.data_quality.note} Scenario outputs are counterfactual model estimates, not forecasts or live telemetry.`,
+      } : original.data_quality,
+    };
 
-    return NextResponse.json({
-      scenario_type: scenarioType,
-      comparisons: comparisons,
-      insights: insights
-    });
-  } catch (e) {
-    return NextResponse.json({ error: 'Failed to simulate scenario' }, { status: 400 });
+    const result: ScenarioResult = {
+      original,
+      modified,
+      changes: {
+        energy_change_percent: energyChangePercent,
+        food_change_percent: foodChangePercent,
+        co2_change_percent: energyChangePercent,
+        cost_change_tl: modified.potential_saving_tl - original.potential_saving_tl,
+      },
+    };
+
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: 'Scenario model could not be evaluated', detail: String(error) }, { status: 400 });
   }
 }

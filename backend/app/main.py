@@ -1,16 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.config import settings
-from app.routers import occupancy, energy, food, actions, scenarios, dashboard
 
-app = FastAPI(title=settings.APP_NAME)
+from app.config import settings
+from app.routers import actions, dashboard, energy, food, occupancy, scenarios
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="BOUNCAMPUS campus intelligence and decision-support API",
+)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 app.include_router(occupancy.router)
@@ -20,10 +25,24 @@ app.include_router(actions.router)
 app.include_router(scenarios.router)
 app.include_router(dashboard.router)
 
+
 @app.get("/")
 def root():
-    return {"message": "Welcome to BOUNCAMPUS API", "docs": "/docs"}
+    return {
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "environment": settings.ENVIRONMENT,
+        "docs": "/docs",
+        "health": "/health",
+        "truth_boundary": "decision-support models; no live university BMS/POS/turnstile telemetry claimed",
+    }
+
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "environment": settings.ENVIRONMENT,
+    }
