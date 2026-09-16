@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ClipboardCheck, Clock3, Gauge, ShieldCheck } from 'lucide-react';
 import DecisionLedger from '@/components/Decision/DecisionLedger';
+import OutcomeLoop from '@/components/Decision/OutcomeLoop';
 import { getDashboard } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
 
@@ -129,6 +130,8 @@ export default function DecisionsPage() {
           <Link href="/data" className="mt-6 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-300">Audit provenance <ArrowRight size={11} /></Link>
         </aside>
       </section>
+
+      <OutcomeLoop actions={data.actions} />
     </div>
   );
 }
