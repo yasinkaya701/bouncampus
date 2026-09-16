@@ -16,7 +16,6 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react';
-import MissionSpotlight from '@/components/Dashboard/MissionSpotlight';
 
 const EXPERIMENTAL_PREFIXES = [
   '/flow', '/microgrid', '/control-room', '/anomalies', '/rescheduler', '/agent-simulation',
@@ -139,12 +138,6 @@ export default function Header() {
           <Link href="/lab" className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-bold ${labActive ? 'bg-[#0b1226] text-white' : 'border border-slate-950/10 bg-white/60 text-slate-600'}`}>Lab</Link>
         </div>
       </header>
-
-      {pathname === '/' && (
-        <div className="mx-auto w-full max-w-[1640px] px-3 pt-4 sm:px-5 md:px-7 lg:px-9 lg:pt-6">
-          <MissionSpotlight />
-        </div>
-      )}
 
       {isExperimentalRoute && (
         <div className="border-b border-amber-300/40 bg-[#fff6e8]">
