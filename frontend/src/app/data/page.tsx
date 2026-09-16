@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, CheckCircle2, Database, ExternalLink, RefreshCw, ShieldAlert } from 'lucide-react';
 import type { SourceMeta } from '@/lib/live-sources';
+import PilotReadiness from '@/components/Data/PilotReadiness';
 
 type HealthPayload = {
   status: 'ok' | 'degraded';
@@ -137,6 +138,8 @@ export default function DataTrustPage() {
           <Link href="/#sources" className="mt-5 inline-flex items-center gap-1.5 text-[10px] font-black text-blue-700">Open overview provenance <ArrowUpRight size={11} /></Link>
         </div>
       </section>
+
+      <PilotReadiness />
     </div>
   );
 }
