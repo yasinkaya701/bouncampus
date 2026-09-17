@@ -80,6 +80,11 @@ jobs:
             exit 1
           fi
 
+      - name: Verify integrated agent head is contained in master
+        run: |
+          branch_head="$(git rev-parse HEAD^2)"
+          python scripts/agent_exit_gate.py --branch-head "$branch_head" --master-ref HEAD
+
   feature-registry:
     runs-on: [self-hosted, macOS, ARM64, bouncampus]
     steps:
