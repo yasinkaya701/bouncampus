@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 560" role="img" aria-labelledby="title desc">
+  <title id="title">Boğaziçi campus digital twin illustration</title>
+  <desc id="desc">An original editorial vector inspired by the historic South Campus, the Bosphorus, trees, and digital campus telemetry.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f8f3"/>
+      <stop offset="1" stop-color="#edf2f5"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcecf3"/>
+      <stop offset="1" stop-color="#b9d8e6"/>
+    </linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0v36" fill="none" stroke="#173f67" stroke-opacity=".045"/>
+    </pattern>
+  </defs>
+  <rect width="1440" height="560" rx="28" fill="url(#sky)"/>
+  <rect width="1440" height="560" rx="28" fill="url(#grid)"/>
+  <path d="M1025 0h415v560H870c84-73 117-137 99-193-20-62-6-116 39-162 43-44 52-112 17-205Z" fill="url(#water)"/>
+  <g fill="none" stroke="#173f67" stroke-opacity=".14" stroke-width="2">
+    <path d="M1059 91c116 26 214 20 294-18"/>
+    <path d="M1026 139c131 29 246 25 345-14"/>
+    <path d="M1009 188c143 30 268 25 376-17"/>
+    <path d="M1005 237c151 30 282 24 393-18"/>
+  </g>
+  <path d="M0 448c149-77 309-106 480-87 125 14 237 2 335-37 112-44 220-43 324 4 80 36 181 50 301 40v192H0Z" fill="#dce8dc"/>
+  <path d="M0 486c142-43 301-54 477-35 128 14 249 6 363-24 99-26 195-24 288 7 82 27 186 35 312 24v102H0Z" fill="#c9dccb"/>
+  <g fill="#173f67" opacity=".92">
+    <rect x="169" y="295" width="242" height="123" rx="6"/>
+    <path d="M150 295h280l-38-39H190Z"/>
+    <rect x="473" y="265" width="298" height="154" rx="6"/>
+    <path d="M451 265h342l-48-45H500Z"/>
+    <rect x="815" y="309" width="184" height="109" rx="6"/>
+    <path d="M797 309h220l-31-34H828Z"/>
+  </g>
+  <g fill="#f6f6f1" opacity=".92">
+    <g transform="translate(194 320)"><rect width="18" height="34" rx="2"/><rect x="42" width="18" height="34" rx="2"/><rect x="84" width="18" height="34" rx="2"/><rect x="126" width="18" height="34" rx="2"/><rect x="168" width="18" height="34" rx="2"/></g>
+    <g transform="translate(503 294)"><rect width="20" height="40" rx="2"/><rect x="48" width="20" height="40" rx="2"/><rect x="96" width="20" height="40" rx="2"/><rect x="144" width="20" height="40" rx="2"/><rect x="192" width="20" height="40" rx="2"/></g>
+    <g transform="translate(842 333)"><rect width="16" height="30" rx="2"/><rect x="38" width="16" height="30" rx="2"/><rect x="76" width="16" height="30" rx="2"/><rect x="114" width="16" height="30" rx="2"/></g>
+  </g>
+  <g fill="#6f8b73">
+    <circle cx="120" cy="393" r="45"/><circle cx="449" cy="391" r="51"/><circle cx="782" cy="396" r="42"/><circle cx="1037" cy="410" r="56"/>
+    <circle cx="93" cy="437" r="31"/><circle cx="711" cy="429" r="28"/><circle cx="1120" cy="439" r="38"/>
+  </g>
+  <g fill="none" stroke="#173f67" stroke-linecap="round">
+    <path d="M575 112c89-44 200-24 267 48" stroke-opacity=".16" stroke-width="2"/>
+    <path d="M606 137c69-32 153-18 206 36" stroke-opacity=".22" stroke-width="2"/>
+    <path d="M638 162c48-21 105-12 143 25" stroke-opacity=".30" stroke-width="2"/>
+    <circle cx="707" cy="195" r="8" fill="#173f67" stroke="none"/>
+    <path d="M706 195 831 127" stroke-opacity=".38" stroke-dasharray="7 8" stroke-width="2"/>
+    <path d="M706 195 562 231" stroke-opacity=".28" stroke-dasharray="7 8" stroke-width="2"/>
+    <path d="M706 195 889 249" stroke-opacity=".28" stroke-dasharray="7 8" stroke-width="2"/>
+  </g>
+  <g transform="translate(84 82)">
+    <rect width="346" height="118" rx="18" fill="#fff" fill-opacity=".86" stroke="#0f172a" stroke-opacity=".08"/>
+    <circle cx="35" cy="34" r="10" fill="#173f67"/>
+    <path d="M35 49v34M20 66h30" stroke="#173f67" stroke-width="6" stroke-linecap="round"/>
+    <text x="68" y="39" fill="#0f172a" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="800">BOUNCAMPUS</text>
+    <text x="68" y="63" fill="#64748b" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="600">Campus intelligence / digital twin layer</text>
+    <path d="M68 82h228" stroke="#0f172a" stroke-opacity=".08"/>
+    <text x="68" y="102" fill="#173f67" font-family="ui-monospace,SFMono-Regular,monospace" font-size="10" font-weight="700">SOUTH CAMPUS · BEBEK · ISTANBUL</text>
+  </g>
+</svg>
