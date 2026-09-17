@@ -55,6 +55,33 @@ export type PilotServiceMeasurement = {
   notes?: string;
 };
 
+export type PilotArmSummary = {
+  measuredServices: number;
+  meanWasteKgPer100Served: number | null;
+  meanWasteKgPerService: number | null;
+  meanOverproductionRatePct: number | null;
+  meanEdibleSurplusKgPer100Served: number | null;
+  meanForecastApePct: number | null;
+  earlySelloutRatePct: number | null;
+  operatorOverrideRatePct: number | null;
+};
+
+export type PilotScorecardStatus = 'INSUFFICIENT_EVIDENCE' | 'PROMISING' | 'FAILED';
+
+export type PilotScorecard = {
+  status: PilotScorecardStatus;
+  control: PilotArmSummary;
+  intervention: PilotArmSummary;
+  normalizedWasteReductionPct: number | null;
+  gates: {
+    enoughEvidence: boolean;
+    wasteReductionTargetMet: boolean | null;
+    earlySelloutGuardrailPassed: boolean | null;
+    foodSafetyManualReviewRequired: true;
+  };
+  notes: string[];
+};
+
 export const FOOD_WASTE_SOURCE = {
   title: 'Boğaziçi University — Campus food waste tracking',
   url: 'https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310',
@@ -147,6 +174,18 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function mean(values: Array<number | null>) {
+  const usable = values.filter((value): value is number => value != null && Number.isFinite(value));
+  if (!usable.length) return null;
+  return usable.reduce((sum, value) => sum + value, 0) / usable.length;
+}
+
+function roundMetric(value: number | null, digits = 2) {
+  if (value == null) return null;
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
 export function simulateFoodWasteScenario(
   preventionRatePct: number,
   recoveryRatePct: number,
@@ -195,8 +234,6 @@ export function buildProductionBand(
   if (scheduleAvailable && signalCoveragePct >= 70) decisionReadiness = 'PILOT_READY';
   else if (scheduleAvailable && signalCoveragePct >= 50) decisionReadiness = 'REVIEW_REQUIRED';
 
-  // Uncertainty expands when contextual signals are missing. The band remains decision support,
-  // never measured cafeteria demand, and can never bypass the human operator gate.
   const lowerFactor = signalCoveragePct >= 80 ? 0.96 : signalCoveragePct >= 60 ? 0.93 : 0.9;
   const upperFactor = signalCoveragePct >= 80 ? 1.06 : signalCoveragePct >= 60 ? 1.09 : 1.13;
   const reasonCodes = signals.filter(signal => !signal.available).map(signal => `MISSING_${signal.id.toUpperCase()}`);
@@ -231,4 +268,89 @@ export function overproductionRatePct(producedPortions: number, servedPortions: 
 export function pilotWasteReductionPct(controlWastePer100: number, interventionWastePer100: number) {
   if (controlWastePer100 <= 0) return null;
   return ((controlWastePer100 - interventionWastePer100) / controlWastePer100) * 100;
+}
+
+export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
+  const errors: string[] = [];
+  if (!measurement.date) errors.push('date is required');
+  if (!measurement.serviceId) errors.push('serviceId is required');
+  if (measurement.arm !== 'CONTROL' && measurement.arm !== 'INTERVENTION') errors.push('arm must be CONTROL or INTERVENTION');
+  if (!Number.isFinite(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0');
+  if (!Number.isFinite(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0');
+  if (!Number.isFinite(measurement.edibleSurplusKg) || measurement.edibleSurplusKg < 0) errors.push('edibleSurplusKg must be >= 0');
+  if (!Number.isFinite(measurement.wasteKg) || measurement.wasteKg < 0) errors.push('wasteKg must be >= 0');
+  if (measurement.modelForecastMeals != null && (!Number.isFinite(measurement.modelForecastMeals) || measurement.modelForecastMeals < 0)) errors.push('modelForecastMeals must be null or >= 0');
+  return errors;
+}
+
+function summarizePilotArm(measurements: PilotServiceMeasurement[]): PilotArmSummary {
+  const wastePer100 = measurements.map(item => wasteKgPer100Served(item.wasteKg, item.servedPortions));
+  const overproduction = measurements.map(item => overproductionRatePct(item.producedPortions, item.servedPortions));
+  const surplusPer100 = measurements.map(item => item.servedPortions > 0 ? (item.edibleSurplusKg / item.servedPortions) * 100 : null);
+  const forecastApe = measurements.map(item => {
+    if (item.modelForecastMeals == null || item.servedPortions <= 0) return null;
+    return (Math.abs(item.modelForecastMeals - item.servedPortions) / item.servedPortions) * 100;
+  });
+  const earlySelloutRate = measurements.length
+    ? (measurements.filter(item => item.earlySellout).length / measurements.length) * 100
+    : null;
+  const overrideRate = measurements.length
+    ? (measurements.filter(item => item.operatorOverride).length / measurements.length) * 100
+    : null;
+
+  return {
+    measuredServices: measurements.length,
+    meanWasteKgPer100Served: roundMetric(mean(wastePer100)),
+    meanWasteKgPerService: roundMetric(mean(measurements.map(item => item.wasteKg))),
+    meanOverproductionRatePct: roundMetric(mean(overproduction)),
+    meanEdibleSurplusKgPer100Served: roundMetric(mean(surplusPer100)),
+    meanForecastApePct: roundMetric(mean(forecastApe)),
+    earlySelloutRatePct: roundMetric(earlySelloutRate),
+    operatorOverrideRatePct: roundMetric(overrideRate),
+  };
+}
+
+export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): PilotScorecard {
+  const controlMeasurements = measurements.filter(item => item.arm === 'CONTROL');
+  const interventionMeasurements = measurements.filter(item => item.arm === 'INTERVENTION');
+  const control = summarizePilotArm(controlMeasurements);
+  const intervention = summarizePilotArm(interventionMeasurements);
+  const minimum = FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm;
+  const enoughEvidence = control.measuredServices >= minimum && intervention.measuredServices >= minimum;
+
+  const reduction = control.meanWasteKgPer100Served != null && intervention.meanWasteKgPer100Served != null
+    ? pilotWasteReductionPct(control.meanWasteKgPer100Served, intervention.meanWasteKgPer100Served)
+    : null;
+  const normalizedWasteReductionPct = roundMetric(reduction);
+  const wasteReductionTargetMet = normalizedWasteReductionPct == null
+    ? null
+    : normalizedWasteReductionPct >= FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct;
+  const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
+    ? null
+    : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
+
+  const notes: string[] = [];
+  if (!enoughEvidence) notes.push(`Need at least ${minimum} measured services in both CONTROL and INTERVENTION arms.`);
+  if (wasteReductionTargetMet === false) notes.push('Pre-registered normalized waste-reduction target was not met.');
+  if (earlySelloutGuardrailPassed === false) notes.push('Early-sellout incidence increased in the intervention arm.');
+  notes.push('Food-safety compliance requires manual operational review and cannot be inferred from service-level numeric fields alone.');
+
+  let status: PilotScorecardStatus = 'INSUFFICIENT_EVIDENCE';
+  if (enoughEvidence) {
+    status = wasteReductionTargetMet === true && earlySelloutGuardrailPassed === true ? 'PROMISING' : 'FAILED';
+  }
+
+  return {
+    status,
+    control,
+    intervention,
+    normalizedWasteReductionPct,
+    gates: {
+      enoughEvidence,
+      wasteReductionTargetMet,
+      earlySelloutGuardrailPassed,
+      foodSafetyManualReviewRequired: true,
+    },
+    notes,
+  };
 }
