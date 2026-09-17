@@ -1,0 +1,31 @@
+name: Agent Coordination
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-coordination-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-agent-runtime:
+    runs-on: [self-hosted, macOS, ARM64, bouncampus]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate agent bus configuration
+        run: python -m json.tool .agents/config.json >/dev/null
+
+      - name: Compile coordination runtime
+        run: python -m py_compile scripts/agent_bus.py scripts/test_agent_bus.py
+
+      - name: Run coordination runtime tests
+        run: python scripts/test_agent_bus.py
+
+      - name: Validate repository-local coordination state
+        run: python scripts/agent_bus.py validate --offline
