@@ -30,7 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-_No active workstreams. The KREATE climate-focus workstream was integrated through the single-PR flow and is released only after its terminal post-merge CI/exit-gate verification passes on `master`._
+| Lane | Branch | Owner role | Paths owned | Status | Handoff |
+| --- | --- | --- | --- | --- | --- |
+| campus-geo | `agent/campus-geo/bogazici-3d-assets` | Workstream Agent | `.agents/WORKSTREAMS.md`, `.github/feature-registry.json`, `frontend/src/lib/campus-3d-assets.ts`, `frontend/src/app/3d-assets/**`, `frontend/src/components/shared/Header.tsx`, `frontend/src/app/sitemap.ts`, `frontend/public/assets/3d/**`, `docs/3d-assets-provenance.md` | ACTIVE | Add source-backed Boğaziçi 3D asset registry: OSM-derived procedural geometry for repo-owned rendering plus license-safe external photogrammetry references; integrate a bilingual asset explorer and preserve attribution/provenance. |
 
 ## Suggested lanes
 
