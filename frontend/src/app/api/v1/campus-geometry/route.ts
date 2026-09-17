@@ -77,6 +77,8 @@ function queryFor(bounds: BBox[]) {
   const selectors = bounds.flatMap(([south, west, north, east]) => [
     `way["building"](${south},${west},${north},${east});`,
     `relation["building"](${south},${west},${north},${east});`,
+    `way["building:part"](${south},${west},${north},${east});`,
+    `relation["building:part"](${south},${west},${north},${east});`,
   ]).join('');
   return `[out:json][timeout:24];(${selectors});out tags center geom;`;
 }
@@ -111,28 +113,40 @@ export async function GET(request: NextRequest) {
       seen.add(key);
       const footprint = extractFootprint(element);
       if (!footprint || footprint.length < 3) return [];
+
       const center = footprint.reduce((acc, point) => ({ lat: acc.lat + point.lat, lon: acc.lon + point.lon }), { lat: 0, lon: 0 });
       const lat = center.lat / footprint.length;
       const lon = center.lon / footprint.length;
       const tags = element.tags ?? {};
       const explicitHeight = parseMeters(tags.height);
       const levels = parsePositiveInt(tags['building:levels']);
+      const minLevel = parsePositiveInt(tags['building:min_level']);
+      const explicitMinHeight = parseMeters(tags.min_height);
+      const minHeight = explicitMinHeight ?? (minLevel ? minLevel * 3.35 : 0);
       const height = explicitHeight ?? (levels ? levels * 3.35 : fallbackHeight(tags));
       const heightSource = explicitHeight ? 'OSM_HEIGHT' : levels ? 'OSM_LEVELS' : 'VISUALIZATION_ESTIMATE';
-      const roofHeight = parseMeters(tags['roof:height']) ?? 0;
+      const roofLevels = parsePositiveInt(tags['roof:levels']);
+      const roofHeight = parseMeters(tags['roof:height']) ?? (roofLevels ? roofLevels * 2.6 : 0);
+      const isPart = Boolean(tags['building:part']);
+
       return [{
         osm_id: key,
         name: tags.name ?? null,
         campus: campusForCenter(lat, lon),
+        geometry_kind: isPart ? 'BUILDING_PART' : 'BUILDING',
         coords: [lat, lon] as [number, number],
         footprint: footprint.map(point => [point.lat, point.lon] as [number, number]),
         height_m: Math.max(3, height),
         height_source: heightSource,
         levels,
-        min_height_m: parseMeters(tags.min_height) ?? 0,
+        min_height_m: minHeight,
+        min_level: minLevel,
+        roof_levels: roofLevels,
         roof_height_m: roofHeight,
         roof_shape: tags['roof:shape'] ?? null,
+        roof_orientation: tags['roof:orientation'] ?? null,
         building: tags.building ?? null,
+        building_part: tags['building:part'] ?? null,
         building_material: tags['building:material'] ?? null,
         building_colour: tags['building:colour'] ?? null,
         roof_material: tags['roof:material'] ?? null,
@@ -149,7 +163,7 @@ export async function GET(request: NextRequest) {
       source: 'OpenStreetMap / Overpass',
       fetched_at: new Date().toISOString(),
       degraded: false,
-      note: 'Footprints and explicit height/level tags are source-backed. Missing heights are conservative visualization estimates and are not survey-grade measurements.',
+      note: 'Footprints, building parts and explicit height/level tags are source-backed. Missing heights are conservative visualization estimates and are not survey-grade measurements.',
     });
   } catch (error) {
     return NextResponse.json({
