@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Box, ExternalLink, Globe2, Map as MapIcon, MapPin } from 'lucide-react';
+import { Box, ExternalLink, Film, Globe2, Map as MapIcon, MapPin } from 'lucide-react';
 import type { Building } from '@/lib/types';
 import { useLocale } from '@/lib/i18n';
 import { presentBuilding } from '@/lib/campus-directory';
 
 const CampusCesiumMap = dynamic(() => import('./CampusCesiumMap'), { ssr: false, loading: () => <MapLoading /> });
 const CampusMap3D = dynamic(() => import('./CampusMap3D'), { ssr: false, loading: () => <MapLoading /> });
+const CampusPhotogrammetryViewer = dynamic(() => import('./CampusPhotogrammetryViewer'), { ssr: false, loading: () => <MapLoading /> });
 
 function MapLoading() {
   return <div className="grid h-[520px] w-full place-items-center rounded-xl bg-slate-100 text-xs font-semibold text-slate-400">Map / Harita…</div>;
@@ -34,11 +35,10 @@ const TILE_LAYERS = {
   street: { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap contributors' },
 } as const;
 
-type MapMode = '2d' | 'cesium' | '3d';
+type MapMode = '2d' | 'cesium' | '3d' | 'photogrammetry';
 type CampusFocus = 'all' | 'south' | 'north';
 type TileType = keyof typeof TILE_LAYERS;
 type LiveLocation = { id: string; coords: [number, number]; matched_name: string; osm_url: string; source: string };
-
 type PositionedBuilding = Building & { liveLocation?: LiveLocation };
 
 export default function CampusMap({ buildings }: { buildings: Building[] }) {
@@ -62,27 +62,14 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
   const positionedBuildings = useMemo<PositionedBuilding[]>(() => buildings.map(building => {
     const location = locations[building.id];
     const display = presentBuilding(building, locale);
-    return {
-      ...building,
-      name: display.name,
-      code: display.code,
-      coords: location?.coords ?? building.coords,
-      liveLocation: location,
-    };
+    return { ...building, name: display.name, code: display.code, coords: location?.coords ?? building.coords, liveLocation: location };
   }), [buildings, locale, locations]);
 
   const focusCampus = (next: CampusFocus) => {
     setFocus(next);
-    if (next === 'south') {
-      setMapCenter([41.0836, 29.0520]);
-      setZoomLevel(17);
-    } else if (next === 'north') {
-      setMapCenter([41.0863, 29.0444]);
-      setZoomLevel(17);
-    } else {
-      setMapCenter([41.0849, 29.0488]);
-      setZoomLevel(16);
-    }
+    if (next === 'south') { setMapCenter([41.0836, 29.0520]); setZoomLevel(17); }
+    else if (next === 'north') { setMapCenter([41.0863, 29.0444]); setZoomLevel(17); }
+    else { setMapCenter([41.0849, 29.0488]); setZoomLevel(16); }
   };
 
   if (!mounted) return <MapLoading />;
@@ -90,27 +77,20 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
   return (
     <div>
       <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex w-fit items-center gap-1 rounded-lg border border-slate-900/10 bg-slate-50 p-1">
-          <button type="button" onClick={() => setMapMode('2d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '2d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><MapIcon size={11} /> {t('Harita', 'Map')}</button>
-          <button type="button" onClick={() => setMapMode('cesium')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === 'cesium' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Globe2 size={11} /> {t('Küre', 'Globe')}</button>
-          <button type="button" onClick={() => setMapMode('3d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '3d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Box size={11} /> {t('Gerçek 3D', 'Real 3D')}</button>
+        <div className="flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg border border-slate-900/10 bg-slate-50 p-1">
+          <button type="button" onClick={() => setMapMode('2d')} className={`bc-focus-ring flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '2d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><MapIcon size={11} /> {t('Harita', 'Map')}</button>
+          <button type="button" onClick={() => setMapMode('cesium')} className={`bc-focus-ring flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === 'cesium' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Globe2 size={11} /> {t('Küre', 'Globe')}</button>
+          <button type="button" onClick={() => setMapMode('3d')} className={`bc-focus-ring flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '3d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Box size={11} /> {t('Geometri 3D', 'Geometry 3D')}</button>
+          <button type="button" onClick={() => setMapMode('photogrammetry')} className={`bc-focus-ring flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === 'photogrammetry' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Film size={11} /> {t('Fotogrametri', 'Photogrammetry')}</button>
         </div>
 
         {mapMode === '2d' && (
           <div className="flex flex-wrap items-center gap-1.5">
             <div className="flex items-center gap-1 rounded-lg border border-slate-900/10 bg-white p-1">
-              {(['all', 'south', 'north'] as const).map(item => (
-                <button key={item} type="button" onClick={() => focusCampus(item)} className={`bc-focus-ring rounded-md px-2.5 py-1 text-[9px] font-bold ${focus === item ? 'bg-[#102a43] text-white' : 'text-slate-500'}`}>
-                  {item === 'all' ? t('Tümü', 'All') : item === 'south' ? t('Güney', 'South') : t('Kuzey', 'North')}
-                </button>
-              ))}
+              {(['all', 'south', 'north'] as const).map(item => <button key={item} type="button" onClick={() => focusCampus(item)} className={`bc-focus-ring rounded-md px-2.5 py-1 text-[9px] font-bold ${focus === item ? 'bg-[#102a43] text-white' : 'text-slate-500'}`}>{item === 'all' ? t('Tümü', 'All') : item === 'south' ? t('Güney', 'South') : t('Kuzey', 'North')}</button>)}
             </div>
             <div className="flex items-center gap-1 rounded-lg border border-slate-900/10 bg-white p-1">
-              {(['street', 'satellite'] as const).map(item => (
-                <button key={item} type="button" onClick={() => setTileType(item)} className={`bc-focus-ring rounded-md px-2.5 py-1 text-[9px] font-bold ${tileType === item ? 'bg-slate-100 text-slate-950' : 'text-slate-500'}`}>
-                  {item === 'street' ? t('Sokak', 'Street') : t('Uydu', 'Satellite')}
-                </button>
-              ))}
+              {(['street', 'satellite'] as const).map(item => <button key={item} type="button" onClick={() => setTileType(item)} className={`bc-focus-ring rounded-md px-2.5 py-1 text-[9px] font-bold ${tileType === item ? 'bg-slate-100 text-slate-950' : 'text-slate-500'}`}>{item === 'street' ? t('Sokak', 'Street') : t('Uydu', 'Satellite')}</button>)}
             </div>
           </div>
         )}
@@ -120,6 +100,8 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
         <div className="overflow-hidden rounded-xl"><CampusCesiumMap buildings={positionedBuildings} /></div>
       ) : mapMode === '3d' ? (
         <div className="overflow-hidden rounded-xl"><CampusMap3D buildings={positionedBuildings} /></div>
+      ) : mapMode === 'photogrammetry' ? (
+        <CampusPhotogrammetryViewer />
       ) : (
         <div className="relative h-[520px] w-full overflow-hidden rounded-xl border border-slate-900/10 bg-slate-100">
           <MapContainer center={mapCenter} zoom={zoomLevel} style={{ height: '100%', width: '100%' }}>
