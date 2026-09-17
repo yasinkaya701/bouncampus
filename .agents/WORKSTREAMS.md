@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | State | Lane | Branch | Owner role | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| `ACTIVE` | `quality-release` | `agent/quality-release/multi-agent-runtime` | Workstream Agent / temporary Merge Coordinator | Build executable multi-agent coordination, inter-agent messaging, ownership validation, handoff/ack/retry semantics and CI enforcement | `.agents/**`, `scripts/agent_coordination.py`, `scripts/verify_agent_coordination.py`, `.github/workflows/agent-coordination.yml`, `AGENTS.md` |
+| `ACTIVE` | `quality-release` | `agent/quality-release/multi-agent-runtime` | Workstream Agent / temporary Merge Coordinator | Build executable multi-agent coordination, branch-independent inter-agent messaging, ownership validation, handoff/ack/retry semantics and CI enforcement | `.agents/**`, `scripts/agent_bus.py`, `scripts/test_agent_bus.py`, `.github/workflows/agent-coordination.yml`, `.github/feature-registry.json`, `AGENTS.md` |
 
 ## Suggested lanes
 
