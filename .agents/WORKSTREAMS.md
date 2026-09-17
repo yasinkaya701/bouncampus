@@ -30,9 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-| State | Lane | Branch | Owner role | Scope | Touched paths |
-| --- | --- | --- | --- | --- | --- |
-| INTEGRATING | `frontend-ux` | `agent/frontend-ux/jury-visual-assets-v3` | Workstream Agent / Frontend UX / Merge Coordinator | Jury-facing visual upgrade with layered campus command-center composition, richer asset system, motion/polish, responsive hierarchy, and truthful climate-operation storytelling. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/components/shared/HomeCampusVisual.tsx`; `frontend/src/app/globals.css`; `frontend/public/assets/campus-signal-orbit.svg`; `frontend/public/assets/campus-atlas-strip.svg` |
+_No active workstreams._
+
+The `frontend-ux / jury-visual-assets-v3` workstream was merged through PR #15 and verified on `master` at merge commit `a51252e59a6856d7db945ba2d9073defe2645c5e` by CI run #192 before ownership was released.
 
 The `campus-geo / photogrammetry-assets` workstream was merged through PR #13 and verified on `master` at merge commit `4ae611ecf394e3cdf05b21b4eeda0dd998526c54` by CI run #188 before ownership was released.
 
