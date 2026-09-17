@@ -1,0 +1,8 @@
+# Local agent runtime state. Durable cross-agent communication is mirrored to Issue #8.
+tasks/
+leases/
+heartbeats/
+messages/
+acks/
+locks/
+remote-cache/
