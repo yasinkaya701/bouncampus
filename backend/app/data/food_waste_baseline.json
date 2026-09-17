@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "unit": "kg",
+  "records": [
+    {
+      "year": 2025,
+      "provenance": "OFFICIAL_PUBLIC_HISTORICAL",
+      "verification_status": "verified-current-public-page",
+      "source_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "total_food_waste_kg": 48251,
+      "recycled_food_waste_kg": 33430,
+      "waste_oil_kg": 6305,
+      "recycled_waste_oil_kg": 6305,
+      "months": [
+        {"month": 1, "food_waste_kg": 3992, "recycled_food_waste_kg": 2250},
+        {"month": 2, "food_waste_kg": 7811, "recycled_food_waste_kg": 1555},
+        {"month": 3, "food_waste_kg": 7004, "recycled_food_waste_kg": 2285},
+        {"month": 4, "food_waste_kg": 4772, "recycled_food_waste_kg": 3090},
+        {"month": 5, "food_waste_kg": 3832, "recycled_food_waste_kg": 2900},
+        {"month": 6, "food_waste_kg": 2777, "recycled_food_waste_kg": 1450},
+        {"month": 7, "food_waste_kg": 1923, "recycled_food_waste_kg": 1850},
+        {"month": 8, "food_waste_kg": 1502, "recycled_food_waste_kg": 3550},
+        {"month": 9, "food_waste_kg": 2072, "recycled_food_waste_kg": 1450},
+        {"month": 10, "food_waste_kg": 1334, "recycled_food_waste_kg": 4850},
+        {"month": 11, "food_waste_kg": 4784, "recycled_food_waste_kg": 3300},
+        {"month": 12, "food_waste_kg": 6448, "recycled_food_waste_kg": 4900}
+      ],
+      "notes": [
+        "Delivered-to-ISTAÇ amounts are included within the reported total food-waste amounts.",
+        "This is campus-level annual/monthly outcome data; it is not cafeteria-, meal-, menu- or timestamp-level training data."
+      ]
+    },
+    {
+      "year": 2024,
+      "provenance": "OFFICIAL_PUBLIC_HISTORICAL",
+      "verification_status": "project-research-snapshot",
+      "source_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "total_food_waste_kg": 50993,
+      "recycled_food_waste_kg": 29776,
+      "waste_oil_kg": 5710,
+      "recycled_waste_oil_kg": 5710,
+      "months": [],
+      "notes": [
+        "Preserved from the project's earlier official-source research snapshot; the current public page now exposes the 2025 table.",
+        "Not used as a per-cafeteria training label."
+      ]
+    }
+  ]
+}
