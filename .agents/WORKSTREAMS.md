@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | State | Lane | Branch | Owner role | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| ACTIVE | `frontend-ux` | `agent/frontend-ux/asset-wow-v2` | Workstream Agent / Frontend UX | Asset-backed jury presentation upgrade: richer campus visual storytelling, original SVG/graphic assets, stronger hierarchy, responsive polish, and truthful product surfaces without removing existing features. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/app/page.tsx`; `frontend/src/app/globals.css`; `frontend/src/components/shared/HomeCampusVisual.tsx`; `frontend/src/components/shared/Header.tsx`; `frontend/public/visuals/**` |
+| INTEGRATING | `frontend-ux` | `agent/frontend-ux/asset-wow-v2` | Workstream Agent / Frontend UX / Merge Coordinator | Asset-backed jury presentation upgrade: richer campus visual storytelling, original SVG/graphic assets, stronger hierarchy, responsive polish, and truthful product surfaces without removing existing features. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/components/shared/HomeCampusVisual.tsx`; `frontend/src/components/shared/Header.tsx`; `frontend/public/assets/bouncampus-mark.svg`; `frontend/public/assets/campus-command-deck.svg` |
 
 ## Suggested lanes
 
