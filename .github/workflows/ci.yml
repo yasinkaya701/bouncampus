@@ -16,7 +16,7 @@ concurrency:
 jobs:
   merge-discipline:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS, ARM64, bouncampus]
     steps:
       - name: Check out exact PR head
         uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
 
   master-merge-audit:
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS, ARM64, bouncampus]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -81,7 +81,7 @@ jobs:
           fi
 
   feature-registry:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS, ARM64, bouncampus]
     steps:
       - uses: actions/checkout@v4
       - name: Validate registered feature files

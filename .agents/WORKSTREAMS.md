@@ -30,12 +30,14 @@ Allowed lifecycle states:
 
 ## Active
 
-_No active workstreams. The merge-before-exit policy bootstrap is complete on `master`; the v2 enforcement marker makes the next normal repository change subject to the mandatory PR + owning-agent merge contract._
+| Lane | Branch | Owner role | Paths owned | Status | Handoff |
+| --- | --- | --- | --- | --- | --- |
+| integration | `agent/integration/kreate-climate-focus` | Workstream Agent + Merge Coordinator lock holder | `frontend/src/app/page.tsx`, `frontend/src/app/demo/page.tsx`, `frontend/src/app/lab/page.tsx`, `frontend/src/components/shared/Header.tsx`, `frontend/src/components/AI/CampusAICopilot.tsx`, `frontend/src/app/{acoustic,agent-simulation,anomalies,control-room,esg-reports,integrations,iot-registry,league,maintenance,microgrid,rescheduler,solar,student,transit,water}/**`, `docs/pitch.md`, `docs/jury-demo-script.md`, `.github/workflows/ci.yml`, `.agents/WORKSTREAMS.md` | INTEGRATING | KREATE focus pass plus exact-head CI repair: preserve 3D/campus geometry; promote occupancy/weather-aware building energy-carbon decision flow; intentionally remove owner-requested mock-heavy routes; repair stale data-quality enum usage and route policy jobs to the working self-hosted runner. |
 
 ## Suggested lanes
 
 - `frontend-ux`: pages, components, styles, accessibility, responsive UI.
 - `campus-geo`: campus directory, building locations, geometry, maps, 3D/assets.
-- `api-product`: API routes, product logic, data contracts, live-source adapters.
+- `api-product`: Next.js API routes, backend data contracts, product logic, integrations.
 - `quality-release`: CI, tests, build gates, deployment verification.
 - `integration`: temporary lock state used by whichever workstream owner is actively merging.

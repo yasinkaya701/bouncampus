@@ -1,35 +1,36 @@
-# BOUNCAMPUS — Hackathon Pitch
+# BOUNCAMPUS — KREATE for Climate Pitch
 
 ## One sentence
 
-> **BOUNCAMPUS is the decision layer between campus public data and real operations.**
+> **BOUNCAMPUS is an AI-assisted climate operations layer that helps campuses identify, stress-test and validate building energy-saving actions before waste becomes emissions.**
 
-It turns disconnected Boğaziçi signals into a source-traceable operational mission, stress-tests that mission, keeps a human approval gate, and learns from pilot outcomes.
+The beachhead problem is **avoidable campus building energy use**. The current product combines schedule-derived occupancy, weather and building context, produces a human-reviewable intervention candidate, stress-tests it, and learns from measured pilot outcomes.
 
 ---
 
 ## Opening — 20 seconds
 
-> Boğaziçi already publishes useful operational context: the course schedule, cafeteria menu, shuttle timetable and academic calendar. Weather is available too.
+> University buildings can remain fully conditioned and lit even when academic demand has fallen sharply. Operators rarely have one decision layer that says which building, which time window and which intervention is worth testing safely.
 >
-> The problem is not that there is zero data. The problem is that these signals live in separate systems and none of them answers one operational question:
->
-> **What should the campus do differently today?**
+> **The climate problem is avoidable building energy use and the emissions attached to it.**
+
+BOUNCAMPUS turns campus signals into a concrete, reviewable energy decision.
 
 ---
 
 ## Product — 25 seconds
 
-> BOUNCAMPUS is Mission Control for campus operations.
+> BOUNCAMPUS combines the course schedule, weather and building context to estimate low-use windows and surface energy interventions.
 >
-> It fuses source-traceable public signals with transparent demand and energy models, then creates one human-reviewable mission with:
+> Every recommendation includes:
 >
-> - why now;
 > - where and when;
-> - evidence;
+> - why now;
+> - source provenance;
 > - confidence;
 > - modeled impact;
-> - and a clear human-control boundary.
+> - counterfactual stress testing;
+> - and a human approval boundary.
 
 The product never upgrades a model estimate into “live sensor data.”
 
@@ -43,19 +44,19 @@ SENSE → DECIDE → STRESS-TEST → HUMAN APPROVAL → PILOT → LEARN
 
 ### 1. Sense
 
-Current product inputs:
+Core KREATE inputs:
 
-- Boğaziçi SKS public menu;
-- Boğaziçi Mekik public timetable;
-- Boğaziçi Academic Calendar;
 - dated official-source BUIS/ÖBİKAS course schedule snapshot;
-- Open-Meteo weather at Bebek campus coordinates.
+- Open-Meteo weather at Bebek campus coordinates;
+- building metadata and source-backed / explicitly-fallback geolocation.
+
+Other public campus feeds may remain contextual, but they are not part of the primary climate claim.
 
 ### 2. Decide
 
-The Mission Brief converts the current campus state into one inspectable recommendation with confidence and evidence.
+The product estimates where academic demand is low enough to justify reviewing an HVAC / lighting / space-consolidation intervention.
 
-Machine-readable endpoint:
+Machine-readable mission endpoint:
 
 ```text
 GET /api/v1/brief
@@ -63,19 +64,18 @@ GET /api/v1/brief
 
 ### 3. Stress-test
 
-Before a human acts, the same live product baseline can be recomputed under counterfactuals such as:
+The jury scenario is intentionally narrow:
 
-- heavy rain;
-- heatwave;
-- exam week;
-- event load;
-- building closure.
+- baseline campus conditions;
+- then a **38°C heatwave** counterfactual.
+
+The goal is to show that an intervention is not static. Outdoor conditions can change cooling demand and therefore change whether the same action remains valuable or safe.
 
 ### 4. Human approval
 
-The model cannot dispatch a BMS, kitchen, transport or IoT command.
+BOUNCAMPUS does not dispatch a BMS command.
 
-The decision ledger records only a review state:
+A decision can only move through review states such as:
 
 - REVIEW
 - APPROVED_FOR_PILOT
@@ -83,74 +83,65 @@ The decision ledger records only a review state:
 
 ### 5. Pilot
 
-A real-world action happens only after field verification and an accountable operator decision.
+A real pilot requires field verification and an accountable facilities decision.
+
+Minimum calibration feeds:
+
+1. building / floor smart-meter totals;
+2. anonymous aggregate occupancy counts.
 
 ### 6. Learn
 
-The Outcome Loop accepts an observed pilot result and compares it with modeled potential, creating calibration evidence for the next decision.
+The Outcome Loop compares expected and measured kWh, computes model error, and records calibration evidence for the next decision.
 
 ---
 
-## 90-second demo
+## 90-second jury demo
 
 Open `/demo`.
 
-### Screen 1 — Signal fusion
+### Screen 1 — Problem + evidence
 
-Show the four evidence cards and source readiness.
+Show only the climate-relevant evidence:
+
+1. course schedule snapshot;
+2. Bebek weather.
 
 Say:
 
-> Every signal has provenance and freshness. If a public page fails, BOUNCAMPUS can show a dated last-known-good official snapshot for continuity, but the product becomes degraded rather than pretending that snapshot is live.
+> The schedule is a demand signal, not a live occupancy sensor. Weather is external live context, not a connected BMS. Every source keeps its provenance.
 
-### Screen 2 — Decision
+### Screen 2 — Energy decision
 
-Show the current Mission Brief.
+Show the top energy intervention candidate.
 
 Point to:
 
+- location;
+- operating window;
 - confidence;
-- why now;
-- location and operating window;
 - modeled impact;
 - human guardrail.
 
-### Screen 3 — Stress test
+Say:
 
-Run Heavy Rain or Heatwave 38°C.
+> This is modeled potential, not measured savings.
+
+### Screen 3 — Heatwave stress test
+
+Run **38°C heatwave**.
 
 Say:
 
-> This starts from the current BOUNCAMPUS baseline; it is not a canned before/after slide.
+> The same decision is recomputed under higher cooling demand. We want the operator to challenge the recommendation before acting.
 
-### Screen 4 — Human approval
+### Screen 4 — Pilot + learning
 
-Click **Approve for pilot review**.
+Open `/decisions` and the Outcome Loop.
 
 Say:
 
-> Approval creates a decision receipt. It does not send a field command.
-
-Then open `/decisions` and show the Outcome Loop:
-
-> After a real pilot we enter the measured result, calculate model error and improve the next mission.
-
----
-
-## Why this can become a real university product
-
-BOUNCAMPUS does not require replacing existing university software.
-
-It can begin as a read-only layer above current systems.
-
-Highest-value production calibration feeds:
-
-1. anonymous occupancy aggregates;
-2. building/floor smart-meter totals;
-3. anonymized cafeteria POS totals by time bucket;
-4. shuttle AVL/GPS.
-
-No raw student identity is necessary for the core optimization loop.
+> A real pilot closes the loop with smart-meter and aggregate occupancy data: expected kWh versus measured kWh, model error and recalibration.
 
 ---
 
@@ -158,35 +149,52 @@ No raw student identity is necessary for the core optimization loop.
 
 | Week | Goal |
 |---|---|
-| 1 | Read-only aggregate integrations |
-| 2 | Model calibration against measured data |
-| 3 | Small human-approved operator pilot |
-| 4 | Outcome proof and operator feedback |
+| 1 | Read-only smart-meter + aggregate occupancy integration |
+| 2 | Calibrate schedule-derived occupancy and building energy model |
+| 3 | Small human-approved intervention pilot |
+| 4 | Compare expected vs measured kWh and document operator feedback |
 
-Proposed validation gates — **targets, not current claims**:
+Validation gates — **targets, not current claims**:
 
-- occupancy model: ≤20% MAPE;
-- food-demand model: ≤15% MAPE;
-- energy pilot: measured positive savings under a qualifying intervention;
-- operator usefulness: ≥70% of surfaced missions accepted or rated useful.
+- schedule-derived occupancy model: ≤20% MAPE after calibration;
+- energy pilot: positive measured kWh savings for a qualifying intervention;
+- model calibration: expected vs measured outcome recorded for every pilot;
+- operator usefulness: ≥70% of surfaced energy missions accepted or rated useful.
 
 ---
 
-## Why this is defensible
+## What stays secondary
 
-The moat is not “we trained one model.”
+### Food waste
 
-It is the system around decisions:
+A valid second use case because schedule + weather + menu can support demand forecasting. It requires POS totals for real calibration. It is not co-equal with the KREATE building-energy story.
 
-- Boğaziçi-specific source adapters;
-- provenance and freshness contract;
-- graceful degradation without fake live data;
-- schedule-to-space demand model;
-- mission ranking and confidence;
+### Water and mobility
+
+Roadmap only until trustworthy field feeds exist. No cistern level, greywater flow, leak, sensor-count, savings, shuttle-GPS or similar operational claim is presented without a real source.
+
+---
+
+## Why this can scale
+
+The product starts with universities because schedules provide a strong demand signal and campuses have multiple buildings under one operator.
+
+The same decision architecture can later extend to:
+
+- hospitals;
+- office campuses;
+- public facilities;
+- industrial sites.
+
+The reusable moat is not one model. It is the decision system around the model:
+
+- source provenance and graceful degradation;
+- schedule-to-space demand modeling;
+- building-level decision ranking;
 - counterfactual stress testing;
 - human approval ledger;
-- outcome calibration loop;
-- privacy-safe pilot integration pattern.
+- measured-outcome calibration loop;
+- privacy-safe read-only pilot integration.
 
 ---
 
@@ -202,14 +210,14 @@ Today BOUNCAMPUS **does not claim** direct access to:
 - shuttle GPS;
 - live IoT telemetry.
 
-Occupancy, energy, food demand, savings and CO₂ values are model estimates until calibrated against authorized operational data.
+Occupancy, energy, savings and CO₂ values are model estimates until calibrated against authorized operational data.
 
 ---
 
 ## Closing — 15 seconds
 
-> Universities do not need another dashboard telling them what already happened.
+> Campuses do not need another sustainability dashboard.
 >
-> They need a decision layer that turns fragmented signals into an action a human can understand, challenge, test and measure.
+> They need a decision layer that identifies a specific energy intervention, lets an operator challenge it, and proves the result with measured data.
 >
-> **BOUNCAMPUS: Sense. Decide. Pilot. Learn.**
+> **BOUNCAMPUS: Sense. Decide. Stress-test. Pilot. Learn.**
