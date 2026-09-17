@@ -1,0 +1,34 @@
+{
+  "source": {
+    "label": "Boğaziçi University Campus Food Waste Tracking",
+    "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+    "provenance": "OFFICIAL_SNAPSHOT",
+    "year": 2025,
+    "retrieved_note": "Official university snapshot reporting monthly campus food waste and waste sent to ISTAC for recycling."
+  },
+  "service_population": {
+    "students": 13000,
+    "staff": 2000,
+    "note": "The same official page states that dining services serve approximately 13,000 students and 2,000 staff."
+  },
+  "totals": {
+    "food_waste_kg": 48251,
+    "sent_to_istac_for_recycling_kg": 33430,
+    "waste_oil_kg": 6305,
+    "recycled_waste_oil_kg": 6305
+  },
+  "months": [
+    {"month": 1, "label_tr": "Ocak", "label_en": "January", "food_waste_kg": 3992, "sent_to_istac_for_recycling_kg": 2250, "waste_oil_kg": 475},
+    {"month": 2, "label_tr": "Şubat", "label_en": "February", "food_waste_kg": 7811, "sent_to_istac_for_recycling_kg": 1555, "waste_oil_kg": 250},
+    {"month": 3, "label_tr": "Mart", "label_en": "March", "food_waste_kg": 7004, "sent_to_istac_for_recycling_kg": 2285, "waste_oil_kg": 900},
+    {"month": 4, "label_tr": "Nisan", "label_en": "April", "food_waste_kg": 4772, "sent_to_istac_for_recycling_kg": 3090, "waste_oil_kg": 825},
+    {"month": 5, "label_tr": "Mayıs", "label_en": "May", "food_waste_kg": 3832, "sent_to_istac_for_recycling_kg": 2900, "waste_oil_kg": 450},
+    {"month": 6, "label_tr": "Haziran", "label_en": "June", "food_waste_kg": 2777, "sent_to_istac_for_recycling_kg": 1450, "waste_oil_kg": 550},
+    {"month": 7, "label_tr": "Temmuz", "label_en": "July", "food_waste_kg": 1923, "sent_to_istac_for_recycling_kg": 1850, "waste_oil_kg": 150},
+    {"month": 8, "label_tr": "Ağustos", "label_en": "August", "food_waste_kg": 1502, "sent_to_istac_for_recycling_kg": 3550, "waste_oil_kg": 350},
+    {"month": 9, "label_tr": "Eylül", "label_en": "September", "food_waste_kg": 2072, "sent_to_istac_for_recycling_kg": 1450, "waste_oil_kg": 830},
+    {"month": 10, "label_tr": "Ekim", "label_en": "October", "food_waste_kg": 1334, "sent_to_istac_for_recycling_kg": 4850, "waste_oil_kg": 600},
+    {"month": 11, "label_tr": "Kasım", "label_en": "November", "food_waste_kg": 4784, "sent_to_istac_for_recycling_kg": 3300, "waste_oil_kg": 550},
+    {"month": 12, "label_tr": "Aralık", "label_en": "December", "food_waste_kg": 6448, "sent_to_istac_for_recycling_kg": 4900, "waste_oil_kg": 375}
+  ]
+}
