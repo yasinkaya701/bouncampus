@@ -17,8 +17,6 @@ Official baseline: https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food
 
 ## Hackathon thesis
 
-The focused product loop is:
-
 ```text
 OFFICIAL WASTE BASELINE
         ↓
@@ -37,20 +35,24 @@ MATCHED 14-DAY PILOT
         ↓
 WASTE KG / 100 SERVED MEALS + GUARDRAILS
         ↓
+MEASURED PILOT SCORECARD
+        ↓
 MODEL CALIBRATION
         ↺
 ```
 
-BOUNCAMPUS does **not** autonomously dispatch a kitchen command. A human operator accepts, edits or rejects every production recommendation.
+BOUNCAMPUS does **not** autonomously dispatch a kitchen command. A human operator accepts, edits or holds every production recommendation.
 
 ## Why this is stronger than another sustainability dashboard
 
-The product does four things the typical reporting dashboard does not:
+The product:
 
 1. acts **before** avoidable food waste is created;
 2. exposes model uncertainty and missing-source context;
 3. can explicitly **withhold** an operational recommendation;
-4. defines the field measurement that can prove the product wrong.
+4. keeps a human operator in control;
+5. defines the field measurement that can prove the product wrong;
+6. already contains the evidence-scoring path for real pilot measurements.
 
 The goal is not “predict demand accurately” in isolation. The goal is to reduce normalized food waste **without degrading service reliability**.
 
@@ -68,7 +70,7 @@ Every production band carries:
 - `operatorApprovalRequired=true`;
 - `autoDispatchAllowed=false`.
 
-Current signal weights are deliberately transparent:
+Current transparent pilot weights:
 
 | Signal | Weight |
 |---|---:|
@@ -77,11 +79,9 @@ Current signal weights are deliberately transparent:
 | Menu context | 20% |
 | Academic calendar | 10% |
 
-This is a pilot policy, not a claim that these weights are universally optimal. Real service data is required for calibration.
+These weights are pilot policy, not learned universal coefficients. Real service data is required for calibration.
 
 ## Truth boundary / claim firewall
-
-The hackathon story separates evidence from estimates.
 
 ### Official/public
 
@@ -89,7 +89,7 @@ The hackathon story separates evidence from estimates.
 - 2025 monthly food-waste values;
 - 2025 recovery totals;
 - Boğaziçi dining-service scale and published capacities;
-- official menu, academic-calendar and shuttle pages when available.
+- official/public contextual sources when available.
 
 ### Model estimates
 
@@ -104,7 +104,7 @@ The hackathon story separates evidence from estimates.
 BOUNCAMPUS does **not** claim access to:
 
 - cafeteria POS transactions;
-- actual produced or served portions per service;
+- actual produced or served portions per service before the pilot;
 - plate-level waste measurements;
 - university BMS or smart meters;
 - turnstiles or Wi-Fi occupancy telemetry;
@@ -137,9 +137,9 @@ The jury flow is five beats:
 2. **DECISION** — show the next-service band, signal coverage and readiness state.
 3. **HUMAN GATE** — show approve/hold and `AUTO_DISPATCH=false`.
 4. **SCENARIO** — stress-test prevention/recovery without presenting modeled outcomes as achieved savings.
-5. **EVIDENCE** — show the pre-registered pilot target, primary KPI and downloadable measurement template.
+5. **EVIDENCE** — show the pre-registered pilot target, primary KPI and measurement workflow.
 
-The one-line pitch:
+One-line pitch:
 
 > **“BOUNCAMPUS turns measured institutional food waste into an uncertainty-aware, human-approved production decision and a controlled pilot that can prove the product wrong.”**
 
@@ -149,6 +149,7 @@ The one-line pitch:
 |---|---|
 | `/` | Focused KREATE command center and official problem baseline |
 | `/food-waste` | Core decision workspace: baseline, source health, readiness, operator gate, scenario lab and pilot contract |
+| `/food-waste/pilot` | Pilot Evidence Lab for entering real control/intervention service measurements and scoring the pre-registered gates |
 | `/demo` | 90-second jury choreography |
 | `/decisions` | Existing human-review decision ledger and outcome loop |
 | `/data` | Source provenance and truth boundary |
@@ -161,24 +162,21 @@ The one-line pitch:
 Important endpoints:
 
 ```text
-GET /api/v1/food
-GET /api/v1/food/pilot-template
-GET /api/v1/dashboard
-GET /api/v1/health
-GET /api/v1/brief
+GET  /api/v1/food
+GET  /api/v1/food/pilot-template
+GET  /api/v1/food/pilot-score
+POST /api/v1/food/pilot-score
+GET  /api/v1/dashboard
+GET  /api/v1/health
+GET  /api/v1/brief
 POST /api/v1/scenarios/simulate
 ```
 
-`GET /api/v1/food` exposes, in one machine-readable contract:
+`GET /api/v1/food` exposes the official baseline, source-backed demand context, decision band/readiness, human-approval policy, scenario output, pilot contract, claim policy and truth boundary.
 
-- official baseline;
-- source-backed demand context;
-- production decision band;
-- readiness and human-approval policy;
-- scenario output;
-- pilot evidence contract;
-- claim policy;
-- explicit truth boundary.
+`GET /api/v1/food/pilot-template` returns the blank measurement CSV.
+
+`POST /api/v1/food/pilot-score` accepts **measured aggregate service outcomes only** and computes the predefined control/intervention scorecard. It does not fabricate pilot measurements.
 
 ## 14-day falsifiable pilot
 
@@ -221,6 +219,31 @@ A promising pilot requires all of the following:
 
 The **10% value is a target, not an achieved result**.
 
+### Measured evidence engine
+
+The Pilot Evidence Lab starts empty. It does not seed synthetic “winning” results.
+
+Once real service measurements are entered, the score engine reports:
+
+- control/intervention sample counts;
+- mean waste kg / 100 served meals;
+- raw waste kg / service;
+- overproduction rate;
+- edible surplus intensity;
+- forecast absolute percentage error;
+- early-sellout rate;
+- operator-override rate;
+- normalized waste reduction versus control;
+- minimum-evidence, reduction-target and early-sellout gates.
+
+Possible numeric classifications:
+
+- `INSUFFICIENT_EVIDENCE`
+- `PROMISING`
+- `FAILED`
+
+`PROMISING` is intentionally not named `PROVEN`: food-safety review, service matching, measurement quality and replication remain necessary.
+
 Detailed protocol: [`docs/food-waste-pilot-protocol.md`](docs/food-waste-pilot-protocol.md)
 
 ## Why the rest of the platform still matters
@@ -235,7 +258,7 @@ Existing capabilities remain preserved as expansion modules:
 - campus map and 3D/photogrammetry context;
 - source provenance and human approval.
 
-They demonstrate that the same `SENSE → DECIDE → APPROVE → PILOT → LEARN` architecture can later expand to energy, mobility and other campus climate operations **after** one primary climate outcome is validated end to end.
+They demonstrate that the same `SENSE → QUALIFY → APPROVE → PILOT → LEARN` architecture can later expand to energy, mobility and other campus climate operations **after** one primary climate outcome is validated end to end.
 
 ## Scale path
 
@@ -257,9 +280,9 @@ Each deployment can swap in local demand signals while keeping the same provenan
 ```text
 OFFICIAL / PUBLIC SIGNALS
 ├─ food-waste baseline
-├─ SKS menu
+├─ menu
 ├─ academic calendar
-├─ BUIS/ÖBİKAS schedule snapshot
+├─ course schedule snapshot
 └─ weather
         │
         ▼
@@ -279,16 +302,12 @@ HUMAN OPERATOR GATE
         │
         ▼
 14-DAY MATCHED PILOT
-├─ forecast meals
-├─ produced portions
-├─ served portions
-├─ edible surplus kg
-├─ waste kg
-├─ early sell-out
-└─ operator override
         │
         ▼
-NORMALIZED SCORECARD + CALIBRATION
+NORMALIZED SCORECARD + GUARDRAILS
+        │
+        ▼
+CALIBRATION / NEXT SERVICE
 ```
 
 ## Tech stack
@@ -326,11 +345,13 @@ Then verify at minimum:
 
 - `/`
 - `/food-waste`
+- `/food-waste/pilot`
 - `/demo`
 - `/decisions`
 - `/data`
 - `/api/v1/food`
 - `/api/v1/food/pilot-template`
+- `/api/v1/food/pilot-score`
 - `/api/v1/health`
 
 Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.md). Work is performed on short-lived agent branches, validated through the single integration PR, merged to `master`, and post-merge verified before completion.
@@ -350,3 +371,5 @@ Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.
 - Full pitch: [`docs/pitch.md`](docs/pitch.md)
 - Pilot protocol: [`docs/food-waste-pilot-protocol.md`](docs/food-waste-pilot-protocol.md)
 - Judge red-team Q&A: [`docs/jury-q-and-a.md`](docs/jury-q-and-a.md)
+- Runtime architecture: [`docs/architecture.md`](docs/architecture.md)
+- Assumptions/methodology: [`docs/assumptions.md`](docs/assumptions.md)
