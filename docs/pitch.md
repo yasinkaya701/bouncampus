@@ -2,222 +2,280 @@
 
 ## One sentence
 
-> **BOUNCAMPUS is an AI-assisted climate operations layer that helps campuses identify, stress-test and validate building energy-saving actions before waste becomes emissions.**
+> **BOUNCAMPUS turns a measured institutional food-waste problem into an uncertainty-aware, human-approved production decision and a controlled pilot that can prove the product wrong.**
 
-The beachhead problem is **avoidable campus building energy use**. The current product combines schedule-derived occupancy, weather and building context, produces a human-reviewable intervention candidate, stress-tests it, and learns from measured pilot outcomes.
+For KREATE, the beachhead is intentionally narrow: **avoidable food waste in campus dining operations caused by uncertain demand and overproduction.**
 
----
-
-## Opening — 20 seconds
-
-> University buildings can remain fully conditioned and lit even when academic demand has fallen sharply. Operators rarely have one decision layer that says which building, which time window and which intervention is worth testing safely.
->
-> **The climate problem is avoidable building energy use and the emissions attached to it.**
-
-BOUNCAMPUS turns campus signals into a concrete, reviewable energy decision.
+The broader campus platform still exists, but it is not allowed to compete with this primary climate story.
 
 ---
 
-## Product — 25 seconds
+# 3-minute pitch
 
-> BOUNCAMPUS combines the course schedule, weather and building context to estimate low-use windows and surface energy interventions.
->
-> Every recommendation includes:
->
-> - where and when;
-> - why now;
-> - source provenance;
-> - confidence;
-> - modeled impact;
-> - counterfactual stress testing;
-> - and a human approval boundary.
+## 0:00–0:30 — Problem: start with a real number
 
-The product never upgrades a model estimate into “live sensor data.”
+> Boğaziçi University already measures the problem. In 2025 it published **48,251 kilograms of food waste**. So we are not here to build another dashboard that tells the university waste exists.
+>
+> The operating question happens earlier: **before the next meal service, how much food should the kitchen prepare when demand is uncertain?**
+
+Show:
+
+- 48,251 kg official 2025 baseline;
+- official source link;
+- 2025 monthly chart.
+
+Do not start with AI, 3D, energy, mobility or feature count.
 
 ---
 
-## The product loop
+## 0:30–1:15 — Product: from context to a bounded decision
+
+> BOUNCAMPUS combines campus demand context—course schedules, academic calendar, weather and menu information—to estimate the next service.
+>
+> But we do not give the kitchen a magic number. We return a **production band plus decision readiness**.
+
+The band exposes:
+
+- predicted meals;
+- lower bound;
+- operator starting point;
+- upper bound;
+- signal coverage;
+- `PILOT_READY`, `REVIEW_REQUIRED` or `WITHHOLD`;
+- missing-source reason codes;
+- `MODEL_ESTIMATE` provenance.
+
+Key line:
+
+> **If evidence gets weaker, the product becomes less confident or refuses to recommend.**
+
+This is a stronger product behavior than always producing a number.
+
+---
+
+## 1:15–1:40 — Human control
+
+> BOUNCAMPUS is decision support, not autonomous kitchen control.
+
+The operator may:
+
+- approve for a controlled pilot;
+- request an edit;
+- hold the recommendation.
+
+The product contract is explicit:
 
 ```text
-SENSE → DECIDE → STRESS-TEST → HUMAN APPROVAL → PILOT → LEARN
+operatorApprovalRequired = true
+autoDispatchAllowed = false
 ```
 
-### 1. Sense
+No hackathon button pretends to send a command to a cafeteria system.
 
-Core KREATE inputs:
+---
 
-- dated official-source BUIS/ÖBİKAS course schedule snapshot;
-- Open-Meteo weather at Bebek campus coordinates;
-- building metadata and source-backed / explicitly-fallback geolocation.
+## 1:40–2:15 — Evidence: define failure before claiming impact
 
-Other public campus feeds may remain contextual, but they are not part of the primary climate claim.
+> A climate-tech demo is not enough. We pre-register what success and failure mean before the pilot.
 
-### 2. Decide
+14-day matched control/intervention pilot.
 
-The product estimates where academic demand is low enough to justify reviewing an HVAC / lighting / space-consolidation intervention.
-
-Machine-readable mission endpoint:
+Primary KPI:
 
 ```text
-GET /api/v1/brief
+waste kg / 100 served meals
 ```
 
-### 3. Stress-test
+Formula:
 
-The jury scenario is intentionally narrow:
+```text
+(waste_kg / served_portions) * 100
+```
 
-- baseline campus conditions;
-- then a **38°C heatwave** counterfactual.
+Why normalize?
 
-The goal is to show that an intervention is not static. Outdoor conditions can change cooling demand and therefore change whether the same action remains valuable or safe.
+Because a quiet service can have less total waste simply because fewer people came. Normalization makes the comparison more defensible.
 
-### 4. Human approval
+Pre-registered gate:
 
-BOUNCAMPUS does not dispatch a BMS command.
+- minimum 5 measured services per arm;
+- target: **≥10% lower normalized waste** than matched control;
+- early-sellout incidence must not increase;
+- food-safety processes cannot be bypassed;
+- operator overrides are reported, not hidden.
 
-A decision can only move through review states such as:
+Say clearly:
 
-- REVIEW
-- APPROVED_FOR_PILOT
-- DECLINED
-
-### 5. Pilot
-
-A real pilot requires field verification and an accountable facilities decision.
-
-Minimum calibration feeds:
-
-1. building / floor smart-meter totals;
-2. anonymous aggregate occupancy counts.
-
-### 6. Learn
-
-The Outcome Loop compares expected and measured kWh, computes model error, and records calibration evidence for the next decision.
+> **Ten percent is our pilot target, not a result we claim today.**
 
 ---
 
-## 90-second jury demo
+## 2:15–2:40 — What we measure
 
-Open `/demo`.
+Each service records aggregate operational data only:
 
-### Screen 1 — Problem + evidence
+1. model forecast meals;
+2. produced portions;
+3. served portions;
+4. edible surplus kg;
+5. waste kg;
+6. early sell-out;
+7. operator override;
+8. anomaly notes.
 
-Show only the climate-relevant evidence:
+No student identity, payment identity, Wi-Fi tracking or individual consumption record is needed for the first pilot.
 
-1. course schedule snapshot;
-2. Bebek weather.
+The repository exposes a ready-to-use CSV template:
 
-Say:
-
-> The schedule is a demand signal, not a live occupancy sensor. Weather is external live context, not a connected BMS. Every source keeps its provenance.
-
-### Screen 2 — Energy decision
-
-Show the top energy intervention candidate.
-
-Point to:
-
-- location;
-- operating window;
-- confidence;
-- modeled impact;
-- human guardrail.
-
-Say:
-
-> This is modeled potential, not measured savings.
-
-### Screen 3 — Heatwave stress test
-
-Run **38°C heatwave**.
-
-Say:
-
-> The same decision is recomputed under higher cooling demand. We want the operator to challenge the recommendation before acting.
-
-### Screen 4 — Pilot + learning
-
-Open `/decisions` and the Outcome Loop.
-
-Say:
-
-> A real pilot closes the loop with smart-meter and aggregate occupancy data: expected kWh versus measured kWh, model error and recalibration.
+```text
+GET /api/v1/food/pilot-template
+```
 
 ---
 
-## 30-day pilot
+## 2:40–3:00 — Scale and close
 
-| Week | Goal |
-|---|---|
-| 1 | Read-only smart-meter + aggregate occupancy integration |
-| 2 | Calibrate schedule-derived occupancy and building energy model |
-| 3 | Small human-approved intervention pilot |
-| 4 | Compare expected vs measured kWh and document operator feedback |
+> Food waste is our wedge, but the transferable asset is the decision loop: source-backed context, uncertainty-aware recommendation, human approval, measured outcome and recalibration.
 
-Validation gates — **targets, not current claims**:
+Scale path:
 
-- schedule-derived occupancy model: ≤20% MAPE after calibration;
-- energy pilot: positive measured kWh savings for a qualifying intervention;
-- model calibration: expected vs measured outcome recorded for every pilot;
-- operator usefulness: ≥70% of surfaced energy missions accepted or rated useful.
-
----
-
-## What stays secondary
-
-### Food waste
-
-A valid second use case because schedule + weather + menu can support demand forecasting. It requires POS totals for real calibration. It is not co-equal with the KREATE building-energy story.
-
-### Water and mobility
-
-Roadmap only until trustworthy field feeds exist. No cistern level, greywater flow, leak, sensor-count, savings, shuttle-GPS or similar operational claim is presented without a real source.
-
----
-
-## Why this can scale
-
-The product starts with universities because schedules provide a strong demand signal and campuses have multiple buildings under one operator.
-
-The same decision architecture can later extend to:
-
+- university cafeterias;
 - hospitals;
-- office campuses;
-- public facilities;
-- industrial sites.
+- factories;
+- schools;
+- municipal kitchens;
+- large catering operators.
 
-The reusable moat is not one model. It is the decision system around the model:
+Close:
 
-- source provenance and graceful degradation;
-- schedule-to-space demand modeling;
-- building-level decision ranking;
-- counterfactual stress testing;
-- human approval ledger;
-- measured-outcome calibration loop;
-- privacy-safe read-only pilot integration.
+> **The 48-ton problem is already known. BOUNCAMPUS acts before the next kilogram becomes waste—and lets the controlled pilot, not the model, decide whether we succeeded.**
 
 ---
 
-## Truth boundary
+# 90-second jury demo
 
-Today BOUNCAMPUS **does not claim** direct access to:
+Open `/demo` and follow exactly five beats.
 
-- BMS;
-- smart meters;
-- turnstiles;
-- Wi-Fi occupancy;
-- cafeteria POS;
-- shuttle GPS;
-- live IoT telemetry.
+## 0–18 s — PROBLEM
 
-Occupancy, energy, savings and CO₂ values are model estimates until calibrated against authorized operational data.
+Show official baseline.
+
+> “48,251 kg is Boğaziçi’s published 2025 food-waste total. The first number you see is not generated by our model.”
+
+## 18–40 s — DECISION
+
+Show demand band + signal coverage + readiness.
+
+> “We estimate the next service from campus context, but the model exposes missing evidence. Weak context widens the band; insufficient context becomes WITHHOLD.”
+
+## 40–55 s — HUMAN GATE
+
+Press approve/hold.
+
+> “AI never dispatches to the kitchen. A human accepts, edits or holds. Even this demo does not fake an external kitchen integration.”
+
+## 55–70 s — SCENARIO
+
+Move prevention slider.
+
+> “This is scenario math on the official baseline, not achieved savings.”
+
+## 70–90 s — EVIDENCE
+
+Show primary KPI and CSV template.
+
+> “We pre-register failure: less than 10% normalized reduction, more early sell-out, or weakened food-safety process means we do not call the pilot successful.”
+
+Final line:
+
+> **“We do not let the AI declare victory. The measured pilot does.”**
 
 ---
 
-## Closing — 15 seconds
+# Why this is climate tech
 
-> Campuses do not need another sustainability dashboard.
->
-> They need a decision layer that identifies a specific energy intervention, lets an operator challenge it, and proves the result with measured data.
->
-> **BOUNCAMPUS: Sense. Decide. Stress-test. Pilot. Learn.**
+Food waste is created by repeated operational decisions under uncertainty. Prevention avoids producing surplus before recovery or disposal becomes necessary.
+
+For scientific honesty, the hackathon product measures direct physical waste first. It does **not** convert modeled kilograms into claimed CO2 or water savings before a measured pilot and a documented lifecycle factor exist.
+
+---
+
+# Product architecture
+
+```text
+OFFICIAL FOOD-WASTE BASELINE
+            ↓
+SOURCE HEALTH + CAMPUS CONTEXT
+(schedule / calendar / weather / menu)
+            ↓
+UNCERTAINTY-AWARE DEMAND BAND
+            ↓
+DECISION READINESS
+PILOT_READY / REVIEW_REQUIRED / WITHHOLD
+            ↓
+HUMAN OPERATOR GATE
+approve / edit / hold
+            ↓
+MATCHED CONTROLLED PILOT
+            ↓
+NORMALIZED WASTE + SERVICE GUARDRAILS
+            ↓
+CALIBRATION / NEXT SERVICE
+```
+
+---
+
+# Claim firewall
+
+## We can claim now
+
+- official historical food-waste baseline;
+- public/live/model source provenance;
+- current model-estimated band;
+- source coverage and readiness state;
+- scenario outcomes explicitly labeled as scenarios;
+- pre-registered pilot target and measurement method.
+
+## We cannot claim before measured evidence
+
+- kilograms saved by BOUNCAMPUS;
+- CO2 avoided by BOUNCAMPUS;
+- water saved by BOUNCAMPUS;
+- actual cafeteria production optimized;
+- actual student demand observed.
+
+---
+
+# What stays secondary
+
+Do not lead with:
+
+- building energy;
+- 3D/photogrammetry;
+- shuttle mobility;
+- generic AI assistant;
+- long platform feature lists.
+
+If asked:
+
+> “Those are implemented expansion modules. We narrowed the hackathon wedge so one climate outcome can be understood, tested and measured end to end.”
+
+---
+
+# Accelerator ask
+
+The next milestone is institutional validation, not more demo surface area:
+
+1. secure a cafeteria pilot partner;
+2. standardize service-level measurements;
+3. run the 14-day matched pilot;
+4. calibrate the demand band against real production/served data;
+5. validate normalized waste reduction and operational guardrails;
+6. only then attach documented climate-equivalent accounting;
+7. repeat at a second site to test portability.
+
+---
+
+# Final sentence
+
+**BOUNCAMPUS is the human-controlled decision layer that acts before institutional food becomes waste and uses measured evidence—not demo claims—to prove climate impact.**
