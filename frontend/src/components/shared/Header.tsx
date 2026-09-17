@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Building2, CheckSquare2, Compass, Database, LayoutDashboard, Trophy } from 'lucide-react';
+import { Building2, BusFront, CheckSquare2, Compass, Database, LayoutDashboard, Trophy } from 'lucide-react';
 import { useLocale, type Locale } from '@/lib/i18n';
 
 const primaryNav = [
   { href: '/', tr: 'Kontrol merkezi', en: 'Command center', icon: LayoutDashboard },
   { href: '/buildings', tr: 'Binalar', en: 'Buildings', icon: Building2 },
+  { href: '/mobility', tr: 'Mekik', en: 'Shuttle', icon: BusFront },
   { href: '/decisions', tr: 'Kararlar', en: 'Decisions', icon: CheckSquare2 },
   { href: '/scenarios', tr: 'Senaryolar', en: 'Scenarios', icon: Compass },
   { href: '/data', tr: 'Kanıt', en: 'Evidence', icon: Database },

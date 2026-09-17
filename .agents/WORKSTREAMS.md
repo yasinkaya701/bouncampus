@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | State | Lane | Branch | Owner role | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| INTEGRATING | frontend-ux | `agent/frontend-ux/jury-wow` | Workstream Agent / Frontend UX / Merge Coordinator | Jury-demo visual system and landing/dashboard polish without feature loss | `.agents/WORKSTREAMS.md`, `frontend/src/app/page.tsx`, `frontend/src/app/globals.css`, `frontend/src/components/shared/Header.tsx`, `frontend/src/components/shared/Footer.tsx`, `frontend/src/components/shared/HomeCampusVisual.tsx`, `frontend/src/components/Dashboard/KPICards.tsx`, `frontend/src/components/Dashboard/MissionSpotlight.tsx` |
+| INTEGRATING | frontend-ux | `agent/frontend-ux/jury-wow` | Workstream Agent / Frontend UX / Merge Coordinator | Jury-demo visual system and landing/dashboard polish without feature loss; preserve the newly merged shuttle mobility surface during integration. | `.agents/WORKSTREAMS.md`, `frontend/src/app/page.tsx`, `frontend/src/app/globals.css`, `frontend/src/components/shared/Header.tsx`, `frontend/src/components/shared/Footer.tsx`, `frontend/src/components/shared/HomeCampusVisual.tsx` |
 
 ## Suggested lanes
 
