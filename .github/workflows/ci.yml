@@ -7,12 +7,50 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  merge-discipline:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Require a single open integration PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json number --jq 'length')"
+          if [ "$count" -ne 1 ]; then
+            echo "BOUNCAMPUS allows exactly one open integration PR; found $count."
+            exit 1
+          fi
+
+      - name: Require PR head to contain current master
+        run: |
+          git merge-base --is-ancestor "${{ github.event.pull_request.base.sha }}" HEAD || {
+            echo "PR head is stale. Integrate the latest master before merge."
+            exit 1
+          }
+
+      - name: Preserve registered features
+        run: python scripts/verify_feature_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
+
+  feature-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate registered feature files
+        run: python scripts/verify_feature_preservation.py
+
   frontend:
     runs-on: [self-hosted, macOS, ARM64, bouncampus]
     defaults:
@@ -23,7 +61,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm ci
+      - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
