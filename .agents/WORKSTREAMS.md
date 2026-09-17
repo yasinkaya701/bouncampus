@@ -30,9 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-| State | Lane | Branch | Owner role | Scope | Touched paths |
-| --- | --- | --- | --- | --- | --- |
-| INTEGRATING | campus-geo | `agent/campus-geo/photogrammetry-assets` | Workstream Agent / Merge Coordinator | Curate source-backed Boğaziçi photogrammetry assets, add provenance policy, and expose provider-hosted 3D models in the campus map without redistributing unverified binaries. | `frontend/public/assets/3d/**`, `frontend/src/lib/photogrammetry-assets.ts`, `frontend/src/components/Dashboard/CampusPhotogrammetryViewer.tsx`, `frontend/src/components/Dashboard/CampusMap.tsx`, `.github/feature-registry.json`, `.agents/WORKSTREAMS.md` |
+_No active workstreams._
+
+The `campus-geo / photogrammetry-assets` workstream was merged through PR #13 and verified on `master` at merge commit `4ae611ecf394e3cdf05b21b4eeda0dd998526c54` by CI run #188 before ownership was released.
 
 ## Suggested lanes
 
