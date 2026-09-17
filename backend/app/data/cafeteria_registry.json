@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "capacity_source": {
+    "provenance": "OFFICIAL_SNAPSHOT",
+    "label": "Boğaziçi University 2025 Administrative Activity Report",
+    "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf"
+  },
+  "service_source": {
+    "provenance": "OFFICIAL_LIVE",
+    "label": "Boğaziçi University Dining Services",
+    "url": "https://yemekhane.bogazici.edu.tr/yemek-servislerimiz"
+  },
+  "cafeterias": [
+    {
+      "id": "B-NORTH-KY",
+      "name_tr": "Kuzey Kampüs Yemekhanesi",
+      "name_en": "North Campus Dining Hall",
+      "campus": "north",
+      "seating_capacity": 692,
+      "weekday": {"breakfast": "07:30-09:30", "lunch": "11:30-14:30", "dinner": "17:00-19:15"},
+      "weekend": {"breakfast": "08:30-10:00", "lunch": "12:00-13:45", "dinner": "17:30-19:30"}
+    },
+    {
+      "id": "B-SOUTH-GY",
+      "name_tr": "Güney Kampüs Yemekhanesi",
+      "name_en": "South Campus Dining Hall",
+      "campus": "south",
+      "seating_capacity": 114,
+      "weekday": {"breakfast": "07:30-09:30", "lunch": "12:15-14:30", "dinner": "17:00-19:15"},
+      "weekend": {"breakfast": "08:30-10:00", "lunch": "12:00-13:45", "dinner": "17:30-19:30"},
+      "notes": ["The official aggregate service-hours page is used for the South weekday lunch start time; meal-specific subpages can differ and should be monitored by the scraper."]
+    },
+    {
+      "id": "B-HISAR-YM",
+      "name_tr": "Hisar Kampüs Yemekhanesi",
+      "name_en": "Hisar Campus Dining Hall",
+      "campus": "hisar",
+      "seating_capacity": 118,
+      "weekday": {"breakfast": null, "lunch": "11:30-14:30", "dinner": null},
+      "weekend": {"breakfast": null, "lunch": null, "dinner": null}
+    },
+    {
+      "id": "B-KANDILLI-YM",
+      "name_tr": "Kandilli Kampüs Yemekhanesi",
+      "name_en": "Kandilli Campus Dining Hall",
+      "campus": "kandilli",
+      "seating_capacity": 120,
+      "weekday": {"breakfast": "07:30-09:30", "lunch": "11:30-14:30", "dinner": "17:00-19:15"},
+      "weekend": {"breakfast": "08:30-10:00", "lunch": "12:00-13:45", "dinner": "17:30-19:30"}
+    },
+    {
+      "id": "B-ANADOLU-YM",
+      "name_tr": "Anadolu Hisarı Kampüs Yemekhanesi",
+      "name_en": "Anadolu Hisarı Campus Dining Hall",
+      "campus": "anadolu-hisari",
+      "seating_capacity": 486,
+      "weekday": {"breakfast": "07:30-09:30", "lunch": "11:30-14:30", "dinner": "17:00-19:15"},
+      "weekend": {"breakfast": "08:30-10:00", "lunch": "12:00-13:45", "dinner": "17:30-19:30"}
+    },
+    {
+      "id": "B-KILYOS-YM",
+      "name_tr": "Kilyos / Sarıtepe Kampüs Yemekhanesi",
+      "name_en": "Kilyos / Sarıtepe Campus Dining Hall",
+      "campus": "kilyos-saritepe",
+      "seating_capacity": 122,
+      "weekday": {"breakfast": "07:30-10:00", "lunch": "12:00-15:00", "dinner": "17:00-19:15"},
+      "weekend": {"breakfast": "08:30-10:00", "lunch": "12:00-13:45", "dinner": "17:30-19:30"}
+    }
+  ]
+}
