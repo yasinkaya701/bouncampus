@@ -32,9 +32,9 @@ Allowed lifecycle states:
 
 | State | Lane | Branch | Owner role | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| `ACTIVE` | `quality-release` | `agent/quality-release/multi-agent-runtime` | Workstream Agent / temporary Merge Coordinator | Build executable multi-agent coordination, branch-independent inter-agent messaging, ownership validation, handoff/ack/retry semantics and CI enforcement | `.agents/**`, `scripts/agent_bus.py`, `scripts/test_agent_bus.py`, `.github/workflows/agent-coordination.yml`, `.github/feature-registry.json`, `AGENTS.md` |
+| `READY_FOR_INTEGRATION` | `quality-release` | `agent/quality-release/multi-agent-runtime` | Workstream Agent / temporary Merge Coordinator | Build executable multi-agent coordination, branch-independent inter-agent messaging, ownership validation, handoff/ack/retry semantics and CI enforcement. Branch Agent Coordination run #5 passed. | `.agents/**`, `scripts/agent_bus.py`, `scripts/test_agent_bus.py`, `.github/workflows/agent-coordination.yml`, `.github/feature-registry.json`, `AGENTS.md` |
 
-_Previous `frontend-ux/asset-wow-v2` workstream was merged in PR #12 and verified by successful `master` CI run #186; its stale integration ownership is released._
+_Previous `frontend-ux/asset-wow-v2` workstream was merged in PR #12 and verified by successful `master` CI run #186; its stale integration ownership is released. Photogrammetry work from PR #13 is preserved in this branch; its separate ownership cleanup is serialized through the repository's single-PR rule._
 
 ## Suggested lanes
 
