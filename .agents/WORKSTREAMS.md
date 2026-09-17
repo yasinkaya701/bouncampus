@@ -32,7 +32,8 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| frontend-ux + api-product + quality-release | `agent/frontend-ux/jury-mode-v3` | Jury Mode integration owner | INTEGRATING | Fail-safe 90-second jury flow, source health/fallback UX, decision explainability, Pilot Evidence Lab CSV workflow, application/pitch hardening, release verification | `frontend/src/app/demo/**`, `frontend/src/app/food-waste/pilot/**`, `frontend/src/app/api/v1/food/**`, `frontend/src/lib/food-waste.ts`, `docs/**`, `.github/feature-registry.json`, `.agents/WORKSTREAMS.md` |
+
+The `frontend-ux + api-product + quality-release / jury-mode-v3` workstream was merged through PR #22 and verified on `master` at merge commit `31dafb6256130e3730d047e9541a8561c758cb60` by CI run #212 before ownership was released. It delivered the guided 90-second fail-safe Jury Mode, source-health and `WITHHOLD` behavior, decision explainability, strict measured CSV import/export in Pilot Evidence Lab, KREATE application answers, stage runbook, and feature-registry protection while preserving the jury-facing UI polish from PR #21.
 
 The `api-product + frontend-ux + quality-release / kreate-winning-v2` workstream was merged through PR #19 and verified on `master` at merge commit `a2fe37c9d3c3507f5f8ae2f56de049707fdbbd1b` by CI run #204 before ownership was released. It delivered readiness-aware food-waste decisions, the operator gate, 14-day falsifiable pilot contract, measurement template, measured pilot scorer, Pilot Evidence Lab, claim firewall, aligned jury/product docs, and repository cleanup.
 
