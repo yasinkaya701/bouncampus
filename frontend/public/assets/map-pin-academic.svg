@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 80" role="img" aria-labelledby="title">
+  <title id="title">Academic building map marker</title>
+  <path d="M32 78C26 67 8 50 8 32 8 18.75 18.75 8 32 8s24 10.75 24 24c0 18-18 35-24 46Z" fill="#173f67"/>
+  <circle cx="32" cy="31" r="15" fill="#f6f6f1"/>
+  <path d="m22 28 10-6 10 6-10 6-10-6Z" fill="#173f67"/>
+  <path d="M25 31v7m14-7v7M23 39h18" fill="none" stroke="#173f67" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
