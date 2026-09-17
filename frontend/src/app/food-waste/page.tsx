@@ -9,7 +9,6 @@ import {
   Database,
   ExternalLink,
   Gauge,
-  Leaf,
   Scale,
   ShieldCheck,
   Sparkles,
@@ -134,7 +133,7 @@ export default function FoodWastePage() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dfe5df" />
                 <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={(value: number) => [formatKg(value, locale), t('Yemek atığı', 'Food waste')]} />
+                <Tooltip formatter={value => [formatKg(Number(value ?? 0), locale), t('Yemek atığı', 'Food waste')]} />
                 <Bar dataKey="wasteKg" fill="#173f67" radius={[7, 7, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -193,20 +192,8 @@ export default function FoodWastePage() {
               )}
             </p>
 
-            <Slider
-              label={t('Üretimde önleme hedefi', 'Prevention target at production')}
-              value={preventionRate}
-              min={0}
-              max={30}
-              onChange={setPreventionRate}
-            />
-            <Slider
-              label={t('Kalan atıkta geri kazanım hedefi', 'Recovery target for remaining waste')}
-              value={recoveryRate}
-              min={Math.round(CURRENT_RECOVERY_RATE_PCT)}
-              max={95}
-              onChange={setRecoveryRate}
-            />
+            <Slider label={t('Üretimde önleme hedefi', 'Prevention target at production')} value={preventionRate} min={0} max={30} onChange={setPreventionRate} />
+            <Slider label={t('Kalan atıkta geri kazanım hedefi', 'Recovery target for remaining waste')} value={recoveryRate} min={Math.round(CURRENT_RECOVERY_RATE_PCT)} max={95} onChange={setRecoveryRate} />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -257,60 +244,26 @@ export default function FoodWastePage() {
 }
 
 function MetricCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.065] p-4 backdrop-blur-sm">
-      <div className="text-[8px] font-black uppercase tracking-[0.12em] text-white/45">{label}</div>
-      <div className="mt-2 font-mono text-[24px] font-black tracking-[-0.04em] text-white">{value}</div>
-    </div>
-  );
+  return <div className="rounded-2xl border border-white/10 bg-white/[0.065] p-4 backdrop-blur-sm"><div className="text-[8px] font-black uppercase tracking-[0.12em] text-white/45">{label}</div><div className="mt-2 font-mono text-[24px] font-black tracking-[-0.04em] text-white">{value}</div></div>;
 }
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-slate-900/10 bg-[#f7f9f6] p-3">
-      <div className="text-[8px] font-black uppercase tracking-[0.1em] text-slate-400">{label}</div>
-      <div className="mt-1 font-mono text-lg font-black text-slate-900">{value}</div>
-    </div>
-  );
+  return <div className="rounded-xl border border-slate-900/10 bg-[#f7f9f6] p-3"><div className="text-[8px] font-black uppercase tracking-[0.1em] text-slate-400">{label}</div><div className="mt-1 font-mono text-lg font-black text-slate-900">{value}</div></div>;
 }
 
 function Slider({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (value: number) => void }) {
   return (
     <label className="mt-6 block">
-      <div className="flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-[0.12em] text-white/65">
-        <span>{label}</span><span className="font-mono text-[#b8e467]">{value}%</span>
-      </div>
-      <input
-        className="mt-3 w-full accent-[#b8e467]"
-        type="range"
-        min={min}
-        max={max}
-        value={value}
-        onChange={event => onChange(Number(event.target.value))}
-      />
+      <div className="flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-[0.12em] text-white/65"><span>{label}</span><span className="font-mono text-[#b8e467]">{value}%</span></div>
+      <input className="mt-3 w-full accent-[#b8e467]" type="range" min={min} max={max} value={value} onChange={event => onChange(Number(event.target.value))} />
     </label>
   );
 }
 
 function ScenarioCard({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5">
-      <div className="text-[8px] font-black uppercase tracking-[0.12em] text-white/42">{label}</div>
-      <div className="mt-3 font-mono text-[28px] font-black tracking-[-0.05em] text-white">{value}</div>
-      <div className="mt-2 text-[9px] leading-4 text-white/45">{detail}</div>
-    </div>
-  );
+  return <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5"><div className="text-[8px] font-black uppercase tracking-[0.12em] text-white/42">{label}</div><div className="mt-3 font-mono text-[28px] font-black tracking-[-0.05em] text-white">{value}</div><div className="mt-2 text-[9px] leading-4 text-white/45">{detail}</div></div>;
 }
 
 function FlowCard({ step, title, body }: { step: string; title: string; body: string }) {
-  return (
-    <article className="bc-panel rounded-[22px] p-5">
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-mono text-[9px] font-black text-emerald-700">{step}</span>
-        <BarChart3 size={14} className="text-slate-300" />
-      </div>
-      <h3 className="mt-6 text-[12px] font-black tracking-[0.06em] text-slate-950">{title}</h3>
-      <p className="mt-2 text-[10px] leading-5 text-slate-500">{body}</p>
-    </article>
-  );
+  return <article className="bc-panel rounded-[22px] p-5"><div className="flex items-center justify-between gap-3"><span className="font-mono text-[9px] font-black text-emerald-700">{step}</span><BarChart3 size={14} className="text-slate-300" /></div><h3 className="mt-6 text-[12px] font-black tracking-[0.06em] text-slate-950">{title}</h3><p className="mt-2 text-[10px] leading-5 text-slate-500">{body}</p></article>;
 }
