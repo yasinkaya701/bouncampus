@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | State | Lane | Branch | Owner role | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| ACTIVE | `api-product` + `frontend-ux` | `agent/api-product/shuttle-mobility` | Workstream Agent / temporary Merge Coordinator when ready | Add campus-loop and inter-campus shuttle product model, sourced route information, bilingual mobility UI, API surface, navigation, and truthful climate/occupancy semantics. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/app/api/v1/shuttles/route.ts`; `frontend/src/app/mobility/page.tsx`; `frontend/src/components/Mobility/ShuttleNetwork.tsx`; `frontend/src/components/shared/Header.tsx`; `frontend/src/lib/shuttle-network.ts`; `frontend/src/app/sitemap.ts` |
+| INTEGRATING | `api-product` + `frontend-ux` | `agent/api-product/shuttle-mobility` | Workstream Agent / Merge Coordinator | Add campus-loop and inter-campus shuttle product model, sourced route information, bilingual mobility UI, API surface, navigation, and truthful climate/occupancy semantics. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/app/api/v1/shuttles/route.ts`; `frontend/src/app/mobility/page.tsx`; `frontend/src/components/Mobility/ShuttleNetwork.tsx`; `frontend/src/components/shared/Header.tsx`; `frontend/src/lib/shuttle-network.ts`; `frontend/src/app/sitemap.ts` |
 
 ## Suggested lanes
 
