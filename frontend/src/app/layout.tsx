@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import './polish.css';
 import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
 import HomeCampusVisual from '@/components/shared/HomeCampusVisual';
