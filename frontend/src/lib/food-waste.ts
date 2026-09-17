@@ -16,6 +16,45 @@ export type FoodWasteScenario = {
   residualReductionKg: number;
 };
 
+export type DemandSignalId = 'schedule' | 'weather' | 'menu' | 'calendar';
+
+export type DemandSignal = {
+  id: DemandSignalId;
+  label: string;
+  available: boolean;
+  weightPct: number;
+};
+
+export type DecisionReadiness = 'PILOT_READY' | 'REVIEW_REQUIRED' | 'WITHHOLD';
+
+export type ProductionDecisionBand = {
+  predictedMeals: number;
+  lowerBound: number;
+  recommendedTarget: number;
+  upperBound: number;
+  signalCoveragePct: number;
+  decisionReadiness: DecisionReadiness;
+  operatorApprovalRequired: true;
+  autoDispatchAllowed: false;
+  provenance: 'MODEL_ESTIMATE';
+  signals: DemandSignal[];
+  reasonCodes: string[];
+};
+
+export type PilotServiceMeasurement = {
+  date: string;
+  serviceId: string;
+  arm: 'CONTROL' | 'INTERVENTION';
+  modelForecastMeals: number | null;
+  producedPortions: number;
+  servedPortions: number;
+  edibleSurplusKg: number;
+  wasteKg: number;
+  earlySellout: boolean;
+  operatorOverride: boolean;
+  notes?: string;
+};
+
 export const FOOD_WASTE_SOURCE = {
   title: 'Boğaziçi University — Campus food waste tracking',
   url: 'https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310',
@@ -54,6 +93,48 @@ export const FOOD_WASTE_BASELINE = {
   campusesWithDining: 6,
 };
 
+export const FOOD_WASTE_PILOT_PROTOCOL = {
+  version: '1.0',
+  durationDays: 14,
+  design: 'MATCHED_CONTROL_INTERVENTION' as const,
+  hypothesis: 'Operator-reviewed demand bands reduce normalized food waste without increasing early sell-out risk.',
+  primaryMetric: {
+    id: 'waste_kg_per_100_served',
+    label: 'Waste kg / 100 served meals',
+    formula: '(waste_kg / served_portions) * 100',
+    rationale: 'Normalizes waste by service volume so a quiet day cannot look artificially better than a busy day.',
+  },
+  secondaryMetrics: [
+    'waste kg / service',
+    'overproduction rate',
+    'edible surplus kg / 100 served meals',
+    'forecast absolute percentage error',
+    'operator override rate',
+    'early-sellout incidence',
+  ],
+  measurementFields: [
+    'date',
+    'service_id',
+    'arm',
+    'model_forecast_meals',
+    'produced_portions',
+    'served_portions',
+    'edible_surplus_kg',
+    'waste_kg',
+    'early_sellout',
+    'operator_override',
+    'notes',
+  ],
+  successGate: {
+    minimumMeasuredServicesPerArm: 5,
+    targetWasteReductionPct: 10,
+    serviceGuardrail: 'No increase in early-sellout incidence versus the matched control arm.',
+    safetyGuardrail: 'No food-safety process may be bypassed by a production recommendation.',
+    interpretation: 'The 10% reduction is a pre-registered pilot target, not an achieved result.',
+  },
+  privacy: 'No personal or student-level data is required for the pilot.',
+};
+
 export const CURRENT_RECOVERY_RATE_PCT =
   (FOOD_WASTE_BASELINE.year2025RecoveredKg / FOOD_WASTE_BASELINE.year2025WasteKg) * 100;
 
@@ -90,16 +171,64 @@ export function simulateFoodWasteScenario(
   };
 }
 
-export function buildProductionBand(predictedMeals: number) {
+export function buildProductionBand(
+  predictedMeals: number,
+  availability: Partial<Record<DemandSignalId, boolean>> = {},
+): ProductionDecisionBand | null {
   const demand = Math.max(0, Math.round(predictedMeals));
   if (!demand) return null;
 
-  // Deliberately conservative: this is a planning band, not a claim about actual production.
-  // The band should be calibrated against measured produced/served/leftover data in a pilot.
+  const signals: DemandSignal[] = [
+    { id: 'schedule', label: 'Course schedule', available: Boolean(availability.schedule), weightPct: 50 },
+    { id: 'weather', label: 'Weather', available: Boolean(availability.weather), weightPct: 20 },
+    { id: 'menu', label: 'Menu context', available: Boolean(availability.menu), weightPct: 20 },
+    { id: 'calendar', label: 'Academic calendar', available: Boolean(availability.calendar), weightPct: 10 },
+  ];
+
+  const signalCoveragePct = signals.reduce(
+    (total, signal) => total + (signal.available ? signal.weightPct : 0),
+    0,
+  );
+  const scheduleAvailable = signals.find(signal => signal.id === 'schedule')?.available ?? false;
+
+  let decisionReadiness: DecisionReadiness = 'WITHHOLD';
+  if (scheduleAvailable && signalCoveragePct >= 70) decisionReadiness = 'PILOT_READY';
+  else if (scheduleAvailable && signalCoveragePct >= 50) decisionReadiness = 'REVIEW_REQUIRED';
+
+  // Uncertainty expands when contextual signals are missing. The band remains decision support,
+  // never measured cafeteria demand, and can never bypass the human operator gate.
+  const lowerFactor = signalCoveragePct >= 80 ? 0.96 : signalCoveragePct >= 60 ? 0.93 : 0.9;
+  const upperFactor = signalCoveragePct >= 80 ? 1.06 : signalCoveragePct >= 60 ? 1.09 : 1.13;
+  const reasonCodes = signals.filter(signal => !signal.available).map(signal => `MISSING_${signal.id.toUpperCase()}`);
+  if (decisionReadiness === 'WITHHOLD') reasonCodes.unshift('INSUFFICIENT_DECISION_CONTEXT');
+  if (decisionReadiness === 'REVIEW_REQUIRED') reasonCodes.unshift('CONTEXT_PARTIAL_OPERATOR_REVIEW_REQUIRED');
+
   return {
     predictedMeals: demand,
-    lowerBound: Math.max(0, Math.round(demand * 0.97)),
-    upperBound: Math.round(demand * 1.05),
-    provenance: 'MODEL_ESTIMATE' as const,
+    lowerBound: Math.max(0, Math.round(demand * lowerFactor)),
+    recommendedTarget: demand,
+    upperBound: Math.round(demand * upperFactor),
+    signalCoveragePct,
+    decisionReadiness,
+    operatorApprovalRequired: true,
+    autoDispatchAllowed: false,
+    provenance: 'MODEL_ESTIMATE',
+    signals,
+    reasonCodes,
   };
+}
+
+export function wasteKgPer100Served(wasteKg: number, servedPortions: number) {
+  if (servedPortions <= 0) return null;
+  return (Math.max(0, wasteKg) / servedPortions) * 100;
+}
+
+export function overproductionRatePct(producedPortions: number, servedPortions: number) {
+  if (producedPortions <= 0) return null;
+  return (Math.max(0, producedPortions - servedPortions) / producedPortions) * 100;
+}
+
+export function pilotWasteReductionPct(controlWastePer100: number, interventionWastePer100: number) {
+  if (controlWastePer100 <= 0) return null;
+  return ((controlWastePer100 - interventionWastePer100) / controlWastePer100) * 100;
 }
