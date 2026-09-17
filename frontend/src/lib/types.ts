@@ -75,15 +75,131 @@ export interface EnergyForecast {
   recommendations?: string[];
 }
 
+export type FoodMealType = 'breakfast' | 'lunch' | 'dinner';
+export type FoodProvenance =
+  | 'OFFICIAL_LIVE'
+  | 'OFFICIAL_PUBLIC_HISTORICAL'
+  | 'OFFICIAL_SNAPSHOT'
+  | 'EXTERNAL_FORECAST'
+  | 'EXTERNAL_COEFFICIENT'
+  | 'MODEL_ESTIMATE'
+  | 'AUTHORIZED_PRIVATE'
+  | 'USER_INPUT'
+  | 'NOT_CONNECTED';
+
+export interface FoodDataSource {
+  id: string;
+  label: string;
+  provenance: FoodProvenance;
+  status: 'CONNECTED' | 'PUBLIC_AGGREGATE' | 'MODEL_ONLY' | 'NOT_CONNECTED';
+  url?: string;
+  detail: string;
+}
+
+export interface FoodDecisionDriver {
+  id: string;
+  label: string;
+  value: string;
+  effect: 'UP' | 'DOWN' | 'NEUTRAL';
+  provenance: FoodProvenance;
+}
+
+export interface FoodBatchPlan {
+  id: 'initial' | 'second' | 'reserve';
+  label: string;
+  portions: number;
+  release_offset_minutes: number;
+  mode: 'COMMIT' | 'CONDITIONAL' | 'RESERVE';
+}
+
 export interface FoodForecast {
+  date: string;
   cafeteria_id: string;
   cafeteria_name: string;
+  campus: string;
+  seating_capacity: number;
+  meal_type: FoodMealType;
+  service_window: string;
   baseline_portions: number;
   predicted_demand: number;
+  demand_low: number;
+  demand_high: number;
+  confidence_level: number;
   recommended_production: number;
+  max_production: number;
   avoided_waste_portions: number;
-  avoided_waste_kg: number;
-  menu_popularity_factor: number;
+  avoided_waste_kg: number | null;
+  water_avoided_liters: number | null;
+  co2_avoided_kg: number | null;
+  menu_popularity_factor: number | null;
+  menu_popularity_status: 'NOT_CONNECTED' | 'AUTHORIZED_PRIVATE' | 'USER_INPUT';
+  batch_plan: FoodBatchPlan[];
+  drivers: FoodDecisionDriver[];
+  provenance: FoodProvenance;
+  model_status: 'PUBLIC_PROXY_UNCALIBRATED' | 'PRIVATE_CALIBRATED' | 'LIVE_REFORECAST';
+  comparison_basis: string;
+}
+
+export interface FoodWasteMonthlyBaseline {
+  month: number;
+  food_waste_kg: number;
+  recycled_food_waste_kg: number;
+}
+
+export interface FoodWasteBaseline {
+  year: number;
+  total_food_waste_kg: number;
+  recycled_food_waste_kg: number;
+  waste_oil_kg: number;
+  provenance: 'OFFICIAL_PUBLIC_HISTORICAL';
+  source_url: string;
+  months: FoodWasteMonthlyBaseline[];
+}
+
+export interface FoodCafeteriaSummary {
+  id: string;
+  name_tr: string;
+  name_en: string;
+  campus: string;
+  seating_capacity: number;
+  service: Record<FoodMealType, string | null>;
+}
+
+export interface FoodIntelligenceResponse {
+  date: string;
+  mode: 'PUBLIC_PROXY' | 'PRIVATE_CALIBRATED';
+  official_baseline: FoodWasteBaseline;
+  operational_scale: {
+    daily_meals: number;
+    package_meals: number;
+    provenance: 'OFFICIAL_SNAPSHOT';
+  };
+  menu: {
+    main_dish: string | null;
+    soup: string | null;
+    vegan_dish: string | null;
+    source: string;
+    provenance: FoodProvenance;
+  };
+  cafeterias: FoodCafeteriaSummary[];
+  forecasts: FoodForecast[];
+  sources: FoodDataSource[];
+  limitations: string[];
+  reforecast_contract: {
+    endpoint: string;
+    cadence_minutes: number;
+    required_private_fields: string[];
+    manual_operator_input_supported: boolean;
+  };
+}
+
+export interface FoodReforecastRequest {
+  date?: string;
+  cafeteria_id: string;
+  meal_type: FoodMealType;
+  served_so_far: number;
+  elapsed_fraction: number;
+  queue_count?: number;
 }
 
 export interface ActionItem {
@@ -150,7 +266,7 @@ export interface RealCampusEvent {
 }
 
 export interface DataQualitySummary {
-  mode: 'LIVE_PUBLIC_DATA' | 'DEGRADED' | 'MODEL_SANDBOX';
+  mode: 'LIVE_PUBLIC_DATA' | 'LIVE_WITH_MODELS' | 'DEGRADED' | 'MODEL_SANDBOX';
   official_live_sources: number;
   external_live_sources: number;
   model_estimates: string[];
