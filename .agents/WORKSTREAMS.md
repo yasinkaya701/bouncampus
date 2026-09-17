@@ -32,6 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
+| frontend-ux + campus-geo + quality-release | `agent/frontend-ux/ui-3d-reliability` | Workstream Agent / temporary Merge Coordinator | ACTIVE | Replace mock-heavy homepage presentation with live-data UI; make campus 3D and photogrammetry resilient with first-party fallbacks; validate and merge | `.agents/WORKSTREAMS.md`, `frontend/src/app/layout.tsx`, `frontend/src/app/page.tsx`, `frontend/src/app/globals.css`, `frontend/src/components/Dashboard/CampusMap.tsx`, `frontend/src/components/Dashboard/CampusMap3DPro.tsx`, `frontend/src/components/Dashboard/CampusPhotogrammetryViewer.tsx` |
 
 The `frontend-ux + api-product + quality-release / jury-mode-v3` workstream was merged through PR #22 and verified on `master` at merge commit `31dafb6256130e3730d047e9541a8561c758cb60` by CI run #212 before ownership was released. It delivered the guided 90-second fail-safe Jury Mode, source-health and `WITHHOLD` behavior, decision explainability, strict measured CSV import/export in Pilot Evidence Lab, KREATE application answers, stage runbook, and feature-registry protection while preserving the jury-facing UI polish from PR #21.
 
@@ -48,5 +49,5 @@ The `campus-geo / photogrammetry-assets` workstream was merged through PR #13 an
 - `frontend-ux`: pages, components, styles, accessibility, responsive UI.
 - `campus-geo`: campus directory, building locations, geometry, maps, 3D/assets.
 - `api-product`: Next.js API routes, product logic, data contracts, live-source adapters.
-- `quality-release`: CI, tests, build gates, deployment verification.
+- `quality-release`: CI, tests, build gates, deployment/release evidence.
 - `integration`: temporary lock state used by whichever workstream owner is actively merging.
