@@ -9,6 +9,8 @@ export interface Building {
   floors: number;
   total_capacity: number;
   type: string;
+  scheduled_sessions_now?: number;
+  scheduled_sessions_today?: number;
   current_occupancy?: number;
   occupancy_ratio?: number;
   energy_profile?: {
@@ -148,7 +150,7 @@ export interface RealCampusEvent {
 }
 
 export interface DataQualitySummary {
-  mode: 'LIVE_WITH_MODELS' | 'DEGRADED';
+  mode: 'LIVE_PUBLIC_DATA' | 'DEGRADED' | 'MODEL_SANDBOX';
   official_live_sources: number;
   external_live_sources: number;
   model_estimates: string[];
@@ -163,6 +165,8 @@ export interface DashboardData {
   food_demand_meals: number;
   potential_saving_tl: number;
   co2_avoided_kg: number;
+  scheduled_sessions_now?: number;
+  scheduled_sessions_today?: number;
   buildings: Building[];
   actions: ActionItem[];
   occupancy_forecasts?: OccupancyForecast[];
