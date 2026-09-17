@@ -15,6 +15,7 @@ This file is the coordination ledger for parallel agents.
 | Lane | Branch | Owner role | Paths owned | Status | Handoff |
 | --- | --- | --- | --- | --- | --- |
 | integration | `master` bootstrap only | Merge Coordinator | `AGENTS.md`, `.agents/**`, `.github/**`, `scripts/verify_feature_preservation.py` | bootstrapping | Replace this row with the first real integration workstream after this policy lands. |
+| campus-geo | `agent/campus-geo/full-campus-3d` | Campus Data / Geo Agent | `frontend/src/components/Dashboard/CampusMap3D*.tsx`, `frontend/src/app/api/v1/campus-geometry/**`, `frontend/src/lib/campus-3d/**`, `docs/campus-3d/**` | active | Source-backed all-campus footprint rendering, architectural detail profiles, provenance and validation handoff. |
 
 ## Suggested lanes
 
