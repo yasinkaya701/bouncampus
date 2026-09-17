@@ -30,7 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-_No active workstreams. The jury-wow frontend workstream was merged through PR #9 and verified on `master` CI run #181 before ownership was released._
+| State | Lane | Branch | Owner role | Scope | Touched paths |
+| --- | --- | --- | --- | --- | --- |
+| `ACTIVE` | `quality-release` | `agent/quality-release/multi-agent-runtime` | Workstream Agent / temporary Merge Coordinator | Build executable multi-agent coordination, inter-agent messaging, ownership validation, handoff/ack/retry semantics and CI enforcement | `.agents/**`, `scripts/agent_coordination.py`, `scripts/verify_agent_coordination.py`, `.github/workflows/agent-coordination.yml`, `AGENTS.md` |
 
 ## Suggested lanes
 
