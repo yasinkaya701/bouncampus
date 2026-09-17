@@ -44,7 +44,7 @@ type PositionedBuilding = Building & { liveLocation?: LiveLocation };
 export default function CampusMap({ buildings }: { buildings: Building[] }) {
   const { locale, t } = useLocale();
   const [mounted, setMounted] = useState(false);
-  const [mapMode, setMapMode] = useState<MapMode>('2d');
+  const [mapMode, setMapMode] = useState<MapMode>('3d');
   const [tileType, setTileType] = useState<TileType>('street');
   const [focus, setFocus] = useState<CampusFocus>('all');
   const [mapCenter, setMapCenter] = useState<[number, number]>([41.0849, 29.0488]);
@@ -93,7 +93,7 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
         <div className="flex w-fit items-center gap-1 rounded-lg border border-slate-900/10 bg-slate-50 p-1">
           <button type="button" onClick={() => setMapMode('2d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '2d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><MapIcon size={11} /> {t('Harita', 'Map')}</button>
           <button type="button" onClick={() => setMapMode('cesium')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === 'cesium' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Globe2 size={11} /> {t('Küre', 'Globe')}</button>
-          <button type="button" onClick={() => setMapMode('3d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '3d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Box size={11} /> 3D</button>
+          <button type="button" onClick={() => setMapMode('3d')} className={`bc-focus-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-bold ${mapMode === '3d' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}><Box size={11} /> {t('Gerçek 3D', 'Real 3D')}</button>
         </div>
 
         {mapMode === '2d' && (
