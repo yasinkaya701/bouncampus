@@ -32,7 +32,8 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| `api-product` + `frontend-ux` | `agent/api-product/food-waste-winning-focus` | Workstream Agent / temporary Merge Coordinator at integration | `INTEGRATING` | Refocus KREATE story around source-backed campus food-waste prevention, replace fabricated food telemetry/actions with an auditable baseline + scenario decision loop, strengthen homepage/jury demo/global narrative and documentation without deleting existing energy/mobility capabilities. | `frontend/src/app/page.tsx`, `frontend/src/app/demo/page.tsx`, `frontend/src/app/food-waste/**`, `frontend/src/app/api/v1/food/**`, `frontend/src/app/layout.tsx`, `frontend/src/app/sitemap.ts`, `frontend/src/lib/food-waste.ts`, `frontend/src/lib/types.ts`, `frontend/src/components/shared/Header.tsx`, `frontend/src/components/shared/HomeCampusVisual.tsx`, `README.md`, `docs/**`, `.github/feature-registry.json`, `.agents/WORKSTREAMS.md` |
+
+The `api-product + frontend-ux / food-waste-winning-focus` workstream was merged through PR #17 and verified on `master` at merge commit `573385b7a703ec845021e8fdbfc2546496d70b1b` by CI run #198 before ownership was released.
 
 The `frontend-ux / jury-visual-assets-v3` workstream was merged through PR #15 and verified on `master` at merge commit `a51252e59a6856d7db945ba2d9073defe2645c5e` by CI run #192 before ownership was released.
 
