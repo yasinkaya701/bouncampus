@@ -209,7 +209,7 @@ export default function CampusAICopilot() {
             </div>
 
             <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-[9px] text-slate-400">
-              <span className="flex items-center gap-2"><Database size={10} className={dashboard?.data_quality?.mode === 'LIVE_WITH_MODELS' ? 'text-emerald-300' : 'text-amber-300'} />{dashboard?.data_quality?.mode === 'LIVE_WITH_MODELS' ? 'PUBLIC SOURCES ONLINE' : 'CHECKING SOURCES'}</span>
+              <span className="flex items-center gap-2"><Database size={10} className={dashboard?.data_quality?.mode === 'LIVE_PUBLIC_DATA' ? 'text-emerald-300' : 'text-amber-300'} />{dashboard?.data_quality?.mode === 'LIVE_PUBLIC_DATA' ? 'PUBLIC SOURCES ONLINE' : 'CHECKING SOURCES'}</span>
               {mission && <span className="font-black text-blue-300">{mission.confidence}% CONF.</span>}
             </div>
           </div>
