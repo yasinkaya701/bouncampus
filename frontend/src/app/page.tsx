@@ -23,6 +23,7 @@ import type { DashboardData } from '@/lib/types';
 import { useLocale } from '@/lib/i18n';
 import {
   FOOD_WASTE_BASELINE,
+  FOOD_WASTE_PILOT_PROTOCOL,
   FOOD_WASTE_SOURCE,
   YEAR_OVER_YEAR_REDUCTION_PCT,
 } from '@/lib/food-waste';
@@ -56,12 +57,12 @@ export default function DashboardPage() {
               <Sparkles size={12} /> {t('KREATE for Climate · BOUNCAMPUS', 'KREATE for Climate · BOUNCAMPUS')}
             </div>
             <h1 className="mt-4 max-w-5xl text-[42px] font-black leading-[.96] tracking-[-0.065em] sm:text-[60px] lg:text-[68px]">
-              {t('Kampüsün 48.251 kg yemek atığını, önlenebilir bir operasyona çeviriyoruz.', 'We turn 48,251 kg of campus food waste into an operation that can prevent the next kilogram.')}
+              {t('Kampüsün 48.251 kg yemek atığını, bir sonraki öğünde önlenecek karara çeviriyoruz.', 'We turn 48,251 kg of campus food waste into a decision that can prevent the next kilogram.')}
             </h1>
             <p className="mt-5 max-w-3xl text-[12px] leading-6 text-white/62 sm:text-[13px]">
               {t(
-                'Resmi atık geçmişi + ders programı + akademik takvim + hava + menü bağlamı → servis talep bandı → insan onayı → ölçümlü pilot → öğrenme. BOUNCAMPUS’ın hackathon odağı tek ve ölçülebilir: yemekhane fazla üretimini ve atığı azaltmak.',
-                'Official waste history + schedules + academic calendar + weather + menu context → service demand band → human approval → measured pilot → learning. The hackathon focus is singular and measurable: reduce cafeteria overproduction and food waste.',
+                'Resmi atık geçmişi → kaynak sağlığı → servis talep bandı → PILOT_READY / REVIEW_REQUIRED / WITHHOLD → insan onayı → kontrollü pilot → ölçüm → öğrenme. BOUNCAMPUS’ın hackathon odağı tek: yemek atığını oluşmadan önce azaltmak ve bunu ölçülebilir biçimde kanıtlamak.',
+                'Official waste history → source health → service demand band → PILOT_READY / REVIEW_REQUIRED / WITHHOLD → human approval → controlled pilot → measurement → learning. The hackathon focus is singular: reduce food waste before it occurs and prove it with measured evidence.',
               )}
             </p>
 
@@ -82,7 +83,7 @@ export default function DashboardPage() {
             <HeroMetric label={t('2025 resmi atık', 'Official 2025 waste')} value={FOOD_WASTE_BASELINE.year2025WasteKg.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} suffix="kg" />
             <HeroMetric label={t('Geri kazanıma giden', 'Sent to recovery')} value={FOOD_WASTE_BASELINE.year2025RecoveredKg.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} suffix="kg" />
             <HeroMetric label={t('2024→2025', '2024→2025')} value={`−${YEAR_OVER_YEAR_REDUCTION_PCT.toFixed(1)}`} suffix="%" />
-            <HeroMetric label={t('Yemekhane kapasitesi', 'Dining capacity')} value={FOOD_WASTE_BASELINE.diningHallCapacity.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} />
+            <HeroMetric label={t('Pilot hedefi · sonuç değil', 'Pilot target · not result')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}`} suffix="%" />
           </div>
         </div>
       </section>
@@ -98,16 +99,16 @@ export default function DashboardPage() {
         <div className="bc-panel rounded-[26px] p-5 sm:p-6">
           <div className="bc-eyebrow">{t('Neden bu problem?', 'Why this problem?')}</div>
           <h2 className="mt-2 text-[30px] font-black leading-[1.02] tracking-[-0.055em] text-slate-950">
-            {t('Çünkü etkiyi jüriye model çıktısıyla değil, gerçek baz çizgisiyle gösteriyoruz.', 'Because we show the jury impact from a measured baseline, not from invented telemetry.')}
+            {t('Çünkü etkiyi model çıktısıyla değil, gerçek baz çizgisi ve falsifiable pilotla kanıtlayabiliriz.', 'Because we can prove impact with a measured baseline and a falsifiable pilot, not with invented telemetry.')}
           </h2>
           <p className="mt-4 text-[10px] leading-5 text-slate-500">
             {t(
-              'Boğaziçi 2024’te 50.993 kg, 2025’te 48.251 kg yemek atığı raporladı. Üniversite zaten porsiyon kontrolü, kompost ve fazla yemeğin değerlendirilmesi gibi yöntemler kullanıyor. BOUNCAMPUS eksik halkayı hedefliyor: bir sonraki servis için ne kadar üretileceğini veriyle planlamak ve sonucu ölçerek öğrenmek.',
-              'Boğaziçi reported 50,993 kg of food waste in 2024 and 48,251 kg in 2025. The university already uses portion control, composting and surplus-food recovery. BOUNCAMPUS targets the missing loop: plan how much to produce for the next service and learn from measured outcomes.',
+              'Boğaziçi 2024’te 50.993 kg, 2025’te 48.251 kg yemek atığı raporladı. BOUNCAMPUS eksik halkayı hedefliyor: bir sonraki servis için ne kadar üretileceğini kaynak kalitesiyle birlikte planlamak, insan kararını kaydetmek ve sonucu servis hacmine göre normalize ederek ölçmek.',
+              'Boğaziçi reported 50,993 kg of food waste in 2024 and 48,251 kg in 2025. BOUNCAMPUS targets the missing loop: plan the next service together with source quality, retain the human decision, and measure the outcome normalized by service volume.',
             )}
           </p>
           <Link href="/food-waste" className="mt-5 inline-flex items-center gap-1.5 text-[10px] font-black text-[#173f67]">
-            {t('Resmi baz çizgisi + senaryo laboratuvarı', 'Official baseline + scenario lab')} <ArrowRight size={10} />
+            {t('Karar motoru + pilot sözleşmesi', 'Decision engine + pilot contract')} <ArrowRight size={10} />
           </Link>
         </div>
 
@@ -119,9 +120,9 @@ export default function DashboardPage() {
           <div className="mt-6 grid gap-2 sm:grid-cols-5">
             {[
               ['01', t('TAHMİN', 'FORECAST'), t('Talep bandı', 'Demand band')],
-              ['02', t('ÖNER', 'RECOMMEND'), t('Üretim bandı', 'Production band')],
+              ['02', t('NİTELE', 'QUALIFY'), t('Hazır / incele / beklet', 'Ready / review / withhold')],
               ['03', t('ONAY', 'APPROVE'), t('Mutfak sorumlusu', 'Kitchen operator')],
-              ['04', t('ÖLÇ', 'MEASURE'), t('Üret / servis / atık', 'Produce / serve / waste')],
+              ['04', t('ÖLÇ', 'MEASURE'), t('100 öğüne normalize et', 'Normalize per 100 meals')],
               ['05', t('ÖĞREN', 'LEARN'), t('Modeli kalibre et', 'Calibrate model')],
             ].map(([step, title, detail], index) => (
               <div key={step} className="rounded-2xl border border-white/10 bg-white/[0.055] p-4">
@@ -164,7 +165,7 @@ export default function DashboardPage() {
           <div>
             <div className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">{t('Jüri cümlesi', 'Jury one-liner')}</div>
             <div className="mt-2 max-w-4xl text-[19px] font-black tracking-[-0.035em] text-slate-950">
-              {t('“BOUNCAMPUS, kampüsün gerçek yemek atığı geçmişini kullanarak bir sonraki serviste ne kadar üretileceğini önerir ve başarısını atık kg/servis ile ölçer.”', '“BOUNCAMPUS uses a campus’s measured food-waste history to recommend how much to produce for the next service, then measures success in waste kg per service.”')}
+              {t('“BOUNCAMPUS, ölçülmüş yemek atığını belirsizlik taşıyan ve insan onayı isteyen bir üretim kararına çevirir; başarıyı kg / 100 servis edilen öğün ile kontrollü pilotta ölçer.”', '“BOUNCAMPUS turns measured food waste into an uncertainty-aware, human-approved production decision, then measures success in kg / 100 served meals in a controlled pilot.”')}
             </div>
           </div>
           <div className="shrink-0 text-[9px] font-black text-slate-400">{sourceCount ? `${sourceCount} ${t('izlenen kaynak', 'tracked sources')}` : t('Kaynaklar yükleniyor', 'Loading sources')}</div>

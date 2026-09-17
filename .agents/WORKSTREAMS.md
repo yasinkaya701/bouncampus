@@ -32,6 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
+| `api-product` + `frontend-ux` + `quality-release` | `agent/api-product/kreate-winning-v2` | Workstream Agent / temporary Merge Coordinator at integration | `INTEGRATING` | Deepen KREATE food-waste product into a jury-ready operating system: readiness-aware production decisions, human gate, falsifiable pilot protocol, blank measurement template, measured pilot scoring engine, interactive Pilot Evidence Lab, claim firewall, corrected runtime architecture, jury choreography and release documentation while preserving secondary campus capabilities. | `frontend/src/lib/food-waste.ts`, `frontend/src/app/api/v1/food/**`, `frontend/src/app/food-waste/**`, `frontend/src/app/demo/page.tsx`, `frontend/src/app/page.tsx`, `frontend/src/app/sitemap.ts`, `README.md`, `docs/**`, `.github/feature-registry.json`, `.agents/WORKSTREAMS.md`, `noop`, `noop2` |
 
 The `api-product + frontend-ux / food-waste-winning-focus` workstream was merged through PR #17 and verified on `master` at merge commit `573385b7a703ec845021e8fdbfc2546496d70b1b` by CI run #198 before ownership was released.
 
