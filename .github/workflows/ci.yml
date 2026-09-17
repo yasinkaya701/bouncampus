@@ -44,20 +44,23 @@ jobs:
       - name: Preserve registered features
         run: python scripts/verify_feature_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
+      - name: Validate merge-before-exit gate
+        run: python -m py_compile scripts/agent_exit_gate.py
+
   master-merge-audit:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Require merged-PR provenance after bootstrap
+      - name: Require merged-PR provenance and merge commit after bootstrap
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if ! git rev-parse HEAD^ >/dev/null 2>&1 || ! git cat-file -e HEAD^:.github/merge-enforcement-enabled 2>/dev/null; then
-            echo "Merge enforcement bootstrap commit; provenance audit starts with the next master change."
+          if ! git rev-parse HEAD^ >/dev/null 2>&1 || ! git cat-file -e HEAD^:.github/merge-enforcement-v2-enabled 2>/dev/null; then
+            echo "Merge-before-exit policy bootstrap commit; strict provenance starts with the next master change after v2 marker."
             exit 0
           fi
 
@@ -67,7 +70,13 @@ jobs:
             --jq '[.[] | select(.merged_at != null and .base.ref == "master")] | length')"
 
           if [ "$merged_count" -lt 1 ]; then
-            echo "Direct push to master detected. Normal engineering changes must arrive through the single integration PR."
+            echo "Direct push to master detected. The owning workstream agent must merge through the single integration PR."
+            exit 1
+          fi
+
+          parent_count="$(git rev-list --parents -n 1 HEAD | awk '{print NF-1}')"
+          if [ "$parent_count" -lt 2 ]; then
+            echo "Master integration is not a merge commit. BOUNCAMPUS requires a normal merge commit so agent_exit_gate can prove the validated agent head reached master."
             exit 1
           fi
 
@@ -77,6 +86,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate registered feature files
         run: python scripts/verify_feature_preservation.py
+      - name: Compile merge-before-exit gate
+        run: python -m py_compile scripts/agent_exit_gate.py
 
   frontend:
     runs-on: [self-hosted, macOS, ARM64, bouncampus]
@@ -103,8 +114,8 @@ jobs:
         run: |
           uv venv --python 3.11 "$RUNNER_TEMP/bouncampus-python"
           echo "$RUNNER_TEMP/bouncampus-python/bin" >> "$GITHUB_PATH"
-      - name: Compile backend Python
-        run: python -m compileall -q backend/app
+      - name: Compile repository Python
+        run: python -m compileall -q backend/app scripts
       - name: Validate critical JSON datasets
         run: |
           python -m json.tool backend/app/data/campus_config.json >/dev/null
