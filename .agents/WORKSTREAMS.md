@@ -30,7 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-_No active workstreams. The jury-wow frontend workstream was merged through PR #9 and verified on `master` CI run #181 before ownership was released._
+| Lane | Branch | Owner role | Paths owned | Status | Handoff |
+| --- | --- | --- | --- | --- | --- |
+| api-product + frontend-ux + quality-release | `agent/api-product/food-intelligence` | Workstream Agent | `.agents/WORKSTREAMS.md`, `.github/feature-registry.json`, `backend/app/{models/food_demand.py,optimizers/food_optimizer.py,routers/food.py,schemas.py,utils/real_data_service.py}`, `backend/app/data/{food_waste_baseline.json,cafeteria_registry.json}`, `backend/tests/test_food_intelligence.py`, `frontend/src/app/api/v1/food/route.ts`, `frontend/src/app/food-waste/page.tsx`, `frontend/src/lib/{types.ts,food-intelligence.ts}`, `docs/food-intelligence.md` | ACTIVE | Replace demo-only food-waste math with a provenance-aware Food Intelligence decision engine: official historical waste baseline, six-cafeteria registry, demand uncertainty, batch production optimizer, live reforecast contract, impact coefficients, API/UI truth labels, and regression tests. |
 
 ## Suggested lanes
 
