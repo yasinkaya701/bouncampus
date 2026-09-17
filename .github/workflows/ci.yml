@@ -44,8 +44,10 @@ jobs:
       - name: Preserve registered features
         run: python scripts/verify_feature_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
-      - name: Validate merge-before-exit gate
-        run: python -m py_compile scripts/agent_exit_gate.py
+      - name: Validate multi-agent coordination state
+        run: |
+          python -m py_compile scripts/agent_bus.py scripts/agent_exit_gate.py
+          python scripts/agent_bus.py validate
 
   master-merge-audit:
     if: github.event_name == 'push'
@@ -85,14 +87,19 @@ jobs:
           branch_head="$(git rev-parse HEAD^2)"
           python scripts/agent_exit_gate.py --branch-head "$branch_head" --master-ref HEAD
 
+      - name: Validate merged multi-agent coordination state
+        run: python scripts/agent_bus.py validate
+
   feature-registry:
     runs-on: [self-hosted, macOS, ARM64, bouncampus]
     steps:
       - uses: actions/checkout@v4
       - name: Validate registered feature files
         run: python scripts/verify_feature_preservation.py
-      - name: Compile merge-before-exit gate
-        run: python -m py_compile scripts/agent_exit_gate.py
+      - name: Validate agent runtime
+        run: |
+          python -m py_compile scripts/agent_bus.py scripts/agent_exit_gate.py
+          python scripts/agent_bus.py validate
 
   frontend:
     runs-on: [self-hosted, macOS, ARM64, bouncampus]
