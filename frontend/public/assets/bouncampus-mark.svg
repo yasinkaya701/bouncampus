@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">BOUNCAMPUS mark</title>
+  <desc id="desc">Original campus climate intelligence symbol combining a gate, signal lines and a climate horizon.</desc>
+  <rect width="64" height="64" rx="18" fill="#071c33"/>
+  <path d="M8 50h48v6H8z" fill="#b8e467"/>
+  <path d="M17 42V24l15-10 15 10v18" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M25 42V29h14v13" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M14 17c4-5 10-8 18-8s14 3 18 8" fill="none" stroke="#b8e467" stroke-width="2.5" stroke-linecap="round" opacity=".95"/>
+  <path d="M19 14c3-3 7-5 13-5s10 2 13 5" fill="none" stroke="#dff2f5" stroke-width="1.6" stroke-linecap="round" opacity=".72"/>
+</svg>
