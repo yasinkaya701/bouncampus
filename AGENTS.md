@@ -15,6 +15,18 @@ BOUNCAMPUS is a multi-agent repository. Parallel work is allowed only when owner
 
 An agent may own more than one lane only when the touched file sets do not overlap with another active lane.
 
+## Machine-readable coordination runtime
+
+All agents MUST use `scripts/agent_bus.py` and `.agents/PROTOCOL.md` for task ownership and inter-agent communication. Chat context alone is not an ownership record.
+
+Before the first product edit, the agent MUST `claim` the workstream with its agent id, lane, branch, scope, and exact owned paths. The claim is rejected when it overlaps another active workstream. During work, the owner renews its heartbeat/lease and communicates dependencies through durable `REQUEST`, `DECISION`, `BLOCKER`, `HANDOFF`, `REVIEW`, or `INFO` messages.
+
+Runtime state is intentionally split across `.agents/tasks/**`, `.agents/leases/**`, `.agents/heartbeats/**`, `.agents/messages/**`, `.agents/acks/**`, and `.agents/locks/**` so parallel agents do not contend on one shared state file. `.agents/WORKSTREAMS.md` is a human-readable overview; the machine-readable task records are the source of truth for active ownership.
+
+A handoff is allowed only while implementation is `ACTIVE` or `BLOCKED`. Work in `READY_FOR_INTEGRATION`, `INTEGRATING`, or `MERGED_VERIFYING` may not be handed to a separate merge agent. A stale owner may be reassigned only through an explicit recorded reassignment with a reason; expiration is evidence of staleness, not silent permission to overwrite owned paths.
+
+Before an agent reports completion, the runtime lifecycle must reach `MERGED_VERIFIED`. `python scripts/agent_bus.py validate` is a required CI gate and rejects invalid states, overlapping ownership, malformed messages, and inconsistent merge-lock state.
+
 ## HARD EXIT CONTRACT — MERGE BEFORE EXIT
 
 **An agent MUST NOT finish, report success, relinquish ownership, or exit while its accepted work exists only on an agent branch or open PR.**
@@ -43,7 +55,7 @@ The only permitted non-merged exit is a **hard external blocker** that the agent
 
 - `master` is protected by process: normal engineering work MUST NOT be committed directly to `master`.
 - Each agent works on a short-lived branch named `agent/<lane>/<task>`.
-- Before editing, the agent declares the files/directories it owns for that workstream in `.agents/WORKSTREAMS.md`.
+- Before editing, the agent claims the files/directories it owns with `python scripts/agent_bus.py claim ...`; `.agents/WORKSTREAMS.md` may mirror the state for humans but does not replace the claim.
 - Two active agents must not edit the same file unless ownership is explicitly reassigned.
 - An agent does not hand completed code to another agent just to perform the merge. The owning agent acquires the Merge Coordinator lock and performs its own integration.
 - Ownership remains active until the work is merged to `master` and post-merge verification passes.
@@ -71,11 +83,12 @@ Before merge, the owning agent acting as Merge Coordinator MUST:
 4. Compare the integration head with `master` and account for every deletion or rename.
 5. Update `.github/feature-registry.json` when a new durable feature is introduced.
 6. Run `python scripts/verify_feature_preservation.py --base-ref <master-sha>`.
-7. Run frontend `npm run typecheck`, `npm run lint`, and `npm run build`.
-8. Compile backend Python and validate critical JSON datasets.
-9. Merge only after all required CI gates are green.
-10. Re-run the release checks on the merged `master` commit.
-11. Run `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` and require it to pass before declaring completion.
+7. Run `python scripts/agent_bus.py validate`.
+8. Run frontend `npm run typecheck`, `npm run lint`, and `npm run build`.
+9. Compile backend Python and validate critical JSON datasets.
+10. Merge only after all required CI gates are green.
+11. Re-run the release checks on the merged `master` commit.
+12. Run `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` and require it to pass before declaring completion.
 
 Existing feature-registry entries may not be removed or weakened in a normal feature PR. Intentional removals require an explicit repository-owner decision documented in the PR.
 
@@ -94,12 +107,12 @@ BOUNCAMPUS must not present model estimates as live university telemetry. Unless
 
 ## Release sequence
 
-1. Workstream agent implements on its owned short-lived branch.
+1. Workstream agent claims its task/path scope in the agent bus and implements on its owned short-lived branch.
 2. The same agent validates the branch and updates it with latest `master`.
-3. The same agent acquires the single Merge Coordinator lock and opens/updates the integration PR.
-4. Feature-preservation + typecheck + lint + build + repository-data gates pass.
+3. The same agent marks the task `READY_FOR_INTEGRATION`, acquires the single Merge Coordinator lock, and opens/updates the integration PR.
+4. Feature-preservation + agent-bus validation + typecheck + lint + build + repository-data gates pass.
 5. The same agent resolves all integration failures and merges the PR to `master`.
-6. The same agent verifies the merged `master` commit and runs the agent exit gate.
+6. The same agent records the merge, verifies the merged `master` commit, reaches `MERGED_VERIFIED`, and runs the agent exit gate.
 7. Only after step 6 may the agent release ownership or report completion.
 8. Deploy the `frontend` Next.js application when the workstream includes release/deployment scope.
 9. Validate deployed `/api/v1/health` and core product routes when deployment is in scope.
@@ -107,4 +120,4 @@ BOUNCAMPUS must not present model estimates as live university telemetry. Unless
 
 ## Bootstrap exception
 
-Policy bootstrap commits that establish or strengthen this execution contract may land directly on `master`. All normal product work must follow the mandatory merge-before-exit workflow above.
+Policy/runtime bootstrap commits that establish or strengthen this execution contract may land directly on `master`. All normal product work must follow the mandatory merge-before-exit workflow above.
