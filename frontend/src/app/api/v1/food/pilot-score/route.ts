@@ -25,7 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'INVALID_JSON' }, { status: 400 });
   }
 
-  const measurements = (payload as { measurements?: unknown })?.measurements;
+  if (!payload || typeof payload !== 'object') {
+    return NextResponse.json({ error: 'INVALID_BODY' }, { status: 400 });
+  }
+
+  const measurements = (payload as { measurements?: unknown }).measurements;
   if (!Array.isArray(measurements)) {
     return NextResponse.json(
       { error: 'MEASUREMENTS_REQUIRED', detail: 'Body must include a measurements array.' },
@@ -33,10 +37,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const typed = measurements as PilotServiceMeasurement[];
-  const validationErrors = typed.flatMap((measurement, index) =>
-    validatePilotMeasurement(measurement).map(message => ({ index, message })),
-  );
+  const validationErrors = measurements.flatMap((candidate, index) => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+      return [{ index, message: 'measurement must be an object' }];
+    }
+    return validatePilotMeasurement(candidate as PilotServiceMeasurement)
+      .map(message => ({ index, message }));
+  });
 
   if (validationErrors.length) {
     return NextResponse.json(
@@ -45,6 +52,7 @@ export async function POST(request: Request) {
     );
   }
 
+  const typed = measurements as PilotServiceMeasurement[];
   return NextResponse.json({
     scorecard: scoreFoodWastePilot(typed),
     protocolVersion: FOOD_WASTE_PILOT_PROTOCOL.version,
