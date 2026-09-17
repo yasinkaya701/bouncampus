@@ -1,16 +1,10 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowLeft, MapPinned } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { useLocale } from '@/lib/i18n';
 
 export default function NotFound() {
-  return (
-    <div className="grid min-h-[62vh] place-items-center">
-      <div className="w-full max-w-2xl rounded-[30px] border border-slate-950/10 bg-white/85 p-8 text-center shadow-sm sm:p-10">
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-[18px] bg-[#0b1226] text-white"><MapPinned size={20} /></div>
-        <div className="bc-eyebrow mt-6">404 / Workspace not found</div>
-        <h1 className="mt-2 text-3xl font-black tracking-[-0.05em] text-[#0a1020]">This campus workspace does not exist.</h1>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-500">Return to the operating overview or continue with a known product workspace.</p>
-        <Link href="/" className="bc-focus-ring mt-6 inline-flex items-center gap-2 rounded-full bg-[#0b1226] px-4 py-2.5 text-xs font-black text-white"><ArrowLeft size={13} /> Back to Overview</Link>
-      </div>
-    </div>
-  );
+  const { t } = useLocale();
+  return <div className="grid min-h-[58vh] place-items-center"><div className="max-w-md text-center"><div className="font-mono text-[11px] font-black text-slate-400">404</div><h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-slate-950">{t('Sayfa bulunamadı', 'Page not found')}</h1><p className="mt-3 text-[11px] leading-5 text-slate-500">{t('Bu adres artık mevcut değil veya taşınmış olabilir.', 'This address may no longer exist or may have moved.')}</p><Link href="/" className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[#102a43] px-3 py-2 text-[10px] font-bold text-white"><ArrowLeft size={11} /> {t('Genel bakışa dön', 'Back to overview')}</Link></div></div>;
 }
