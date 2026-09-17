@@ -30,9 +30,7 @@ Allowed lifecycle states:
 
 ## Active
 
-| State | Lane | Branch | Owner role | Scope | Touched paths |
-| --- | --- | --- | --- | --- | --- |
-| INTEGRATING | frontend-ux | `agent/frontend-ux/jury-wow` | Workstream Agent / Frontend UX / Merge Coordinator | Jury-demo visual system and landing/dashboard polish without feature loss; preserve the newly merged shuttle mobility surface during integration. | `.agents/WORKSTREAMS.md`, `frontend/src/app/page.tsx`, `frontend/src/app/globals.css`, `frontend/src/components/shared/Header.tsx`, `frontend/src/components/shared/Footer.tsx`, `frontend/src/components/shared/HomeCampusVisual.tsx` |
+_No active workstreams. The jury-wow frontend workstream was merged through PR #9 and verified on `master` CI run #181 before ownership was released._
 
 ## Suggested lanes
 
