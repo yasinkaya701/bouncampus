@@ -44,6 +44,15 @@
       ]
     },
     {
+      "id": "campus-photogrammetry-assets",
+      "required_paths": [
+        "frontend/src/lib/photogrammetry-assets.ts",
+        "frontend/src/components/Dashboard/CampusPhotogrammetryViewer.tsx",
+        "frontend/public/assets/3d/photogrammetry-manifest.json",
+        "frontend/public/assets/3d/README.md"
+      ]
+    },
+    {
       "id": "bilingual-ui-core",
       "required_paths": [
         "frontend/src/lib/i18n.tsx",
