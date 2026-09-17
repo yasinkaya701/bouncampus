@@ -30,7 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-_No active workstreams. The jury-wow frontend workstream was merged through PR #9 and verified on `master` CI run #181 before ownership was released._
+| State | Lane | Branch | Owner role | Scope | Touched paths |
+| --- | --- | --- | --- | --- | --- |
+| INTEGRATING | `frontend-ux` | `agent/frontend-ux/asset-wow-v2` | Workstream Agent / Frontend UX / Merge Coordinator | Asset-backed jury presentation upgrade: richer campus visual storytelling, original SVG/graphic assets, stronger hierarchy, responsive polish, and truthful product surfaces without removing existing features. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/components/shared/HomeCampusVisual.tsx`; `frontend/src/components/shared/Header.tsx`; `frontend/public/assets/bouncampus-mark.svg`; `frontend/public/assets/campus-command-deck.svg` |
 
 ## Suggested lanes
 

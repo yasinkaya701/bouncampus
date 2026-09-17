@@ -55,6 +55,8 @@
       "id": "campus-visual-assets",
       "required_paths": [
         "frontend/public/assets/bouncampus-hero.svg",
+        "frontend/public/assets/bouncampus-mark.svg",
+        "frontend/public/assets/campus-command-deck.svg",
         "frontend/public/assets/building-placeholder.svg",
         "frontend/public/assets/campus-topography.svg",
         "frontend/public/assets/map-pin-academic.svg"

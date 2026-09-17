@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Building2, BusFront, CheckSquare2, Compass, Database, LayoutDashboard, Trophy } from 'lucide-react';
@@ -36,9 +37,8 @@ export default function Header() {
       <div className="mx-auto flex min-h-[72px] w-full max-w-[1520px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-7">
           <Link href="/" className="bc-focus-ring group flex shrink-0 items-center gap-3 rounded-xl">
-            <span className="relative grid h-10 w-10 overflow-hidden rounded-xl bg-[#071c33] text-white shadow-[0_10px_24px_rgba(7,28,51,.16)]">
-              <span className="absolute inset-x-0 bottom-0 h-2 bg-[#b8e467] transition-all duration-300 group-hover:h-2.5" />
-              <span className="grid place-items-center pb-1 text-[10px] font-black tracking-[0.12em]">BC</span>
+            <span className="relative h-10 w-10 overflow-hidden rounded-[13px] shadow-[0_10px_24px_rgba(7,28,51,.16)] ring-1 ring-slate-950/[0.06] transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_32px_rgba(7,28,51,.22)]">
+              <Image src="/assets/bouncampus-mark.svg" alt="" fill sizes="40px" className="object-cover" priority />
             </span>
             <div className="hidden sm:block">
               <div className="flex items-center gap-2">
