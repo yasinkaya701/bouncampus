@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "lease_ttl_minutes": 45,
+  "merge_lock_ttl_minutes": 30,
+  "lanes": [
+    "frontend-ux",
+    "campus-geo",
+    "api-product",
+    "quality-release",
+    "integration"
+  ],
+  "message_types": [
+    "INFO",
+    "REQUEST",
+    "DECISION",
+    "BLOCKER",
+    "HANDOFF",
+    "REVIEW",
+    "ACK"
+  ],
+  "terminal_state": "MERGED_VERIFIED"
+}
