@@ -280,6 +280,8 @@ export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
   if (!Number.isFinite(measurement.edibleSurplusKg) || measurement.edibleSurplusKg < 0) errors.push('edibleSurplusKg must be >= 0');
   if (!Number.isFinite(measurement.wasteKg) || measurement.wasteKg < 0) errors.push('wasteKg must be >= 0');
   if (measurement.modelForecastMeals != null && (!Number.isFinite(measurement.modelForecastMeals) || measurement.modelForecastMeals < 0)) errors.push('modelForecastMeals must be null or >= 0');
+  if (typeof measurement.earlySellout !== 'boolean') errors.push('earlySellout must be boolean');
+  if (typeof measurement.operatorOverride !== 'boolean') errors.push('operatorOverride must be boolean');
   return errors;
 }
 
