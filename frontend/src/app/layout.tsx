@@ -12,10 +12,10 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'BOUNCAMPUS — Boğaziçi Campus Data',
+    default: 'BOUNCAMPUS — Campus Food-Waste Decision Intelligence',
     template: '%s · BOUNCAMPUS',
   },
-  description: 'Boğaziçi University campus buildings, schedules and public operational data with visible source provenance.',
+  description: 'A source-traceable decision system that turns measured campus food waste into human-approved production planning and measurable pilot outcomes.',
   applicationName: 'BOUNCAMPUS',
   manifest: '/manifest.webmanifest',
   alternates: { canonical: '/' },
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
     locale: 'tr_TR',
     url: '/',
     siteName: 'BOUNCAMPUS',
-    title: 'BOUNCAMPUS — Boğaziçi Campus Data',
-    description: 'A source-aware view of Boğaziçi campus data.',
+    title: 'BOUNCAMPUS — Campus Food-Waste Decision Intelligence',
+    description: 'From official food-waste baseline to next-service production decision and measured pilot outcome.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BOUNCAMPUS — Boğaziçi Campus Data',
-    description: 'A source-aware view of Boğaziçi campus data.',
+    title: 'BOUNCAMPUS — Campus Food-Waste Decision Intelligence',
+    description: 'From official food-waste baseline to next-service production decision and measured pilot outcome.',
   },
 };
 
