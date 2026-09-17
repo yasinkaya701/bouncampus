@@ -15,6 +15,24 @@ BOUNCAMPUS is a multi-agent repository. Parallel work is allowed only when owner
 
 An agent may own more than one lane only when the touched file sets do not overlap with another active lane.
 
+## Executable coordination bus
+
+Repository policy is enforced by `scripts/agent_bus.py` and `.agents/PROTOCOL.md`.
+
+Before the first product edit, every workstream agent MUST:
+
+1. read `AGENTS.md` and `.agents/PROTOCOL.md`;
+2. synchronize the branch-independent agent bus with `python scripts/agent_bus.py sync --agent <agent-id>` when GitHub credentials are available;
+3. declare the workstream in `.agents/WORKSTREAMS.md`;
+4. claim the same task/path scope with `python scripts/agent_bus.py claim ...` in its worktree;
+5. reject or resolve any overlapping path ownership before implementation.
+
+Cross-agent dependencies, architectural decisions, blockers, reviews, and handoffs MUST use the structured bus instead of relying on private chat context. The remote transport is GitHub Issue #8 and uses `BOUNCAMPUS_AGENT_BUS_V1` envelopes. `REQUEST` and `HANDOFF` messages that require acknowledgement remain outstanding until an `ACK` is recorded. Use `pending-acks` and `retry` rather than silently assuming delivery.
+
+Agents should heartbeat their active task at least every 15 minutes. Expired leases indicate stale ownership but do not authorize another agent to overwrite the work without explicit reassignment.
+
+`--offline` is permitted only when remote delivery is intentionally unavailable. Offline local records are not evidence that another agent received a message or accepted a handoff.
+
 ## HARD EXIT CONTRACT — MERGE BEFORE EXIT
 
 **An agent MUST NOT finish, report success, relinquish ownership, or exit while its accepted work exists only on an agent branch or open PR.**
