@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | State | Lane | Branch | Owner role | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| INTEGRATING | `frontend-ux` | `agent/frontend-ux/asset-wow-v2` | Workstream Agent / Frontend UX / Merge Coordinator | Asset-backed jury presentation upgrade: richer campus visual storytelling, original SVG/graphic assets, stronger hierarchy, responsive polish, and truthful product surfaces without removing existing features. | `.agents/WORKSTREAMS.md`; `.github/feature-registry.json`; `frontend/src/components/shared/HomeCampusVisual.tsx`; `frontend/src/components/shared/Header.tsx`; `frontend/public/assets/bouncampus-mark.svg`; `frontend/public/assets/campus-command-deck.svg` |
+| INTEGRATING | campus-geo | `agent/campus-geo/photogrammetry-assets` | Workstream Agent / Merge Coordinator | Curate source-backed Boğaziçi photogrammetry assets, add provenance policy, and expose provider-hosted 3D models in the campus map without redistributing unverified binaries. | `frontend/public/assets/3d/**`, `frontend/src/lib/photogrammetry-assets.ts`, `frontend/src/components/Dashboard/CampusPhotogrammetryViewer.tsx`, `frontend/src/components/Dashboard/CampusMap.tsx`, `.github/feature-registry.json`, `.agents/WORKSTREAMS.md` |
 
 ## Suggested lanes
 
