@@ -44,6 +44,33 @@ jobs:
       - name: Preserve registered features
         run: python scripts/verify_feature_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
+  master-merge-audit:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Require merged-PR provenance after bootstrap
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! git rev-parse HEAD^ >/dev/null 2>&1 || ! git cat-file -e HEAD^:.github/merge-enforcement-enabled 2>/dev/null; then
+            echo "Merge enforcement bootstrap commit; provenance audit starts with the next master change."
+            exit 0
+          fi
+
+          merged_count="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '[.[] | select(.merged_at != null and .base.ref == "master")] | length')"
+
+          if [ "$merged_count" -lt 1 ]; then
+            echo "Direct push to master detected. Normal engineering changes must arrive through the single integration PR."
+            exit 1
+          fi
+
   feature-registry:
     runs-on: ubuntu-latest
     steps:
