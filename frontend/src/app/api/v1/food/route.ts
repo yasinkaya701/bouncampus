@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
-import type { FoodForecast } from '@/lib/types';
+import {
+  buildProductionBand,
+  CURRENT_RECOVERY_RATE_PCT,
+  FOOD_WASTE_2025,
+  FOOD_WASTE_BASELINE,
+  FOOD_WASTE_SOURCE,
+  SKS_ACTIVITY_SOURCE,
+  simulateFoodWasteScenario,
+  YEAR_OVER_YEAR_REDUCTION_PCT,
+} from '@/lib/food-waste';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -7,25 +16,56 @@ export async function GET(request: Request) {
   const dateVal = requestUrl.searchParams.get('date_val');
   if (dateVal) dashboardUrl.searchParams.set('date_val', dateVal);
 
+  let predictedMeals = 0;
+  let dashboardAvailable = false;
+
   try {
     const response = await fetch(dashboardUrl, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`dashboard ${response.status}`);
-    const dashboard = await response.json();
-    const predicted = Number(dashboard.food_demand_meals ?? 0);
-
-    const forecast: FoodForecast = {
-      cafeteria_id: 'BOUN-DINING-COMBINED',
-      cafeteria_name: 'Kuzey + Güney Yemekhaneleri',
-      baseline_portions: predicted,
-      predicted_demand: predicted,
-      recommended_production: predicted,
-      avoided_waste_portions: 0,
-      avoided_waste_kg: 0,
-      menu_popularity_factor: 1,
-    };
-
-    return NextResponse.json(predicted > 0 ? [forecast] : []);
+    if (response.ok) {
+      const dashboard = await response.json();
+      predictedMeals = Number(dashboard.food_demand_meals ?? 0);
+      dashboardAvailable = true;
+    }
   } catch {
-    return NextResponse.json([]);
+    // The official historical baseline remains usable even if the live/model dashboard is unavailable.
   }
+
+  const preventionRatePct = Number(requestUrl.searchParams.get('prevention_rate_pct') ?? 15);
+  const recoveryRatePct = Number(requestUrl.searchParams.get('recovery_rate_pct') ?? 85);
+
+  return NextResponse.json({
+    baseline: {
+      ...FOOD_WASTE_BASELINE,
+      currentRecoveryRatePct: Number(CURRENT_RECOVERY_RATE_PCT.toFixed(1)),
+      yearOverYearReductionPct: Number(YEAR_OVER_YEAR_REDUCTION_PCT.toFixed(1)),
+      monthly2025: FOOD_WASTE_2025,
+      source: FOOD_WASTE_SOURCE,
+    },
+    demandContext: {
+      available: dashboardAvailable && predictedMeals > 0,
+      productionBand: buildProductionBand(predictedMeals),
+      provenance: 'MODEL_ESTIMATE',
+      note: 'Schedule/weather-derived planning context; not cafeteria POS, production, or served-meal telemetry.',
+    },
+    scenario: simulateFoodWasteScenario(preventionRatePct, recoveryRatePct),
+    sources: [FOOD_WASTE_SOURCE, SKS_ACTIVITY_SOURCE],
+    truthBoundary: {
+      official: [
+        '2024 and 2025 annual food-waste totals',
+        '2025 monthly waste/recovery values',
+        'campus dining-service scale and published dining-hall capacity',
+      ],
+      modeled: [
+        'next-service meal demand',
+        'production planning band',
+        'prevention/recovery scenario outcomes',
+      ],
+      unavailable: [
+        'cafeteria POS transactions',
+        'actual produced portions by service',
+        'actual served portions by service',
+        'plate-waste measurements by menu item',
+      ],
+    },
+  });
 }

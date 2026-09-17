@@ -1,25 +1,73 @@
 # BOUNCAMPUS
 
-**The decision layer between campus data and real operations.**
+**Campus food-waste decision intelligence for KREATE for Climate.**
 
-BOUNCAMPUS is a source-traceable campus **Mission Control** for Boğaziçi University. It fuses public university signals, a dated official course-schedule snapshot, external weather and transparent decision models into one operational mission: what should a human operator review, why now, what evidence supports it, how robust is it under a shock, and what happened after a pilot?
+BOUNCAMPUS turns a measured campus climate problem into an operator decision loop. For the hackathon, the product is deliberately focused on **food-waste prevention in university dining operations**.
 
-> **Boğaziçi'nin verisi var. Eksik olan karar katmanı.**
+Boğaziçi University publicly reports:
 
-## Why this is not another dashboard
+- **50,993 kg** food waste in 2024;
+- **48,251 kg** food waste in 2025;
+- **33,430 kg** of 2025 food waste sent to İSTAÇ for recovery;
+- dining services spanning six campuses, with published dining-hall capacity and service schedules.
 
-The product loop is:
+Official baseline: https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310
+
+> **The 48-ton problem is already known. BOUNCAMPUS moves from reporting it to preventing the next kilogram and measuring the result.**
+
+## Hackathon thesis
+
+The focused product loop is:
 
 ```text
-SENSE → DECIDE → STRESS-TEST → HUMAN APPROVAL → PILOT → LEARN
+OFFICIAL WASTE BASELINE
+        ↓
+NEXT-SERVICE DEMAND BAND
+(schedule + academic calendar + weather + menu context)
+        ↓
+OPERATOR-REVIEWED PRODUCTION BAND
+        ↓
+MEASURED SERVICE OUTCOME
+(produced / served / edible surplus / waste kg)
+        ↓
+MODEL CALIBRATION
+        ↺
 ```
 
-1. **Sense** — ingest source-traceable campus context.
-2. **Decide** — rank a human-reviewable operational mission with evidence and confidence.
-3. **Stress-test** — recompute the current baseline under rain, heatwave, exam, event or closure scenarios.
-4. **Human approval** — create an auditable pilot-review state without dispatching a campus command.
-5. **Pilot** — execute only after field verification and operator approval.
-6. **Learn** — compare an observed outcome with modeled potential and capture calibration error.
+BOUNCAMPUS does **not** autonomously dispatch a kitchen command. A human operator accepts, edits or rejects every production recommendation.
+
+## Why this is credible
+
+The hackathon story separates evidence from estimates.
+
+### Official/public
+
+- 2024 and 2025 annual food-waste totals;
+- 2025 monthly food-waste values;
+- 2025 recovery totals;
+- Boğaziçi dining-service scale and published capacities;
+- official menu, academic-calendar and shuttle pages when available.
+
+### Model estimates
+
+- next-service meal demand;
+- conservative production planning band;
+- prevention/recovery scenario outcomes;
+- occupancy and building-energy estimates elsewhere in the platform.
+
+### Not currently available
+
+BOUNCAMPUS does **not** claim access to:
+
+- cafeteria POS transactions;
+- actual produced or served portions per service;
+- plate-level waste measurements;
+- university BMS or smart meters;
+- turnstiles or Wi-Fi occupancy telemetry;
+- shuttle GPS;
+- live IoT sensor networks.
+
+This truth boundary is visible in the UI because hackathon credibility matters more than fake precision.
 
 ## 90-second Jury Mode
 
@@ -29,193 +77,124 @@ Open:
 /demo
 ```
 
-The jury flow is deliberately four screens:
+The jury flow is four steps:
 
-- **01 / SENSE** — official/public signals + provenance + source health
-- **02 / REASON** — today's campus mission + confidence + modeled impact
-- **03 / SIMULATE** — live-baseline counterfactual stress test
-- **04 / ACT** — explicit human approval boundary + decision receipt
+1. **PROVE** — show the official 48,251 kg 2025 baseline and source.
+2. **FORECAST** — show the next-service demand/production band as `MODEL_ESTIMATE`.
+3. **STRESS-TEST** — change prevention and recovery targets on the official baseline.
+4. **PILOT** — show the 14-day A/B measurement plan and success metric: **waste kg / service**.
 
-Full demo narration: [`docs/jury-demo-script.md`](docs/jury-demo-script.md)
+The one-line pitch:
+
+> **“BOUNCAMPUS uses a campus’s measured food-waste history to recommend how much to produce for the next service, then measures success in waste kg per service.”**
 
 ## Product surfaces
 
 | Surface | Purpose |
 |---|---|
-| `/` | Mission Control: today's mission, source context, map, KPIs and decision queue |
-| `/demo` | 90-second Jury Mode |
-| `/buildings` | Campus building intelligence and schedule-derived utilization |
+| `/` | Focused KREATE command center and official problem baseline |
+| `/food-waste` | Core food-waste workspace, source-backed monthly history, demand band and scenario lab |
+| `/demo` | 90-second jury flow |
+| `/decisions` | Human-review decision ledger and outcome loop |
+| `/data` | Source provenance and truth boundary |
+| `/buildings` | Existing campus building intelligence |
+| `/scenarios` | Existing counterfactual model workspace |
+| `/mobility` | Existing source-backed campus/inter-campus shuttle workspace |
 | `/courses` | BUIS/ÖBİKAS schedule explorer |
-| `/decisions` | Human approval ledger + outcome calibration loop |
-| `/scenarios` | Counterfactual decision stress testing |
-| `/data` | Data Trust + production pilot readiness |
-| `/lab` | Clearly separated future/prototype workflows |
-| `/api/v1/brief` | Machine-readable current Mission Brief |
-| `/api/v1/health` | Public-source health and freshness state |
+| `/lab` | Experimental/future modules separated from the jury story |
 
-## What is actually live?
-
-| Feed | Source | Product class |
-|---|---|---|
-| Cafeteria menu | Boğaziçi SKS | `OFFICIAL_LIVE` when verified |
-| Shuttle timetable | Boğaziçi Mekik | `OFFICIAL_LIVE` when verified |
-| Academic calendar | Boğaziçi Academic Calendar | `OFFICIAL_LIVE` when verified |
-| Course timetable | BUIS/ÖBİKAS public schedule | `OFFICIAL_SNAPSHOT` |
-| Bebek weather | Open-Meteo at campus coordinates | `EXTERNAL_LIVE` |
-| Occupancy | timetable + room-capacity model | `MODEL_ESTIMATE` |
-| Energy | building profile + occupancy + weather model | `MODEL_ESTIMATE` |
-| Food demand | lunch class-flow + weather model | `MODEL_ESTIMATE` |
-| Savings / CO₂ | optimization model outputs | `MODEL_ESTIMATE` |
-
-If an official public page temporarily fails, BOUNCAMPUS may show a **last-known-good official public snapshot for continuity**, but that source is explicitly marked degraded and is **not** presented as live.
-
-BOUNCAMPUS does **not** currently claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, shuttle GPS or live IoT telemetry.
-
-See [`docs/live-data-contract.md`](docs/live-data-contract.md) for the complete provenance contract.
-
-## Mission Brief
-
-`GET /api/v1/brief` turns the dashboard state into a deterministic, inspectable decision object:
+Important endpoints:
 
 ```text
-Mission Brief
-├─ status
-├─ title + recommendation
-├─ why_now
-├─ confidence
-├─ location + operating window
-├─ evidence[]
-│  ├─ value
-│  ├─ interpretation
-│  └─ provenance
-├─ impact[]
-├─ source_health
-└─ human guardrail
+GET /api/v1/food
+GET /api/v1/dashboard
+GET /api/v1/health
+GET /api/v1/brief
+POST /api/v1/scenarios/simulate
 ```
 
-This is the central product abstraction. A UI card, Copilot explanation or external integration can all consume the same Mission Brief.
+`GET /api/v1/food` exposes the official food-waste baseline, demand-model context, scenario output and the explicit evidence boundary in one machine-readable contract.
 
-## Decision accountability
+## What happens in the 14-day pilot?
 
-The decision workspace is more than a recommendation list.
+Use one comparable dining service as control and one as intervention. Record only four service-level values:
 
-Each candidate can be locally marked:
+1. portions produced;
+2. portions served;
+3. edible surplus;
+4. waste kg.
 
-- `REVIEW`
-- `APPROVED_FOR_PILOT`
-- `DECLINED`
-
-The hackathon build keeps this ledger in browser storage and explicitly does **not** send BMS, kitchen, transport or IoT commands.
-
-After a pilot, the **Outcome Loop** accepts the observed result and compares it with the model prediction, producing model error as calibration evidence.
+Primary outcome:
 
 ```text
-model potential → human pilot → observed outcome → model error → better calibration
+waste kg / service
 ```
 
-## Decision Explainer
+Secondary outcomes:
 
-The floating product assistant is mission-aware rather than a generic chatbot. It explains:
+- overproduction rate;
+- edible-surplus recovery;
+- forecast error band;
+- operator override frequency.
 
-- why today's mission exists;
-- which evidence supports it;
-- which evidence is weakest;
-- why confidence is high/medium/low;
-- what must be verified before a real pilot;
-- which values are live, snapshots or model estimates.
+The pilot can therefore prove or reject the product hypothesis without requiring invasive personal data or a large integration project.
 
-It cannot dispatch a field command.
+## Why the rest of the platform still matters
+
+Food waste is the hackathon wedge, not the entire long-term platform.
+
+Existing capabilities are preserved as expansion modules:
+
+- campus building/energy decisions;
+- counterfactual scenarios;
+- source-backed shuttle mobility;
+- campus map and 3D/photogrammetry context;
+- source provenance and human approval.
+
+They show that the same `SENSE → DECIDE → APPROVE → PILOT → LEARN` architecture can later expand to energy, mobility and other campus climate operations without diluting the jury narrative today.
 
 ## Architecture
 
 ```text
 OFFICIAL / PUBLIC SIGNALS
-
-SKS Menu ───────┐
-Mekik ──────────┤
-Academic Calendar│
-BUIS snapshot ──┤
-Open-Meteo ─────┘
+├─ food-waste baseline
+├─ SKS menu
+├─ academic calendar
+├─ BUIS/ÖBİKAS schedule snapshot
+└─ weather
         │
         ▼
 PROVENANCE + SOURCE HEALTH
         │
         ▼
-CAMPUS STATE MODELS
-├─ schedule-derived utilization
-├─ physics-lite energy
-└─ cafeteria demand
+FOOD DEMAND CONTEXT
         │
         ▼
-MISSION BRIEF
-├─ recommendation
-├─ why now
-├─ evidence
-├─ confidence
-└─ modeled impact
-        │
-        ├──────────────► COUNTERFACTUAL ENGINE
-        │                    │
-        ▼                    ▼
-HUMAN DECISION LEDGER ◄─ stress-tested mission
+PRODUCTION BAND
         │
         ▼
-PILOT OUTCOME
+HUMAN OPERATOR GATE
         │
         ▼
-CALIBRATION EVIDENCE
+14-DAY PILOT
+├─ produced portions
+├─ served portions
+├─ edible surplus
+└─ waste kg
+        │
+        ▼
+CALIBRATION / NEXT SERVICE
 ```
-
-## Production pilot path
-
-BOUNCAMPUS does not require the university to replace an existing system. It sits above existing sources as a read-only decision layer first.
-
-Highest-value calibration feeds:
-
-1. **P0 — anonymous occupancy aggregates**: Wi-Fi AP, turnstile or room-count totals; no raw identities required.
-2. **P0 — building/floor smart-meter totals**: measure energy baseline vs pilot outcome.
-3. **P1 — cafeteria POS totals by time bucket**: calibrate demand and overproduction estimates without student/payment identity.
-4. **P1 — shuttle AVL/GPS**: upgrade timetable context to actual arrival reliability.
-
-### 30-day pilot
-
-| Week | Goal |
-|---|---|
-| 1 | Read-only aggregate integrations |
-| 2 | Model calibration against measured data |
-| 3 | Small human-approved operator pilot |
-| 4 | Outcome proof, model error and operator feedback |
-
-Privacy defaults:
-
-- aggregate counts before individual records;
-- no raw student identifiers in the decision layer;
-- read-only integrations before control;
-- every adapter retains provenance and freshness metadata.
-
-## Demo resilience
-
-A hackathon product cannot collapse because one public page times out during judging.
-
-For selected official public feeds, the repository contains a dated **last-known-good public snapshot**. If the current upstream cannot be verified:
-
-- the product may display that snapshot for continuity;
-- the source is marked degraded / snapshot;
-- confidence falls;
-- the UI never calls that value live.
-
-This keeps the demo reliable without crossing the truth boundary.
 
 ## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Mission Control / gateway | Next.js 14 / TypeScript |
+| Product gateway | Next.js 14 / TypeScript |
 | Research backend | FastAPI / Python 3.11+ |
-| Models | transparent schedule / energy / demand logic; research ML stack available |
-| Optimization | decision rules + counterfactual scenario engine |
 | Frontend | React, Tailwind, Recharts |
-| Maps | Leaflet / optional 3D campus visualization |
+| Maps | Leaflet + optional 3D/photogrammetry |
+| Models | transparent schedule / demand / energy logic |
 | Deployment target | Vercel frontend + optional FastAPI service |
 
 ## Run locally
@@ -228,20 +207,7 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-Important product endpoints:
-
-```text
-GET /api/v1/health
-GET /api/v1/dashboard
-GET /api/v1/brief
-POST /api/v1/scenarios/simulate
-```
-
-The Next.js product gateway is sufficient for the hackathon demo; the FastAPI service is optional research infrastructure.
-
 ## Validation sequence
-
-Implementation is intentionally separated from final validation. Before release:
 
 ```bash
 cd frontend
@@ -251,18 +217,23 @@ npm run lint
 npm run build
 ```
 
-Then verify:
+Then verify at minimum:
 
 - `/`
+- `/food-waste`
 - `/demo`
 - `/decisions`
-- `/scenarios`
 - `/data`
+- `/api/v1/food`
 - `/api/v1/health`
-- `/api/v1/brief`
 
-The repository currently follows the temporary single-branch policy documented in [`AGENTS.md`](AGENTS.md): routine engineering work targets `master` until the owner changes that rule.
+Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.md). Work is performed on short-lived agent branches, validated through the single integration PR, merged to `master`, and post-merge verified before completion.
 
----
+## KREATE for Climate
 
-Built for the Sustainability Hackathon — **15 October 2026**.
+- **Hackathon:** 15 October 2026, İstanbul
+- **Core climate problem:** avoidable institutional food waste
+- **Primary pilot metric:** waste kg / service
+- **Scale path:** universities → hospitals → factories → schools → large catering operations
+
+Detailed product rationale and pitch structure: [`docs/kreate-winning-product.md`](docs/kreate-winning-product.md).
