@@ -14,7 +14,7 @@ This file is the coordination ledger for parallel agents.
 
 | Lane | Branch | Owner role | Paths owned | Status | Handoff |
 | --- | --- | --- | --- | --- | --- |
-| integration | `master` bootstrap only | Merge Coordinator | `AGENTS.md`, `.agents/**`, `.github/**`, `scripts/verify_feature_preservation.py` | bootstrapping | Replace this row with the first real integration workstream after this policy lands. |
+| integration | `agent/integration/kreate-climate-focus` | Merge Coordinator | `frontend/src/app/page.tsx`, `frontend/src/app/demo/page.tsx`, `frontend/src/app/lab/page.tsx`, `frontend/src/components/shared/Header.tsx`, `frontend/src/app/{acoustic,agent-simulation,anomalies,control-room,esg-reports,integrations,iot-registry,league,maintenance,microgrid,rescheduler,solar,student,transit,water}/**`, `docs/pitch.md`, `docs/jury-demo-script.md`, `.agents/WORKSTREAMS.md` | active | KREATE focus pass: preserve 3D/campus geometry, promote occupancy/weather-aware energy-carbon decision flow, remove unfinished/mock-heavy first-class surfaces. |
 
 ## Suggested lanes
 
