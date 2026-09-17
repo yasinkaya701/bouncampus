@@ -21,19 +21,21 @@ import {
 } from '@/lib/food-waste';
 import { useLocale } from '@/lib/i18n';
 
+type ProductionBand = {
+  predictedMeals: number;
+  lowerBound: number;
+  recommendedTarget: number;
+  upperBound: number;
+  signalCoveragePct: number;
+  decisionReadiness: DecisionReadiness;
+  signals: Array<{ id: string; label: string; available: boolean; weightPct: number }>;
+  reasonCodes?: string[];
+};
+
 type FoodApi = {
   demandContext?: {
     available?: boolean;
-    productionBand?: null | {
-      predictedMeals: number;
-      lowerBound: number;
-      recommendedTarget: number;
-      upperBound: number;
-      signalCoveragePct: number;
-      decisionReadiness: DecisionReadiness;
-      signals: Array<{ id: string; label: string; available: boolean; weightPct: number }>;
-      reasonCodes?: string[];
-    };
+    productionBand?: ProductionBand | null;
   };
 };
 
@@ -57,8 +59,8 @@ export default function JuryModePage() {
         if (!response.ok) throw new Error('food api unavailable');
         const payload = await response.json() as FoodApi;
         setFood(payload);
-        const band = payload.demandContext?.productionBand;
-        setHealth(payload.demandContext?.available && band ? 'LIVE' : 'PARTIAL');
+        const productionBand = payload.demandContext?.productionBand;
+        setHealth(payload.demandContext?.available && productionBand ? 'LIVE' : 'PARTIAL');
       })
       .catch(() => {
         setFood(null);
@@ -153,7 +155,7 @@ function ProblemStep({ nf, t }: { nf: (value: number) => string; t: (tr: string,
   );
 }
 
-function DecisionStep({ band, health, nf, t }: { band: FoodApi['demandContext'] extends { productionBand?: infer T } ? T : never; health: DemoHealth; nf: (value: number) => string; t: (tr: string, en: string) => string }) {
+function DecisionStep({ band, health, nf, t }: { band: ProductionBand | null; health: DemoHealth; nf: (value: number) => string; t: (tr: string, en: string) => string }) {
   if (!band || health === 'FALLBACK') {
     return (
       <div>
@@ -188,7 +190,7 @@ function DecisionStep({ band, health, nf, t }: { band: FoodApi['demandContext'] 
   );
 }
 
-function HumanGateStep({ canPilot, operatorGate, setOperatorGate, band, t }: { canPilot: boolean; operatorGate: 'HOLD' | 'PILOT_APPROVED'; setOperatorGate: (value: 'HOLD' | 'PILOT_APPROVED') => void; band: FoodApi['demandContext'] extends { productionBand?: infer T } ? T : never; t: (tr: string, en: string) => string }) {
+function HumanGateStep({ canPilot, operatorGate, setOperatorGate, band, t }: { canPilot: boolean; operatorGate: 'HOLD' | 'PILOT_APPROVED'; setOperatorGate: (value: 'HOLD' | 'PILOT_APPROVED') => void; band: ProductionBand | null; t: (tr: string, en: string) => string }) {
   return (
     <div>
       <div className="bc-eyebrow">03 · {t('İNSAN KAPISI', 'HUMAN GATE')}</div>
@@ -235,7 +237,7 @@ function CloseStep({ t }: { t: (tr: string, en: string) => string }) {
   );
 }
 
-function DemoHealthPanel({ health, band, t }: { health: DemoHealth; band: FoodApi['demandContext'] extends { productionBand?: infer T } ? T : never; t: (tr: string, en: string) => string }) {
+function DemoHealthPanel({ health, band, t }: { health: DemoHealth; band: ProductionBand | null; t: (tr: string, en: string) => string }) {
   return (
     <div className="grid gap-2 rounded-[20px] border border-slate-900/10 bg-[#f7f9f6] p-4 sm:grid-cols-3">
       <HealthItem label={t('Resmi baz çizgi', 'Official baseline')} value="READY" good />
