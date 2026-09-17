@@ -3,7 +3,6 @@ import './globals.css';
 import './polish.css';
 import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
-import HomeCampusVisual from '@/components/shared/HomeCampusVisual';
 import { LocaleProvider } from '@/lib/i18n';
 import { getSiteUrl } from '@/lib/site-url';
 import 'leaflet/dist/leaflet.css';
@@ -36,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#102a43',
+  themeColor: '#07131f',
   colorScheme: 'light',
 };
 
@@ -47,8 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <LocaleProvider>
           <a href="#main-content" className="bc-skip-link">Skip to main content</a>
           <Header />
-          <main id="main-content" className="mx-auto w-full max-w-[1520px] flex-1 px-4 pb-10 pt-7 sm:px-6 lg:px-8 lg:pt-9">
-            <HomeCampusVisual />
+          <main id="main-content" className="mx-auto w-full max-w-[1600px] flex-1 px-3 pb-10 pt-4 sm:px-5 sm:pt-6 lg:px-7 lg:pt-7">
             {children}
           </main>
           <Footer />
