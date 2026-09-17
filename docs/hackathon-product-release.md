@@ -1,58 +1,85 @@
 # BOUNCAMPUS Hackathon Product Release
 
-## Product surface
+## KREATE product surface
 
-The jury-facing product is intentionally narrower and more coherent than the full experiment repository.
+The jury-facing product is intentionally narrower than the full campus platform.
 
-### Core workspaces
+### Primary workspaces
 
-1. **Overview** — live operating brief, public feeds, model KPIs, campus map, source provenance.
-2. **Campus** — building inventory and schedule-derived building intelligence.
-3. **Courses** — BUIS/ÖBİKAS schedule explorer with department/day/campus filters.
-4. **Decisions** — human-approved operational recommendation queue.
-5. **Scenarios** — counterfactual workspace using the current dashboard state as baseline.
-6. **Data Trust** — runtime source health and provenance contract.
-7. **Prototype Lab** — experimental workflows that are explicitly separated from production-facing claims.
+1. **Command Center (`/`)** — official 48,251 kg problem baseline, product thesis and operating loop.
+2. **Food Waste (`/food-waste`)** — monthly official baseline, next-service planning context, prevention/recovery scenario and pilot measurement contract.
+3. **Jury Mode (`/demo`)** — four-step 90-second proof path.
+4. **Evidence (`/data`)** — source provenance and truth boundary.
+5. **Decisions (`/decisions`)** — human approval / outcome-loop infrastructure.
+
+### Supporting platform surfaces
+
+- `/courses` — schedule context.
+- `/buildings` — campus building intelligence.
+- `/scenarios` — existing counterfactual model workspace.
+- `/mobility` — source-backed shuttle workspace.
+- `/lab` — experimental workflows, never part of the primary pitch.
 
 ## Data truth contract
 
-BOUNCAMPUS uses four user-visible classes:
+BOUNCAMPUS uses visible provenance classes:
 
-- `OFFICIAL_LIVE` — currently fetched Boğaziçi public page/data.
-- `OFFICIAL_SNAPSHOT` — dated local snapshot originating from an official Boğaziçi source.
-- `EXTERNAL_LIVE` — current third-party data such as weather.
-- `MODEL_ESTIMATE` — computed decision-support output.
+- `OFFICIAL_LIVE` — currently fetched Boğaziçi public page/data;
+- `OFFICIAL_SNAPSHOT` — dated local snapshot from an official Boğaziçi source;
+- `EXTERNAL_LIVE` — current third-party context such as weather;
+- `MODEL_ESTIMATE` — computed decision-support output;
+- `OFFICIAL_PUBLIC` — source-backed historical/public institutional baseline used by the food-waste module.
 
-`FALLBACK` means a source could not be used. A fallback must never fabricate a previous live value.
+The product does not claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, kitchen production telemetry, shuttle GPS or live IoT telemetry unless such a source is explicitly integrated and verified.
 
-The product does not currently claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, shuttle GPS or live IoT telemetry.
+## Food-waste runtime contract
 
-## Runtime model architecture
+`GET /api/v1/food` is the primary KREATE product endpoint. It returns:
 
-The standalone Next.js product is the default hackathon deployment. Its `/api/v1` routes provide the source-traceable product API.
+- 2024/2025 official food-waste baseline;
+- 2025 monthly food-waste values;
+- official annual recovery value;
+- demand-model availability and conservative production band;
+- prevention/recovery scenario output;
+- explicit official / modeled / unavailable truth boundary.
 
-- `/api/v1/dashboard` is the primary operating-state endpoint.
-- `/api/v1/buildings` derives current building utilization from the dashboard model.
-- `/api/v1/occupancy` derives utilization from the course schedule snapshot.
-- `/api/v1/energy` combines building profiles, schedule-derived utilization and current external weather.
-- `/api/v1/food` exposes a cafeteria demand estimate without inventing POS-measured waste savings.
-- `/api/v1/actions` derives recommendations from the current dashboard model instead of fixed demo text.
-- `/api/v1/scenarios/simulate` applies explicit counterfactual deltas to the current dashboard baseline.
-- `/api/v1/health` reports upstream source and schedule-snapshot readiness.
+The historical baseline remains available even if the dashboard demand context is unavailable. If demand cannot be calculated, the product withholds a production recommendation instead of inventing one.
 
-The FastAPI service remains available as a separate deployment option but is not required for the standalone hackathon web app.
+## Jury demo path
 
-## Demo path
+Recommended 90-second flow:
 
-Recommended 4–6 minute jury flow:
+1. **PROVE** — show 48,251 kg official 2025 food waste and open the source if challenged.
+2. **FORECAST** — show the next-service demand/production band and its `MODEL_ESTIMATE` label.
+3. **STRESS-TEST** — adjust prevention/recovery target against the official historical baseline.
+4. **PILOT** — show the 14-day controlled measurement plan and primary outcome `waste kg / service`.
 
-1. Open **Overview** and explain the Data Trust distinction.
-2. Show official SKS / Mekik / calendar feeds and external weather.
-3. Open **Campus**, pick a building and explain schedule-derived occupancy vs live sensors.
-4. Open **Decisions** and show that recommendations stop before automatic actuation.
-5. Open **Scenarios** and run a heatwave or exam-week counterfactual.
-6. Open **Data Trust** to prove where every signal came from.
-7. Only enter **Lab** if the jury asks about future BMS/IoT/energy-control extensions.
+Do not lead with 3D, energy, mobility or feature count. Those are expansion evidence after the core problem is understood.
+
+## Pilot contract
+
+For each pilot service record:
+
+1. portions produced;
+2. portions served;
+3. edible surplus;
+4. waste kg;
+5. operator override / reason when applicable.
+
+Primary outcome:
+
+```text
+waste kg / service
+```
+
+Secondary outcomes:
+
+- overproduction rate;
+- edible-surplus recovery;
+- demand forecast error;
+- operator override frequency.
+
+No modeled scenario result may be presented as measured impact before this pilot evidence exists.
 
 ## Deployment contract
 
@@ -63,31 +90,37 @@ Recommended 4–6 minute jury flow:
 - `NEXT_PUBLIC_API_URL` should remain empty for the standalone build.
 - After deployment verify:
   - `/`
-  - `/buildings`
-  - `/courses`
+  - `/food-waste`
+  - `/demo`
   - `/decisions`
-  - `/scenarios`
   - `/data`
+  - `/api/v1/food`
   - `/api/v1/health`
 
 ### Optional FastAPI deployment
 
-Copy `backend/.env.example` to `.env` and set production `CORS_ORIGINS` to the exact frontend origins. Do not use wildcard CORS with credentials.
+The FastAPI service remains research infrastructure and is not required for the standalone hackathon product. If deployed, use exact production `CORS_ORIGINS`; do not use wildcard CORS with credentials.
 
 ## Data freshness gate
 
-The current BUIS/ÖBİKAS snapshot predates the 28–30 September 2026 add/drop period. It must be refreshed after add/drop before the final hackathon release. The runtime health layer is designed to expose stale snapshot state rather than hide it.
+The BUIS/ÖBİKAS schedule snapshot must be refreshed after the 28–30 September 2026 add/drop period before the final hackathon release. A stale snapshot must remain visibly classified as a snapshot rather than being presented as live.
 
-## Validation pending
+## Validation gate
 
-Feature implementation and product convergence are separate from release validation. Before merge/release, run:
+Before merge/release:
 
-- `npm ci`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run build`
-- backend Python compile/import checks
-- source parser checks in the deployed Vercel runtime
-- responsive smoke tests on desktop and mobile
+```bash
+cd frontend
+npm ci
+npm run typecheck
+npm run lint
+npm run build
+```
 
-GitHub Actions hosted runner allocation is currently tracked separately and should be repaired before release validation is considered complete.
+Repository gate:
+
+```bash
+python scripts/verify_feature_preservation.py --base-ref <master-sha>
+```
+
+Also compile backend Python, validate critical JSON datasets, require exact-head PR CI, merge through the repository integration contract, then verify the resulting `master` commit before releasing the workstream.
