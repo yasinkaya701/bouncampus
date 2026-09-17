@@ -30,9 +30,7 @@ Allowed lifecycle states:
 
 ## Active
 
-| Lane | Branch | Owner role | Paths owned | Status | Merge evidence / blocker |
-| --- | --- | --- | --- | --- | --- |
-| policy | `master` bootstrap | Repository policy bootstrap | `AGENTS.md`, `.agents/**`, `.github/**`, `scripts/agent_exit_gate.py` | `MERGED_VERIFYING` | Bootstrap policy commit; normal work after this point must use agent branch + PR + owning-agent merge. |
+_No active workstreams. The merge-before-exit policy bootstrap is complete on `master`; the v2 enforcement marker makes the next normal repository change subject to the mandatory PR + owning-agent merge contract._
 
 ## Suggested lanes
 
