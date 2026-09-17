@@ -115,7 +115,10 @@ export async function GET(request: NextRequest) {
       const lat = center.lat / footprint.length;
       const lon = center.lon / footprint.length;
       const tags = element.tags ?? {};
-      const height = parseMeters(tags.height) ?? fallbackHeight(tags);
+      const explicitHeight = parseMeters(tags.height);
+      const levels = parsePositiveInt(tags['building:levels']);
+      const height = explicitHeight ?? (levels ? levels * 3.35 : fallbackHeight(tags));
+      const heightSource = explicitHeight ? 'OSM_HEIGHT' : levels ? 'OSM_LEVELS' : 'VISUALIZATION_ESTIMATE';
       const roofHeight = parseMeters(tags['roof:height']) ?? 0;
       return [{
         osm_id: key,
@@ -124,7 +127,8 @@ export async function GET(request: NextRequest) {
         coords: [lat, lon] as [number, number],
         footprint: footprint.map(point => [point.lat, point.lon] as [number, number]),
         height_m: Math.max(3, height),
-        levels: parsePositiveInt(tags['building:levels']),
+        height_source: heightSource,
+        levels,
         min_height_m: parseMeters(tags.min_height) ?? 0,
         roof_height_m: roofHeight,
         roof_shape: tags['roof:shape'] ?? null,
