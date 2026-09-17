@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "repository": "yasinkaya701/bouncampus",
+  "lease_ttl_minutes": 45,
+  "merge_lock_ttl_minutes": 30,
+  "heartbeat_interval_minutes": 15,
+  "lanes": [
+    "frontend-ux",
+    "campus-geo",
+    "api-product",
+    "quality-release",
+    "integration"
+  ],
+  "message_types": [
+    "INFO",
+    "REQUEST",
+    "DECISION",
+    "BLOCKER",
+    "HANDOFF",
+    "REVIEW",
+    "ACK"
+  ],
+  "terminal_state": "MERGED_VERIFIED",
+  "remote_bus": {
+    "enabled": true,
+    "transport": "github_issue",
+    "issue_number": 8,
+    "marker": "BOUNCAMPUS_AGENT_BUS_V1",
+    "token_env": ["GITHUB_TOKEN", "GH_TOKEN"]
+  }
+}
