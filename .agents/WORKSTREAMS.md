@@ -30,7 +30,9 @@ Allowed lifecycle states:
 
 ## Active
 
-_No active workstreams._
+| Status | Lane | Branch | Owner | Scope | Touched paths |
+| --- | --- | --- | --- | --- | --- |
+| ACTIVE | api-product + frontend-ux | `agent/api-product/food-waste-ops` | Workstream Agent | Turn campus food-waste data into an operational cafeteria climate-decision flow: demand/production guidance, risk drivers, what-if comparison, impact proxies, bilingual UI, and explicit data-truth boundaries. | `.agents/WORKSTREAMS.md`, `frontend/src/app/food-waste/page.tsx`, `frontend/src/app/api/v1/food/route.ts`, `frontend/src/lib/food-waste.ts`, `frontend/src/data/food_waste_2025.json`, `.github/feature-registry.json` |
 
 The `campus-geo / photogrammetry-assets` workstream was merged through PR #13 and verified on `master` at merge commit `4ae611ecf394e3cdf05b21b4eeda0dd998526c54` by CI run #188 before ownership was released.
 
@@ -39,5 +41,5 @@ The `campus-geo / photogrammetry-assets` workstream was merged through PR #13 an
 - `frontend-ux`: pages, components, styles, accessibility, responsive UI.
 - `campus-geo`: campus directory, building locations, geometry, maps, 3D/assets.
 - `api-product`: Next.js API routes, product logic, data contracts, live-source adapters.
-- `quality-release`: CI, tests, build gates, deployment verification.
+- `quality-release`: CI, tests, build gates, deployment/release evidence.
 - `integration`: temporary lock state used by whichever workstream owner is actively merging.
