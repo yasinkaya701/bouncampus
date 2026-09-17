@@ -59,6 +59,15 @@
         "frontend/public/assets/campus-topography.svg",
         "frontend/public/assets/map-pin-academic.svg"
       ]
+    },
+    {
+      "id": "campus-3d-asset-registry",
+      "required_paths": [
+        "frontend/src/lib/campus-3d-assets.ts",
+        "frontend/src/app/3d-assets/page.tsx",
+        "frontend/public/assets/3d/README.md",
+        "docs/3d-assets-provenance.md"
+      ]
     }
   ]
 }
