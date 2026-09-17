@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/`, lastModified: now, changeFrequency: 'daily', priority: 1 },
     { url: `${base}/food-waste`, lastModified: now, changeFrequency: 'daily', priority: 0.98 },
     { url: `${base}/demo`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
+    { url: `${base}/food-waste/pilot`, lastModified: now, changeFrequency: 'daily', priority: 0.94 },
     { url: `${base}/decisions`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${base}/data`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${base}/buildings`, lastModified: now, changeFrequency: 'weekly', priority: 0.75 },
