@@ -3,16 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Building2, BusFront, CheckSquare2, Compass, Database, LayoutDashboard, Trophy } from 'lucide-react';
+import { Building2, BusFront, CheckSquare2, Compass, Database, LayoutDashboard, Trophy, Utensils } from 'lucide-react';
 import { useLocale, type Locale } from '@/lib/i18n';
 
 const primaryNav = [
   { href: '/', tr: 'Kontrol merkezi', en: 'Command center', icon: LayoutDashboard },
+  { href: '/food-waste', tr: 'Yemek atığı', en: 'Food waste', icon: Utensils },
+  { href: '/decisions', tr: 'Kararlar', en: 'Decisions', icon: CheckSquare2 },
+  { href: '/data', tr: 'Kanıt', en: 'Evidence', icon: Database },
   { href: '/buildings', tr: 'Binalar', en: 'Buildings', icon: Building2 },
   { href: '/mobility', tr: 'Mekik', en: 'Shuttle', icon: BusFront },
-  { href: '/decisions', tr: 'Kararlar', en: 'Decisions', icon: CheckSquare2 },
   { href: '/scenarios', tr: 'Senaryolar', en: 'Scenarios', icon: Compass },
-  { href: '/data', tr: 'Kanıt', en: 'Evidence', icon: Database },
 ];
 
 function LocaleButton({ value, current, onClick }: { value: Locale; current: Locale; onClick: () => void }) {
@@ -45,7 +46,7 @@ export default function Header() {
                 <div className="text-[14px] font-black tracking-[-0.04em] text-slate-950">BOUNCAMPUS</div>
                 <span className="rounded-full border border-emerald-900/10 bg-emerald-50 px-1.5 py-0.5 text-[7px] font-black uppercase tracking-[0.12em] text-emerald-700">KREATE</span>
               </div>
-              <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-slate-400">Campus climate intelligence</div>
+              <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-slate-400">Food-waste decision intelligence</div>
             </div>
           </Link>
 
