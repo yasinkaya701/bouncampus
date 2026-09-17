@@ -1,0 +1,3 @@
+BOUNCAMPUS merge-before-exit enforcement v2 is active.
+
+After this marker lands on master, normal repository changes must arrive through the single integration PR, use a normal merge commit, and be merged by the workstream-owning agent before that agent may exit or report completion.

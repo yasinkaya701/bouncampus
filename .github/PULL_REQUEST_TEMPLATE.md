@@ -1,8 +1,10 @@
 ## Integration batch
 
-Merge Coordinator:
+Owning Workstream Agent / temporary Merge Coordinator:
 
-Agent branches/workstreams included:
+Agent branch:
+
+Additional compatible branches included, if any:
 
 ## Feature preservation
 
@@ -32,9 +34,15 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 - [ ] Critical JSON datasets validate.
 - [ ] CI is green on the exact PR head SHA.
 
-## Merge contract
+## Mandatory merge-before-exit contract
 
+- [ ] The agent that accepted this work is the agent driving this PR.
 - [ ] This is the repository's only open PR.
 - [ ] PR head contains the current `master` base commit.
 - [ ] No follow-up branch is required to make this batch functionally complete.
-- [ ] After merge, the merged `master` commit will be used for deployment/release verification.
+- [ ] The owning agent will resolve conflicts and CI failures rather than hand the merge to another agent.
+- [ ] The owning agent will perform the merge using a normal merge commit.
+- [ ] The owning agent will verify the resulting `master` commit after merge.
+- [ ] `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` will pass before the agent reports completion or exits.
+
+**A PR being open, review-ready, or green is not completion. The owning agent must merge and verify `master` before releasing the workstream.**
