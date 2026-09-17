@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
-import type { DashboardData, ActionItem } from '@/lib/types';
+import type { ActionItem, DashboardData } from '@/lib/types';
 import type { MissionBrief, MissionEvidence, MissionImpact } from '@/lib/mission-types';
 import type { SourceMeta } from '@/lib/live-sources';
+
+type MissionConfidence = {
+  score: number;
+  label: MissionBrief['confidence_label'];
+};
 
 function displayValue(value: string | null | undefined, fallback = 'unavailable') {
   if (value == null || value === '') return fallback;
@@ -12,9 +17,9 @@ function inputSources(data: DashboardData): SourceMeta[] {
   return (data.sources ?? []).filter(source => source.provenance !== 'MODEL_ESTIMATE');
 }
 
-function confidenceFor(data: DashboardData) {
+function confidenceFor(data: DashboardData): MissionConfidence {
   const sources = inputSources(data);
-  if (!sources.length) return { score: 20, label: 'LOW' as const };
+  if (!sources.length) return { score: 20, label: 'LOW' };
 
   const weighted = sources.map(source => {
     if (!source.ok) return 0;
@@ -26,9 +31,9 @@ function confidenceFor(data: DashboardData) {
 
   const raw = weighted.reduce<number>((sum, value) => sum + value, 0) / sources.length;
   const score = Math.max(20, Math.min(95, Math.round(raw * 100)));
-  if (score >= 80) return { score, label: 'HIGH' as const };
-  if (score >= 55) return { score, label: 'MEDIUM' as const };
-  return { score, label: 'LOW' as const };
+  if (score >= 80) return { score, label: 'HIGH' };
+  if (score >= 55) return { score, label: 'MEDIUM' };
+  return { score, label: 'LOW' };
 }
 
 function missionTitle(action: ActionItem | undefined) {
@@ -38,6 +43,13 @@ function missionTitle(action: ActionItem | undefined) {
   return 'Redirect capacity before congestion becomes visible.';
 }
 
+function evidence(
+  base: Omit<MissionEvidence, 'source'>,
+  source: SourceMeta | undefined,
+): MissionEvidence {
+  return source ? { ...base, source } : base;
+}
+
 function evidenceFrom(data: DashboardData, action: ActionItem | undefined): MissionEvidence[] {
   const weatherSource = data.live_weather?.provenance;
   const menuSource = data.live_menu?.provenance;
@@ -45,42 +57,38 @@ function evidenceFrom(data: DashboardData, action: ActionItem | undefined): Miss
   const scheduleSource = data.sources?.find(source => source.id === 'boun-course-schedule');
 
   return [
-    {
+    evidence({
       id: 'schedule',
       label: 'Academic demand signal',
       value: `${(data.real_courses_loaded ?? 0).toLocaleString('tr-TR')} course records`,
       interpretation: action?.type === 'energy'
         ? 'The timetable provides the demand shape used to identify low-use windows.'
         : 'The timetable provides the student-flow signal used by the model.',
-      source: scheduleSource,
-    },
-    {
+    }, scheduleSource),
+    evidence({
       id: 'weather',
       label: 'Bebek weather',
       value: displayValue(data.live_weather?.temperature == null ? null : `${data.live_weather.temperature}°C`),
       interpretation: data.live_weather?.rain
         ? 'Rain raises indoor demand and cafeteria pressure in the demand model.'
         : 'Outdoor conditions are included in energy and food-demand assumptions.',
-      source: weatherSource,
-    },
-    {
+    }, weatherSource),
+    evidence({
       id: 'menu',
       label: 'SKS menu',
       value: displayValue(data.live_menu?.main_dish),
       interpretation: menuSource?.ok
         ? 'The current official menu is operational context; demand volume remains modeled without POS data.'
         : 'A last-known-good official public snapshot may be shown for continuity; it is not treated as live.',
-      source: menuSource,
-    },
-    {
+    }, menuSource),
+    evidence({
       id: 'shuttle',
       label: 'Mekik timetable',
       value: displayValue(data.live_shuttle?.next_departure),
       interpretation: shuttleSource?.ok
         ? 'Published departure timing adds mobility context; this is not live GPS.'
         : 'A last-known-good official timetable snapshot may be shown; confidence is reduced because the upstream is not currently verified.',
-      source: shuttleSource,
-    },
+    }, shuttleSource),
   ];
 }
 
@@ -129,12 +137,17 @@ export async function GET(request: Request) {
   const passing = sources.filter(source => source.ok).length;
   const unavailable = sources.length - passing;
   const confidence = confidenceFor(data);
-  const degraded = data.data_quality?.mode === 'DEGRADED';
+  const status: MissionBrief['status'] = data.data_quality?.mode === 'DEGRADED'
+    ? 'DEGRADED'
+    : action
+      ? 'READY'
+      : 'WATCH';
+  const decisionType: MissionBrief['decision_type'] = action?.type ?? null;
 
   const brief: MissionBrief = {
     generated_at: new Date().toISOString(),
     date: data.date,
-    status: degraded ? 'DEGRADED' : action ? 'READY' : 'WATCH',
+    status,
     title: missionTitle(action),
     one_liner: action
       ? `${action.location} için ${action.time} penceresinde doğrulanabilir bir operasyon fırsatı bulundu.`
@@ -143,7 +156,7 @@ export async function GET(request: Request) {
     confidence: confidence.score,
     confidence_label: confidence.label,
     decision_id: action?.id ?? null,
-    decision_type: action?.type ?? null,
+    decision_type: decisionType,
     location: action?.location ?? 'Campus-wide',
     operating_window: action?.time ?? 'Continuous watch',
     recommendation: action?.title ?? 'Continue monitoring source and schedule signals',
