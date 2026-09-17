@@ -150,7 +150,7 @@ export default function DashboardPage() {
           </div>
           <span className="bc-chip border-slate-950/[0.08] bg-[#f7f9f6] text-slate-500"><MapPin size={10} /> {t('Boğaziçi kampüs bağlamı', 'Boğaziçi campus context')}</span>
         </div>
-        {data ? <CampusMap data={data} /> : <div className="grid h-[460px] place-items-center rounded-[22px] bg-slate-50 text-[10px] font-black uppercase tracking-[0.12em] text-slate-300">{t('Kampüs bağlamı yükleniyor…', 'Loading campus context…')}</div>}
+        {data ? <CampusMap buildings={data.buildings} /> : <div className="grid h-[460px] place-items-center rounded-[22px] bg-slate-50 text-[10px] font-black uppercase tracking-[0.12em] text-slate-300">{t('Kampüs bağlamı yükleniyor…', 'Loading campus context…')}</div>}
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
