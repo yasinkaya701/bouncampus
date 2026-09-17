@@ -68,6 +68,16 @@
         "frontend/src/components/Mobility/ShuttleNetwork.tsx",
         "frontend/src/app/mobility/page.tsx"
       ]
+    },
+    {
+      "id": "multi-agent-coordination-runtime",
+      "required_paths": [
+        ".agents/config.json",
+        ".agents/PROTOCOL.md",
+        "scripts/agent_bus.py",
+        "scripts/test_agent_bus.py",
+        ".github/workflows/agent-coordination.yml"
+      ]
     }
   ]
 }
