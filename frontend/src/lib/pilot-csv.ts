@@ -1,0 +1,156 @@
+import { validatePilotMeasurement, type PilotServiceMeasurement } from '@/lib/food-waste';
+
+export const PILOT_CSV_HEADERS = [
+  'date',
+  'service_id',
+  'arm',
+  'model_forecast_meals',
+  'produced_portions',
+  'served_portions',
+  'edible_surplus_kg',
+  'waste_kg',
+  'early_sellout',
+  'operator_override',
+  'notes',
+] as const;
+
+export type PilotCsvParseResult = {
+  measurements: PilotServiceMeasurement[];
+  errors: string[];
+};
+
+function parseCsvRows(text: string) {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+
+    if (char === '"') {
+      if (quoted && next === '"') {
+        cell += '"';
+        index += 1;
+      } else {
+        quoted = !quoted;
+      }
+      continue;
+    }
+
+    if (char === ',' && !quoted) {
+      row.push(cell);
+      cell = '';
+      continue;
+    }
+
+    if ((char === '\n' || char === '\r') && !quoted) {
+      if (char === '\r' && next === '\n') index += 1;
+      row.push(cell);
+      if (row.some(value => value.trim() !== '')) rows.push(row);
+      row = [];
+      cell = '';
+      continue;
+    }
+
+    cell += char;
+  }
+
+  row.push(cell);
+  if (row.some(value => value.trim() !== '')) rows.push(row);
+  return rows;
+}
+
+function parseNumber(value: string, nullable = false) {
+  const trimmed = value.trim();
+  if (nullable && trimmed === '') return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
+}
+
+function parseBoolean(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (['true', '1', 'yes', 'y', 'evet'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'n', 'hayır', 'hayir', ''].includes(normalized)) return false;
+  return null;
+}
+
+export function parsePilotCsv(text: string): PilotCsvParseResult {
+  const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  if (!rows.length) return { measurements: [], errors: ['CSV is empty.'] };
+
+  const headers = rows[0].map(value => value.trim().toLowerCase());
+  const missingHeaders = PILOT_CSV_HEADERS.filter(header => !headers.includes(header));
+  if (missingHeaders.length) {
+    return {
+      measurements: [],
+      errors: [`Missing required CSV headers: ${missingHeaders.join(', ')}`],
+    };
+  }
+
+  const indexOf = (name: typeof PILOT_CSV_HEADERS[number]) => headers.indexOf(name);
+  const measurements: PilotServiceMeasurement[] = [];
+  const errors: string[] = [];
+
+  rows.slice(1).forEach((values, rowIndex) => {
+    const value = (name: typeof PILOT_CSV_HEADERS[number]) => values[indexOf(name)] ?? '';
+    const earlySellout = parseBoolean(value('early_sellout'));
+    const operatorOverride = parseBoolean(value('operator_override'));
+    const armRaw = value('arm').trim().toUpperCase();
+
+    if (earlySellout == null || operatorOverride == null) {
+      errors.push(`Row ${rowIndex + 2}: boolean fields must be true/false, yes/no, or 1/0.`);
+      return;
+    }
+
+    const measurement: PilotServiceMeasurement = {
+      date: value('date').trim(),
+      serviceId: value('service_id').trim(),
+      arm: armRaw as PilotServiceMeasurement['arm'],
+      modelForecastMeals: parseNumber(value('model_forecast_meals'), true),
+      producedPortions: parseNumber(value('produced_portions')) as number,
+      servedPortions: parseNumber(value('served_portions')) as number,
+      edibleSurplusKg: parseNumber(value('edible_surplus_kg')) as number,
+      wasteKg: parseNumber(value('waste_kg')) as number,
+      earlySellout,
+      operatorOverride,
+      notes: value('notes').trim(),
+    };
+
+    const validationErrors = validatePilotMeasurement(measurement);
+    if (validationErrors.length) {
+      errors.push(`Row ${rowIndex + 2}: ${validationErrors.join('; ')}`);
+      return;
+    }
+
+    measurements.push(measurement);
+  });
+
+  return { measurements, errors };
+}
+
+function escapeCsv(value: string | number | boolean | null | undefined) {
+  const raw = value == null ? '' : String(value);
+  return /[",\n\r]/.test(raw) ? `"${raw.replace(/"/g, '""')}"` : raw;
+}
+
+export function serializePilotCsv(measurements: PilotServiceMeasurement[]) {
+  const lines = [PILOT_CSV_HEADERS.join(',')];
+  measurements.forEach(item => {
+    lines.push([
+      item.date,
+      item.serviceId,
+      item.arm,
+      item.modelForecastMeals,
+      item.producedPortions,
+      item.servedPortions,
+      item.edibleSurplusKg,
+      item.wasteKg,
+      item.earlySellout,
+      item.operatorOverride,
+      item.notes ?? '',
+    ].map(escapeCsv).join(','));
+  });
+  return `${lines.join('\n')}\n`;
+}
