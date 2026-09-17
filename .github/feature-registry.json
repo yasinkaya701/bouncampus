@@ -59,6 +59,14 @@
         "frontend/public/assets/campus-topography.svg",
         "frontend/public/assets/map-pin-academic.svg"
       ]
+    },
+    {
+      "id": "multi-agent-coordination-bus",
+      "required_paths": [
+        ".agents/config.json",
+        ".agents/PROTOCOL.md",
+        "scripts/agent_bus.py"
+      ]
     }
   ]
 }
