@@ -59,6 +59,15 @@
         "frontend/public/assets/campus-topography.svg",
         "frontend/public/assets/map-pin-academic.svg"
       ]
+    },
+    {
+      "id": "shuttle-mobility-network",
+      "required_paths": [
+        "frontend/src/lib/shuttle-network.ts",
+        "frontend/src/app/api/v1/shuttles/route.ts",
+        "frontend/src/components/Mobility/ShuttleNetwork.tsx",
+        "frontend/src/app/mobility/page.tsx"
+      ]
     }
   ]
 }
