@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from 'react-leaflet';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -70,6 +70,8 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
     return { ...building, name: display.name, code: display.code, coords: location?.coords ?? building.coords, liveLocation: location };
   }), [buildings, locale, locations]);
 
+  const fallbackTo3D = useCallback(() => setMapMode('3d'), []);
+
   const focusCampus = (next: CampusFocus) => {
     setFocus(next);
     if (next === 'south') { setMapCenter([41.0836, 29.0520]); setZoomLevel(17); }
@@ -126,7 +128,7 @@ export default function CampusMap({ buildings }: { buildings: Building[] }) {
       ) : mapMode === '3d' ? (
         <div className="overflow-hidden rounded-[22px]"><CampusMap3D buildings={positionedBuildings} /></div>
       ) : mapMode === 'photogrammetry' ? (
-        <CampusPhotogrammetryViewer onFallback={() => setMapMode('3d')} />
+        <CampusPhotogrammetryViewer onFallback={fallbackTo3D} />
       ) : (
         <div className="relative h-[600px] w-full overflow-hidden rounded-[22px] border border-slate-900/10 bg-slate-100">
           <MapContainer center={mapCenter} zoom={zoomLevel} style={{ height: '100%', width: '100%' }}>
