@@ -186,6 +186,22 @@ def test_frontend_contract_is_explicit() -> None:
         assert marker in route, f"food API truth boundary missing {marker}"
 
 
+def test_registered_ui_preserves_provenance_boundary() -> None:
+    food_page = (ROOT / "frontend/src/app/food-waste/page.tsx").read_text(encoding="utf-8")
+    jury_page = (ROOT / "frontend/src/app/demo/jury/page.tsx").read_text(encoding="utf-8")
+
+    for marker in ("MODEL_ESTIMATE", "POLICY_HEURISTIC", "NOT_CALIBRATED"):
+        assert marker in food_page, f"food-waste UI missing provenance marker {marker}"
+        assert marker in jury_page, f"jury UI missing provenance marker {marker}"
+
+    assert "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL" in food_page
+    assert "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL" in jury_page
+    assert "<strong>MODEL_ESTIMATE.</strong>" not in food_page
+    assert jury_page.count('tag="MODEL_ESTIMATE"') == 1, "only the point forecast may be tagged MODEL_ESTIMATE"
+    assert jury_page.count('tag="POLICY_HEURISTIC"') == 3, "planning bounds/target must be policy heuristics"
+    assert "AUTO_DISPATCH=false" in jury_page
+
+
 def test_kreate_checker_enforces_food_decision_integrity() -> None:
     checker = (ROOT / "scripts/kreate_check.py").read_text(encoding="utf-8")
     assert "check_food_decision_integrity" in checker
@@ -206,6 +222,7 @@ def main() -> int:
         test_metrics_reject_misaligned_inputs,
         test_backend_food_claim_firewall,
         test_frontend_contract_is_explicit,
+        test_registered_ui_preserves_provenance_boundary,
         test_kreate_checker_enforces_food_decision_integrity,
     ]
     for test in tests:
