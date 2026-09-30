@@ -4,7 +4,7 @@
   "title": "Deep-research Boğaziçi food operations and procurement",
   "priority": "P0",
   "lane": "campus-data-geo",
-  "state": "READY_FOR_INTEGRATION",
+  "state": "BLOCKED",
   "owner_agent": "research-evidence",
   "branch": "agent/campus-data-geo/bogazici-food-ops-deep-dive",
   "depends_on": [],
@@ -40,20 +40,24 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T00:00:00+03:00",
-    "heartbeat_at": "2026-10-01T00:00:00+03:00",
+    "heartbeat_at": "2026-10-01T00:17:00+03:00",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "Research feature PR #42 is merged into role/cs2-product-strategy, but durable master promotion is blocked by an unrelated pre-existing failed CI on hardware/policy PR #40 that is an ancestor of the CS2 role branch.",
+    "evidence": "PR #42 merged to role/cs2-product-strategy at 3f1c31ff6e1fc46adec321fac05b2e86041ea227. PR #40 CI run 36776218081 fails only in repository-data step 'Test autonomous task operations': scripts/test_agent_task.py::test_waiting_human_requires_approval_before_resume is rejected because WAITING_HUMAN requires a non-NONE PENDING human gate. Frontend, feature-registry and merge-discipline jobs passed. Research does not modify scripts/agent_task.py, scripts/test_agent_task.py, AGENTS.md, or the failing invariant.",
+    "next_action": "After the unrelated agent-task invariant regression on the ancestor policy branch is repaired and integrated, sync role/cs2-product-strategy with master, run role integration validation, merge research to master, and record post-merge evidence."
+  },
   "integration": {
-    "pull_request": null,
+    "pull_request": 42,
     "validated_head_sha": "242347ff956276b20703e0e916b084fe955047c2",
-    "merge_sha": null,
+    "merge_sha": "3f1c31ff6e1fc46adec321fac05b2e86041ea227",
     "post_merge_verified_at": null
   },
   "notes": [
     "Secondary/public-source research only; it must not be counted as PMR or pilot evidence.",
     "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md because those are shared/high-conflict claim-policy surfaces and active CS1 work has owned them.",
     "Successful current tender is IKN 2025/1727143; cancelled predecessor IKN 2025/1335958 is retained only as provenance warning.",
-    "Master promotion must follow the CS2 role integration topology and must not overwrite concurrent role/governance work."
+    "All six research-file changes are already available to agents on role/cs2-product-strategy; only durable master promotion is blocked."
   ]
 }
