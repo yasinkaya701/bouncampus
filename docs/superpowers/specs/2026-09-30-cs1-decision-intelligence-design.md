@@ -1,111 +1,115 @@
 # CS1 Decision Intelligence System — Design Specification
 
-**Status:** design approved in principle; this document is the authoritative architecture for the CS1 implementation plan.
+**Status:** architecture direction approved; written specification awaiting final user review before implementation planning.
 
 **Date:** 2026-09-30
 
 **Owner:** CS1 — Decision Intelligence Lead
 
-**Scope:** BOUNCAMPUS institutional dining / food-waste decision support, with interfaces designed so the same decision-intelligence primitives can later support other campus operations.
+**Scope:** BOUNCAMPUS institutional dining / food-waste decision support, with reusable decision-intelligence primitives for later campus domains.
 
 ## 1. Purpose
 
-BOUNCAMPUS needs a decision system, not a forecast demo. The system must answer a harder question than “what is tomorrow's demand?”: **given the information available at the actual decision time, what should an operator do, how uncertain is that recommendation, when should the system abstain, and how will we later prove whether the recommendation was better than the current alternative?**
+BOUNCAMPUS needs a decision system, not a forecast demo. The system must answer: **given only the information actually available at the decision time, what should an operator do, why, with what uncertainty, when should the system abstain, and how can the team later prove whether that decision was better than the current alternative?**
 
-The architecture therefore separates five concerns that are currently partially mixed together:
+The architecture therefore separates:
 
-1. source health and decision-time context,
+1. decision-time source health,
 2. forecast / estimate generation,
 3. baseline comparison and model eligibility,
-4. operational decision policy under asymmetric risk,
-5. measured pilot evaluation and claim promotion.
+4. uncertainty representation,
+5. operational decision policy under asymmetric risk,
+6. readiness / abstention,
+7. operator review and override,
+8. measured pilot evaluation,
+9. evidence and claim promotion.
 
-The system must remain useful before complete cafeteria telemetry exists, but it must never convert missing evidence into fake certainty.
+No later layer may manufacture evidence that an earlier layer does not provide.
 
 ## 2. Current-State Findings
 
-The repository already contains several strong pieces that should be preserved:
+Strong pieces already exist and should be preserved:
 
-- the active Next `/api/v1/food` route distinguishes official historical data, modeled outputs, unavailable telemetry, scenarios, and forbidden claims;
+- the active Next `/api/v1/food` route separates official baseline data, modeled outputs, unavailable telemetry, scenarios, and forbidden claims;
 - `buildProductionBand` already exposes source coverage, readiness, operator approval, no auto-dispatch, and reason codes;
-- the pilot score endpoint accepts measured records rather than fabricating outcomes;
-- the CS1 role explicitly requires baseline-first evaluation, uncertainty honesty, abstention, operator usefulness, and measurable pilot design.
+- the pilot score endpoint accepts measured service records rather than fabricating outcomes;
+- the CS1 role already requires baseline-first evaluation, uncertainty honesty, abstention, operator usefulness, and measurable pilot design.
 
-The important weaknesses are architectural rather than cosmetic:
+The main weaknesses are architectural:
 
-- the current TypeScript production band uses fixed signal weights and fixed multiplicative band factors without an explicit policy/version object;
-- readiness is driven mainly by source availability, while model/data validation state is not represented as a separate dimension;
-- the Python `/food` endpoint exposes pre-pilot “potential waste saved” and “cost saved” values derived from an assumed buffer, creating a claim-boundary inconsistency;
-- the Python demand model trains from `GENERATED_DATA_DIR`, so its outputs cannot be treated as validation against real cafeteria demand;
-- Python and Next can independently describe food decisions, which risks semantic drift;
-- no shared baseline-evaluation harness currently determines whether additional model complexity beats realistic alternatives;
-- uncertainty semantics do not yet distinguish heuristic planning ranges from statistically calibrated predictive intervals;
-- operator overrides can be measured in the pilot but are not yet a first-class decision-feedback event.
+- current TypeScript signal weights and band factors are fixed heuristics without a versioned policy object;
+- readiness is driven mainly by source availability while method/data validation state is not a separate dimension;
+- the Python `/food` endpoint exposes pre-pilot potential waste/cost savings derived from an assumed buffer;
+- the Python demand model trains from `GENERATED_DATA_DIR`, so it cannot be described as validated against real cafeteria demand;
+- Python and Next can independently describe food decisions, creating semantic-drift risk;
+- no shared baseline-evaluation harness determines whether model complexity beats realistic alternatives;
+- uncertainty semantics do not yet distinguish a heuristic planning range from a statistically calibrated predictive interval;
+- operator overrides are measured only as pilot fields rather than first-class feedback events;
+- reproducibility metadata, drift monitoring, and method eligibility are not yet first-class artifacts.
 
 ## 3. Design Goals
-
-The implementation must provide all of the following.
 
 ### 3.1 Decision integrity
 
 Every recommendation must state:
 
-- what service / decision it refers to,
-- what information was available at decision time,
-- which forecast / baseline method generated the estimate,
-- what uncertainty representation is being used,
-- which policy converted the estimate into a planning action,
-- why the recommendation is actionable, review-only, or withheld,
-- whether operator approval is required,
-- what evidence class supports each material value.
+- service / decision identity,
+- information available at decision time,
+- method generating the estimate,
+- uncertainty representation and semantics,
+- policy producing the planning action,
+- readiness state and reason codes,
+- operator-approval requirement,
+- provenance class for material values,
+- evaluation / validation state.
 
 ### 3.2 Baseline-first evaluation
 
-The learned model is one candidate, not the default winner. A method is operationally eligible only after comparison against meaningful baselines on time-respecting evaluation data.
+The learned model is one candidate, not the default winner. Simple operational alternatives must compete on the same time-safe evaluation rows. If a baseline wins, the system uses or recommends the baseline.
 
 ### 3.3 Honest uncertainty
 
-The system may expose a heuristic planning range before calibration exists, but that range must be labeled as a policy heuristic. Terms such as “confidence interval”, “90% interval”, or “calibrated uncertainty” are forbidden unless the relevant calibration evaluation exists.
+A heuristic planning range may exist before statistical calibration, but it must be labeled `POLICY_HEURISTIC` and `calibrated: false`. Terms such as “confidence interval”, “90% interval”, and “calibrated uncertainty” are forbidden without calibration evidence.
 
 ### 3.4 Safe abstention
 
-`WITHHOLD` is a valid product outcome. Missing, stale, contradictory, out-of-domain, or inadequately validated information can prevent a recommendation.
+`WITHHOLD` is a valid product outcome. Missing, stale, contradictory, out-of-domain, safety-blocked, or inadequately validated contexts can prevent an operational recommendation.
 
-### 3.5 Human decision support, not autonomous kitchen control
+### 3.5 Human decision support
 
-The product may recommend, explain, and record operator action. It must not automatically dispatch a production order during the application/pilot stage.
+During the application and pilot stages, BOUNCAMPUS may recommend, explain, and record operator action. It must not automatically dispatch production orders.
 
 ### 3.6 Measurable learning loop
 
-Operator overrides, actual production, actual served portions, waste, early sell-out, source outages, and method identity must be recordable so the next evaluation can learn from real decisions rather than screenshots.
+Recommendations, source state, model version, operator actions, actual production, served portions, waste, sell-out, and exclusions must be linkable by stable IDs.
 
 ### 3.7 Claim firewall
 
-No endpoint or UI surface may transform model output, a scenario, or a policy heuristic into achieved environmental or financial impact.
+No model output, scenario, generated-data result, or heuristic may be transformed into achieved environmental or financial impact without measured evidence.
 
 ## 4. Explicit Non-Goals
 
-This design does **not** require, before real target data exists:
+Before appropriate real target data exists, the architecture does not require:
 
-- a deep-learning model,
-- a statistically calibrated interval,
-- a causal claim that BOUNCAMPUS reduces waste,
-- automated kitchen dispatch,
+- deep learning,
+- calibrated predictive intervals,
+- causal claims of waste reduction,
+- autonomous kitchen control,
 - student-level tracking,
-- fabricated historical POS records,
-- arbitrary complexity added for presentation value.
+- fabricated historical POS data,
+- numeric economic loss weights presented as learned facts.
 
-The architecture supports these capabilities only when evidence justifies them.
+The architecture may later support such capabilities only when evidence supports promotion.
 
 ## 5. Research-Informed Principles
 
-The implementation follows several findings from forecasting and decision-support literature:
+The design follows several lessons from forecasting and decision-support literature:
 
-1. **Simple methods remain serious competitors.** Restaurant forecasting studies show that simpler linear/statistical approaches can be competitive depending on the horizon and data, so the system must benchmark rather than assume complex ML wins.
-2. **Prediction accuracy alone is insufficient.** Operational decisions should be evaluated against the cost and utility of the downstream decision, not only one generic forecasting metric.
-3. **Human review must be measured, not romanticized.** Human adjustments can help or hurt depending on context. Overrides therefore become logged evidence rather than assumed improvement.
-4. **Abstention and calibration are separate capabilities.** A model can be accurate on average yet badly calibrated on important cases. The system must evaluate calibration and selective risk before using probabilistic confidence operationally.
-5. **Probabilistic forecasts should be judged by decision value as well as statistical quality.** If a probabilistic method improves coverage but produces worse operational choices, it should not win the decision layer.
+1. **Simple methods are serious competitors.** Restaurant forecasting work shows that simpler methods can remain competitive depending on data and horizon; complexity must earn its place.
+2. **Forecast accuracy alone is not enough.** Operational usefulness depends on the downstream decision, asymmetric error costs, and service guardrails.
+3. **Human review must be measured.** Human adjustments can help or hurt depending on context, so overrides become evidence rather than assumed improvement.
+4. **Abstention and calibration are separate capabilities.** High average accuracy does not guarantee trustworthy uncertainty on the cases that matter.
+5. **Probabilistic forecasts should be evaluated for decision utility as well as statistical quality.** Better interval metrics do not automatically mean better operational choices.
 
 ### Research references
 
@@ -116,18 +120,16 @@ The implementation follows several findings from forecasting and decision-suppor
 - Elena Revilla, M. Saenz, Matthias Seifert, Ye Ma (2023), *Human–Artificial Intelligence Collaboration in Prediction: A Field Experiment in the Retail Industry*, Journal of Management Information Systems 40, 1071–1098. https://consensus.app/papers/human–artificial-intelligence-collaboration-in-revilla-saenz/ef59fcab5b125edca2b21e758c6dcc4a/?utm_source=chatgpt
 - Sheng-Jie Wang, Yanfei Kang, F. Petropoulos (2023), *Combining probabilistic forecasts of intermittent demand*, European Journal of Operational Research 315, 1038–1048. https://consensus.app/papers/combining-probabilistic-forecasts-of-intermittent-wang-kang/c064a03c698956eb838b7e5051b449fb/?utm_source=chatgpt
 
-## 6. System Architecture
-
-The decision system is organized as a pipeline with explicit boundaries:
+## 6. Architecture
 
 ```text
 Source Adapters
     ↓
 Decision-Time Signal Snapshot
     ↓
-Forecast Candidate Layer ──→ Baseline Candidate Layer
-    ↓                           ↓
-Forecast Evaluation / Eligibility Registry
+Forecast Candidates ↔ Baseline Candidates
+    ↓
+Time-Safe Evaluation + Method Eligibility Registry
     ↓
 Uncertainty Representation
     ↓
@@ -144,26 +146,26 @@ Pilot Measurement + Evaluation
 Evidence / Claim Promotion
 ```
 
-No later layer may silently invent evidence that an earlier layer does not provide.
+Each boundary has a versioned contract. The active Next runtime orchestrates product decisions; Python is responsible for model/offline analytics and must not independently create stronger claims.
 
-## 7. Truth and Provenance Model
+## 7. Provenance Model
 
-Every material value must carry or inherit one of these classes:
+Every material value must carry or inherit one of:
 
-- `OFFICIAL_PUBLIC`: value copied from an official public source;
-- `MEASURED_OPERATIONAL`: value measured in an authorized pilot or operational system;
-- `MODEL_ESTIMATE`: output produced by a predictive model;
-- `BASELINE_ESTIMATE`: output produced by an explicit baseline method;
-- `POLICY_HEURISTIC`: value created by a transparent decision rule that has not been statistically learned or calibrated;
-- `SCENARIO`: user-selected what-if calculation;
-- `GENERATED_SANDBOX`: synthetic/generated data or an output dependent on such data;
-- `UNAVAILABLE`: value not currently observed.
+- `OFFICIAL_PUBLIC`
+- `MEASURED_OPERATIONAL`
+- `MODEL_ESTIMATE`
+- `BASELINE_ESTIMATE`
+- `POLICY_HEURISTIC`
+- `SCENARIO`
+- `GENERATED_SANDBOX`
+- `UNAVAILABLE`
 
-`GENERATED_SANDBOX` may demonstrate software behavior and experiment plumbing. It may not be promoted into measured performance or an achieved impact claim.
+`GENERATED_SANDBOX` can prove software plumbing works. It cannot prove real forecasting performance, pilot readiness, or achieved impact.
 
 ## 8. Decision-Time Signal Snapshot
 
-A source being present is not enough. Each signal snapshot must capture:
+Source presence is insufficient. Each signal must represent data quality at the decision timestamp.
 
 ```ts
 type DecisionSignal = {
@@ -182,21 +184,15 @@ type DecisionSignal = {
 };
 ```
 
-Initial food-decision candidates include:
+Food-decision candidates include schedule, academic calendar, menu, weather, events, historical meal/service counts when available, and explicitly recorded operator context.
 
-- course schedule,
-- academic calendar,
-- menu,
-- weather,
-- event context,
-- historical service counts when later available,
-- operator-supplied context when explicitly recorded.
+A feature may be used only if it would have been available at the real decision time. This rule prevents temporal leakage from future-known information.
 
-Signal importance is **not** hard-coded as scientific truth. A policy may currently assign heuristic weights, but those weights must be versioned and labeled `POLICY_HEURISTIC` until experiments justify them.
+Signal weights, when used before evidence exists, are versioned policy heuristics rather than learned importance.
 
-## 9. Forecast Candidate Layer
+## 9. Forecast Candidate Registry
 
-Forecasting becomes a registry of candidate methods. Each method exposes a common interface:
+All estimators implement a common result contract.
 
 ```ts
 type ForecastCandidateResult = {
@@ -205,16 +201,16 @@ type ForecastCandidateResult = {
   target: 'MEALS_SERVED';
   horizon: string;
   pointEstimate: number | null;
-  interval: PredictiveInterval | null;
+  predictiveInterval: PredictiveInterval | null;
   provenance: ProvenanceClass;
   trainingDataClass: 'GENERATED' | 'MEASURED' | 'MIXED' | 'NONE';
   featureIds: string[];
-  eligibleForDecision: boolean;
+  eligibilityState: MethodEligibility;
   eligibilityReasons: string[];
 };
 ```
 
-Candidate methods should include, as data allows:
+Candidate methods, as data permits:
 
 1. same comparable service / same weekday,
 2. recent median,
@@ -223,17 +219,46 @@ Candidate methods should include, as data allows:
 5. menu-conditioned simple baseline,
 6. operator estimate captured during PMR/pilot,
 7. current XGBoost model,
-8. later quantile / probabilistic candidates only when real target data supports them.
+8. later quantile / probabilistic methods.
 
-The current XGBoost path depends on generated cafeteria data and must therefore be classified as `GENERATED_SANDBOX` until trained/evaluated on an acceptable measured target dataset.
+The current XGBoost path is trained from generated cafeteria data and is therefore `GENERATED_SANDBOX` / `SANDBOX_ONLY` until trained and evaluated on acceptable measured targets.
 
-## 10. Time-Safe Baseline Evaluation
+## 10. Method Eligibility and Reproducibility
 
-Offline evaluation must prevent leakage. Random train/test shuffling is not the default for service forecasting.
+Method eligibility states:
 
-The evaluator uses chronological or rolling-origin splits when timestamps exist. Each candidate is evaluated on exactly the same eligible service rows.
+- `SANDBOX_ONLY`
+- `EVALUATED_OFFLINE`
+- `PILOT_ELIGIBLE`
+- `PILOT_EVALUATED`
+- `RETIRED`
 
-Core metrics:
+Every evaluation artifact must include:
+
+- method ID and version,
+- git commit SHA,
+- dataset ID / provenance class,
+- dataset checksum or immutable artifact identifier when possible,
+- target definition,
+- feature list,
+- decision-time cutoff rule,
+- split definition,
+- evaluation window,
+- metrics,
+- baseline IDs,
+- exclusions / missingness,
+- generated-vs-measured label,
+- eligibility conclusion.
+
+A method cannot become `PILOT_ELIGIBLE` from generated data alone.
+
+## 11. Time-Safe Baseline Evaluation
+
+Random shuffling is not the default for service forecasting. Evaluation uses chronological or rolling-origin splits when timestamped data exists.
+
+Every candidate is scored on the same eligible rows.
+
+Core forecast metrics:
 
 - MAE,
 - WAPE,
@@ -242,9 +267,9 @@ Core metrics:
 - median absolute error,
 - large-underforecast incidence,
 - large-overforecast incidence,
-- error by cafeteria / meal type / weekday where sample size permits.
+- segmented errors by cafeteria / meal type / weekday where sample size supports interpretation.
 
-Decision metrics become available only when the corresponding measured outcomes exist:
+Decision metrics are computed only when corresponding measured outcomes exist:
 
 - waste kg / 100 served,
 - overproduction rate,
@@ -252,25 +277,13 @@ Decision metrics become available only when the corresponding measured outcomes 
 - operator override rate,
 - service-level decision loss.
 
-A model is not promoted because it has a lower training loss. The evaluation registry records whether it beats a meaningful baseline and on what dataset.
+A complex model is not promoted because of training loss or one cherry-picked metric.
 
-### Eligibility states
+## 12. Uncertainty Model
 
-- `SANDBOX_ONLY`: software/demo use only;
-- `EVALUATED_OFFLINE`: evaluated on acceptable real targets but not yet operator-piloted;
-- `PILOT_ELIGIBLE`: meets predefined offline gates and can be used in a human-reviewed pilot;
-- `PILOT_EVALUATED`: has measured pilot outcome evidence;
-- `RETIRED`: kept for reproducibility but not selectable.
+### 12.1 Heuristic planning range
 
-## 11. Uncertainty Model
-
-The design separates two different objects.
-
-### 11.1 Planning range
-
-A planning range may be generated from policy heuristics before calibrated uncertainty exists.
-
-Required metadata:
+Before calibration, operational policy may define a planning range:
 
 ```ts
 type PlanningRange = {
@@ -284,11 +297,11 @@ type PlanningRange = {
 };
 ```
 
-It must never be called a confidence interval.
+A heuristic planning range **does not by itself force `REVIEW_REQUIRED`**. It may be used in an operator-reviewed pilot if the forecast method is `PILOT_ELIGIBLE`, the heuristic is explicitly versioned/pre-registered, sensitivity is acceptable, required sources are healthy, and all pilot guardrails pass. The system must still label the range as uncalibrated.
 
-### 11.2 Predictive interval
+### 12.2 Predictive interval
 
-A predictive interval is allowed only when produced by an evaluated probabilistic method.
+A statistical predictive interval is allowed only after evaluated probabilistic forecasting.
 
 ```ts
 type PredictiveInterval = {
@@ -302,26 +315,26 @@ type PredictiveInterval = {
 };
 ```
 
-Candidate approaches later include quantile regression, conformal intervals, or other justified methods. Promotion requires empirical coverage checks on held-out chronological data.
+Potential future methods include quantile regression and conformal intervals. Promotion requires held-out chronological empirical coverage checks.
 
-### 11.3 Selective risk
+### 12.3 Selective risk
 
-Once calibrated uncertainty exists, the evaluator should report a risk–coverage curve: how error changes as the system abstains on increasingly uncertain cases. A single confidence threshold without such evaluation must not be described as “safe”.
+When a meaningful uncertainty score exists, evaluation should include a risk–coverage curve showing the tradeoff between abstention rate and error on accepted decisions. A raw confidence threshold without calibration/selective-risk evidence must not be described as safe.
 
-## 12. Decision Policy and Asymmetric Risk
+## 13. Decision Policy and Asymmetric Risk
 
-The decision layer must not simply return forecast × 1.05 and call it optimization.
+The decision layer must not equate “forecast × fixed buffer” with optimization.
 
-It receives:
+Inputs:
 
-- forecast candidate result,
+- selected forecast/baseline,
 - source snapshot,
 - operational constraints,
-- current policy version,
-- known model validation state,
+- policy version,
+- method validation state,
 - PMR-informed risk assumptions when available.
 
-The abstract objective is:
+Conceptual objective:
 
 ```text
 expected decision loss
@@ -332,102 +345,100 @@ expected decision loss
 + safety_violation_penalty
 ```
 
-Before PMR establishes credible cost ratios, numeric weights are policy hypotheses and must be labeled `POLICY_HEURISTIC`. They may be used for scenario/sensitivity analysis, not presented as learned economics.
+Until PMR supplies credible cost ratios, numeric weights are `POLICY_HEURISTIC`. They may support scenarios and sensitivity analysis, not learned-economic claims.
 
-The policy must support sensitivity analysis over plausible risk ratios. If the recommendation changes drastically under small weight changes, readiness should degrade and the reason should be visible.
+Policy sensitivity is first-class. If small changes in plausible weights cause large target changes, readiness is downgraded and the instability is visible.
 
-## 13. Readiness and Abstention
+## 14. Readiness and Abstention
 
-Readiness combines **source readiness**, **method eligibility**, **uncertainty state**, and **operational constraints**. It is not a synonym for source coverage.
+Readiness combines source readiness, method eligibility, uncertainty/policy state, disagreement, and operational constraints.
 
-Primary states remain:
+States:
 
 - `PILOT_READY`
 - `REVIEW_REQUIRED`
 - `WITHHOLD`
 
-### 13.1 WITHHOLD
+### WITHHOLD
 
 Examples:
 
-- a policy-critical source is missing or stale;
-- no eligible forecast/baseline exists for the requested service;
-- the selected method is outside its supported domain;
-- input values fail integrity checks;
-- contradictory sources create unresolved decision ambiguity;
-- a safety constraint cannot be checked;
-- the only available estimate is sandbox-generated and the request is for a real operational recommendation.
+- critical source missing/stale,
+- no eligible method,
+- out-of-domain request,
+- invalid input,
+- unresolved source contradiction,
+- safety constraint cannot be checked,
+- only sandbox-generated estimates exist for a real operational recommendation.
 
-When `WITHHOLD`, the API may return estimates for diagnostic visibility, but `recommendation.actionable` is false and no production target is presented as an operator action.
+Diagnostic estimates may be returned, but `actionable=false` and no target may be presented as an operational instruction.
 
-### 13.2 REVIEW_REQUIRED
+### REVIEW_REQUIRED
 
 Examples:
 
-- useful context exists but one non-critical source is degraded;
-- only a heuristic planning range exists;
-- the model/baseline disagreement exceeds a policy threshold;
-- policy sensitivity is high;
-- an offline-evaluated model is being shadow-tested rather than piloted.
+- non-critical source degraded,
+- model/baseline disagreement exceeds the policy threshold,
+- policy sensitivity is high,
+- method is in shadow/offline-evaluated state rather than pilot-eligible,
+- heuristic policy is unregistered, changed, or outside its pre-registered range.
 
-### 13.3 PILOT_READY
+### PILOT_READY
 
-Requires all of the following:
+Requires:
 
-- required decision-time signals satisfy policy health rules;
-- the selected method is `PILOT_ELIGIBLE` or better;
-- decision contract and provenance are complete;
-- no safety blocker exists;
-- operator approval is required;
+- required signals pass health rules,
+- selected method is `PILOT_ELIGIBLE` or better,
+- contract/provenance are complete,
+- any heuristic planning policy is explicit and versioned,
+- policy sensitivity stays within the pilot gate,
+- no safety blocker exists,
+- operator approval is mandatory,
 - auto-dispatch is false.
 
-`PILOT_READY` means suitable for an operator-reviewed experiment. It does **not** mean waste reduction is proven.
+`PILOT_READY` means suitable for an operator-reviewed experiment, not validated waste reduction.
 
-## 14. Method Selection and Disagreement
+## 15. Method Selection and Disagreement
 
-The system should not silently switch methods. It returns:
+The system returns selected method, selection rule, compared alternatives, baseline status, and disagreement diagnostics.
 
-- selected method,
-- selection rule,
-- evaluated alternatives,
-- baseline comparison state,
-- disagreement diagnostics.
+Initial selection logic:
 
-An initial selection policy may be:
+1. consider only methods eligible for the requested stage;
+2. prefer a method that beats the designated operational baseline under the registered primary offline metric and does not violate guardrails;
+3. if no complex method beats the baseline, select the baseline;
+4. if no acceptable evaluation exists, remain review-only or withhold;
+5. if eligible methods disagree beyond a versioned threshold, expose disagreement and require review.
 
-1. prefer the highest-eligible method that beats the designated operational baseline on the registered primary offline metric;
-2. if no complex method beats the baseline, use the baseline;
-3. if no acceptable evaluation exists, remain review-only or withhold depending on context;
-4. if methods disagree beyond a configured threshold, expose the disagreement and require review.
+“Simple baseline wins” is a valid and desirable result.
 
-This makes “simple baseline wins” a valid system outcome.
+## 16. Explanation Contract
 
-## 15. Explanation Contract
+Explanations must derive from actual computation and state.
 
-Explanations must be generated from actual inputs and policy decisions, not decorative copy.
+Possible explanation components:
 
-A recommendation explanation may include:
-
-- selected method and why it was selected,
-- sources used / missing / stale,
-- forecast-vs-baseline difference,
-- active policy heuristic,
-- decision constraint that changed the target,
-- uncertainty / planning-range semantics,
-- readiness downgrade reasons,
+- method selected and why,
+- baseline comparison,
+- source used/missing/stale,
+- actual policy rule applied,
+- constraint that changed the target,
+- uncertainty/planning-range semantics,
+- readiness downgrade reason,
 - operator-review requirement.
 
-Reason codes are machine-readable and stable; display text may evolve independently.
+Reason codes are stable machine-readable identifiers; display copy can evolve separately.
 
-## 16. Canonical Decision Contract
+## 17. Canonical Decision Contract
 
-A versioned language-neutral schema becomes the contract source of truth. TypeScript and Python models conform to it.
+A language-neutral versioned JSON schema is the contract source of truth.
 
 Representative response:
 
 ```json
 {
   "schemaVersion": "food-decision-v1",
+  "decisionId": "2026-10-01:B-SOUTH-GY:lunch:food-policy-v1",
   "service": {
     "serviceId": "2026-10-01:B-SOUTH-GY:lunch",
     "date": "2026-10-01",
@@ -472,24 +483,24 @@ Representative response:
 }
 ```
 
-Exact numeric example values are illustrative contract examples, not performance claims.
+Values are illustrative contract examples, not performance claims.
 
-## 17. Runtime Responsibility Split
+## 18. Runtime Responsibility Split
 
-### 17.1 Next / TypeScript — product decision runtime
+### Next / TypeScript — authoritative product decision runtime
 
-The active Next API is the authoritative product orchestration layer for:
+The active Next product owns:
 
 - source snapshots,
-- decision contract assembly,
+- contract assembly,
 - readiness / abstention,
-- policy heuristics,
-- explanation and claim boundary,
+- versioned policy application,
+- explanation / claim boundary,
 - pilot score API.
 
-New code should live in focused modules under `frontend/src/lib/decision-intelligence/` rather than allowing `food-waste.ts` to become a monolith.
+Decision logic should move from a growing `food-waste.ts` into focused modules under `frontend/src/lib/decision-intelligence/`.
 
-Recommended module boundaries:
+Recommended modules:
 
 - `contracts.ts`
 - `provenance.ts`
@@ -498,86 +509,31 @@ Recommended module boundaries:
 - `policy.ts`
 - `baselines.ts`
 - `uncertainty.ts`
-- `evaluation.ts`
 - `pilot.ts`
 - `claims.ts`
 - `index.ts`
 
-### 17.2 Python — model and offline evaluation layer
+### Python — model, benchmark, calibration, and offline policy evaluation
 
 Python owns:
 
-- model training / inference,
-- baseline benchmark tooling,
+- model training/inference,
+- baseline benchmarking,
 - chronological evaluation,
 - calibration experiments,
-- offline ablations,
+- signal ablations,
+- policy-sensitivity experiments,
 - model metadata / eligibility artifacts.
 
-Python must not invent achieved impact. The legacy `/food` response must be brought behind the same contract / claim rules or reduced to a compatibility adapter.
+Python may reproduce policy calculations for offline evaluation, but it is not a second authoritative product-policy implementation. If the legacy FastAPI `/food` route remains, it must behave as a compatibility adapter under the shared schema/claim firewall rather than inventing independent semantics.
 
-### 17.3 Shared contract
+### Shared schema
 
-A versioned JSON schema under `contracts/` defines the language-neutral response contract. Contract fixtures are validated in CI from both TypeScript-facing and Python-facing tests where practical.
-
-## 18. Pilot Measurement System
-
-The current matched control/intervention protocol is retained and strengthened.
-
-Required service record fields include:
-
-- date / service ID,
-- arm,
-- method ID / version,
-- forecast point estimate,
-- planning range,
-- selected target shown to operator,
-- operator final target,
-- operator action (`ACCEPT`, `OVERRIDE`, `REJECT`),
-- override reason code,
-- produced portions,
-- served portions,
-- edible surplus kg,
-- waste kg,
-- early sell-out,
-- source-health snapshot ID,
-- notes.
-
-### 18.1 Primary KPI
-
-`waste_kg_per_100_served = waste_kg / served_portions × 100`
-
-This remains the pre-registered primary outcome because it normalizes waste by service volume.
-
-### 18.2 Guardrails
-
-At minimum:
-
-- early-sellout incidence must not worsen materially versus matched control;
-- no food-safety process may be bypassed;
-- missing measurements are reported, not silently imputed into favorable outcomes;
-- operator overrides remain in the dataset;
-- service exclusions require a pre-specified or documented reason.
-
-### 18.3 Pilot interpretation states
-
-Retain conservative language:
-
-- `INSUFFICIENT_EVIDENCE`
-- `PROMISING`
-- `FAILED`
-
-A future `SUPPORTED` or `VALIDATED` state requires a stronger evidence rule and is intentionally absent from the initial application-stage scorecard.
-
-### 18.4 Statistical reporting
-
-For small pilots, report raw service counts, arm means/medians, effect size, and uncertainty without pretending a tiny sample proves a population-level effect. Bootstrap or randomization/permutation intervals may be added as descriptive sensitivity analysis when sample structure permits; they do not override design limitations.
+`contracts/food-decision-v1.schema.json` defines the language-neutral contract. TypeScript and Python-facing fixtures are validated against it in CI.
 
 ## 19. Operator Feedback Loop
 
-Every recommendation event should be addressable by ID. Operator action is stored as a separate event so the original recommendation cannot be rewritten after the fact.
-
-Operator event:
+Original recommendations are immutable events. Operator actions are separate linked events.
 
 ```ts
 type OperatorDecisionEvent = {
@@ -590,197 +546,212 @@ type OperatorDecisionEvent = {
 };
 ```
 
-This enables later analysis of:
+This enables later analysis of whether overrides improve outcomes, which conditions trigger them, and which operator-visible context is missing from the system.
 
-- whether overrides improve accuracy/outcomes,
-- which conditions trigger overrides,
-- whether explanations reduce unnecessary overrides,
-- whether the model misses operator-visible context.
+## 20. Pilot Measurement System
 
-## 20. Experiment Suite
+The current matched control/intervention design is retained and strengthened.
 
-The implementation must support the following evidence-producing experiments rather than a single model demo.
+A measured service record includes:
+
+- service/date/arm,
+- decision ID,
+- method ID/version,
+- forecast point estimate,
+- planning range shown,
+- recommended target,
+- operator final target,
+- operator action and override reason,
+- produced portions,
+- served portions,
+- edible surplus kg,
+- waste kg,
+- early sell-out,
+- source snapshot ID,
+- notes / exclusion reason.
+
+### Primary KPI
+
+`waste_kg_per_100_served = waste_kg / served_portions × 100`
+
+### Guardrails
+
+- early-sellout incidence must not worsen materially versus matched control;
+- food-safety processes cannot be bypassed;
+- missing measurements remain visible;
+- overrides stay in the dataset;
+- exclusions require documented reasons;
+- arm assignment / comparability is not retrospectively changed to improve results.
+
+### Interpretation states
+
+- `INSUFFICIENT_EVIDENCE`
+- `PROMISING`
+- `FAILED`
+
+A stronger `SUPPORTED`/`VALIDATED` state is intentionally absent from the small application-stage pilot.
+
+### Statistical reporting
+
+For small pilots, report sample counts, raw distributions, means/medians, effect size, missingness, and uncertainty without implying population-level proof. Bootstrap or permutation sensitivity may be added when the design supports it, but does not erase small-sample limitations.
+
+## 21. Experiment Suite
 
 ### EXP-CS1-01 — Data lineage audit
 
-Question: which current variables are official, measured, generated, inferred, or unavailable?
-
-Output: machine-readable source/provenance registry and claim implications.
+Classify every decision variable as official, measured, generated, modeled, heuristic, scenario, or unavailable.
 
 ### EXP-CS1-02 — Baseline benchmark
 
-Question: does the candidate model beat realistic simple alternatives on acceptable target data?
-
-Output: chronological benchmark report with metrics and dataset provenance.
+Compare candidate models with realistic simple baselines using time-safe evaluation.
 
 ### EXP-CS1-03 — Signal ablation
 
-Question: which context signals materially improve held-out performance or decision utility?
+Measure which signals improve held-out performance/decision utility; remove signals that add no defensible value.
 
-Output: per-signal delta; remove signals that add complexity without value.
+### EXP-CS1-04 — Source outage and degradation
 
-### EXP-CS1-04 — Source outage / degradation
-
-Question: does the system fail safely when schedule, menu, weather, or calendar data is missing/stale?
-
-Output: readiness state and reason-code matrix.
+Verify safe behavior under missing, stale, and contradictory schedule/menu/weather/calendar data.
 
 ### EXP-CS1-05 — Uncertainty calibration
 
-Question: if intervals are introduced, do empirical coverage and interval width support their stated semantics?
-
-Output: calibration table and risk–coverage analysis.
+If predictive intervals are introduced, test empirical coverage, width, and risk–coverage behavior.
 
 ### EXP-CS1-06 — Policy sensitivity
 
-Question: how sensitive is the recommendation to plausible under/overproduction cost ratios and planning-buffer assumptions?
+Map target changes under plausible under/overproduction cost ratios and buffer assumptions; flag unstable decisions.
 
-Output: target-vs-policy surface and instability flags.
+### EXP-CS1-07 — H-006 operator workflow fit
 
-### EXP-CS1-07 — Operator workflow fit / H-006
-
-Question: can an operator understand, review, override, and use the recommendation within the real workflow without unacceptable service/safety risk?
-
-Output: PMR evidence, objections, decision timing, baseline workflow, override reasons, changed requirements.
+Use PMR to learn decision timing, current baseline, available data, failure costs, override behavior, and safety constraints.
 
 ### EXP-CS1-08 — Measured pilot
 
-Question: does operator-reviewed decision support improve the pre-registered waste KPI without violating sell-out/safety guardrails?
+Test whether operator-reviewed decision support improves the registered waste KPI without violating sell-out/safety guardrails.
 
-Output: measured pilot scorecard and evidence registry entries.
+## 22. Drift and Runtime Observability
 
-## 21. Claim Firewall
+Once measured targets exist, the system records:
 
-The product and CI must enforce four categories.
+- source uptime/freshness,
+- feature missingness,
+- forecast residual distribution,
+- signed bias over rolling windows,
+- baseline-vs-selected-method performance,
+- method-selection frequency,
+- abstention rate,
+- operator override rate and reasons,
+- readiness-state distribution.
+
+Drift alerts are evidence for review, not automatic retraining permission. Retraining requires a new versioned evaluation artifact.
+
+Before real targets exist, observability is limited to source health, contract integrity, and sandbox diagnostics.
+
+## 23. Claim Firewall
 
 ### Allowed before measured pilot evidence
 
-- official historical food-waste totals with source,
-- current source-health state,
-- model/baseline estimates clearly labeled,
-- heuristic planning ranges clearly labeled,
-- what-if scenarios clearly labeled,
-- experiment design and pre-registered target,
-- offline benchmark results when dataset provenance is disclosed.
+- sourced historical food-waste totals,
+- source-health state,
+- labeled model/baseline estimates,
+- labeled heuristic planning ranges,
+- labeled scenarios,
+- pre-registered pilot targets/formulas,
+- offline benchmark results with dataset provenance disclosed.
 
 ### Forbidden before measured evidence
 
 - “BOUNCAMPUS saved X kg of food”;
 - “BOUNCAMPUS saved X TL”;
-- avoided CO2/water attributed to BOUNCAMPUS operation;
+- avoided CO2/water attributed to operation;
 - “actual production optimized” without measured production integration;
-- “actual student demand observed” without real served/POS telemetry;
-- “90% confidence interval” for an arbitrary heuristic band;
-- “validated model” when evaluation used generated data only.
+- “actual student demand observed” without served/POS telemetry;
+- confidence/calibration language for arbitrary heuristic bands;
+- “validated model” when evaluation depends only on generated data.
 
-CI should scan critical active product surfaces and contract fixtures for known forbidden fields / wording and require provenance semantics to remain present.
+CI scans critical active product surfaces and fixtures for known forbidden fields/semantics and verifies required provenance fields remain present.
 
-## 22. Error Handling and Degraded Modes
+## 24. Error Handling and Degraded Modes
 
-The system must degrade explicitly rather than silently substitute facts.
+- official source unavailable → stale snapshot only if staleness is explicit and policy permits it;
+- weather unavailable → mark missing; never synthesize “live” weather for a real decision contract;
+- menu fallback → classify separately from official live menu;
+- model artifact unavailable → use eligible baseline if available, otherwise withhold;
+- generated data only → sandbox rendering allowed, real operational recommendation withheld;
+- invalid pilot measurement → reject with field-level errors;
+- ambiguous service identity → reject rather than attach evidence to the wrong service;
+- shared schema mismatch → fail CI and reject incompatible runtime payloads where validation is active.
 
-Examples:
+## 25. Testing Strategy
 
-- official source unavailable → keep last official snapshot only if staleness is visible and policy permits it;
-- weather source unavailable → mark signal unavailable; never synthesize “live” weather for the decision contract;
-- menu source fallback → classify fallback separately from official live menu;
-- model artifact missing → use an eligible baseline if available, otherwise withhold;
-- generated dataset only → sandbox output may render but cannot become real operator action;
-- invalid pilot measurement → reject the record with field-level errors;
-- ambiguous service ID → reject rather than join measurements to the wrong service.
+### Unit tests
 
-## 23. Testing Strategy
+Cover provenance, freshness, readiness, abstention, heuristic boundaries, asymmetric-cost behavior, method selection, disagreement, claim firewall, operator events, pilot validation, and pilot scoring.
 
-Testing is layered.
+### Contract tests
 
-### 23.1 Unit tests
+Verify:
 
-Cover:
-
-- provenance classification,
-- signal freshness / availability,
-- readiness rules,
-- abstention rules,
-- policy heuristic boundaries,
-- asymmetric-cost behavior,
-- model/baseline selection,
-- disagreement handling,
-- claim firewall,
-- pilot validation / scoring.
-
-### 23.2 Contract tests
-
-Fixtures must verify that:
-
-- Next and Python-facing contracts preserve required fields;
-- `WITHHOLD` cannot accidentally be actionable;
-- `automaticDispatchAllowed` remains false for pilot stage;
+- Next/Python-facing fixtures match the shared schema;
+- `WITHHOLD` cannot be actionable;
+- auto-dispatch remains false;
 - planning ranges cannot claim calibration;
-- generated-data models cannot be promoted to validated operational status;
-- achieved-savings fields do not reappear before measured evidence.
+- generated-data models cannot be promoted to pilot-eligible/validated status;
+- achieved-savings fields cannot reappear before measured evidence.
 
-### 23.3 Evaluation tests
+### Evaluation tests
 
-Synthetic/generated fixtures are allowed to test evaluator mechanics, but output must state that the fixture is not empirical performance evidence.
+Synthetic/generated fixtures may test benchmark mechanics only. Output must explicitly identify them as non-empirical evidence.
 
-### 23.4 Failure-mode tests
+### Failure matrix
 
-Explicit source-outage matrix:
+At minimum test schedule missing, menu missing, weather missing, calendar missing, multiple missing, stale source, contradictory source, model unavailable, model-vs-baseline disagreement, invalid/negative demand, and schema-version mismatch.
 
-- schedule missing,
-- menu missing,
-- weather missing,
-- calendar missing,
-- multiple sources missing,
-- stale source,
-- contradictory source,
-- model unavailable,
-- model-vs-baseline large disagreement,
-- negative / zero / malformed demand.
+## 26. Work Packages and Migration
 
-## 24. Migration Strategy
+The architecture is broad; execution is intentionally split into reviewable, merge-safe work packages under this single spec.
 
-Implementation should be incremental and merge-safe.
+### WP1 — Contract, provenance, and claim integrity
 
-### Phase A — Contract and truth boundary
+- shared schema,
+- unsupported Python savings removal,
+- provenance classes,
+- readiness/abstention semantics,
+- contract/claim regression tests.
 
-- add shared decision schema,
-- remove unsupported Python savings claims,
-- add explicit provenance/readiness semantics,
-- preserve current UI/API fields where compatibility is required.
+**Independent value:** eliminates the most dangerous truth-boundary failures even if later packages are delayed.
 
-### Phase B — Modular decision runtime
+### WP2 — Modular runtime, baselines, and evaluation
 
-- split `food-waste.ts` decision logic into focused modules,
-- make policy version and heuristic semantics explicit,
-- add source freshness / health,
-- prevent generated-data model from being silently treated as validated.
+- modular TS decision runtime,
+- baseline registry,
+- Python chronological evaluator,
+- reproducibility artifact,
+- generated-data eligibility gate,
+- method selection/disagreement.
 
-### Phase C — Baselines and offline evaluation
+**Independent value:** converts the system from “one model” to baseline-first decision intelligence.
 
-- implement baseline registry,
-- add chronological evaluator,
-- write machine-readable model eligibility artifact,
-- support signal ablation and policy sensitivity.
+### WP3 — Operator loop, policy sensitivity, and pilot evidence
 
-### Phase D — Operator and pilot evidence loop
+- operator events,
+- policy sensitivity,
+- enhanced pilot records/scorecard,
+- H-006 workflow-fit experiment contract,
+- source-outage matrix.
 
-- extend pilot records with method/recommendation/operator events,
-- strengthen scorecard completeness/guardrails,
-- preserve raw override behavior.
+**Independent value:** makes real operator learning and pilot evaluation auditable.
 
-### Phase E — Calibrated uncertainty when evidence permits
+### WP4 — Calibrated uncertainty and drift, evidence-gated
 
-- add probabilistic candidate(s),
-- evaluate empirical interval coverage,
-- add risk–coverage analysis,
-- promote interval semantics only if calibration passes.
+- probabilistic candidate(s),
+- calibration evaluation,
+- risk–coverage analysis,
+- residual drift monitoring.
 
-No phase is allowed to claim outcomes from a later phase.
+**Gate:** WP4 must not fabricate calibration using generated data. If suitable measured targets are unavailable, WP4 ships only the evaluation interfaces/tests and remains unpromoted.
 
-## 25. Expected Repository Shape
-
-Likely implementation paths:
+## 27. Expected Repository Shape
 
 ```text
 contracts/
@@ -794,7 +765,6 @@ frontend/src/lib/decision-intelligence/
   policy.ts
   baselines.ts
   uncertainty.ts
-  evaluation.ts
   pilot.ts
   claims.ts
   index.ts
@@ -809,7 +779,7 @@ backend/app/decision/
   provenance.py
   baselines.py
   evaluation.py
-  policy.py
+  policy_eval.py
   uncertainty.py
 
 backend/app/models/
@@ -831,43 +801,44 @@ KREATE/EXPERIMENTS/
   CS1_H006_WORKFLOW_FIT.md
 ```
 
-The implementation plan may combine or omit files when an existing repository pattern is clearly better, but it must preserve the responsibilities above.
+Exact file count may change during planning if existing repository patterns provide a cleaner boundary, but responsibilities and contract semantics may not be silently weakened.
 
-## 26. Acceptance Criteria
+## 28. Application-Stage Acceptance Criteria
 
-The CS1 subsystem is implementation-complete for the application-stage architecture when all of the following hold:
+The implementation is application-stage complete when:
 
-1. a single versioned decision contract describes source state, estimate, planning range/interval semantics, readiness, human gate, reason codes, and claim boundary;
-2. Python no longer exposes unsupported pre-pilot waste/cost savings as achieved or potential product impact;
-3. generated-data-dependent models are visibly sandbox-only until evaluated on acceptable targets;
-4. at least four realistic baseline methods are implemented or the absence of required real target data is explicitly surfaced by the benchmark tool;
-5. evaluation is chronological/time-safe when timestamped data exists;
+1. one versioned decision contract captures source state, estimate, uncertainty semantics, readiness, human gate, reason codes, provenance, and claim boundary;
+2. Python no longer exposes unsupported pre-pilot waste/cost savings;
+3. generated-data-dependent models remain visibly sandbox-only;
+4. realistic baseline methods are implemented where target data allows, and the benchmark tool explicitly reports when target data is insufficient;
+5. evaluation is chronological/time-safe for timestamped data;
 6. model selection can choose a simple baseline when it wins;
-7. arbitrary planning ranges are labeled `POLICY_HEURISTIC` and `calibrated: false`;
+7. heuristic ranges are labeled `POLICY_HEURISTIC`, `POLICY_PLANNING_RANGE`, and `calibrated: false`;
 8. calibrated interval terminology is impossible without calibration metadata;
-9. `WITHHOLD` is tested for critical missing/degraded contexts;
-10. operator approval is mandatory and automatic dispatch remains disabled;
-11. operator override events can be represented without rewriting the original recommendation;
-12. pilot scoring validates measured inputs, primary KPI, sell-out guardrail, override rate, and evidence sufficiency;
-13. claim-firewall tests prevent reintroduction of unmeasured savings fields / validated-language leaks;
-14. TypeScript typecheck/lint/build and repository Python validation remain green;
-15. application-facing claims can be traced to official source, model result, policy heuristic, or measured pilot evidence without category mixing.
+9. `WITHHOLD` is exercised under critical failure states;
+10. operator approval is mandatory and auto-dispatch disabled;
+11. operator override events are separate from original recommendations;
+12. pilot scoring validates measured inputs, KPI, sell-out guardrail, overrides, missingness, and evidence sufficiency;
+13. claim-firewall tests prevent unmeasured savings / validated-language leaks;
+14. method evaluation artifacts are reproducible and versioned;
+15. TypeScript and Python CI gates remain green;
+16. application-facing claims can be traced to official source, model result, baseline result, policy heuristic, scenario, or measured pilot evidence without category mixing.
 
-## 27. Deferred Promotion Gates
+## 29. Deferred Promotion Gates
 
-These capabilities remain architecturally supported but cannot be promoted until evidence exists:
+Architecturally supported but not promotable without evidence:
 
 - calibrated predictive intervals,
 - learned asymmetric cost coefficients,
-- validated signal importance,
+- validated feature importance,
 - real operator-vs-model performance comparison,
 - measured food-waste reduction,
 - financial savings,
 - environmental impact attribution,
 - autonomous production control.
 
-Their absence is not a product failure. Pretending they already exist would be.
+Not having these yet is acceptable. Pretending to have them is not.
 
-## 28. Final Design Decision
+## 30. Final Design Decision
 
-BOUNCAMPUS CS1 will be implemented as an **evidence-aware decision intelligence system** rather than a single forecasting model. Forecasts, baselines, policy heuristics, operator judgment, uncertainty, source health, pilot measurements, and impact claims remain separate but connected layers. The architecture is intentionally capable of becoming more sophisticated, yet every promotion in sophistication requires stronger evidence rather than stronger wording.
+BOUNCAMPUS CS1 will be an **evidence-aware decision intelligence system**, not a single forecasting model. Forecasts, baselines, policy heuristics, uncertainty, operator judgment, source health, measurements, and impact claims remain separate but connected layers. More sophisticated methods may be added, but every promotion in sophistication requires stronger evidence rather than stronger wording.
