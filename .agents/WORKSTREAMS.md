@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| quality-release | `agent/quality-release/kreate-team-os` | Execution systems engineer | ACTIVE | Bootstrap the minimal KREATE application/PMR collaboration and evidence system without changing product behavior. | `.agents/WORKSTREAMS.md`; `KREATE/**`; `.github/ISSUE_TEMPLATE/kreate-task.yml`; `.github/PULL_REQUEST_TEMPLATE.md`; `scripts/kreate_check.py` |
+| quality-release | `agent/quality-release/kreate-team-os` | Execution systems engineer | ACTIVE | Bootstrap the minimal KREATE application/PMR collaboration and evidence system without changing product behavior. | `.agents/WORKSTREAMS.md`; `KREATE/**`; `.github/ISSUE_TEMPLATE/kreate-task.yml`; `.github/PULL_REQUEST_TEMPLATE.md`; `.github/workflows/ci.yml`; `scripts/kreate_check.py` |
 
 The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
 
