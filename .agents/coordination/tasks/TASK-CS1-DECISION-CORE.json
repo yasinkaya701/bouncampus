@@ -4,9 +4,9 @@
   "title": "Build CS1 food decision integrity core",
   "priority": "P0",
   "lane": "api-product",
-  "state": "READY",
-  "owner_agent": null,
-  "branch": null,
+  "state": "CLAIMED",
+  "owner_agent": "cs1-decision-intelligence",
+  "branch": "agent/api-product/cs1-decision-core",
   "depends_on": [],
   "touched_paths": [
     "backend/app/decision/food_policy.py",
@@ -38,8 +38,8 @@
     "decided_at": null
   },
   "lease": {
-    "claimed_at": null,
-    "heartbeat_at": null,
+    "claimed_at": "2026-09-30T19:46:00Z",
+    "heartbeat_at": "2026-09-30T19:46:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
