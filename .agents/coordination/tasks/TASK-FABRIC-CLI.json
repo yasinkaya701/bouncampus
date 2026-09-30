@@ -4,7 +4,7 @@
   "title": "Add mechanical agent task claim and transition CLI",
   "priority": "P0",
   "lane": "quality-release",
-  "state": "ACTIVE",
+  "state": "READY_FOR_INTEGRATION",
   "owner_agent": "execution-systems-engineer",
   "branch": "agent/quality-release/fabric-task-cli",
   "depends_on": [],
@@ -36,7 +36,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T16:53:00Z",
-    "heartbeat_at": "2026-09-30T16:53:00Z",
+    "heartbeat_at": "2026-09-30T16:57:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -48,6 +48,7 @@
   },
   "notes": [
     "This task intentionally does not touch .agents/FABRIC.md, which remains owned by the blocked direct-push recovery task.",
-    "The CLI operates on a checked-out agent-coordination task store and relies on git/GitHub commit conflict semantics for remote atomicity."
+    "The CLI operates on a checked-out agent-coordination task store and relies on git/GitHub commit conflict semantics for remote atomicity.",
+    "Implementation is merged with latest master through branch head 00a8f4194790d2c67de1f16335bcf1f64a24db8b and is ready for exact-head integration CI."
   ]
 }
