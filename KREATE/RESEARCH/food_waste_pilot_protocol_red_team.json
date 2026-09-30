@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "status": "METHODOLOGY_RESEARCH_ADDENDUM",
+  "target_protocol": "docs/food-waste-pilot-protocol.md",
+  "strengths_to_keep": [
+    "service_level_unit_of_analysis",
+    "control_vs_intervention",
+    "human_operator_review",
+    "physical_waste_measurement",
+    "normalized_primary_kpi",
+    "sellout_guardrail",
+    "operator_override_tracking",
+    "claim_firewall"
+  ],
+  "critical_risks": [
+    "five_services_per_arm_is_not_power_calculation",
+    "ten_percent_target_is_policy_target_not_statistical_threshold",
+    "sequential_control_then_intervention_time_confounding",
+    "served_portions_is_censored_demand_under_sellout",
+    "sellout_boolean_lacks_severity",
+    "undifferentiated_waste_can_miss_production_mechanism",
+    "kg_per_served_can_be_confounded_by_menu_mass",
+    "measurement_reliability_requires_QA",
+    "operator_override_needs_predeclared_analysis",
+    "missing_and_exclusion_rules_need_preregistration"
+  ],
+  "recommended_required_fields": [
+    "date",
+    "service_id",
+    "campus",
+    "meal_period",
+    "service_regime",
+    "menu_class",
+    "arm",
+    "operator_baseline_planned_qty",
+    "model_forecast_meals",
+    "model_recommended_low",
+    "model_recommended_high",
+    "final_approved_qty",
+    "operator_action",
+    "production_lock_timestamp",
+    "produced_portions",
+    "served_portions",
+    "early_sellout",
+    "sellout_timestamp",
+    "service_end_timestamp",
+    "forced_substitution_event",
+    "emergency_batch_event",
+    "service_delay_minutes",
+    "estimated_unserved_demand_if_available",
+    "preparation_waste_kg",
+    "unserved_edible_surplus_kg",
+    "plate_waste_kg",
+    "other_waste_kg",
+    "measurement_complete",
+    "measurement_issue_code",
+    "notes"
+  ],
+  "censoring_rule": "if early sellout occurs, served_portions is a lower bound on demand; ordinary forecast APE against served_portions must not be treated as full-demand forecast error",
+  "preferred_designs": [
+    "interleaved_matched_service_pairs",
+    "blocked_crossover_by_repeated_meal_context",
+    "sequential_quasi_experiment_only_if_operationally_required"
+  ],
+  "measurement_QA": [
+    "same_scale_where_possible",
+    "document_tare_procedure",
+    "label_category_containers",
+    "same_category_definitions_across_arms",
+    "rehearse_unscored_service",
+    "record_measurement_timestamp",
+    "record_missing_spillage_contamination",
+    "lock_units"
+  ],
+  "analysis_rules": [
+    "primary analysis keeps intervention-assigned services even when operator edits or holds recommendation",
+    "override modes reported separately as diagnostics",
+    "predeclare missing and exclusion rules",
+    "shadow recommendations on control can be computed only if hidden from operator before decision lock",
+    "do not claim statistical proof from arbitrary small minimum sample",
+    "do not convert pilot forecast accuracy directly into climate or economic impact"
+  ],
+  "protocol_upgrade_gate": [
+    "exploratory_vs_powered_decision",
+    "intervention_assignment_scheme",
+    "primary_production_relevant_waste_boundary",
+    "sellout_censoring_rule",
+    "service_severity_guardrails",
+    "current_operator_baseline_field",
+    "shadow_control_policy",
+    "override_analysis_rule",
+    "missing_exclusion_rules",
+    "measurement_QA_procedure"
+  ],
+  "academic_references": [
+    "https://consensus.app/papers/food-waste-in-school-canteens-a-reference-methodology-for-boschini-falasconi/75e74e10a5f855e288b6d3cfb8597d5e/?utm_source=chatgpt",
+    "https://consensus.app/papers/why-the-waste-a-largescale-study-on-the-causes-of-food-waste-boschini-falasconi/62a0bfdeedb85a509104d2d0295538fd/?utm_source=chatgpt",
+    "https://consensus.app/papers/from-evaluation-to-action-testing-nudging-strategies-to-vidal-mones-díaz-ruíz/7a8861096e3854b98bb84176bc09869f/?utm_source=chatgpt"
+  ]
+}
