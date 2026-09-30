@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "TASK-DIRECT-PUSH-RECOVERY",
+  "title": "Recover green master provenance after unauthorized direct push",
+  "priority": "P0",
+  "lane": "quality-release",
+  "state": "ACTIVE",
+  "owner_agent": "execution-systems-engineer",
+  "branch": "agent/quality-release/direct-push-recovery",
+  "depends_on": [],
+  "touched_paths": [
+    ".agents/FABRIC.md"
+  ],
+  "acceptance_criteria": [
+    "Document autonomous recovery procedure for a direct-master-push incident",
+    "Current master state is revalidated through the single integration PR",
+    "Post-merge master-merge-audit succeeds",
+    "Task reaches MERGED_VERIFIED with PR/head/merge/post-merge evidence"
+  ],
+  "validation_commands": [
+    "python scripts/agent_fabric_check.py",
+    "python scripts/test_agent_fabric_check.py",
+    "python scripts/verify_feature_preservation.py",
+    "python scripts/kreate_check.py",
+    "cd frontend && npm run typecheck && npm run lint && npm run build"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-09-30T16:44:00Z",
+    "heartbeat_at": "2026-09-30T16:44:00Z",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Triggered because master commit baf1bb6fb61df396c4922d7c1cfae85f838bdd14 was pushed directly after PR #33, causing master-merge-audit failure in CI #254.",
+    "This task is autonomous; the separate branch-protection administration task remains the only human gate."
+  ]
+}
