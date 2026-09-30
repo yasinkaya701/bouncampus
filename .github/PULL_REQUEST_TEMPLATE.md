@@ -26,6 +26,7 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 ## Validation
 
 - [ ] `python scripts/verify_feature_preservation.py --base-ref <master-sha>`
+- [ ] `python scripts/kreate_check.py`
 - [ ] `cd frontend && npm ci --no-audit --no-fund`
 - [ ] `cd frontend && npm run typecheck`
 - [ ] `cd frontend && npm run lint`
