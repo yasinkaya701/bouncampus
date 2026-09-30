@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "TASK-BOGAZICI-FOOD-OPS-DEEP-DIVE",
+  "title": "Deep-research Boğaziçi food operations and procurement",
+  "priority": "P0",
+  "lane": "campus-data-geo",
+  "state": "READY_FOR_INTEGRATION",
+  "owner_agent": "research-evidence",
+  "branch": "agent/campus-data-geo/bogazici-food-ops-deep-dive",
+  "depends_on": [],
+  "touched_paths": [
+    "KREATE/RESEARCH/README.md",
+    "KREATE/RESEARCH/BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md",
+    "KREATE/RESEARCH/BOGAZICI_SOURCE_RECONCILIATION.md",
+    "KREATE/RESEARCH/BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md",
+    "KREATE/RESEARCH/bogazici_food_operations_deep_dive.json",
+    "KREATE/RESEARCH/bogazici_food_procurement_2026_2027.json"
+  ],
+  "acceptance_criteria": [
+    "Official Boğaziçi food-service governance, digital signals, service regimes and procurement structure are mapped with provenance and caveats",
+    "Public clues about BUCard/QR/menu votes are never promoted to claims of private data access",
+    "Official-source metric conflicts are preserved in a reconciliation artifact rather than silently normalized",
+    "Current successful 2026-2027 tender is distinguished from the cancelled predecessor by IKN",
+    "Procurement quantities, unit-price structure, daily capacity requirement and contract value are represented without treating contract value as food-waste cost",
+    "IE, EE, CS1 and CS2 receive actionable PMR/data/model handoffs",
+    "Machine-readable JSON companions expose findings, source conflicts, candidate data, contract unknowns and role handoffs"
+  ],
+  "validation_commands": [
+    "python -m json.tool KREATE/RESEARCH/bogazici_food_operations_deep_dive.json",
+    "python -m json.tool KREATE/RESEARCH/bogazici_food_procurement_2026_2027.json",
+    "python scripts/kreate_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-10-01T00:00:00+03:00",
+    "heartbeat_at": "2026-10-01T00:00:00+03:00",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": "242347ff956276b20703e0e916b084fe955047c2",
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Secondary/public-source research only; it must not be counted as PMR or pilot evidence.",
+    "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md because those are shared/high-conflict claim-policy surfaces and active CS1 work has owned them.",
+    "Successful current tender is IKN 2025/1727143; cancelled predecessor IKN 2025/1335958 is retained only as provenance warning.",
+    "Master promotion must follow the CS2 role integration topology and must not overwrite concurrent role/governance work."
+  ]
+}
