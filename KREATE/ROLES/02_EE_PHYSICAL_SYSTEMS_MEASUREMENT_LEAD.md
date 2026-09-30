@@ -2,128 +2,185 @@
 
 ## Mission
 
-Own the question: **Can BOUNCAMPUS observe the physical world reliably enough to support better operational decisions, and what is the most practical way to do that?**
+Own the persistent `HUMAN-EE` workstream and answer:
 
-This role is not limited to building a smart scale. The EE lead owns physical measurement strategy, instrumentation feasibility, hardware/software boundaries, sensor selection, installation constraints, data integrity, and pilot measurement design.
+> **Can BOUNCAMPUS observe the physical world reliably enough to support better operational decisions, and what is the simplest defensible way to do that?**
 
-The right answer may be a custom device, an existing kitchen scale, a POS integration, a manual measurement protocol, a sensor fusion approach, or no new hardware at all.
+The EE role owns physical measurement strategy, instrumentation feasibility, hardware/software boundaries, calibration, data integrity, installation constraints, and pilot measurement design. The right answer may be custom electronics, an existing scale, a software integration, a manual SOP, sensor fusion, or no new hardware.
 
-The mission is to create the strongest evidence loop with the least unnecessary complexity.
+Detailed hardware execution lives in [`../HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`](../HARDWARE/HARDWARE_AGENT_PLAYBOOK.md). Plugin/tool behavior is defined in [`../../.agents/PLUGIN_POLICY.md`](../../.agents/PLUGIN_POLICY.md).
 
-## North Star
+## Persistent parent, many child agents
+
+The EE human owns one long-lived parent branch:
+
+```text
+work/ee/<slug>
+```
+
+The parent may fan out into any number of bounded hardware child tasks:
+
+```text
+HUMAN-EE
+├── agent/hw-measurement/<task>
+├── agent/hw-sensors/<task>
+├── agent/hw-power/<task>
+├── agent/hw-firmware/<task>
+├── agent/hw-pcb/<task>
+├── agent/hw-mechanical/<task>
+├── agent/hw-calibration/<task>
+└── agent/hw-verification/<task>
+```
+
+There is no artificial agent-count ceiling. Fifty hardware agents are valid if their dependencies and `touched_paths` do not conflict. Agents must not silently co-own the same schematic, PCB, firmware module, BOM, calibration artifact, or interface contract.
+
+Child work integrates into the EE parent branch, never directly into `master`.
+
+## North star
 
 Improve the team's ability to answer:
 
-1. what actually happened in the physical operation,
-2. whether the data is trustworthy,
-3. whether measurement can be deployed without disrupting staff,
-4. whether a pilot can produce defensible evidence,
-5. whether hardware adds enough value to justify itself,
-6. whether the resulting system can scale beyond a one-off prototype.
+1. what actually happened physically;
+2. whether the measurement is trustworthy;
+3. whether data collection is operationally realistic;
+4. whether the pilot can produce defensible evidence;
+5. whether custom hardware creates enough value to justify complexity;
+6. whether the system can scale beyond a one-off demo.
 
-## Core Ownership
+## Core ownership
 
-Primary ownership areas include:
+- measurement requirements and architecture;
+- sensors, analog front end, ADC/interface, filtering;
+- power architecture and protection;
+- MCU/compute/peripheral budgeting;
+- firmware state/fault behavior;
+- connectivity, buffering, retry and offline behavior;
+- PCB/interconnect constraints and test points;
+- mechanical/enclosure/serviceability constraints;
+- calibration, repeatability, hysteresis, drift and uncertainty;
+- BOM/sourcing/lifecycle risk;
+- DFM/DFT readiness when manufacturing matters;
+- pilot measurement SOP and failure modes;
+- hardware API/data-contract coordination with CS1/CS2;
+- deciding whether custom hardware should exist at all.
 
-- physical measurement architecture,
-- waste / surplus measurement strategy,
-- sensor and instrumentation experiments,
-- calibration and repeatability,
-- measurement uncertainty,
-- edge-device reliability,
-- connectivity and offline behavior,
-- installation / power / enclosure feasibility,
-- data provenance at the physical layer,
-- pilot measurement SOPs,
-- physical-system failure modes,
-- hardware-vs-software tradeoffs,
-- identifying what should be measured versus what can be inferred.
+## Hardware child lanes
 
-## Current Candidate: Smart Waste Measurement Node
+Use the narrowest lane that makes ownership obvious:
 
-A current candidate architecture is:
+- `hw-measurement` — measurand, range, accuracy/repeatability need, operator workflow;
+- `hw-sensors` — sensor technology, AFE, ADC/interface, filtering, calibration inputs;
+- `hw-power` — source, rails, peaks, conversion, protection, brownout/thermal behavior;
+- `hw-firmware` — drivers, state machine, buffering, retries, watchdog, diagnostics;
+- `hw-pcb` — schematic/layout constraints, grounding, connectors, test points, ERC/DRC;
+- `hw-mechanical` — mounting, enclosure, cleaning/ingress, strain relief, serviceability;
+- `hw-calibration` — references, calibration points, drift/hysteresis/repeatability tests;
+- `hw-verification` — acceptance matrix, failure injection, integration and evidence capture.
 
-`load cell / scale → amplifier / interface → MCU or gateway → network → BOUNCAMPUS measurement API`
+Other hardware child lanes are allowed when they create a cleaner non-overlapping boundary.
 
-Possible implementation components include:
+## Evidence maturity
 
-- load cell,
-- HX711 or other ADC / scale interface,
-- ESP32 or equivalent controller,
-- tare / confirmation input,
-- local status indication,
-- Wi-Fi or other connectivity,
-- optional local buffering,
-- optional display,
-- optional enclosure.
+Every hardware claim must retain its real evidence level:
 
-This architecture is **not mandatory**. It should survive comparison with simpler or better approaches.
+- `ASSUMPTION` — not verified;
+- `DATASHEET` — supported by manufacturer/reference documentation;
+- `CALCULATION` — engineering calculation with stated inputs;
+- `SIMULATION` — simulated only;
+- `BENCH_TEST` — physically measured under recorded bench conditions;
+- `FIELD_TEST` — measured in intended/representative operating conditions;
+- `PRODUCTION_EVIDENCE` — verified on release/manufactured hardware with a defined process.
 
-## Measurement Questions Before Hardware
+A CAD render, schematic, firmware build, SPICE result, or datasheet claim is never bench/field evidence by itself.
 
-Before committing to any device, establish:
+## Measurement before hardware
 
-- What exactly needs to be measured?
-- At what point in the workflow?
-- By whom?
-- How often?
-- What accuracy is operationally meaningful?
-- What categories matter: edible surplus, preparation waste, plate waste, total waste, produced quantity, served quantity?
-- Does an existing device already produce the data?
-- Would integration be easier than new hardware?
-- What human action would measurement require?
-- Would that action change behavior and bias the data?
-- What happens when connectivity fails?
-- How will measurements be associated with the correct service?
+Before committing to a device, establish:
 
-The hardware should follow the measurement requirement, not the other way around.
+- what decision the measurement improves;
+- exact measurand and workflow location;
+- operator/user and measurement frequency;
+- operationally meaningful accuracy/repeatability;
+- existing equipment/data sources;
+- burden and behavior-change risk;
+- service/event association;
+- failure, missing-data, power-loss and reconnect behavior;
+- whether inference/integration/manual SOP is better than new electronics.
 
-## Prototype Freedom
+The hardware follows the measurement requirement, not the other way around.
 
-The EE lead is free to explore alternative physical-system concepts where they could create more value.
+## Current candidate — not a commitment
 
-Examples include:
+A candidate waste-measurement architecture is:
 
-- smart weighing node,
-- existing digital-scale integration,
-- load-cell platform,
-- service throughput sensing,
-- portion-counting mechanisms,
-- button / NFC / RFID service labeling,
-- simple edge display,
-- environmental sensing if PMR/model evidence supports it,
-- local storage and delayed sync,
-- camera-assisted measurement if there is a defensible reason,
-- low-tech measurement procedures when they outperform custom electronics,
-- integration with existing POS or kitchen systems.
+```text
+load cell / scale
+  -> amplifier / ADC interface
+  -> MCU/gateway
+  -> network/buffer
+  -> BOUNCAMPUS measurement API
+```
 
-Experiments should be cheap and reversible until evidence supports deeper investment.
+Potential parts may include a load cell, HX711-class interface, ESP32-class controller, local confirmation/tare input, status indication, buffering and enclosure. These remain candidates until evidence justifies them.
 
-## Bench Validation
+## Electrical design gate
 
-For any measurement device, establish the relevant performance envelope.
+When custom electronics are justified, create the relevant subset of:
 
-Depending on the device this may include:
+- input ranges and absolute-maximum review;
+- excitation/reference assumptions;
+- sensor/error budget;
+- regulator headroom and worst-case power budget;
+- decoupling and rail-stability intent;
+- reverse-polarity/overcurrent/ESD protection where relevant;
+- analog/noisy-domain separation and return paths;
+- connector ratings and safe pinout;
+- boot/reset/programming behavior;
+- test points and debug access;
+- tolerance/reference accuracy;
+- thermal assumptions;
+- creepage/clearance when relevant;
+- component availability/package manufacturability;
+- ERC/DRC or equivalent tool evidence when available.
 
-- zero stability,
-- tare behavior,
-- known-reference accuracy,
-- repeatability,
-- hysteresis,
-- drift,
-- sensitivity to placement,
-- temperature effects,
-- power interruption behavior,
-- reconnect behavior,
-- local buffering,
-- invalid-reading detection,
-- duplicate-event handling.
+Generated Gerbers or a PCB image do not prove these checks passed.
 
-Do not use arbitrary engineering thresholds if the operational requirement is unknown. First determine what accuracy or reliability is actually needed for the decision or pilot.
+## Firmware gate
 
-## Data Contract
+Measurement firmware should provide, where relevant:
 
-A useful physical measurement should carry enough context to be auditable. Candidate fields include:
+- deterministic state flow;
+- explicit invalid/error states;
+- watchdog/recovery behavior;
+- documented filtering/debouncing;
+- safe calibration storage/versioning;
+- local buffering when connectivity fails;
+- idempotent event IDs/retries;
+- timestamp/order semantics;
+- useful diagnostics;
+- reproducible build instructions;
+- no silent conversion of bad readings into plausible numbers.
+
+## Bench / field validation
+
+Useful physical tests can include:
+
+- zero stability and tare;
+- known-reference accuracy;
+- repeatability;
+- hysteresis and drift;
+- placement and temperature sensitivity;
+- power interruption/recovery;
+- reconnect and offline buffering;
+- invalid-reading rejection;
+- duplicate-event handling;
+- operator workflow burden.
+
+Do not invent arbitrary acceptance thresholds when the operational requirement is unknown. Establish the decision need first.
+
+## Data contract
+
+Physical measurements should carry enough context to audit their origin. Candidate fields include:
 
 ```json
 {
@@ -138,128 +195,73 @@ A useful physical measurement should carry enough context to be auditable. Candi
 }
 ```
 
-The exact schema may change with the measurement architecture. Coordinate with CS1/CS2 rather than optimizing the hardware in isolation.
+Distinguish directly measured, manually entered, estimated, derived, missing, and rejected/invalid values.
 
-## Measurement Quality and Provenance
+## Plugin / specialized-tool behavior
 
-The system should be able to distinguish, where relevant:
+Hardware child agents may proactively use available capabilities for:
 
-- directly measured,
-- manually entered,
-- estimated,
-- derived,
-- missing,
-- rejected / invalid.
+- schematic/PCB CAD;
+- circuit/SPICE simulation;
+- datasheet/component lookup;
+- BOM sourcing/lifecycle analysis;
+- firmware build/debug;
+- mechanical CAD;
+- signal/power-integrity analysis;
+- DFM/DFT/manufacturing review;
+- remote bench/instrument access.
 
-A physical sensor does not automatically create ground truth. Calibration, labeling, operator workflow, and data association matter just as much.
+If a useful capability is unavailable, continue all safe independent work and use [`../HARDWARE/PLUGIN_CAPABILITY_REQUEST_TEMPLATE.md`](../HARDWARE/PLUGIN_CAPABILITY_REQUEST_TEMPLATE.md) to describe what remains unverified. Do not invent a plugin name or pretend a tool was used.
 
-## Pilot Design Contribution
+## Physical safety
 
-The EE lead should help design a pilot that can actually be executed.
+Design, calculations, simulation, CAD, firmware work, and non-energized review are autonomous.
 
-Questions include:
+Use `PHYSICAL_SAFETY` before dangerous energization, mains/high-current work, risky battery testing, hazardous actuator motion, destructive physical testing, or consequential field installation.
 
-- what will be measured per service,
-- which measurements are mandatory,
-- who records them,
-- how control/intervention services are compared,
-- what happens when a reading is missing,
-- what constitutes invalid measurement,
-- how early sell-out or stockout is observed,
-- how operator overrides are captured,
-- how measurement burden is minimized.
+## Collaboration contracts
 
-The role should challenge pilots that look statistically neat but operationally unrealistic.
+### IE
 
-## Hardware Is Not Automatically a Differentiator
+Consume real PMR about workflow, operator burden, existing equipment and measurement gaps.
 
-The team should not build hardware merely because an EE member exists.
+### CS1
 
-A custom device is justified when it materially improves one or more of:
+Agree on required signals, quality/status semantics, calibration metadata, and evaluation needs.
 
-- data availability,
-- trustworthiness,
-- timeliness,
-- operator burden,
-- intervention loop closure,
-- pilotability,
-- defensibility,
-- scalability.
+### CS2
 
-If a commercial scale + simple data-entry workflow is better for the application stage, say so. If a custom node creates a strong measurable advantage, build it.
+Provide evidence maturity, limitations, pilotability, and defensible differentiation inputs for application synthesis.
 
-## Freedom to Explore
+Use Fabric `produces` / `consumes` IDs for durable agent-to-agent handoffs instead of human chat relay.
 
-The EE lead may independently initiate small experiments that answer high-value questions without waiting for permission.
-
-Examples:
-
-- test whether a low-cost load cell is stable enough,
-- compare manual vs automatic tare,
-- benchmark two sensor options,
-- prototype offline buffering,
-- inspect existing scale interfaces,
-- estimate installation burden,
-- test whether service identification needs a button/NFC flow,
-- prove that a proposed sensor is unnecessary,
-- identify a better physical variable than waste mass.
-
-Exploration should produce evidence and a decision, not endless prototyping.
-
-## Collaboration
-
-### With IE
-
-Use PMR to understand measurement reality, operator burden, workflow, and existing equipment.
-
-### With CS1
-
-Define what measurements are needed to evaluate predictions and interventions, and agree on quality/status semantics.
-
-### With CS2
-
-Explain what physical evidence can support product claims, pilot design, differentiation, and application language.
-
-## Anti-AI-Slop Standard
-
-AI can assist with datasheets, firmware drafts, calculations, experiment design, and documentation. It cannot substitute for bench evidence or physical constraints.
+## Anti-AI-slop standard
 
 Reject:
 
-- hardware specs invented without checking components,
-- claimed accuracy without calibration evidence,
-- fake sensor readings,
-- simulated results presented as measured,
-- generic IoT architecture diagrams with no operational need,
-- unnecessary sensors added for appearance,
-- enclosure / PCB work that consumes time before the measurement question is established,
-- climate-impact claims inferred directly from sensor existence.
+- invented component specifications;
+- fake sensor readings;
+- claimed accuracy without calibration evidence;
+- simulations presented as measurements;
+- generic IoT diagrams without a decision need;
+- sensors added for appearance;
+- premature enclosure/PCB work before measurement need is clear;
+- climate-impact claims inferred merely from having hardware.
 
-## Strong Outputs
+## Strong outputs
 
-Useful deliverables may include:
+Good EE child outputs include:
 
-- measurement architecture comparison,
-- calibrated prototype,
-- experiment CSV,
-- photos / bench evidence,
-- firmware with clear failure behavior,
-- measurement quality model,
-- pilot measurement SOP,
-- integration contract,
-- deployment constraint list,
-- decision proving that a proposed hardware component should be removed.
+- architecture comparison with a decision;
+- exact measurement requirements;
+- schematic/PCB constraints with evidence class;
+- BOM with exact identities and sourcing notes;
+- firmware with failure behavior;
+- calibration/repeatability experiment;
+- measured CSV with provenance;
+- measurement quality model;
+- pilot SOP;
+- deployment constraint list;
+- a defensible decision to remove unnecessary hardware.
 
-## Application-Stage Success Criteria
-
-By October 8, the physical-systems side should ideally demonstrate:
-
-- a credible measurement strategy,
-- understanding of current operational measurement gaps,
-- at least one tested technical path where feasible,
-- explicit limitations and failure modes,
-- a defensible hardware-vs-integration decision,
-- a pilot measurement approach that could be run in reality,
-- no claim that prototype hardware is production-ready unless evidence supports it.
-
-A polished physical prototype is valuable, but a well-supported decision that a simpler solution is superior is also a success.
+The objective is the strongest trustworthy measurement loop, not the largest hardware stack.
