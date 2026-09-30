@@ -9,6 +9,38 @@
     "cs1": "role/cs1-decision-intelligence",
     "cs2": "role/cs2-product-strategy"
   },
+  "hardware": {
+    "primary_role": "ee",
+    "playbook": "KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md",
+    "recommended_lanes": [
+      "hw-measurement",
+      "hw-sensors",
+      "hw-power",
+      "hw-firmware",
+      "hw-pcb",
+      "hw-mechanical",
+      "hw-calibration",
+      "hw-verification"
+    ],
+    "evidence_labels": [
+      "ASSUMPTION",
+      "DATASHEET",
+      "CALCULATION",
+      "SIMULATION",
+      "BENCH_TEST",
+      "FIELD_TEST",
+      "PRODUCTION_EVIDENCE"
+    ],
+    "physical_safety_gate_required": true
+  },
+  "capabilities": {
+    "plugin_policy": ".agents/PLUGIN_POLICY.md",
+    "proactive_plugin_use_allowed": true,
+    "plugin_discovery_allowed": true,
+    "user_plugin_request_allowed": true,
+    "continue_without_optional_plugin": true,
+    "do_not_fabricate_plugin_availability": true
+  },
   "integration": {
     "scope": "per-role-master-integration",
     "allow_parallel_role_pull_requests": true,
