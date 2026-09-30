@@ -19,7 +19,7 @@ An agent may own more than one lane only when the touched file sets do not overl
 
 ## Autonomous control plane
 
-**Default mode is AUTONOMOUS. Human involvement is exception-only.**
+**Default mode is AUTONOMOUS. Human involvement is exception-only inside an accepted work package.**
 
 The machine-readable contract lives in `.agents/fabric.json`; the execution protocol lives in `.agents/FABRIC.md`.
 
@@ -35,7 +35,7 @@ The `agent-coordination` branch is a deliberate policy exception: agents may wri
 
 ## Human-by-exception policy
 
-Agents MUST NOT ask a human for routine engineering judgment that can be resolved by repository inspection, testing, a reversible implementation choice, or a bounded experiment.
+Agents MUST NOT ask a human for routine engineering judgment that can be resolved by repository inspection, testing, a reversible implementation choice, or a bounded experiment **while executing the currently accepted work package**.
 
 Human input is required only for these gate kinds:
 
@@ -45,9 +45,71 @@ Human input is required only for these gate kinds:
 4. `EXTERNAL_COMMITMENT` — final submission, purchase/payment, contract/legal acceptance, consequential external message, or committing to a pilot/date on behalf of the team.
 5. `PRODUCT_DIRECTION` — a material pivot to the agreed beachhead, primary problem, or core product direction when evidence supports materially different choices.
 
-Everything else is autonomous by default, including decomposition, branch creation, code edits, tests, reversible refactors, dependency updates, ordinary documentation, routine feature prioritization, conflict resolution, PR creation, merge execution, rollback/revert, and post-merge verification.
+Everything else is autonomous by default **inside the accepted work package**, including decomposition, branch creation, code edits, tests, reversible refactors, dependency updates, ordinary documentation, routine feature prioritization, conflict resolution, PR creation, merge execution, rollback/revert, and post-merge verification.
 
 `WAITING_HUMAN` is valid only when the task has a non-`NONE` human gate, asks one concrete decision, and all work independent of that decision is already complete. Uncertainty alone is not a human gate.
+
+## Post-work user decision checkpoint
+
+Autonomy inside a work package does **not** authorize an agent to finish one meaningful task and then blindly select the next strategic workstream.
+
+The required lifecycle is:
+
+> **Accept work → finish it end-to-end → merge and verify → explain the result → surface real next options → recommend one → ask the user to choose the next meaningful direction when a material branch exists.**
+
+After a work package reaches `MERGED_VERIFIED`, or after a bounded research/PMR/experiment package reaches its accepted Definition of Done, the agent MUST evaluate whether the next step is merely completion of the same direction or a new meaningful branch.
+
+### Continue autonomously when
+
+The next action is:
+
+- required to finish the same accepted acceptance criteria;
+- a routine integration or verification step;
+- low-risk and reversible;
+- an obvious sequential subtask with no material strategic alternative;
+- a small technical choice that can be resolved by tests or inspection.
+
+Do not interrupt the user for those cases.
+
+### Stop and request direction when
+
+The current work is complete and the next action would commit substantial effort to one of multiple credible directions, for example:
+
+- a new major feature stream;
+- a new PMR segment;
+- a different beachhead or persona;
+- hardware versus hardware-free direction;
+- a new hardware architecture;
+- a materially different model/data strategy;
+- a substantial application narrative change;
+- a new campus domain expansion;
+- a large polish/demo workstream before the application deadline;
+- any other next workstream where choosing one path meaningfully delays or excludes another.
+
+### Required decision package
+
+Before asking the user for direction, the agent MUST provide enough information to support an informed choice:
+
+1. **Completed** — what was actually delivered;
+2. **Evidence / result** — tests, commits, measurements, interview findings, benchmark results, or evidence IDs;
+3. **What changed** — assumptions, risks, product requirements, feature priority, or KREATE claims affected;
+4. **Options** — normally 2–4 materially different next paths, without fake alternatives;
+5. for each option: **expected result, effort/cost, main risk, dependencies, and KREATE impact**;
+6. **Recommendation** — which option the agent prefers and why;
+7. **Decision needed** — one concise user choice.
+
+The agent MUST take a position. “All options are equally good” is not useful unless the evidence genuinely supports that conclusion.
+
+Do not ask vague questions such as “What should I do next?” or “Should I continue?” without first supplying the result and decision context.
+
+A good checkpoint ends with something like:
+
+> **Recommended:** Option B because it produces the highest PMR/evidence value before October 8 with lower dependency risk.  
+> **Decision needed:** choose A, B, or C for the next workstream.
+
+For KREATE-specific work, follow the detailed protocol in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
+
+This checkpoint occurs **after the current work package is complete**. It does not weaken the merge-before-exit contract and must not be used as an excuse to stop with accepted code unmerged or unverified.
 
 ## Task claim and lease rules
 
@@ -160,6 +222,7 @@ Real-world evidence and KREATE claims remain subject to the stricter evidence sy
 7. The same agent verifies the merged `master`, runs the exit gate, and records merge evidence.
 8. Only then does the task become `MERGED_VERIFIED` and release its lease.
 9. Deploy/verify runtime surfaces when deployment is part of the task scope.
+10. If the completed work exposes multiple meaningful next directions, present the user decision checkpoint before claiming a new strategic workstream.
 
 ## Bootstrap exception
 
