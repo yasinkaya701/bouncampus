@@ -1,8 +1,8 @@
 # Reservation & Dining Decision Workstream Index
 
 **Research date:** 2026-10-01  
-**Purpose:** Entry point for agents working specifically on Boğaziçi dining intent, decision rights, reservation/no-show uncertainty, accepted operational truth and the first falsifiable pilot.  
-**Status:** Secondary/public-source research + proposed pilot method. Not PMR, not pilot evidence, not a measured outcome.
+**Purpose:** Entry point for agents working specifically on Boğaziçi dining intent, decision rights, reservation/no-show uncertainty, accepted operational truth, evidence acquisition and the first falsifiable pilot.  
+**Status:** Secondary/public-source research + proposed acquisition/pilot methods. Not PMR, not pilot evidence, not a measured outcome.
 
 ## Read in this order
 
@@ -10,9 +10,11 @@
 2. [`BOGAZICI_FOOD_GOVERNANCE_DECISION_RIGHTS.md`](./BOGAZICI_FOOD_GOVERNANCE_DECISION_RIGHTS.md) — production-planning/reporting obligations and the unresolved role graph across Food Services, TEMAŞ, Control Organisation, BİD/BUCard and sustainability governance.
 3. [`BOGAZICI_SOURCE_RECONCILIATION.md`](./BOGAZICI_SOURCE_RECONCILIATION.md) — semantic firewall: reservation ≠ served ≠ user charge ≠ accepted service ≠ contractor settlement; historic rules ≠ current policy.
 4. [`BOGAZICI_PMR_TARGET_MAP.md`](./BOGAZICI_PMR_TARGET_MAP.md) — who to interview, in what order, and which narrow question each role owns.
-5. [`PILOT_RESERVATION_RECONCILIATION_PROTOCOL.md`](./PILOT_RESERVATION_RECONCILIATION_PROTOCOL.md) — event reconciliation → transparent baselines → residual model only if justified → shadow/advisory pilot.
-6. [`bogazici_dining_decision_graph.json`](./bogazici_dining_decision_graph.json) — machine-readable facts, sources, roles, signals, decisions, unknowns, pilot gates and falsifiers.
-7. [`AGENT_NEXT_ACTIONS.md`](./AGENT_NEXT_ACTIONS.md) — role-specific execution handoff for IE, EE, CS1, CS2, backend and frontend.
+5. [`BOGAZICI_EVIDENCE_ACQUISITION_PLAYBOOK.md`](./BOGAZICI_EVIDENCE_ACQUISITION_PLAYBOOK.md) — when public research must stop and which minimum artifact/aggregate field should be acquired from Food Services, TEMAŞ, Control, Tahakkuk, Procurement, BİD or reporting owners.
+6. [`bogazici_evidence_acquisition_queue.json`](./bogazici_evidence_acquisition_queue.json) — machine-readable `EA-01...EA-06` acquisition tasks, owners, exact minimum requests, privacy exclusions, downstream gates and stop conditions.
+7. [`PILOT_RESERVATION_RECONCILIATION_PROTOCOL.md`](./PILOT_RESERVATION_RECONCILIATION_PROTOCOL.md) — event reconciliation → transparent baselines → residual model only if justified → shadow/advisory pilot.
+8. [`bogazici_dining_decision_graph.json`](./bogazici_dining_decision_graph.json) — machine-readable facts, sources, roles, signals, decisions, unknowns, pilot gates and falsifiers.
+9. [`AGENT_NEXT_ACTIONS.md`](./AGENT_NEXT_ACTIONS.md) — role-specific execution handoff for IE, EE, CS1, CS2, backend and frontend.
 
 ## Existing packs that must also be respected
 
@@ -36,6 +38,7 @@ but:
 identify existing intent / history / contract / service signals
 → reconcile their event semantics
 → find a decision that remains uncertain and reachable before freeze
+→ acquire the minimum authoritative evidence object for unresolved semantics
 → compare the cheapest transparent policy against current practice
 → add residual modeling only if it earns its complexity
 → keep human approval
@@ -55,6 +58,28 @@ identify existing intent / history / contract / service signals
 8. What share of addressable waste is pre-consumer surplus versus preparation/plate waste?
 9. Who captures financial/operational benefit from a better decision?
 
+## P0 evidence acquisition sequence
+
+Use `bogazici_evidence_acquisition_queue.json` rather than repeating broad web research:
+
+```text
+EA-01  quantity owner + freeze time
+EA-02  accepted-service + hakediş semantics
+EA-03  historical reservation → realized service aggregates
+EA-04  physical surplus/waste boundary
+EA-05  produced/consumed/discarded monthly report schema
+EA-06  current authoritative contract/specification locator
+```
+
+Important routing refinement:
+
+- Food Services / TEMAŞ answer the production workflow;
+- Control Organisation helps identify accepted operational truth;
+- **Tahakkuk** is a formal public owner for university hakediş payments and is therefore a high-value route for payment-basis artifacts;
+- Procurement is the authoritative current-contract/specification route;
+- BİD should be asked for source-owner aggregate event counts, not person-level histories;
+- formal Bilgi Edinme is a narrow public-document fallback, not an access-control bypass.
+
 ## Hard gates
 
 Do not build complex ML unless:
@@ -67,4 +92,10 @@ Do not build complex ML unless:
 - the data path can be implemented with aggregate/minimized data;
 - an operator can approve/override and outcomes can be verified.
 
-Failure at a gate means change the control point or stop — not add model complexity.
+Do not make monetary/contract claims unless:
+
+- current accepted/hakediş quantity semantics are resolved from authoritative current evidence;
+- relevant unit-price / variable-cost meaning is separately verified;
+- user contribution, subsidy/accounting and contractor settlement are not conflated.
+
+Failure at a gate means acquire the missing authoritative evidence, change the control point or stop — not add model complexity or weaker derivative sources.
