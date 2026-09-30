@@ -11,6 +11,7 @@ from app.config import settings
 class FoodDemandPredictor:
     MODEL_ID = "food-demand-xgboost"
     TRAINING_DATA_PROVENANCE = "REPOSITORY_GENERATED_DATA_UNVERIFIED"
+    METHOD_ELIGIBILITY = "SANDBOX_ONLY"
 
     def __init__(self):
         self.model = None
@@ -40,6 +41,7 @@ class FoodDemandPredictor:
             "forecast_provenance": "MODEL_ESTIMATE",
             "training_data_path": self.training_data_path,
             "training_data_provenance": self.TRAINING_DATA_PROVENANCE,
+            "method_eligibility": self.METHOD_ELIGIBILITY,
             "calibration_status": "NOT_CALIBRATED",
             "impact_validation_status": "NOT_PILOT_VALIDATED",
         }

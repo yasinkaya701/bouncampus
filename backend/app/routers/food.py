@@ -76,6 +76,7 @@ def get_food_forecast(date_val: Optional[str] = None):
     signal_availability = _decision_signals(live_menu, live_weather)
     menu_items = _menu_items(live_menu)
     model_metadata = f_pred.metadata()
+    method_eligibility = str(model_metadata.get("method_eligibility", "SANDBOX_ONLY"))
 
     forecasts: List[FoodDemandForecast] = []
     for cafeteria_id in ["B-SOUTH-GY", "B-NORTH-KY"]:
@@ -91,6 +92,7 @@ def get_food_forecast(date_val: Optional[str] = None):
                 point_forecast,
                 menu_items,
                 signal_availability=signal_availability,
+                method_eligibility=method_eligibility,
             )
             forecasts.append(
                 FoodDemandForecast(
@@ -104,6 +106,7 @@ def get_food_forecast(date_val: Optional[str] = None):
                     menu_items=menu_items,
                     policy_version=decision["policy_version"],
                     model_id=decision["model_id"],
+                    method_eligibility=decision["method_eligibility"],
                     forecast_provenance=decision["forecast_provenance"],
                     decision_provenance=decision["decision_provenance"],
                     band_semantics=decision["band_semantics"],

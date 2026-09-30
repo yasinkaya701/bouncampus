@@ -30,9 +30,11 @@ def test_policy_metadata_and_full_context() -> None:
     decision = policy.build_food_decision(
         1000,
         {"schedule": True, "weather": True, "menu": True, "calendar": True},
-        model_id="food-demand-xgboost",
+        model_id="measured-food-method-v1",
+        method_eligibility="PILOT_ELIGIBLE",
     )
     assert decision["policy_version"] == policy.POLICY_VERSION
+    assert decision["method_eligibility"] == "PILOT_ELIGIBLE"
     assert decision["forecast_provenance"] == "MODEL_ESTIMATE"
     assert decision["decision_provenance"] == "POLICY_HEURISTIC"
     assert decision["band_semantics"] == "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL"
@@ -54,6 +56,7 @@ def test_policy_degrades_and_abstains() -> None:
     review = policy.build_food_decision(
         1000,
         {"schedule": True, "weather": False, "menu": False, "calendar": False},
+        method_eligibility="PILOT_ELIGIBLE",
     )
     assert review["signal_coverage_pct"] == 50
     assert review["decision_readiness"] == "REVIEW_REQUIRED"
@@ -64,6 +67,7 @@ def test_policy_degrades_and_abstains() -> None:
     withheld = policy.build_food_decision(
         1000,
         {"schedule": False, "weather": True, "menu": True, "calendar": True},
+        method_eligibility="PILOT_ELIGIBLE",
     )
     assert withheld["decision_readiness"] == "WITHHOLD"
     assert withheld["abstained"] is True
@@ -77,6 +81,7 @@ def test_policy_handles_invalid_demand_without_action() -> None:
         decision = policy.build_food_decision(
             value,
             {"schedule": True, "weather": True, "menu": True, "calendar": True},
+            method_eligibility="PILOT_ELIGIBLE",
         )
         assert decision["predicted_demand"] == 0
         assert decision["decision_readiness"] == "WITHHOLD"
@@ -91,6 +96,8 @@ def test_signal_weights_are_explicit_policy_not_confidence() -> None:
     assert policy.REQUIRED_SIGNALS == ("schedule",)
     assert policy.PILOT_READY_MIN_COVERAGE_PCT == 70
     assert policy.REVIEW_MIN_COVERAGE_PCT == 50
+    assert "SANDBOX_ONLY" in policy.METHOD_ELIGIBILITY_STATES
+    assert "PILOT_ELIGIBLE" in policy.METHOD_ELIGIBILITY_STATES
 
 
 def test_naive_baselines_do_not_use_future_values() -> None:
@@ -124,6 +131,8 @@ def test_forecast_metrics_and_ranking() -> None:
     )
     assert report["ranking_by_mae"][0] == "strong"
     assert report["metrics"]["strong"]["mae"] < report["metrics"]["weak"]["mae"]
+    assert report["common_support_n"] == 3
+    assert report["common_support_pct"] == 100.0
 
 
 def test_metrics_reject_misaligned_inputs() -> None:
@@ -134,6 +143,13 @@ def test_metrics_reject_misaligned_inputs() -> None:
         assert "same length" in str(exc)
     else:
         raise AssertionError("misaligned actual/predicted arrays must be rejected")
+
+    try:
+        baselines.compare_forecasts([1.0, 2.0], {"bad": [1.0]})
+    except ValueError as exc:
+        assert "same length" in str(exc)
+    else:
+        raise AssertionError("misaligned benchmark candidates must be rejected")
 
 
 def test_backend_food_claim_firewall() -> None:
@@ -161,10 +177,13 @@ def test_backend_food_claim_firewall() -> None:
     assert "automatic kitchen dispatch" in actions_route.lower()
     assert "provenance=" in dashboard_route
     assert "provenance=" in actions_route
+    assert 'METHOD_ELIGIBILITY = "SANDBOX_ONLY"' in (ROOT / "backend/app/models/food_demand.py").read_text(encoding="utf-8")
+    assert "method_eligibility=method_eligibility" in food_route
 
 
 def test_frontend_contract_is_explicit() -> None:
     library = (ROOT / "frontend/src/lib/food-waste.ts").read_text(encoding="utf-8")
+    eligibility = (ROOT / "frontend/src/lib/food-decision-eligibility.ts").read_text(encoding="utf-8")
     route = (ROOT / "frontend/src/app/api/v1/food/route.ts").read_text(encoding="utf-8")
     for marker in (
         "policyVersion",
@@ -176,12 +195,15 @@ def test_frontend_contract_is_explicit() -> None:
         "abstained",
     ):
         assert marker in library, f"frontend decision contract missing {marker}"
+    for marker in ("MethodEligibility", "SANDBOX_ONLY", "METHOD_SANDBOX_ONLY"):
+        assert marker in eligibility, f"frontend eligibility contract missing {marker}"
     for marker in (
         "forbiddenUntilMeasured",
         "humanApprovalRequired",
         "automaticKitchenDispatch",
         "decisionAssessment",
         "READY_FOR_MEASURED_DATA",
+        "methodEligibility: 'SANDBOX_ONLY'",
     ):
         assert marker in route, f"food API truth boundary missing {marker}"
 

@@ -96,12 +96,65 @@ def compare_forecasts(
     actual: Sequence[float | int | None],
     forecasts: Mapping[str, Sequence[float | int | None]],
 ) -> dict[str, object]:
-    """Return comparable offline metrics and a deterministic MAE ranking."""
+    """Compare every candidate on one identical finite evaluation support.
 
-    metrics = {
-        name: evaluate_predictions(actual, predicted)
+    Ranking methods on different subsets is invalid because a sparse method could
+    omit difficult services and appear artificially strong. This function therefore
+    intersects the available rows across the target and every candidate before any
+    metric or ranking is computed.
+    """
+
+    actual_values = list(actual)
+    for name, predicted in forecasts.items():
+        if len(predicted) != len(actual_values):
+            raise ValueError(
+                f"actual and predicted must have the same length for forecast {name!r}"
+            )
+
+    if not forecasts:
+        return {
+            "metrics": {},
+            "ranking_by_mae": [],
+            "best_by_mae": None,
+            "common_support_n": 0,
+            "common_support_pct": 0.0,
+            "evaluation_indices": [],
+            "available_n_by_method": {},
+            "result_scope": "OFFLINE_BENCHMARK_ONLY",
+        }
+
+    normalized_actual = [_to_optional_float(value) for value in actual_values]
+    normalized_forecasts = {
+        name: [_to_optional_float(value) for value in predicted]
         for name, predicted in forecasts.items()
     }
+
+    valid_actual_indices = [
+        index for index, value in enumerate(normalized_actual) if value is not None
+    ]
+    evaluation_indices = [
+        index
+        for index in valid_actual_indices
+        if all(values[index] is not None for values in normalized_forecasts.values())
+    ]
+
+    actual_common = [normalized_actual[index] for index in evaluation_indices]
+    metrics = {
+        name: evaluate_predictions(
+            actual_common,
+            [values[index] for index in evaluation_indices],
+        )
+        for name, values in normalized_forecasts.items()
+    }
+    available_n_by_method = {
+        name: sum(
+            1
+            for index in valid_actual_indices
+            if values[index] is not None
+        )
+        for name, values in normalized_forecasts.items()
+    }
+
     eligible = [
         (name, result)
         for name, result in metrics.items()
@@ -118,9 +171,21 @@ def compare_forecasts(
             ),
         )
     ]
+    valid_actual_n = len(valid_actual_indices)
+    common_support_n = len(evaluation_indices)
+    common_support_pct = (
+        0.0
+        if valid_actual_n == 0
+        else round((common_support_n / valid_actual_n) * 100, 6)
+    )
+
     return {
         "metrics": metrics,
         "ranking_by_mae": ranking,
         "best_by_mae": ranking[0] if ranking else None,
+        "common_support_n": common_support_n,
+        "common_support_pct": common_support_pct,
+        "evaluation_indices": evaluation_indices,
+        "available_n_by_method": available_n_by_method,
         "result_scope": "OFFLINE_BENCHMARK_ONLY",
     }

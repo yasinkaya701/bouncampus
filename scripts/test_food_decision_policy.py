@@ -27,13 +27,21 @@ def assert_claim_firewall(result: dict) -> None:
     assert "HEURISTIC_BAND_NOT_CALIBRATED" in result["reason_codes"]
 
 
-def test_withholds_without_schedule_backbone() -> None:
-    result = FoodOptimizer().optimize(
+def pilot_eligible_optimize(*, demand: int, signals: dict[str, bool]):
+    return FoodOptimizer().optimize(
         "2026-10-01",
         "B-SOUTH-GY",
-        1000,
+        demand,
         [],
-        signal_availability={"schedule": False, "menu": True},
+        signal_availability=signals,
+        method_eligibility="PILOT_ELIGIBLE",
+    )
+
+
+def test_withholds_without_schedule_backbone() -> None:
+    result = pilot_eligible_optimize(
+        demand=1000,
+        signals={"schedule": False, "menu": True},
     )
     assert_claim_firewall(result)
     assert result["decision_readiness"] == "WITHHOLD"
@@ -45,12 +53,9 @@ def test_withholds_without_schedule_backbone() -> None:
 
 
 def test_requires_review_when_context_is_partial() -> None:
-    result = FoodOptimizer().optimize(
-        "2026-10-01",
-        "B-SOUTH-GY",
-        1000,
-        [],
-        signal_availability={"schedule": True, "menu": False},
+    result = pilot_eligible_optimize(
+        demand=1000,
+        signals={"schedule": True, "menu": False},
     )
     assert_claim_firewall(result)
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
@@ -61,7 +66,21 @@ def test_requires_review_when_context_is_partial() -> None:
     assert "CONTEXT_PARTIAL_OPERATOR_REVIEW_REQUIRED" in result["reason_codes"]
 
 
-def test_marks_core_context_pilot_ready_but_keeps_human_gate() -> None:
+def test_marks_pilot_eligible_core_context_ready_but_keeps_human_gate() -> None:
+    result = pilot_eligible_optimize(
+        demand=1000,
+        signals={"schedule": True, "menu": True},
+    )
+    assert_claim_firewall(result)
+    assert result["method_eligibility"] == "PILOT_ELIGIBLE"
+    assert result["decision_readiness"] == "PILOT_READY"
+    assert result["signal_coverage_pct"] == 70
+    assert result["recommended"] == 1000
+    assert result["planning_lower"] == 930
+    assert result["planning_upper"] == 1090
+
+
+def test_optimizer_defaults_to_sandbox_and_abstains() -> None:
     result = FoodOptimizer().optimize(
         "2026-10-01",
         "B-SOUTH-GY",
@@ -70,20 +89,16 @@ def test_marks_core_context_pilot_ready_but_keeps_human_gate() -> None:
         signal_availability={"schedule": True, "menu": True},
     )
     assert_claim_firewall(result)
-    assert result["decision_readiness"] == "PILOT_READY"
-    assert result["signal_coverage_pct"] == 70
-    assert result["recommended"] == 1000
-    assert result["planning_lower"] == 930
-    assert result["planning_upper"] == 1090
+    assert result["method_eligibility"] == "SANDBOX_ONLY"
+    assert result["decision_readiness"] == "WITHHOLD"
+    assert result["recommended"] is None
+    assert "METHOD_SANDBOX_ONLY" in result["reason_codes"]
 
 
 def test_non_positive_demand_abstains() -> None:
-    result = FoodOptimizer().optimize(
-        "2026-10-01",
-        "B-SOUTH-GY",
-        -25,
-        [],
-        signal_availability={"schedule": True, "menu": True},
+    result = pilot_eligible_optimize(
+        demand=-25,
+        signals={"schedule": True, "menu": True},
     )
     assert_claim_firewall(result)
     assert result["planning_lower"] == 0
@@ -97,7 +112,8 @@ def main() -> int:
     tests = [
         test_withholds_without_schedule_backbone,
         test_requires_review_when_context_is_partial,
-        test_marks_core_context_pilot_ready_but_keeps_human_gate,
+        test_marks_pilot_eligible_core_context_ready_but_keeps_human_gate,
+        test_optimizer_defaults_to_sandbox_and_abstains,
         test_non_positive_demand_abstains,
     ]
     for test in tests:

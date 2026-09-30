@@ -15,12 +15,15 @@ class FoodOptimizer:
         predicted_demand,
         menu,
         signal_availability: Mapping[str, bool] | None = None,
+        *,
+        method_eligibility: str = "SANDBOX_ONLY",
     ):
         del date, cafeteria_id, menu
         result = build_food_decision(
             predicted_demand,
             signal_availability,
             model_id="food-demand-xgboost",
+            method_eligibility=method_eligibility,
         )
 
         # Preserve the old adapter keys for internal callers while the API contract

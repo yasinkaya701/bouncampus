@@ -93,6 +93,13 @@ class FoodDemandForecast(BaseModel):
     menu_items: List[MenuPopularity]
     policy_version: str
     model_id: str
+    method_eligibility: Literal[
+        "SANDBOX_ONLY",
+        "EVALUATED_OFFLINE",
+        "PILOT_ELIGIBLE",
+        "PILOT_EVALUATED",
+        "RETIRED",
+    ]
     forecast_provenance: Literal["MODEL_ESTIMATE"]
     decision_provenance: Literal["POLICY_HEURISTIC"]
     band_semantics: Literal["PLANNING_RANGE_NOT_CALIBRATED_INTERVAL"]

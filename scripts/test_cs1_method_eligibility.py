@@ -60,6 +60,18 @@ def test_offline_only_method_requires_review_not_pilot_ready() -> None:
     assert "METHOD_NOT_YET_PILOT_ELIGIBLE" in decision["reason_codes"]
 
 
+def test_unknown_eligibility_fails_closed() -> None:
+    policy = load_module("food_policy_unknown_eligibility", "backend/app/decision/food_policy.py")
+    decision = policy.build_food_decision(
+        1000,
+        {"schedule": True, "weather": True, "menu": True, "calendar": True},
+        method_eligibility="MAGIC_READY",
+    )
+    assert decision["method_eligibility"] == "SANDBOX_ONLY"
+    assert decision["decision_readiness"] == "WITHHOLD"
+    assert "UNKNOWN_METHOD_ELIGIBILITY_TREATED_AS_SANDBOX" in decision["reason_codes"]
+
+
 def test_forecast_ranking_uses_identical_common_support() -> None:
     baselines = load_module("food_baselines_common_support", "backend/app/decision/baselines.py")
     report = baselines.compare_forecasts(
@@ -74,14 +86,16 @@ def test_forecast_ranking_uses_identical_common_support() -> None:
     assert report["metrics"]["complete"]["n"] == 2
     assert report["metrics"]["sparse"]["n"] == 2
     assert report["evaluation_indices"] == [0, 2]
+    assert report["available_n_by_method"] == {"complete": 4, "sparse": 2}
 
 
 def test_frontend_contract_blocks_sandbox_pilot_readiness() -> None:
-    library = (ROOT / "frontend/src/lib/food-waste.ts").read_text(encoding="utf-8")
+    eligibility = (ROOT / "frontend/src/lib/food-decision-eligibility.ts").read_text(encoding="utf-8")
     route = (ROOT / "frontend/src/app/api/v1/food/route.ts").read_text(encoding="utf-8")
     for marker in ("MethodEligibility", "methodEligibility", "SANDBOX_ONLY", "METHOD_SANDBOX_ONLY"):
-        assert marker in library, f"frontend decision contract missing method-eligibility marker {marker}"
+        assert marker in eligibility, f"frontend method-eligibility gate missing marker {marker}"
     assert "methodEligibility: 'SANDBOX_ONLY'" in route
+    assert "source coverage alone can never promote a sandbox model" in route
 
 
 def main() -> int:
@@ -89,6 +103,7 @@ def main() -> int:
         test_sandbox_method_can_never_be_pilot_ready,
         test_pilot_eligible_method_may_be_pilot_ready_with_healthy_context,
         test_offline_only_method_requires_review_not_pilot_ready,
+        test_unknown_eligibility_fails_closed,
         test_forecast_ranking_uses_identical_common_support,
         test_frontend_contract_blocks_sandbox_pilot_readiness,
     ]
