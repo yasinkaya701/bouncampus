@@ -10,7 +10,7 @@
   "depends_on": [],
   "touched_paths": [
     ".github/PULL_REQUEST_TEMPLATE.md",
-    ".github/workflows/cs1-decision-validation.yml",
+    ".github/feature-registry.json",
     "backend/app/decision/__init__.py",
     "backend/app/decision/food_policy.py",
     "backend/app/decision/baselines.py",
@@ -34,6 +34,7 @@
     "scripts/test_food_decision_policy.py",
     "scripts/test_cs1_decision_intelligence.py",
     "scripts/test_cs1_method_eligibility.py",
+    "scripts/test_cs1_cross_contract.py",
     "KREATE/EXPERIMENTS/CS1_DECISION_INTELLIGENCE_V1.md",
     "KREATE/EVIDENCE.md",
     "KREATE/ASSUMPTIONS.md",
@@ -51,6 +52,7 @@
     "All forecast candidates are ranked on identical common-support service rows so sparse methods cannot omit difficult cases",
     "Pilot scorecards enforce sample sufficiency, normalized waste reduction, sellout guardrails, override visibility, and data-quality checks",
     "Machine-readable policy metadata includes policy version, model provenance, decision provenance, method eligibility, limitations, and reason codes",
+    "Python and Next decision-policy versions remain mechanically locked against drift",
     "KREATE validation fails on reintroduction of unsupported food-impact claims or removal of the human gate",
     "Technical experiment documentation distinguishes repository capability, model estimates, policy heuristics, and measured pilot evidence",
     "Repository evidence records technical capability without promoting it to market or impact proof",
@@ -60,6 +62,7 @@
     "python scripts/test_food_decision_policy.py",
     "python scripts/test_cs1_decision_intelligence.py",
     "python scripts/test_cs1_method_eligibility.py",
+    "python scripts/test_cs1_cross_contract.py",
     "python scripts/kreate_check.py",
     "python -m compileall -q backend/app scripts",
     "cd frontend && npm run typecheck && npm run lint && npm run build"
@@ -74,13 +77,13 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T21:16:00Z",
+    "heartbeat_at": "2026-09-30T21:22:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
   "integration": {
-    "pull_request": null,
-    "validated_head_sha": null,
+    "pull_request": 45,
+    "validated_head_sha": "4ea6feaf558cca1276643f68e82424e69a7fef88",
     "merge_sha": null,
     "post_merge_verified_at": null
   },
@@ -91,8 +94,10 @@
     "Active dashboard/actions, fallback data, and registered jury/food-waste UI surfaces are included to prevent provenance drift.",
     "Method eligibility is a hard readiness gate: repository-generated XGBoost remains SANDBOX_ONLY until acceptable measured-target evaluation exists.",
     "Baseline ranking uses identical common support across all candidates and reports support coverage explicitly.",
+    "Python and Next policy contracts are cross-checked mechanically; food-decision-v1.1 is the current shared version.",
     "Latest role-branch PR template retained semantically correct anti-fabrication wording but dropped two legacy validator literals; this task adds one automation-compatibility comment so current governance and KREATE validation agree.",
-    "Temporary .github/workflows/cs1-decision-validation.yml is reserved only to run exact-head validation on the CS1 branch and will be deleted before integration; final feature PR validation uses the normal role-targeted CI.",
+    "Temporary branch-only CS1 validation workflow was deleted before integration; PR #45 uses the normal role-targeted CI.",
+    "Final feature head 783ee20a8ede6fcab9be0e30b7991be7b2f6aaa4 triggered a successful Vercel preview deployment; normal PR CI remains the merge gate.",
     "Does not intentionally modify .github/workflows/ci.yml; that file is inherited unchanged from the synchronized role branch."
   ]
 }
