@@ -15,6 +15,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 - Public professional contact information is for role routing only; it is **not interview evidence, endorsement, availability or permission for repeated outreach**.
 - Policy/ranking pressure is market context, **not willingness-to-pay evidence or a guaranteed score/compliance outcome**.
 - Vendor claims and case-study percentages are competitive context, **not neutral evidence or expected BOUNCAMPUS impact**.
+- National university counts are ecosystem context, **not addressable-customer counts or TAM without segmentation evidence**.
 
 ## Available packs
 
@@ -32,6 +33,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 | [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) | Cross-domain event/provenance model, food-pilot data contract, decision records, water/energy governance implications and verification levels. | — |
 | [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) | Peer-reviewed synthesis connecting food-waste causality, forecasting, smart-campus decision processes, measurement and model design. | — |
 | [Competitor & Substitute Landscape](./COMPETITOR_SUBSTITUTE_LANDSCAPE.md) | Türkiye-first comparison of Emissary Campus, Winnow, Leanpath, BMS/BEMS, in-house dashboards and manual/reporting substitutes; converts overlap into differentiation and PMR questions. | — |
+| [Türkiye Market Segmentation & Beachhead](./MARKET_SEGMENTATION_AND_BEACHHEAD.md) | Decision-structure, measurement-maturity and sustainability-maturity segmentation; ideal pilot criteria, validation gates and market-sizing rules. | — |
 | [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) | Role-specific execution handoff for IE, EE, CS1, CS2, frontend and backend agents, including kill/modify conditions. | — |
 
 ## Recommended reading order
@@ -56,7 +58,8 @@ This directory contains secondary/public-source research prepared for KREATE age
 
 11. Read [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) for safe why-now context and national benchmark signals.
 12. Read [Competitor & Substitute Landscape](./COMPETITOR_SUBSTITUTE_LANDSCAPE.md) before claiming novelty, designing broad platform features or writing competitor analysis.
-13. Read [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) before defining durable cross-domain schemas, water/energy expansion or evidence export surfaces.
+13. Read [Türkiye Market Segmentation & Beachhead](./MARKET_SEGMENTATION_AND_BEACHHEAD.md) before TAM/SAM/SOM work, external PMR sampling or beachhead claims.
+14. Read [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) before defining durable cross-domain schemas, water/energy expansion or evidence export surfaces.
 
 ## How agents should consume a pack
 
@@ -75,6 +78,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 13. Treat external academic intervention effects as **design references**, not expected or measured Boğaziçi effects.
 14. Preserve event-time, reporting-period and measurement-stage semantics; if two values cannot be safely reconciled, represent the conflict rather than silently cleaning it.
 15. Verify competitor capabilities directly before claiming a gap; vendor marketing claims and case-study savings are not neutral performance evidence.
+16. Do not turn a national institution count into an addressable market count before decision/workflow segmentation and buying-path evidence exist.
 
 ## Current cross-pack synthesis
 
@@ -96,6 +100,9 @@ Find the real decision owner, timing, constraints, data, consequences, current w
 
 TECH JOB:
 Start with a simple baseline, preserve uncertainty/human approval, and verify outcomes against service-level guardrails.
+
+BEACHHEAD GATE:
+Repeated pain + reachable control point + measurable outcome + current-tool gap + incentive alignment + pilot feasibility + repeatability.
 
 PLATFORM DIRECTION IF VALIDATED:
 Observe -> Reconcile -> Predict -> Diagnose -> Recommend -> Human Act -> Verify.
