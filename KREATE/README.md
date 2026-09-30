@@ -64,7 +64,7 @@ Submit the strongest evidence-backed KREATE application by **2026-10-08 23:59** 
 - Target: **16 distinct interviews**.
 - Hard minimum: **12 distinct interviews**.
 - Each teammate leads **4** target interviews.
-- A conversation counts toward the tracker only when a real stakeholder conversation occurred and the repo contains notes sufficient to create at least one traceable evidence item or an explicit finding of no supporting evidence.
+- A conversation counts toward the tracker only when a real stakeholder conversation occurred and the repo contains notes sufficient to create at least one traceable evidence item or an explicit finding of no promotable evidence.
 - Never invent names, quotes, organizations, incidents, or outcomes to fill the tracker.
 
 See [PMR/INTERVIEW_TRACKER.md](./PMR/INTERVIEW_TRACKER.md) and [PMR/INTERVIEW_TEMPLATE.md](./PMR/INTERVIEW_TEMPLATE.md).
@@ -84,6 +84,35 @@ Use these exact labels where relevant:
 
 Every material claim must cite an ID from [EVIDENCE.md](./EVIDENCE.md) or remain explicitly `HYPOTHESIS`/`UNKNOWN`.
 
+## Evidence promotion pipeline
+
+No AI or human summary may skip these layers:
+
+```text
+RAW ARTIFACT
+(interview notes / source / test output / model output)
+        ↓
+EVIDENCE REGISTRY
+(narrow claim + evidence ID + type + source + owner + confidence)
+        ↓
+ASSUMPTION / DECISION UPDATE
+(what changed, what did not, contradiction preserved)
+        ↓
+SUBMISSION CLAIM LEDGER
+(label + evidence IDs + domain owner + human reviewer)
+        ↓
+APPLICATION COPY
+```
+
+Rules:
+
+1. Raw notes are not automatically evidence.
+2. An evidence item supports only the narrow claim written in its registry row.
+3. Repository artifacts prove repository state, not customer demand or market validation.
+4. Interview count is not validation by itself; concrete incidents and changed decisions matter.
+5. Contradictory evidence is preserved and can move an assumption to `CONFLICTING` or `REJECTED`.
+6. A claim is not submission-ready until it reaches `READY` in the claim ledger and a second human has reviewed it.
+
 ## Operating files
 
 - [STATUS.md](./STATUS.md) — current state only.
@@ -94,9 +123,37 @@ Every material claim must cite an ID from [EVIDENCE.md](./EVIDENCE.md) or remain
 - [DECISIONS.md](./DECISIONS.md) — KEEP / MODIFY / KILL decision log.
 - [EXPERIMENTS/EXPERIMENT_TEMPLATE.md](./EXPERIMENTS/EXPERIMENT_TEMPLATE.md) — bounded experiment record.
 - [FEATURES.md](./FEATURES.md) — evidence-gated feature backlog.
-- [APPLICATION_RUBRIC.md](./APPLICATION_RUBRIC.md) — rubric closure board.
+- [APPLICATION_RUBRIC.md](./APPLICATION_RUBRIC.md) — rubric closure board + final claim ledger.
 - [`../docs/assumptions.md`](../docs/assumptions.md) — existing product truth boundary and methodology.
 - [`../docs/food-waste-pilot-protocol.md`](../docs/food-waste-pilot-protocol.md) — existing falsifiable pilot protocol.
+
+## Validation commands
+
+Daily/PR mechanical gate:
+
+```bash
+python scripts/kreate_check.py
+```
+
+This validates structure, evidence ID/type consistency, interview tracker states, assumption/decision references, claim-ledger mechanics, local links, and GitHub review gates. It is intentionally compatible with unfinished PMR.
+
+Final application gate:
+
+```bash
+python scripts/kreate_check.py --submission
+```
+
+The submission mode additionally requires:
+
+- at least **12** tracker rows marked `COMPLETED` with real metadata;
+- every completed interview to link `E-INT-*` evidence or explicitly state `NONE — no promotable claim`;
+- `E-PUB-001` to have a human re-verification/date instead of a TODO;
+- no `DRAFT` material claims in the submission claim ledger;
+- at least one `READY` claim;
+- matching evidence type for `PUBLIC SOURCE`, `INTERVIEW EVIDENCE`, `TECHNICAL TEST`, and `MODEL ESTIMATE` claims;
+- named domain owner and human reviewer on every `READY` claim.
+
+**Passing the script is necessary, not sufficient.** Humans still verify interview notes, public sources, context, claim wording, and final application copy.
 
 ## Daily workflow
 
