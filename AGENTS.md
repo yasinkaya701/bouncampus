@@ -2,136 +2,160 @@
 
 ## Purpose
 
-BOUNCAMPUS is a multi-agent, four-role KREATE repository. Parallel development is encouraged. Integration is controlled by role branches, explicit path ownership, CI gates, and verified merges to `master`.
+BOUNCAMPUS is a **four-human, many-agent** KREATE repository.
 
-The repository optimizes for two things at the same time:
+Each human owns exactly one persistent parent workstream. Any number of autonomous child agents may work beneath that parent when dependencies and path ownership allow it. The repository deliberately avoids an arbitrary agent-count cap; 50+ child agents are valid when their work is independent.
 
-1. let IE, EE, CS1, and CS2 move independently without waiting for a repository-wide PR lock;
-2. prevent stale branches, silent feature loss, and conflict-heavy merges from reaching `master`.
+The operating goals are:
 
-## Core roles
+1. maximize parallel execution without turning humans into dispatchers;
+2. prevent path collisions, stale merges, evidence fabrication, and silent feature loss;
+3. keep `master` as durable product truth;
+4. require humans only for genuinely critical real-world decisions.
 
-KREATE roles:
+The machine-readable contract lives in `.agents/fabric.json`; detailed execution semantics live in `.agents/FABRIC.md`.
 
-- **IE — Customer Discovery & Market Lead**
-- **EE — Physical Systems & Measurement Lead**
-- **CS1 — Decision Intelligence Lead**
-- **CS2 — Product Strategy, Evidence Synthesis & Application Lead**
+## Four persistent human parent workstreams
 
-Engineering lanes such as `frontend-ux`, `api-product`, `campus-geo`, and `quality-release` remain valid task lanes. A lane may be executed under whichever KREATE role owns the outcome.
+| Parent | Role | Parent branch pattern |
+| --- | --- | --- |
+| `HUMAN-IE` | Customer Discovery & Market Lead | `work/ie/<slug>` |
+| `HUMAN-EE` | Physical Systems & Measurement Lead | `work/ee/<slug>` |
+| `HUMAN-CS1` | Decision Intelligence Lead | `work/cs1/<slug>` |
+| `HUMAN-CS2` | Product Strategy, Evidence Synthesis & Application Lead | `work/cs2/<slug>` |
+
+Exactly one parent workstream exists per role, and one human may not own several active parent workstreams.
+
+Parent workstreams are long-lived accountability boundaries. A verified integration batch does not finish the human's whole role; its audit evidence is appended to `integration_history`, then the parent returns to `ACTIVE` for the next child-agent wave.
+
+## Child-agent model
+
+Normal execution happens on short-lived child branches:
+
+```text
+HUMAN-CS1 / work/cs1/kreate
+├── agent/api-product/baseline
+├── agent/api-product/data-quality
+├── agent/api-product/uncertainty
+├── agent/quality-release/red-team
+└── ... 50+ siblings when safe
+```
+
+A child task:
+
+- belongs to exactly one parent via `parent_id`;
+- has one leased `owner_agent` using `agent:<identity>`;
+- declares `depends_on`, `touched_paths`, acceptance criteria, and validation commands;
+- may declare `produces` / `consumes` artifact contracts;
+- may be required or optional for the current parent integration batch;
+- integrates only into its owning parent branch.
+
+**A child agent never integrates directly to `master`.**
 
 ## Branch topology
 
-`master` is durable product truth.
-
-Each KREATE role has a long-lived integration branch:
-
-| Role | Long-lived branch |
-| --- | --- |
-| IE | `role/ie-customer-discovery` |
-| EE | `role/ee-physical-systems` |
-| CS1 | `role/cs1-decision-intelligence` |
-| CS2 | `role/cs2-product-strategy` |
-
-Normal implementation uses short-lived task branches:
-
 ```text
-role/<role>
-  ├─ agent/<lane>/<task-a>
-  ├─ agent/<lane>/<task-b>
-  └─ agent/<lane>/<task-c>
-```
-
-Default flow:
-
-```text
-latest master
-    ↓ sync
-role/<role>
-    ↓ branch
-agent/<lane>/<task>
-    ↓ PR
-role/<role>
-    ↓ integration PR
 master
+  ↑ normal merge commit, exact-head CI, post-merge verification
+work/<role>/<parent>
+  ↑ child fan-in
+agent/<lane>/<task>
 ```
 
-The long-lived role branch is a staging/integration surface, not a place to bypass review.
+`agent-coordination` is the long-lived **metadata-only** coordination branch. Product code, application claims, secrets, and binary release artifacts do not belong there.
 
-`agent-coordination` remains the long-lived metadata-only coordination branch under `.agents/coordination/**`.
+Repository-wide governance/bootstrap work that cannot belong to one KREATE parent may use `agent/quality-release/<task>` directly against `master`, but it must still pass the full integration contract.
 
-## Parallel PR policy
+## Concurrency and ownership
 
-The old repository-wide single-PR rule is removed.
+Agent count is not the concurrency limit. Contracts are.
 
-Parallelism is allowed under these rules:
+Before a child becomes active:
 
-- Multiple open PRs may exist at the same time.
-- A role branch may have up to **3 open feature PRs** targeting it.
-- Each role may have at most **1 open role-to-`master` integration PR** at a time.
-- Different roles may have integration PRs open concurrently.
-- A `master` integration PR is mergeable only when its head contains the current `master` base SHA and all required checks are green.
-- When one PR merges to `master`, any other open `master` PR that became stale must sync the new `master` before it can merge.
-- Repository-wide governance/bootstrap work may use `agent/quality-release/<task>` directly against `master` when it cannot reasonably live under one role branch.
-- Direct pushes to `master` are forbidden by process and audited by CI.
+1. its parent exists and is not complete;
+2. hard dependencies are `MERGED_VERIFIED`;
+3. any in-fabric producer of a consumed artifact is verified;
+4. `touched_paths` do not overlap another active child;
+5. no pending/rejected critical human gate blocks the work;
+6. the agent owns a valid lease and heartbeat.
 
-This gives parallel review without permitting stale concurrent merges.
+Parent/child path overlap counts as conflict. Cross-parent conflicts count exactly the same as same-parent conflicts.
 
-## Task ownership and conflict prevention
+If a newly discovered necessary path overlaps another active child, re-scope, wait, or explicitly coordinate ownership. Do not silently edit the conflicting path.
 
-Before implementation, a Workstream Agent must:
+## Child integration: agent -> parent
 
-1. read/claim the task using the `agent-coordination` task store when the work is represented there;
-2. verify hard dependencies are `MERGED_VERIFIED`;
-3. declare realistic `touched_paths`;
-4. verify no active task owns overlapping product paths;
-5. create a short-lived `agent/<lane>/<task>` branch from the correct role branch;
-6. keep the task lease alive while the work is active.
+Child lifecycle:
 
-Two active tasks must not own overlapping product paths. Parent/child ownership counts as overlap.
+```text
+BACKLOG -> READY -> CLAIMED -> ACTIVE -> READY_FOR_INTEGRATION
+        -> INTEGRATING(parent branch) -> MERGED_VERIFIED(parent-contained)
+```
 
-If work must cross role boundaries, choose one primary role branch and document the cross-role impact. If the change is genuinely repository-wide, use the quality/release governance path rather than silently editing several role branches.
+Before a child becomes `MERGED_VERIFIED`:
 
-## Feature PR requirements: task branch -> role branch
+- targeted validation passes;
+- the validated child head is recorded;
+- child work is integrated into the exact owning parent branch;
+- the integrated parent commit is recorded;
+- the task's path/dependency/evidence contracts still hold.
 
-A feature PR is not final delivery. It stages validated work into a role branch.
+A child `MERGED_VERIFIED` means verified inside its parent. Final `master` provenance is recorded by the later parent integration batch.
 
-Before merging a feature PR into a role branch:
+## Parent readiness and fan-in
 
-1. the PR head contains the latest target role-branch base SHA;
-2. declared ownership does not overlap an active incompatible task;
-3. targeted tests pass;
-4. repository CI required for the touched surfaces passes on the exact PR head;
-5. deletions/renames are intentional;
-6. conflicts are resolved by reviewing both sides, never by blind whole-file `ours`/`theirs`;
-7. the PR is small enough to understand and revert independently.
+A parent batch becomes ready only when:
 
-A task merged only into a role branch is **not** `MERGED_VERIFIED` and is not yet present in durable product truth.
+- at least one new child is verified into the parent;
+- all pending `required_for_parent=true` children are `MERGED_VERIFIED`;
+- incomplete optional children are explicitly optional;
+- the current parent branch represents the combined validated batch.
 
-## Role integration PR requirements: role branch -> master
+Previously promoted children recorded in `integration_history` do not make a new empty batch ready.
 
-A role integration PR may contain one or more compatible, already-reviewed workstreams from that role.
+## Parallel parent PRs, one master integration slot
 
-It may merge only when all of the following are true:
+Up to **4** parent/master PRs may be open concurrently, normally one per human parent.
 
-1. the role branch has been synchronized with current `master`;
-2. the PR head contains the exact current `master` base commit;
-3. `python scripts/verify_feature_preservation.py --base-ref <master-sha>` passes;
-4. `python scripts/agent_fabric_check.py` passes;
-5. `python scripts/kreate_check.py` passes;
-6. repository Python compilation/data validation passes;
-7. frontend `npm ci`, typecheck, lint, and build pass when the frontend is in CI;
-8. every deletion or rename is accounted for;
-9. cross-role/shared-file changes are explicitly called out in the PR checklist;
-10. CI is green on the exact PR head SHA;
-11. merge uses a normal merge commit;
-12. merged `master` is verified after merge.
+- At most **1** parent/master PR may be non-draft.
+- The non-draft PR owns the master integration slot.
+- Other parent PRs remain draft and may receive advisory CI/review.
+- Green draft CI is not merge evidence after `master` changes.
+- When a parent acquires the integration slot, its branch must contain current `master` and receive fresh exact-head CI.
+- Merge uses a normal merge commit.
+- Post-merge verification is mandatory.
 
-If another PR lands first, the role PR becomes stale and must re-sync before merge. It does not get grandfathered through on previously green CI.
+Parent queue order is deterministic:
 
-## Shared and high-conflict surfaces
+1. P0 before P1 before P2;
+2. larger dependency-unblocking value;
+3. oldest ready timestamp;
+4. parent ID tie-break.
 
-Treat these as shared/high-conflict surfaces:
+## Master integration contract
+
+A parent/master integration is valid only when:
+
+1. parent is first in the queue and owns the sole integration slot;
+2. required child work is verified into the parent;
+3. parent head contains current `master`;
+4. `python scripts/verify_feature_preservation.py --base-ref <master-sha>` passes;
+5. `python scripts/test_agent_fabric_check.py` passes;
+6. `python scripts/test_agent_task.py` passes;
+7. `python scripts/agent_fabric_check.py` passes;
+8. `python scripts/kreate_check.py` passes;
+9. repository Python/data validation passes;
+10. frontend install/typecheck/lint/build passes while those checks remain in CI;
+11. exact-head CI is green;
+12. merge uses a normal merge commit;
+13. resulting `master` passes post-merge audit;
+14. `scripts/agent_exit_gate.py` proves integrated-head containment.
+
+After verification, append PR/base/head/merge/timestamp/child IDs to the parent's `integration_history`, clear the current integration slot metadata, and return the parent to `ACTIVE`.
+
+## Shared / high-conflict surfaces
+
+Treat these as shared:
 
 - `AGENTS.md`
 - `.agents/**`
@@ -139,97 +163,115 @@ Treat these as shared/high-conflict surfaces:
 - root build/deployment configuration
 - dependency lockfiles
 - shared API/data contracts
-- feature registry
+- `.github/feature-registry.json`
 - KREATE claim/evidence policy files
 
-A PR touching a shared/high-conflict surface must:
-
-- identify the owning role or governance owner;
-- list other active workstreams that could be affected;
-- preserve both valid sides during conflict resolution;
-- run the broad repository validation gates, not only a narrow unit test.
-
-## Merge-before-completion contract
-
-`PR opened`, `feature PR merged to role branch`, `review ready`, or `tests green on a feature branch` are not final completion states.
-
-For an accepted task to become `MERGED_VERIFIED`:
-
-1. its implementation must be contained in the role branch that will integrate it;
-2. the role-to-`master` integration PR must pass exact-head CI;
-3. the integration PR must merge to `master` using a normal merge commit;
-4. the resulting `master` commit must pass post-merge verification;
-5. `python scripts/agent_exit_gate.py --branch-head <task-or-integration-head>` must prove the validated work is contained in `master`;
-6. integration evidence must be recorded in coordination state.
-
-Several compatible tasks may share one role-to-`master` integration PR. They may also integrate independently. The old repository-wide integration slot no longer exists.
+Changes to these surfaces require broad repository validation and explicit cross-parent impact review.
 
 ## Human-by-exception policy
 
-Default mode is autonomous inside accepted work.
+All four roles are autonomous by default. IE and CS2 do **not** have a routine post-task checkpoint anymore.
 
 Human input is required only for:
 
-1. `EVIDENCE_ATTESTATION`
-2. `IRREVERSIBLE_ACTION`
-3. `PHYSICAL_SAFETY`
-4. `EXTERNAL_COMMITMENT`
-5. `PRODUCT_DIRECTION`
+1. `EVIDENCE_ATTESTATION` — attest a real interview, exact quote, private institutional fact, measured result, or other real-world evidence.
+2. `IRREVERSIBLE_ACTION` — destructive/difficult-to-reverse external action, credential revocation/rotation, or repository/account administration.
+3. `PHYSICAL_SAFETY` — dangerous hardware energization, actuator motion, mains/high-current work, or consequential field deployment.
+4. `EXTERNAL_COMMITMENT` — final submission, purchase/payment, contract/legal acceptance, consequential external message, or binding pilot/date commitment.
+5. `PRODUCT_DIRECTION` — material pivot to the agreed beachhead, primary problem, or core product thesis.
 
-Routine branch creation, PR creation, conflict resolution, reversible refactors, tests, and merge execution are not human gates.
+Routine architecture, research, PMR planning, model choice, sensor comparison, coding, drafting, testing, documentation, plugin discovery, branch/PR creation, conflict resolution, and merge execution are not human gates.
 
-## Role-specific post-work checkpoint
+`WAITING_HUMAN` is reserved for a pending critical gate with one concrete question after all independent work is complete.
 
-The strategic checkpoint remains role scoped:
+## Product truth and KREATE evidence boundary
 
-- **IE: CHECKPOINT ON**
-- **CS2: CHECKPOINT ON**
-- **EE: CHECKPOINT OFF**
-- **CS1: CHECKPOINT OFF**
+Parallel autonomy never authorizes fabricated evidence.
 
-Detailed behavior lives in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
+Do not claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, shuttle GPS, or IoT telemetry unless actually integrated and verified.
 
-IE/CS2 should surface a user decision after completing a package when the next step is a genuine strategic branch such as a different beachhead, buyer, major product thesis, or application narrative.
+Do not invent:
 
-EE/CS1 should continue to the next highest-value aligned technical task unless one of the explicit human gates applies.
+- interviews or customer names;
+- exact quotes;
+- pilot outcomes;
+- model accuracy;
+- hardware performance;
+- live telemetry;
+- carbon/water/food savings.
+
+Real-world evidence and application claims remain governed by the stricter evidence system under `KREATE/`.
+
+## Hardware engineering policy
+
+Hardware is first-class engineering work, not demo decoration. The detailed contract lives in `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`.
+
+EE may fan out hardware children into lanes such as:
+
+- `hw-measurement`
+- `hw-sensors`
+- `hw-power`
+- `hw-firmware`
+- `hw-pcb`
+- `hw-mechanical`
+- `hw-calibration`
+- `hw-verification`
+
+Hardware evidence must preserve maturity labels:
+
+- `ASSUMPTION`
+- `DATASHEET`
+- `CALCULATION`
+- `SIMULATION`
+- `BENCH_TEST`
+- `FIELD_TEST`
+- `PRODUCTION_EVIDENCE`
+
+A CAD render, schematic, datasheet value, or simulation is not bench evidence.
+
+When custom electronics are justified, agents should create the relevant subset of measurement requirements, block/interface diagrams, error budget, power tree/budget, schematic/PCB constraints, firmware state/failure behavior, data contract, BOM, calibration plan, verification matrix, safety/failure notes, debug/test-point strategy, and DFM/DFT evidence.
+
+Dangerous physical actions remain subject to `PHYSICAL_SAFETY`; design, calculation, CAD, simulation, firmware development, and non-energized review remain autonomous.
+
+## Plugins and specialized tools
+
+Agents may proactively use installed/connected plugins and specialized tools when they materially improve execution or verification.
+
+- Prefer an available specialized capability over a weaker invented workaround.
+- Never pretend a plugin/tool exists or was used when it was not discovered/available.
+- An agent may ask the user to install/connect/authorize a capability when genuinely needed.
+- Optional plugin requests are **not** human-gate blockers; useful work should continue.
+- If a missing capability is truly required for acceptance criteria, record the exact blocker.
+- Never ask users to paste secrets into repository files/chat when a normal authorization flow exists.
+- Tool output keeps its real evidence class: simulation is simulation, CAD is design verification, and remote physical measurements count as physical evidence only with recorded provenance/conditions.
+
+See `.agents/PLUGIN_POLICY.md` for the detailed capability policy.
 
 ## Feature preservation
 
 A merge is invalid if an existing feature, route, data source, asset, validation gate, or evidence boundary disappears unintentionally.
 
-Before a `master` merge:
+Before integration:
 
-- start from latest `master`;
-- account for deletions and renames;
-- update `.github/feature-registry.json` for new durable features when applicable;
-- run feature-preservation checks;
-- run agent-fabric checks;
-- run the full relevant CI suite;
-- verify `master` after merge.
+- account for every deletion/rename;
+- preserve valid work from concurrent parents;
+- update the feature registry for new durable capabilities when applicable;
+- never resolve product conflicts with blind whole-file `ours`/`theirs`;
+- run the full relevant validation gates.
 
-Intentional removal of a registered durable feature requires explicit repository-owner direction and PR documentation.
+Intentional removal of a registered durable feature requires explicit repository-owner direction.
 
-## Product truth and evidence boundary
+## Practical execution loop
 
-BOUNCAMPUS must not present estimates as live university telemetry.
+1. Parent objective exposes bounded child work.
+2. Agents fan out non-overlapping child tasks.
+3. Agents claim, execute, test, review, and heartbeat independently.
+4. Verified children fan into their owning parent.
+5. Parent readiness is computed from required pending children.
+6. Up to four parent PRs may stay open as drafts.
+7. One parent acquires the master integration slot.
+8. Sync current `master`, rerun exact-head CI, merge normally.
+9. Verify merged `master` and record the immutable batch.
+10. Parent returns to `ACTIVE` and starts the next child wave.
 
-Unless explicitly integrated and verified, do not claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, shuttle GPS, or IoT sensor networks.
-
-Real-world PMR, interview claims, pilot measurements, and KREATE evidence remain subject to the evidence system under `KREATE/`. Parallel development never authorizes fabricated evidence.
-
-## Practical release sequence
-
-1. Expose/claim independent non-overlapping tasks.
-2. Branch from the owning role branch.
-3. Implement and validate in parallel.
-4. Open feature PRs into the owning role branch.
-5. Merge compatible feature PRs after exact-head validation.
-6. Periodically sync the role branch from latest `master`.
-7. Open one role-to-`master` integration PR for that role.
-8. Run full integration gates.
-9. Merge with a normal merge commit.
-10. Verify merged `master` and record evidence.
-11. Mark included tasks `MERGED_VERIFIED`.
-12. Delete disposable feature branches when practical.
-
-See `.agents/FABRIC.md` and `docs/development-workflow.md` for the operational protocol.
+See `.agents/FABRIC.md`, `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`, `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`, and `docs/development-workflow.md` for operational details.
