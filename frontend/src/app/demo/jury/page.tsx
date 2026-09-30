@@ -22,19 +22,31 @@ import {
 import { useLocale } from '@/lib/i18n';
 
 type ProductionBand = {
+  policyVersion: string;
   predictedMeals: number;
   lowerBound: number;
   recommendedTarget: number;
   upperBound: number;
   signalCoveragePct: number;
   decisionReadiness: DecisionReadiness;
-  signals: Array<{ id: string; label: string; available: boolean; weightPct: number }>;
+  provenance: 'MODEL_ESTIMATE';
+  decisionProvenance: 'POLICY_HEURISTIC';
+  bandSemantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL';
+  calibrationStatus: 'NOT_CALIBRATED';
+  signals: Array<{
+    id: string;
+    label: string;
+    available: boolean;
+    weightPct: number;
+    weightBasis: 'POLICY_HEURISTIC';
+  }>;
   reasonCodes?: string[];
 };
 
 type FoodApi = {
   demandContext?: {
     available?: boolean;
+    actionable?: boolean;
     productionBand?: ProductionBand | null;
   };
 };
@@ -60,7 +72,7 @@ export default function JuryModePage() {
         const payload = await response.json() as FoodApi;
         setFood(payload);
         const productionBand = payload.demandContext?.productionBand;
-        setHealth(payload.demandContext?.available && productionBand ? 'LIVE' : 'PARTIAL');
+        setHealth(payload.demandContext?.available && payload.demandContext?.actionable && productionBand ? 'LIVE' : 'PARTIAL');
       })
       .catch(() => {
         setFood(null);
@@ -161,12 +173,12 @@ function DecisionStep({ band, health, nf, t }: { band: ProductionBand | null; he
       <div>
         <div className="bc-eyebrow">02 · {t('KARAR KALİTESİ', 'DECISION QUALITY')}</div>
         <h2 className="mt-3 text-[34px] font-black tracking-[-0.05em] text-slate-950">WITHHOLD</h2>
-        <p className="mt-3 max-w-3xl text-[11px] leading-6 text-slate-500">{t('Canlı bağlam yoksa sistem operasyonel sayı uydurmuyor. Resmi problem kanıtı görünür kalıyor; üretim önerisi güvenli biçimde bekletiliyor.', 'If live context is unavailable, the system does not invent an operational number. Official problem evidence remains visible while the production recommendation is safely withheld.')}</p>
+        <p className="mt-3 max-w-3xl text-[11px] leading-6 text-slate-500">{t('Gerekli bağlam yoksa sistem operasyonel sayı uydurmuyor. Resmi problem kanıtı görünür kalıyor; üretim önerisi güvenli biçimde bekletiliyor.', 'If required context is unavailable, the system does not invent an operational number. Official problem evidence remains visible while the production recommendation is safely withheld.')}</p>
         <div className="mt-5 grid gap-2 sm:grid-cols-4">
-          <SignalContract label={t('Ders programı', 'Course schedule')} weight="50%" />
-          <SignalContract label={t('Hava', 'Weather')} weight="20%" />
-          <SignalContract label={t('Menü', 'Menu')} weight="20%" />
-          <SignalContract label={t('Akademik takvim', 'Academic calendar')} weight="10%" />
+          <SignalContract label={t('Ders programı', 'Course schedule')} weight="50% POLICY" />
+          <SignalContract label={t('Hava', 'Weather')} weight="20% POLICY" />
+          <SignalContract label={t('Menü', 'Menu')} weight="20% POLICY" />
+          <SignalContract label={t('Akademik takvim', 'Academic calendar')} weight="10% POLICY" />
         </div>
       </div>
     );
@@ -175,12 +187,15 @@ function DecisionStep({ band, health, nf, t }: { band: ProductionBand | null; he
   return (
     <div>
       <div className="bc-eyebrow">02 · {t('KARAR KALİTESİ', 'DECISION QUALITY')}</div>
-      <div className="mt-3 flex flex-wrap items-center gap-3"><h2 className="text-[34px] font-black tracking-[-0.05em] text-slate-950">{band.decisionReadiness}</h2><span className="rounded-full bg-slate-100 px-3 py-1 font-mono text-[8px] font-black text-slate-600">{band.signalCoveragePct}% SIGNAL COVERAGE</span></div>
+      <div className="mt-3 flex flex-wrap items-center gap-3"><h2 className="text-[34px] font-black tracking-[-0.05em] text-slate-950">{band.decisionReadiness}</h2><span className="rounded-full bg-slate-100 px-3 py-1 font-mono text-[8px] font-black text-slate-600">{band.signalCoveragePct}% POLICY COVERAGE</span></div>
       <div className="mt-5 grid gap-3 sm:grid-cols-4">
-        <BigMetric label={t('Tahmin', 'Forecast')} value={nf(band.predictedMeals)} tag="MODEL_ESTIMATE" />
-        <BigMetric label={t('Alt bant', 'Lower band')} value={nf(band.lowerBound)} tag="MODEL_ESTIMATE" />
-        <BigMetric label={t('Başlangıç', 'Starting point')} value={nf(band.recommendedTarget)} tag="MODEL_ESTIMATE" />
-        <BigMetric label={t('Üst bant', 'Upper band')} value={nf(band.upperBound)} tag="MODEL_ESTIMATE" />
+        <BigMetric label={t('Nokta tahmini', 'Point forecast')} value={nf(band.predictedMeals)} tag="MODEL_ESTIMATE" />
+        <BigMetric label={t('Alt planlama sınırı', 'Lower planning bound')} value={nf(band.lowerBound)} tag="POLICY_HEURISTIC" />
+        <BigMetric label={t('Operatör başlangıcı', 'Operator starting point')} value={nf(band.recommendedTarget)} tag="POLICY_HEURISTIC" />
+        <BigMetric label={t('Üst planlama sınırı', 'Upper planning bound')} value={nf(band.upperBound)} tag="POLICY_HEURISTIC" />
+      </div>
+      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-[8px] font-black leading-5 text-amber-900">
+        {band.provenance} → {band.decisionProvenance} · {band.calibrationStatus} · {band.bandSemantics}
       </div>
       <div className="mt-5 grid gap-2 sm:grid-cols-4">
         {band.signals.map(signal => <SignalState key={signal.id} label={signal.label} weight={signal.weightPct} available={signal.available} />)}
@@ -195,7 +210,7 @@ function HumanGateStep({ canPilot, operatorGate, setOperatorGate, band, t }: { c
     <div>
       <div className="bc-eyebrow">03 · {t('İNSAN KAPISI', 'HUMAN GATE')}</div>
       <h2 className="mt-3 text-[34px] font-black tracking-[-0.05em] text-slate-950">{t('AI mutfağa tek başına komut vermez.', 'AI never dispatches to the kitchen alone.')}</h2>
-      <p className="mt-3 max-w-3xl text-[11px] leading-6 text-slate-500">{t('Pilot onayı yalnız canlı bağlam ve PILOT_READY kararı varken açılır. Bu buton dahi harici mutfak sistemine dispatch yapmaz.', 'Pilot approval is enabled only with live context and a PILOT_READY decision. Even this button does not dispatch to an external kitchen system.')}</p>
+      <p className="mt-3 max-w-3xl text-[11px] leading-6 text-slate-500">{t('Pilot onayı yalnız actionable canlı bağlam ve PILOT_READY kararı varken açılır. Bu buton dahi harici mutfak sistemine dispatch yapmaz.', 'Pilot approval is enabled only with actionable live context and a PILOT_READY decision. Even this button does not dispatch to an external kitchen system.')}</p>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <button type="button" disabled={!canPilot} onClick={() => setOperatorGate('PILOT_APPROVED')} className={`rounded-[20px] border p-5 text-left ${operatorGate === 'PILOT_APPROVED' ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-slate-900/10 bg-white text-slate-900'} disabled:cursor-not-allowed disabled:opacity-35`}><CheckCircle2 size={17} /><div className="mt-5 text-[12px] font-black">{t('Kontrollü pilotu onayla', 'Approve controlled pilot')}</div><div className="mt-1 text-[9px] opacity-55">{band?.decisionReadiness ?? 'WITHHOLD'} · AUTO_DISPATCH=false</div></button>
         <button type="button" onClick={() => setOperatorGate('HOLD')} className={`rounded-[20px] border p-5 text-left ${operatorGate === 'HOLD' ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-900/10 bg-white text-slate-900'}`}><ShieldCheck size={17} /><div className="mt-5 text-[12px] font-black">{t('Beklet / gözden geçir', 'Hold / review')}</div><div className="mt-1 text-[9px] opacity-55">{t('Varsayılan güvenli durum', 'Safe default')}</div></button>
@@ -214,7 +229,7 @@ function EvidenceStep({ t }: { t: (tr: string, en: string) => string }) {
         <BigMetric label={t('Hedef', 'Target')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} tag="TARGET_NOT_RESULT" />
         <BigMetric label={t('Minimum kanıt', 'Minimum evidence')} value={`${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}+${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}`} tag="CONTROL+INTERVENTION" />
       </div>
-      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-[9px] leading-5 text-amber-900">{t('Erken tükenme artarsa veya gıda güvenliği süreci geçmezse PROMISING sonucu verilemez. İklim etkisi ancak gerçek ölçümden sonra ayrıca hesaplanabilir.', 'If early sell-out increases or food-safety review fails, the intervention cannot be called PROMISING. Climate impact can only be calculated separately after real measurement.')}</div>
+      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-[9px] leading-5 text-amber-900">{t('Erken tükenme artarsa, data-quality gate geçmezse veya gıda güvenliği süreci geçmezse PROMISING sonucu verilemez. İklim etkisi ancak gerçek ölçümden sonra ayrıca hesaplanabilir.', 'If early sell-out increases, the data-quality gate fails, or food-safety review fails, the intervention cannot be called PROMISING. Climate impact can only be calculated separately after real measurement.')}</div>
       <Link href="/food-waste/pilot" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#173f67] px-4 py-3 text-[9px] font-black text-white"><Gauge size={12} /> {t('Pilot Evidence Lab’i aç', 'Open Pilot Evidence Lab')}</Link>
     </div>
   );
@@ -225,7 +240,7 @@ function CloseStep({ t }: { t: (tr: string, en: string) => string }) {
     <div className="grid gap-6 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
       <div>
         <div className="bc-eyebrow">05 · {t('KAPANIŞ', 'CLOSE')}</div>
-        <h2 className="mt-3 text-[36px] font-black leading-[1.02] tracking-[-0.055em] text-slate-950">{t('48 tonluk problemi raporlamıyoruz; bir sonraki öğünde oluşmasını önlemeye çalışıyoruz.', 'We are not reporting the 48-ton problem; we are trying to prevent it in the next service.')}</h2>
+        <h2 className="mt-3 text-[36px] font-black leading-[1.02] tracking-[-0.055em] text-slate-950">{t('48 tonluk problemi raporlamıyoruz; bir sonraki öğünde oluşmasını azaltabilecek kararı test ediyoruz.', 'We are not merely reporting the 48-ton problem; we are testing a decision that may reduce waste in the next service.')}</h2>
         <p className="mt-4 text-[12px] font-black leading-6 text-[#173f67]">{t('Ama başarıyı AI söylemiyor — kontrollü pilot söylüyor.', 'But AI does not declare victory — the controlled pilot does.')}</p>
       </div>
       <div className="rounded-[22px] bg-[#071c33] p-5 text-white">
@@ -258,7 +273,7 @@ function BigMetric({ label, value, tag }: { label: string; value: string; tag: s
 }
 
 function SignalState({ label, weight, available }: { label: string; weight: number; available: boolean }) {
-  return <div className={`rounded-xl border p-3 ${available ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}><div className="text-[8px] font-black text-slate-700">{label}</div><div className="mt-2 flex justify-between font-mono text-[7px] font-black"><span>{weight}%</span><span>{available ? 'LIVE' : 'MISSING'}</span></div></div>;
+  return <div className={`rounded-xl border p-3 ${available ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}><div className="text-[8px] font-black text-slate-700">{label}</div><div className="mt-2 flex justify-between font-mono text-[7px] font-black"><span>{weight}% POLICY</span><span>{available ? 'AVAILABLE' : 'MISSING'}</span></div></div>;
 }
 
 function SignalContract({ label, weight }: { label: string; weight: string }) {
@@ -276,9 +291,9 @@ function stepLabel(index: number, t: (tr: string, en: string) => string) {
 function presenterCue(index: number, t: (tr: string, en: string) => string) {
   return [
     t('48.251 kg sayısıyla aç. Bunun resmi kaynak olduğunu söyle.', 'Open with 48,251 kg and say it is official public data.'),
-    t('Tahminden önce güveni göster: sinyaller eksikse WITHHOLD.', 'Show trust before prediction: missing context can force WITHHOLD.'),
+    t('Nokta tahmini MODEL_ESTIMATE; bant ve eşikler POLICY_HEURISTIC. Eksik gerekli bağlamda WITHHOLD.', 'Point forecast is MODEL_ESTIMATE; range and thresholds are POLICY_HEURISTIC. Missing required context forces WITHHOLD.'),
     t('Bir kez HOLD’a, yalnız uygunsa bir kez pilot onayına bas.', 'Tap HOLD once, and approve the pilot only if eligible.'),
     t('≥10% hedefin sonuç olmadığını özellikle söyle ve Evidence Lab’i göster.', 'Explicitly say ≥10% is a target, not a result, and show the Evidence Lab.'),
-    t('Kapanış cümlesini aynen söyle; ardından soruyu jüriye bırak.', 'Deliver the closing line verbatim, then hand the floor to the jury.'),
+    t('Kapanışta “test ediyoruz” de; başarıyı yalnız ölçümün ilan edeceğini vurgula.', 'Close with “we are testing it” and stress that only measurement can declare success.'),
   ][index];
 }
