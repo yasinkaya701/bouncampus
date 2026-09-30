@@ -4,7 +4,7 @@
   "title": "Benchmark Türkiye public-university dining procurement",
   "priority": "P0",
   "lane": "campus-data-geo",
-  "state": "READY_FOR_INTEGRATION",
+  "state": "BLOCKED",
   "owner_agent": "research-evidence",
   "branch": "agent/campus-data-geo/turkiye-university-dining-market",
   "depends_on": [],
@@ -35,20 +35,24 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T00:20:00+03:00",
-    "heartbeat_at": "2026-10-01T00:20:00+03:00",
+    "heartbeat_at": "2026-10-01T00:24:00+03:00",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "Feature PR #44 is merged into role/cs2-product-strategy, but durable master promotion is blocked by unrelated ancestor policy PR #40 remaining open with failing repository-data CI.",
+    "evidence": "PR #44 merged at d1e5e2db3403ae222ddae445e569880eb827d209. PR #40 remains open on master and its prior CI failure is in scripts/test_agent_task.py WAITING_HUMAN gate invariants, outside KREATE/RESEARCH/**.",
+    "next_action": "After the unrelated policy/agent-task CI regression is repaired or superseded, sync role/cs2-product-strategy from master and run the normal role-to-master integration gates."
+  },
   "integration": {
-    "pull_request": null,
-    "validated_head_sha": null,
-    "merge_sha": null,
+    "pull_request": 44,
+    "validated_head_sha": "3db433384a59f52cec158a93631e4d3bdda6edda",
+    "merge_sha": "d1e5e2db3403ae222ddae445e569880eb827d209",
     "post_merge_verified_at": null
   },
   "notes": [
     "Secondary public-procurement research only; not PMR or market-size validation.",
     "Sample includes Boğaziçi, Düzce, Abdullah Gül, Türk-Alman, Marmara on-site/transported and İstanbul University notice-level data.",
     "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md.",
-    "Master promotion remains subject to the CS2 role integration topology and unrelated ancestor CI health."
+    "All benchmark files are already available to agents on role/cs2-product-strategy; only master promotion is blocked."
   ]
 }
