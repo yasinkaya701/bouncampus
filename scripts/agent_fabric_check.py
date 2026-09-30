@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Validate the lightweight BOUNCAMPUS autonomous multi-agent control plane."""
+"""Validate the BOUNCAMPUS autonomous parent/child agent fabric."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import re
-import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -37,6 +36,7 @@ REQUIRED_TASK_KEYS_V1 = {
 }
 REQUIRED_TASK_KEYS_V2 = REQUIRED_TASK_KEYS_V1 | {
     "parent_id",
+    "required_for_parent",
     "produces",
     "consumes",
     "child_integration",
@@ -53,6 +53,7 @@ REQUIRED_PARENT_KEYS = {
     "child_ids",
     "human_gate",
     "integration",
+    "integration_history",
     "notes",
 }
 
@@ -79,8 +80,18 @@ CRITICAL_HUMAN_GATES = {
     "EXTERNAL_COMMITMENT",
     "PRODUCT_DIRECTION",
 }
+DEFAULT_PARENT_STATES = {
+    "ACTIVE",
+    "BLOCKED",
+    "WAITING_HUMAN",
+    "READY_FOR_INTEGRATION",
+    "INTEGRATING",
+    "MERGED_VERIFYING",
+    "COMPLETE",
+}
 TASK_ID_RE = re.compile(r"^TASK-[A-Z0-9][A-Z0-9-]{2,63}$")
-PARENT_ID_RE = re.compile(r"^HUMAN-[A-Z0-9][A-Z0-9-]{1,63}$")
+PARENT_ID_RE = re.compile(r"^HUMAN-(IE|EE|CS1|CS2)(?:-[A-Z0-9-]+)?$")
+SHA_RE = re.compile(r"^[0-9a-fA-F]{7,64}$")
 
 
 def load_json(path: Path) -> Any:
@@ -126,10 +137,18 @@ def _validate_string_list(value: Any, source: str, field: str, errors: list[str]
     if not isinstance(value, list):
         errors.append(f"{source}: {field} must be a list")
         return
-    if any(not isinstance(item, str) or not item.strip() for item in value):
+    bad = [item for item in value if not isinstance(item, str) or not item.strip()]
+    if bad:
         errors.append(f"{source}: {field} entries must be non-empty strings")
     if len(value) != len(set(value)):
         errors.append(f"{source}: duplicate {field} entries are not allowed")
+
+
+def _validate_sha(value: Any, source: str, field: str, errors: list[str], *, required: bool = True) -> None:
+    if value is None and not required:
+        return
+    if not isinstance(value, str) or not SHA_RE.fullmatch(value):
+        errors.append(f"{source}: {field} must be a git SHA string")
 
 
 def _validate_human_gate(
@@ -143,28 +162,31 @@ def _validate_human_gate(
     if not isinstance(gate, dict):
         errors.append(f"{source}: human_gate must be an object")
         return
-    gate_kind = gate.get("kind")
-    gate_status = gate.get("status")
-    if gate_kind not in config.get("human_gate_kinds", []):
-        errors.append(f"{source}: invalid human_gate.kind {gate_kind!r}")
-    if gate_kind not in CRITICAL_HUMAN_GATES | {"NONE"}:
-        errors.append(f"{source}: human gate {gate_kind!r} is not a critical gate")
-    if gate_status not in config.get("human_gate_statuses", []):
-        errors.append(f"{source}: invalid human_gate.status {gate_status!r}")
-    if gate_kind == "NONE" and gate_status != "NOT_REQUIRED":
+    kind = gate.get("kind")
+    status = gate.get("status")
+    allowed_kinds = set(config.get("human_gate_kinds", []))
+    allowed_statuses = set(config.get("human_gate_statuses", []))
+    if kind not in allowed_kinds:
+        errors.append(f"{source}: invalid human_gate.kind {kind!r}")
+    if kind not in CRITICAL_HUMAN_GATES | {"NONE"}:
+        errors.append(f"{source}: human gate {kind!r} is not a critical gate")
+    if status not in allowed_statuses:
+        errors.append(f"{source}: invalid human_gate.status {status!r}")
+    if kind == "NONE" and status != "NOT_REQUIRED":
         errors.append(f"{source}: NONE human gate must use NOT_REQUIRED")
-    if gate_kind != "NONE" and gate_status == "NOT_REQUIRED":
+    if kind != "NONE" and status == "NOT_REQUIRED":
         errors.append(f"{source}: non-NONE human gate cannot use NOT_REQUIRED")
     if state == "WAITING_HUMAN":
-        if gate_kind not in CRITICAL_HUMAN_GATES or gate_status != "PENDING":
+        if kind not in CRITICAL_HUMAN_GATES or status != "PENDING":
             errors.append(f"{source}: WAITING_HUMAN requires a critical PENDING human gate")
-        if not isinstance(gate.get("question"), str) or not gate.get("question", "").strip():
+        question = gate.get("question")
+        if not isinstance(question, str) or not question.strip():
             errors.append(f"{source}: WAITING_HUMAN requires one concrete human_gate.question")
-    if gate_status in {"APPROVED", "REJECTED"}:
+    if status in {"APPROVED", "REJECTED"}:
         for field in ("decision", "decided_by", "decided_at"):
             value = gate.get(field)
             if not isinstance(value, str) or not value.strip():
-                errors.append(f"{source}: {gate_status} human gate requires {field}")
+                errors.append(f"{source}: {status} human gate requires {field}")
         decided_at = gate.get("decided_at")
         if isinstance(decided_at, str) and decided_at.strip():
             try:
@@ -193,11 +215,13 @@ def validate_config(config: dict[str, Any], errors: list[str]) -> None:
     if missing:
         errors.append(f"{CONFIG_PATH}: missing required keys {missing}")
         return
+
     schema = config.get("schema_version")
     if schema not in {1, 2}:
         errors.append(f"{CONFIG_PATH}: schema_version must be 1 or 2")
     if config.get("autonomy_default") != "AUTONOMOUS":
         errors.append(f"{CONFIG_PATH}: autonomy_default must be AUTONOMOUS")
+
     states = set(config.get("states", []))
     active = set(config.get("active_states", []))
     terminal = set(config.get("terminal_states", []))
@@ -207,33 +231,9 @@ def validate_config(config: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{CONFIG_PATH}: terminal_states contains values not present in states")
     if active & terminal:
         errors.append(f"{CONFIG_PATH}: active_states and terminal_states must be disjoint")
-    integration = config.get("integration", {})
-    if integration.get("merge_method") != "merge":
-        errors.append(f"{CONFIG_PATH}: merge_method must remain 'merge'")
-    if schema == 1:
-        if integration.get("max_open_pull_requests") != 1:
-            errors.append(f"{CONFIG_PATH}: schema-v1 max_open_pull_requests must remain 1")
-    else:
-        for field in ("coordination_parent_dir", "parent_branch_pattern", "parent_roles"):
-            if field not in config:
-                errors.append(f"{CONFIG_PATH}: schema-v2 requires {field}")
-        if config.get("human_parent_limit_per_role") != 1:
-            errors.append(f"{CONFIG_PATH}: human_parent_limit_per_role must be 1")
-        if config.get("child_agent_limit") is not None:
-            errors.append(f"{CONFIG_PATH}: child_agent_limit must be null; concurrency is contract-limited, not count-limited")
-        roles = config.get("parent_roles")
-        if roles != ["IE", "EE", "CS1", "CS2"]:
-            errors.append(f"{CONFIG_PATH}: parent_roles must be exactly IE, EE, CS1, CS2")
-        if integration.get("max_parent_pull_requests") != 4:
-            errors.append(f"{CONFIG_PATH}: max_parent_pull_requests must be 4")
-        if integration.get("max_integration_ready_pull_requests") != 1:
-            errors.append(f"{CONFIG_PATH}: max_integration_ready_pull_requests must be 1")
-        if integration.get("child_target_must_be_parent_branch") is not True:
-            errors.append(f"{CONFIG_PATH}: child_target_must_be_parent_branch must be true")
-        try:
-            re.compile(config.get("parent_branch_pattern", ""))
-        except re.error as exc:
-            errors.append(f"{CONFIG_PATH}: invalid parent_branch_pattern: {exc}")
+
+    if set(config.get("human_gate_kinds", [])) != CRITICAL_HUMAN_GATES | {"NONE"}:
+        errors.append(f"{CONFIG_PATH}: human gates must be NONE plus the five critical gate kinds")
     ttl = config.get("lease", {}).get("default_ttl_minutes")
     if not isinstance(ttl, int) or ttl <= 0:
         errors.append(f"{CONFIG_PATH}: default_ttl_minutes must be a positive integer")
@@ -241,9 +241,46 @@ def validate_config(config: dict[str, Any], errors: list[str]) -> None:
         re.compile(config.get("branch_pattern", ""))
     except re.error as exc:
         errors.append(f"{CONFIG_PATH}: invalid branch_pattern: {exc}")
-    configured_gates = set(config.get("human_gate_kinds", []))
-    if configured_gates != CRITICAL_HUMAN_GATES | {"NONE"}:
-        errors.append(f"{CONFIG_PATH}: human gates must be NONE plus the five critical gate kinds")
+
+    integration = config.get("integration", {})
+    if integration.get("merge_method") != "merge":
+        errors.append(f"{CONFIG_PATH}: merge_method must remain 'merge'")
+
+    if schema == 1:
+        if integration.get("max_open_pull_requests") != 1:
+            errors.append(f"{CONFIG_PATH}: schema-v1 max_open_pull_requests must remain 1")
+        return
+
+    v2_required = {
+        "coordination_parent_dir",
+        "parent_branch_pattern",
+        "parent_roles",
+        "human_parent_limit_per_role",
+        "child_agent_limit",
+        "parent_states",
+    }
+    missing_v2 = sorted(v2_required - set(config))
+    if missing_v2:
+        errors.append(f"{CONFIG_PATH}: schema-v2 missing {missing_v2}")
+        return
+    if config.get("parent_roles") != ["IE", "EE", "CS1", "CS2"]:
+        errors.append(f"{CONFIG_PATH}: parent_roles must be exactly IE, EE, CS1, CS2")
+    if config.get("human_parent_limit_per_role") != 1:
+        errors.append(f"{CONFIG_PATH}: human_parent_limit_per_role must be 1")
+    if config.get("child_agent_limit") is not None:
+        errors.append(f"{CONFIG_PATH}: child_agent_limit must be null; safety is contract-limited, not count-limited")
+    if set(config.get("parent_states", [])) != DEFAULT_PARENT_STATES:
+        errors.append(f"{CONFIG_PATH}: parent_states do not match persistent parent lifecycle")
+    try:
+        re.compile(config.get("parent_branch_pattern", ""))
+    except re.error as exc:
+        errors.append(f"{CONFIG_PATH}: invalid parent_branch_pattern: {exc}")
+    if integration.get("max_parent_pull_requests") != 4:
+        errors.append(f"{CONFIG_PATH}: max_parent_pull_requests must be 4")
+    if integration.get("max_integration_ready_pull_requests") != 1:
+        errors.append(f"{CONFIG_PATH}: max_integration_ready_pull_requests must be 1")
+    if integration.get("child_target_must_be_parent_branch") is not True:
+        errors.append(f"{CONFIG_PATH}: child_target_must_be_parent_branch must be true")
 
 
 def validate_task(
@@ -274,7 +311,6 @@ def validate_task(
         errors.append(f"{source}: id must be a string")
     elif not template and not TASK_ID_RE.fullmatch(task_id):
         errors.append(f"{source}: invalid task id {task_id!r}")
-
     title = task.get("title")
     if not isinstance(title, str) or not title.strip():
         errors.append(f"{source}: title must be non-empty")
@@ -294,6 +330,8 @@ def validate_task(
     if schema == 2:
         for field in ("produces", "consumes"):
             _validate_string_list(task.get(field), source, field, errors)
+        if not isinstance(task.get("required_for_parent"), bool):
+            errors.append(f"{source}: required_for_parent must be boolean")
 
     if template:
         return
@@ -329,13 +367,13 @@ def validate_task(
             target = child_integration.get("target_parent_branch")
             if target == "master":
                 errors.append(f"{source}: child integration may not target master")
-            if state == "INTEGRATING" and (not isinstance(target, str) or not target.strip()):
-                errors.append(f"{source}: INTEGRATING child requires child_integration.target_parent_branch")
+            if state == "INTEGRATING":
+                if not isinstance(target, str) or not target.strip():
+                    errors.append(f"{source}: INTEGRATING child requires child_integration.target_parent_branch")
+                _validate_sha(child_integration.get("validated_head_sha"), source, "child_integration.validated_head_sha", errors)
             if state in {"MERGED_VERIFYING", "MERGED_VERIFIED"}:
-                for field in ("validated_head_sha", "integrated_commit_sha"):
-                    value = child_integration.get(field)
-                    if not isinstance(value, str) or not value.strip():
-                        errors.append(f"{source}: {state} child requires child_integration.{field}")
+                _validate_sha(child_integration.get("validated_head_sha"), source, "child_integration.validated_head_sha", errors)
+                _validate_sha(child_integration.get("integrated_commit_sha"), source, "child_integration.integrated_commit_sha", errors)
             if state == "MERGED_VERIFIED":
                 verified_at = child_integration.get("verified_at")
                 if not isinstance(verified_at, str) or not verified_at.strip():
@@ -351,9 +389,11 @@ def validate_task(
     if state in ACTIVE_OWNERSHIP_STATES or state == "MERGED_VERIFIED":
         if not isinstance(owner, str) or not owner.strip():
             errors.append(f"{source}: {state} task requires owner_agent")
+        elif schema == 2 and not owner.startswith("agent:"):
+            errors.append(f"{source}: schema-v2 owner_agent must use agent:<identity>")
         if not isinstance(branch, str) or not branch.strip():
             errors.append(f"{source}: {state} task requires branch")
-        elif not re.fullmatch(config["branch_pattern"], branch):
+        elif not re.fullmatch(config.get("branch_pattern", ""), branch):
             errors.append(f"{source}: branch {branch!r} does not match configured pattern")
 
     if state in VALIDATION_REQUIRED_STATES:
@@ -415,22 +455,61 @@ def validate_task(
             if state == "INTEGRATING" and not isinstance(integration.get("pull_request"), int):
                 errors.append(f"{source}: INTEGRATING requires integration.pull_request")
             if state in {"MERGED_VERIFYING", "MERGED_VERIFIED"}:
-                if not isinstance(integration.get("merge_sha"), str) or not integration.get("merge_sha", "").strip():
-                    errors.append(f"{source}: {state} requires integration.merge_sha")
+                _validate_sha(integration.get("merge_sha"), source, "integration.merge_sha", errors)
             if state == "MERGED_VERIFIED":
-                for field in ("pull_request", "validated_head_sha", "merge_sha", "post_merge_verified_at"):
-                    value = integration.get(field)
-                    if field == "pull_request":
-                        if not isinstance(value, int):
-                            errors.append(f"{source}: MERGED_VERIFIED requires integration.pull_request")
-                    elif not isinstance(value, str) or not value.strip():
-                        errors.append(f"{source}: MERGED_VERIFIED requires integration.{field}")
+                if not isinstance(integration.get("pull_request"), int):
+                    errors.append(f"{source}: MERGED_VERIFIED requires integration.pull_request")
+                _validate_sha(integration.get("validated_head_sha"), source, "integration.validated_head_sha", errors)
                 verified = integration.get("post_merge_verified_at")
-                if isinstance(verified, str) and verified.strip():
+                if not isinstance(verified, str) or not verified.strip():
+                    errors.append(f"{source}: MERGED_VERIFIED requires integration.post_merge_verified_at")
+                else:
                     try:
                         parse_timestamp(verified)
                     except ValueError as exc:
                         errors.append(f"{source}: invalid post_merge_verified_at: {exc}")
+
+
+def _validate_parent_history(parent: dict[str, Any], source: str, errors: list[str]) -> None:
+    history = parent.get("integration_history")
+    if not isinstance(history, list):
+        errors.append(f"{source}: integration_history must be a list")
+        return
+    seen_prs: set[int] = set()
+    integrated_children: set[str] = set()
+    for index, entry in enumerate(history):
+        label = f"{source}: integration_history[{index}]"
+        if not isinstance(entry, dict):
+            errors.append(f"{label} must be an object")
+            continue
+        pr = entry.get("pull_request")
+        if not isinstance(pr, int):
+            errors.append(f"{label}.pull_request must be integer")
+        elif pr in seen_prs:
+            errors.append(f"{label}: duplicate pull request {pr}")
+        else:
+            seen_prs.add(pr)
+        for field in ("base_master_sha", "validated_head_sha", "merge_sha"):
+            _validate_sha(entry.get(field), label, field, errors)
+        verified_at = entry.get("post_merge_verified_at")
+        if not isinstance(verified_at, str) or not verified_at.strip():
+            errors.append(f"{label}.post_merge_verified_at is required")
+        else:
+            try:
+                parse_timestamp(verified_at)
+            except ValueError as exc:
+                errors.append(f"{label}: invalid post_merge_verified_at: {exc}")
+        children = entry.get("child_ids")
+        if not isinstance(children, list) or not children:
+            errors.append(f"{label}.child_ids must be a non-empty list")
+        else:
+            for child_id in children:
+                if not isinstance(child_id, str) or not TASK_ID_RE.fullmatch(child_id):
+                    errors.append(f"{label}: invalid child id {child_id!r}")
+                elif child_id in integrated_children:
+                    errors.append(f"{label}: child {child_id} appears in multiple verified parent batches")
+                else:
+                    integrated_children.add(child_id)
 
 
 def validate_parent(
@@ -464,15 +543,17 @@ def validate_parent(
     if parent.get("priority") not in config.get("priorities", []):
         errors.append(f"{source}: invalid priority {parent.get('priority')!r}")
     state = parent.get("state")
-    if state not in config.get("states", []):
-        errors.append(f"{source}: invalid state {state!r}")
+    if state not in set(config.get("parent_states", DEFAULT_PARENT_STATES)):
+        errors.append(f"{source}: invalid parent state {state!r}")
         return
-    parent_branch = parent.get("parent_branch")
-    if not isinstance(parent_branch, str) or not re.fullmatch(config.get("parent_branch_pattern", ""), parent_branch):
-        errors.append(f"{source}: invalid parent_branch {parent_branch!r}")
+    branch = parent.get("parent_branch")
+    if not isinstance(branch, str) or not re.fullmatch(config.get("parent_branch_pattern", ""), branch):
+        errors.append(f"{source}: invalid parent_branch {branch!r}")
     _validate_string_list(parent.get("child_ids"), source, "child_ids", errors)
     _validate_string_list(parent.get("notes"), source, "notes", errors)
     _validate_human_gate(parent.get("human_gate"), source=source, state=state, config=config, errors=errors)
+    _validate_parent_history(parent, source, errors)
+
     integration = parent.get("integration")
     if not isinstance(integration, dict):
         errors.append(f"{source}: integration must be an object")
@@ -480,22 +561,26 @@ def validate_parent(
     pr_state = integration.get("pr_state")
     if pr_state is not None and pr_state not in config.get("parent_pr_states", []):
         errors.append(f"{source}: invalid parent integration.pr_state {pr_state!r}")
-    if state == "INTEGRATING":
+    if state == "READY_FOR_INTEGRATION":
+        ready_at = integration.get("ready_for_integration_at")
+        if not isinstance(ready_at, str) or not ready_at.strip():
+            errors.append(f"{source}: READY_FOR_INTEGRATION requires ready_for_integration_at")
+        elif template is False:
+            try:
+                parse_timestamp(ready_at)
+            except ValueError as exc:
+                errors.append(f"{source}: invalid ready_for_integration_at: {exc}")
+        if pr_state != "DRAFT":
+            errors.append(f"{source}: READY_FOR_INTEGRATION requires integration.pr_state DRAFT")
+    if state in {"INTEGRATING", "MERGED_VERIFYING"}:
         if not isinstance(integration.get("pull_request"), int):
-            errors.append(f"{source}: INTEGRATING parent requires integration.pull_request")
+            errors.append(f"{source}: {state} parent requires integration.pull_request")
         if pr_state != "READY":
-            errors.append(f"{source}: INTEGRATING parent requires integration.pr_state READY")
-    if state in {"MERGED_VERIFYING", "MERGED_VERIFIED"}:
-        if not isinstance(integration.get("merge_sha"), str) or not integration.get("merge_sha", "").strip():
-            errors.append(f"{source}: {state} parent requires integration.merge_sha")
-    if state == "MERGED_VERIFIED":
-        for field in ("pull_request", "validated_head_sha", "post_merge_verified_at"):
-            value = integration.get(field)
-            if field == "pull_request":
-                if not isinstance(value, int):
-                    errors.append(f"{source}: MERGED_VERIFIED parent requires integration.pull_request")
-            elif not isinstance(value, str) or not value.strip():
-                errors.append(f"{source}: MERGED_VERIFIED parent requires integration.{field}")
+            errors.append(f"{source}: {state} parent requires integration.pr_state READY")
+        _validate_sha(integration.get("base_master_sha"), source, "integration.base_master_sha", errors)
+        _validate_sha(integration.get("validated_head_sha"), source, "integration.validated_head_sha", errors)
+    if state == "MERGED_VERIFYING":
+        _validate_sha(integration.get("merge_sha"), source, "integration.merge_sha", errors)
 
 
 def load_tasks(root: Path, config: dict[str, Any], errors: list[str]) -> dict[str, dict[str, Any]]:
@@ -603,8 +688,6 @@ def validate_parent_uniqueness(parents: dict[str, dict[str, Any]], errors: list[
     by_role: dict[str, str] = {}
     by_human: dict[str, str] = {}
     for parent_id, parent in parents.items():
-        if parent.get("state") == "CANCELLED":
-            continue
         role = parent.get("role")
         human = parent.get("human_owner")
         if isinstance(role, str):
@@ -632,8 +715,8 @@ def validate_child_parents(
             errors.append(f"{task_id}: parent {parent_id} does not exist")
             continue
         parent = parents[parent_id]
-        if parent.get("state") == "CANCELLED" and task.get("state") not in {"CANCELLED", "MERGED_VERIFIED"}:
-            errors.append(f"{task_id}: active child cannot belong to CANCELLED parent {parent_id}")
+        if parent.get("state") == "COMPLETE" and task.get("state") not in {"CANCELLED", "MERGED_VERIFIED"}:
+            errors.append(f"{task_id}: active child cannot belong to COMPLETE parent {parent_id}")
         child_integration = task.get("child_integration", {})
         target = child_integration.get("target_parent_branch") if isinstance(child_integration, dict) else None
         if target is not None and target != parent.get("parent_branch"):
@@ -642,18 +725,23 @@ def validate_child_parents(
             )
 
 
-def validate_parent_child_links(
+def validate_parent_history_links(
     tasks: dict[str, dict[str, Any]],
     parents: dict[str, dict[str, Any]],
     errors: list[str],
 ) -> None:
     for parent_id, parent in parents.items():
-        for child_id in parent.get("child_ids", []):
-            child = tasks.get(child_id)
-            if child is None:
-                errors.append(f"{parent_id}: child_ids references missing task {child_id}")
-            elif child.get("schema_version") == 2 and child.get("parent_id") != parent_id:
-                errors.append(f"{parent_id}: child {child_id} belongs to {child.get('parent_id')}, not {parent_id}")
+        for index, entry in enumerate(parent.get("integration_history", [])):
+            if not isinstance(entry, dict):
+                continue
+            for child_id in entry.get("child_ids", []):
+                child = tasks.get(child_id)
+                if child is None:
+                    errors.append(f"{parent_id}: integration_history[{index}] references missing child {child_id}")
+                elif child.get("schema_version") == 2 and child.get("parent_id") != parent_id:
+                    errors.append(f"{parent_id}: historical child {child_id} belongs to {child.get('parent_id')}")
+                elif child.get("state") != "MERGED_VERIFIED":
+                    errors.append(f"{parent_id}: historical child {child_id} is not MERGED_VERIFIED")
 
 
 def validate_repository(
@@ -717,10 +805,9 @@ def validate_repository(
 
     tasks = load_tasks(root, config, errors)
     for task_id, task in tasks.items():
-        source = f"{config.get('coordination_task_dir')}/{task_id}.json"
         validate_task(
             task,
-            source,
+            f"{config.get('coordination_task_dir')}/{task_id}.json",
             config,
             errors,
             warnings,
@@ -731,15 +818,20 @@ def validate_repository(
 
     parents = load_parents(root, config, errors)
     for parent_id, parent in parents.items():
-        source = f"{config.get('coordination_parent_dir')}/{parent_id}.json"
-        validate_parent(parent, source, config, errors, template=False)
+        validate_parent(
+            parent,
+            f"{config.get('coordination_parent_dir')}/{parent_id}.json",
+            config,
+            errors,
+            template=False,
+        )
 
     validate_dependencies(tasks, errors)
     validate_path_ownership(tasks, errors)
     if config.get("schema_version") == 2:
         validate_parent_uniqueness(parents, errors)
         validate_child_parents(tasks, parents, errors)
-        validate_parent_child_links(tasks, parents, errors)
+        validate_parent_history_links(tasks, parents, errors)
     return errors, warnings, tasks
 
 
@@ -790,10 +882,10 @@ def main() -> int:
         return 1
     print("AGENT FABRIC VALIDATION: PASS")
     print("- fabric configuration is valid")
-    print("- task template is structurally valid")
+    print("- task and parent templates are structurally valid")
     print(f"- coordination tasks validated: {len(tasks)}")
     print("- dependency graph and active path ownership are conflict-free")
-    print("- parent/child, lease, blocker, human-gate, and integration invariants hold")
+    print("- persistent parent/child, lease, human-gate, and integration invariants hold")
     if args.summary:
         print_summary(tasks)
     return 0
