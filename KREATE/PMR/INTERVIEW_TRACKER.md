@@ -25,6 +25,17 @@ A row is a slot, not evidence that an interview occurred. Keep `TODO` until a re
 
 ## Status guidance
 
-Use simple states only when true: `TODO`, `OUTREACH`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.
+Allowed states are exactly: `TODO`, `OUTREACH`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.
 
-`COMPLETED` means the real conversation occurred and notes were captured. It does **not** mean the interview supports the current hypothesis.
+- `TODO` — slot is unworked.
+- `OUTREACH` — real outreach occurred; do not invent a scheduled time.
+- `SCHEDULED` — a real date/time is agreed and must appear in `Scheduled`.
+- `COMPLETED` — the real conversation occurred and notes were captured. This does **not** mean the interview supports the current hypothesis.
+- `CANCELLED` — the planned contact will not occur; keep the row for auditability and reuse the slot only by explicitly changing its status/context.
+
+For `COMPLETED`, fill note-taker, stakeholder type, organization type, and completed date. `Evidence linked` must contain either:
+
+- one or more real `E-INT-*` IDs created in [../EVIDENCE.md](../EVIDENCE.md), or
+- `NONE — no promotable claim` when the interview was real/useful but did not support a claim worth promoting.
+
+Never create an `E-INT-*` ID merely to make the completed-interview count look stronger.
