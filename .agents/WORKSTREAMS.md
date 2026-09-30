@@ -32,6 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
+| frontend-ux + api-product + quality-release | `agent/frontend-ux/archive-stale-flow-mock` | Workstream Agent / temporary Merge Coordinator | INTEGRATING | Remove stale mock/synthetic/superseded surfaces from active runtime and documentation trees while preserving provenance under `legacy/`: archive the orphan hard-coded `/flow` route, unused synthetic backend data-generation/training utilities, and the pre-food-waste platform walkthrough; replace stale create-next-app documentation without changing active production behavior. | `.agents/WORKSTREAMS.md`, `frontend/README.md`, `frontend/src/app/flow/page.tsx`, `backend/app/data/generator.py`, `backend/generate_and_train.py`, `docs/walkthrough.md`, `legacy/README.md`, `legacy/frontend/src/app/flow/page.tsx`, `legacy/backend/synthetic-training/generator.py`, `legacy/backend/synthetic-training/generate_and_train.py`, `legacy/docs/platform-walkthrough-pre-food-waste.md` |
 
 The `quality-release / kreate-team-os` workstream was merged through PR #27 at merge commit `557cb53eea229a999dec265ac076067b82922f94` and verified on `master` by CI run #241. Verification included feature preservation, frontend typecheck/lint/build, repository Python compile, `python scripts/kreate_check.py`, critical JSON validation, merged-PR provenance, and confirmation that the integrated agent head is contained in `master`. Ownership is released; the stale pre-runner blocker state has been removed.
 
