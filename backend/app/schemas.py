@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any, Literal
-from datetime import date
+
 
 class Building(BaseModel):
     id: str
@@ -14,22 +14,28 @@ class Building(BaseModel):
     occupancy_ratio: Optional[float] = None
     floor_capacities: Optional[List[int]] = None
 
-class BuildingInfo(Building): pass
+
+class BuildingInfo(Building):
+    pass
+
 
 class OccupancyByHour(BaseModel):
     hour: int
     occupancy_count: int
     occupancy_ratio: float
 
+
 class OccupancyByFloor(BaseModel):
     floor: int
     hourly_occupancy: List[OccupancyByHour]
+
 
 class OccupancyForecast(BaseModel):
     date: str
     building_id: str
     total_hourly: List[OccupancyByHour]
     by_floor: Optional[List[OccupancyByFloor]] = None
+
 
 class FloorEnergyDetail(BaseModel):
     floor: int
@@ -38,15 +44,18 @@ class FloorEnergyDetail(BaseModel):
     lighting_kwh: float
     is_active: bool
 
+
 class HourlyEnergyForecast(BaseModel):
     hour: int
     total_kwh: float
     floor_details: List[FloorEnergyDetail]
 
+
 class EnergySaving(BaseModel):
     kwh_saved: float
     cost_saved_tl: float
     co2_avoided_kg: float
+
 
 class EnergyForecast(BaseModel):
     date: str
@@ -56,22 +65,48 @@ class EnergyForecast(BaseModel):
     savings: EnergySaving
     hourly_forecast: List[HourlyEnergyForecast]
 
+
 class MenuPopularity(BaseModel):
     name: str
     name_en: str
     category: str
-    popularity_score: float
-    avg_rating: float
+    popularity_score: Optional[float] = None
+    avg_rating: Optional[float] = None
+    popularity_provenance: Literal["POLICY_HEURISTIC", "UNAVAILABLE"] = "UNAVAILABLE"
+
+
+class DecisionSignal(BaseModel):
+    id: str
+    available: bool
+    policy_weight_pct: int
+    weight_basis: Literal["POLICY_HEURISTIC"]
+
 
 class FoodDemandForecast(BaseModel):
     date: str
     cafeteria_id: str
     meal_type: str
     predicted_demand: int
-    recommended_production: int
+    planning_lower: int
+    recommended_production: Optional[int]
+    planning_upper: int
     menu_items: List[MenuPopularity]
-    potential_waste_saved_kg: float
-    cost_saved_tl: float
+    policy_version: str
+    model_id: str
+    forecast_provenance: Literal["MODEL_ESTIMATE"]
+    decision_provenance: Literal["POLICY_HEURISTIC"]
+    band_semantics: Literal["PLANNING_RANGE_NOT_CALIBRATED_INTERVAL"]
+    calibration_status: Literal["NOT_CALIBRATED"]
+    signal_coverage_pct: int
+    decision_readiness: Literal["PILOT_READY", "REVIEW_REQUIRED", "WITHHOLD"]
+    abstained: bool
+    operator_approval_required: bool
+    automatic_kitchen_dispatch: bool
+    signals: List[DecisionSignal]
+    reason_codes: List[str]
+    limitations: List[str]
+    model_metadata: Dict[str, Any]
+
 
 class ActionItem(BaseModel):
     id: str
@@ -84,9 +119,11 @@ class ActionItem(BaseModel):
     impact_value: float
     impact_unit: str
 
+
 class ScenarioRequest(BaseModel):
     scenario_type: str
     params: Dict[str, Any]
+
 
 class ScenarioComparison(BaseModel):
     metric: str
@@ -95,10 +132,12 @@ class ScenarioComparison(BaseModel):
     diff: float
     diff_percent: float
 
+
 class ScenarioResult(BaseModel):
     scenario_type: str
     comparisons: List[ScenarioComparison]
     insights: List[str]
+
 
 class ImpactMetrics(BaseModel):
     kwh_saved: float
@@ -106,12 +145,14 @@ class ImpactMetrics(BaseModel):
     food_waste_avoided_kg: float
     cost_saved_tl: float
 
+
 class LiveWeatherInfo(BaseModel):
     source: str
     temperature: float
     humidity: int
     rain: bool
     wind_speed: float
+
 
 class LiveMenuInfo(BaseModel):
     source: str
@@ -124,6 +165,7 @@ class LiveMenuInfo(BaseModel):
     options: List[str]
     popularity_multiplier: float
 
+
 class LiveWindTurbineInfo(BaseModel):
     source: str
     wind_speed_kmh: float
@@ -131,6 +173,7 @@ class LiveWindTurbineInfo(BaseModel):
     daily_clean_mwh: float
     co2_offset_kg: float
     campus_electricity_coverage_percent: float
+
 
 class RealCampusEvent(BaseModel):
     name: str
@@ -140,6 +183,7 @@ class RealCampusEvent(BaseModel):
     expected_attendance: int
     category: str
     impact: str
+
 
 class DashboardData(BaseModel):
     date: str
@@ -155,5 +199,3 @@ class DashboardData(BaseModel):
     live_wind: Optional[LiveWindTurbineInfo] = None
     today_events: Optional[List[RealCampusEvent]] = None
     real_courses_loaded: Optional[int] = None
-
-
