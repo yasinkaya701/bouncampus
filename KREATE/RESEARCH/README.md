@@ -15,6 +15,14 @@ This directory contains secondary/public-source research prepared for KREATE age
 | Pack | Purpose | Machine-readable companion |
 | --- | --- | --- |
 | [Boğaziçi Sustainability 2025](./BOGAZICI_SUSTAINABILITY_2025.md) | Deep secondary research from Boğaziçi sustainability/SDG sources plus peer-reviewed institutional-dining literature; includes food, water, energy, transport, data-quality caveats, PMR questions and role-specific handoffs. | [`bogazici_sustainability_2025.json`](./bogazici_sustainability_2025.json) |
+| [Boğaziçi Food Operations Deep Dive](./BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md) | Decision/governance map for central production, contractor controls, BUCampus menu voting, BUCard/QR candidate signals, service regimes, packaged service, pilot data requests and CS1 model-design rules. | [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json) |
+| [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) | Cross-source data-quality control: capacity, beneficiary, serving, packaged-meal, food-waste/İSTAÇ and service-regime semantics that agents must reconcile before joining metrics or training models. | See the `source_conflicts` section of [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json). |
+
+## Recommended reading order
+
+1. Start with the Sustainability 2025 pack for the broad campus problem landscape and claim firewall.
+2. Read the Food Operations Deep Dive before PMR, data requests, architecture or modeling around dining operations.
+3. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
 
 ## How agents should consume a pack
 
@@ -23,3 +31,4 @@ This directory contains secondary/public-source research prepared for KREATE age
 3. Before promoting a number into `../EVIDENCE.md`, reopen the source, verify wording/date/units, and write a claim no broader than the source supports.
 4. Route unknown workflow facts to PMR rather than filling them with assumptions.
 5. Route quantitative/model implications to reproducible technical tests rather than presenting them as measured campus performance.
+6. For dining data, preserve `source`, `year`, `unit`, `period`, `scope` and `counting_semantics`; use `UNKNOWN` rather than inferring missing semantics.
