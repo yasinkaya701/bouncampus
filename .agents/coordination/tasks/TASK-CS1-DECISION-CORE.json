@@ -21,6 +21,7 @@
     "backend/app/optimizers/food_optimizer.py",
     "frontend/src/lib/food-waste.ts",
     "frontend/src/lib/types.ts",
+    "frontend/src/lib/realData.ts",
     "frontend/src/app/api/v1/food/route.ts",
     "frontend/src/app/api/v1/food/pilot-score/route.ts",
     "frontend/src/app/api/v1/food/pilot-template/route.ts",
@@ -38,7 +39,7 @@
   "acceptance_criteria": [
     "Backend and Next food-decision surfaces share explicit versioned readiness, abstention, provenance, reason-code, and human-review semantics",
     "Pre-pilot product surfaces do not expose achieved food-waste, cost, carbon, or water savings claims",
-    "All active food action/dashboard and registered decision UI surfaces respect the same claim firewall and provenance semantics",
+    "All active food action/dashboard, fallback data, and registered decision UI surfaces respect the same claim firewall and provenance semantics",
     "Heuristic planning bands are explicitly labeled POLICY_HEURISTIC and never described as calibrated confidence intervals",
     "Decision readiness degrades from PILOT_READY to REVIEW_REQUIRED to WITHHOLD based on source health and required context",
     "A baseline evaluation framework supports naive historical and operator baselines without fabricating measured results",
@@ -66,7 +67,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T20:45:00Z",
+    "heartbeat_at": "2026-09-30T20:48:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -80,7 +81,7 @@
     "Scope expanded by user request from minimal core to the broad CS1 Decision Intelligence v1 workstream.",
     "No PMR, pilot, calibration, or achieved-impact result may be invented; infrastructure may be implemented before evidence exists.",
     "Model point estimation, policy heuristics, technical benchmarks, and measured pilot evidence are separate evidence classes.",
-    "Active dashboard/actions and registered jury/food-waste UI surfaces are included to prevent provenance drift.",
+    "Active dashboard/actions, fallback data, and registered jury/food-waste UI surfaces are included to prevent provenance drift.",
     "Temporary .github/workflows/cs1-decision-validation.yml is reserved only to run exact-head validation on the CS1 branch and will be deleted before integration.",
     "Does not touch .github/workflows/ci.yml because TASK-FABRIC-CLI currently owns that path."
   ]
