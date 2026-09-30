@@ -4,7 +4,7 @@
   "title": "Map Boğaziçi PMR role targets",
   "priority": "P0",
   "lane": "campus-data-geo",
-  "state": "READY_FOR_INTEGRATION",
+  "state": "BLOCKED",
   "owner_agent": "research-evidence",
   "branch": "agent/campus-data-geo/bogazici-pmr-target-map",
   "depends_on": [],
@@ -35,19 +35,23 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T00:35:00+03:00",
-    "heartbeat_at": "2026-10-01T00:35:00+03:00",
+    "heartbeat_at": "2026-10-01T00:39:00+03:00",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "Feature PR #52 is merged into role/cs2-product-strategy, but durable master promotion remains blocked by unrelated ancestor policy PR #40 failing repository-data CI.",
+    "evidence": "PR #52 merged at 0876ae1b249688d5d971cd763c5406e574a141ce. The ancestor failure is in scripts/test_agent_task.py WAITING_HUMAN gate invariants and is outside KREATE/RESEARCH/**.",
+    "next_action": "After the unrelated policy/agent-task regression is repaired or superseded, sync role/cs2-product-strategy from master, run role integration gates, merge to master and record post-merge verification."
+  },
   "integration": {
-    "pull_request": null,
-    "validated_head_sha": null,
-    "merge_sha": null,
+    "pull_request": 52,
+    "validated_head_sha": "4fefcf05770785f1616cca6c1d4a960a54521877",
+    "merge_sha": "0876ae1b249688d5d971cd763c5406e574a141ce",
     "post_merge_verified_at": null
   },
   "notes": [
     "Public role/contact mapping only; no outreach or interview has been performed by this task.",
     "Direct public contacts are used only where published by the organization; no private/personal contact data are collected.",
-    "Does not touch KREATE/EVIDENCE.md, KREATE/ASSUMPTIONS.md or interview tracker files."
+    "All files are already available to agents on role/cs2-product-strategy; only durable master promotion is blocked."
   ]
 }
