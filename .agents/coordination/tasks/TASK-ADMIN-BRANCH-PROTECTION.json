@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "TASK-ADMIN-BRANCH-PROTECTION",
+  "title": "Enforce master branch protection / ruleset",
+  "priority": "P0",
+  "lane": "quality-release",
+  "state": "WAITING_HUMAN",
+  "owner_agent": "agent-fabric-dispatcher",
+  "branch": "agent/quality-release/branch-protection",
+  "depends_on": [],
+  "touched_paths": [
+    ".agents/coordination/admin-branch-protection"
+  ],
+  "acceptance_criteria": [
+    "Direct pushes to master are rejected by GitHub before they mutate the branch",
+    "Normal pull-request merge commits remain permitted",
+    "Required CI checks must pass before master integration"
+  ],
+  "validation_commands": [
+    "Verify repository ruleset/branch protection through GitHub administration",
+    "Attempt a non-destructive test branch workflow and confirm master requires PR integration"
+  ],
+  "human_gate": {
+    "kind": "IRREVERSIBLE_ACTION",
+    "status": "PENDING",
+    "question": "Enable a GitHub master branch protection/ruleset that blocks direct pushes and requires PR-based integration with required CI checks?",
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-09-30T16:43:00Z",
+    "heartbeat_at": "2026-09-30T16:43:00Z",
+    "ttl_minutes": 10080
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Observed direct master push baf1bb6fb61df396c4922d7c1cfae85f838bdd14 after verified PR #33 merge. CI can detect this policy violation but cannot prevent the mutation while repository protection is disabled.",
+    "The connected GitHub execution surface does not expose repository administration writes, so this is intentionally the only critical human/admin gate created by the fabric bootstrap.",
+    "No product implementation is blocked by this task; autonomous agents continue on non-overlapping branches and use the single integration PR discipline."
+  ]
+}
