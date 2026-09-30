@@ -19,7 +19,7 @@ An agent may own more than one lane only when the touched file sets do not overl
 
 ## Autonomous control plane
 
-**Default mode is AUTONOMOUS. Human involvement is exception-only.**
+**Default mode is AUTONOMOUS. Human involvement is exception-only inside an accepted work package.**
 
 The machine-readable contract lives in `.agents/fabric.json`; the execution protocol lives in `.agents/FABRIC.md`.
 
@@ -35,7 +35,7 @@ The `agent-coordination` branch is a deliberate policy exception: agents may wri
 
 ## Human-by-exception policy
 
-Agents MUST NOT ask a human for routine engineering judgment that can be resolved by repository inspection, testing, a reversible implementation choice, or a bounded experiment.
+Agents MUST NOT ask a human for routine engineering judgment that can be resolved by repository inspection, testing, a reversible implementation choice, or a bounded experiment **while executing the currently accepted work package**.
 
 Human input is required only for these gate kinds:
 
@@ -45,9 +45,76 @@ Human input is required only for these gate kinds:
 4. `EXTERNAL_COMMITMENT` — final submission, purchase/payment, contract/legal acceptance, consequential external message, or committing to a pilot/date on behalf of the team.
 5. `PRODUCT_DIRECTION` — a material pivot to the agreed beachhead, primary problem, or core product direction when evidence supports materially different choices.
 
-Everything else is autonomous by default, including decomposition, branch creation, code edits, tests, reversible refactors, dependency updates, ordinary documentation, routine feature prioritization, conflict resolution, PR creation, merge execution, rollback/revert, and post-merge verification.
+Everything else is autonomous by default **inside the accepted work package**, including decomposition, branch creation, code edits, tests, reversible refactors, dependency updates, ordinary documentation, routine feature prioritization, conflict resolution, PR creation, merge execution, rollback/revert, and post-merge verification.
 
 `WAITING_HUMAN` is valid only when the task has a non-`NONE` human gate, asks one concrete decision, and all work independent of that decision is already complete. Uncertainty alone is not a human gate.
+
+## Post-work user decision checkpoint — role scoped
+
+The post-work user decision checkpoint is **not universal**.
+
+For KREATE role work, the policy is:
+
+- **IE — Customer Discovery & Market Lead: CHECKPOINT ON**
+- **CS2 — Product Strategy, Evidence Synthesis & Application Lead: CHECKPOINT ON**
+- **EE — Physical Systems & Measurement Lead: CHECKPOINT OFF**
+- **CS1 — Decision Intelligence Lead: CHECKPOINT OFF**
+
+The detailed role-specific protocol lives in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
+
+### IE and CS2 — preserve user control over strategic branches
+
+Autonomy inside a work package does **not** authorize IE or CS2 to finish one meaningful task and then blindly select the next strategic workstream.
+
+Their required lifecycle is:
+
+> **Accept work → finish it end-to-end → merge/verify when applicable → explain the result → surface real next options → recommend one → ask the user to choose when a material strategic branch exists.**
+
+After a completed package, IE/CS2 should stop for user direction when the next action would commit substantial effort to one of multiple credible strategic directions, for example:
+
+- a different beachhead, persona, buyer, or PMR segment;
+- a major product-thesis change;
+- a new major feature family that displaces other important work;
+- a substantial application narrative change;
+- a new campus-domain expansion;
+- a major market/pilot path choice;
+- any other branch where choosing one path materially delays or excludes another.
+
+Their decision package must include:
+
+1. **Completed** — what was delivered;
+2. **Evidence / result** — tests, commits, measurements, interview findings, benchmark results, or evidence IDs;
+3. **What changed** — assumptions, risks, product requirements, feature priority, or KREATE claims affected;
+4. **Options** — normally 2–4 materially different next paths without fake alternatives;
+5. for each option: **expected result, effort/cost, main risk, dependencies, and KREATE impact**;
+6. **Recommendation** — which option the agent prefers and why;
+7. **Decision needed** — one concise user choice.
+
+IE/CS2 should not ask vague questions such as “What should I do next?” without first supplying the result and decision context.
+
+### EE and CS1 — continuous technical execution
+
+EE and CS1 must **not** pause after completed technical work merely to ask the user which technical direction to take next.
+
+After a work package reaches `MERGED_VERIFIED`, or after a bounded experiment reaches its accepted Definition of Done, EE/CS1 should:
+
+1. report the concrete result and evidence;
+2. record limitations, failures, and changed assumptions;
+3. inspect current KREATE objectives, dependencies, ready work, and latest IE/CS2 strategic decisions;
+4. choose the next highest-value non-conflicting technical task;
+5. continue autonomously.
+
+EE may autonomously choose among measurement architectures, component/sensor approaches, calibration work, hardware-free alternatives, integration methods, or pilot-instrumentation tasks.
+
+CS1 may autonomously choose among realistic baselines, model/heuristic experiments, signal ablation, uncertainty methods, decision-cost formulations, data-quality work, evaluation, or pilot analytics.
+
+Multiple technically plausible paths are **not** by themselves a reason to ask the user. EE/CS1 should use tests and bounded experiments to choose.
+
+If EE/CS1 uncover evidence that implies a genuine market/product pivot rather than a technical choice, they should document the finding and surface it to IE/CS2. The strategic role then runs the user checkpoint if needed.
+
+Checkpoint OFF does not override `EVIDENCE_ATTESTATION`, `IRREVERSIBLE_ACTION`, `PHYSICAL_SAFETY`, `EXTERNAL_COMMITMENT`, or a genuine `PRODUCT_DIRECTION` human gate.
+
+This role split does not weaken the merge-before-exit contract and must not be used as an excuse to stop with accepted code unmerged or unverified.
 
 ## Task claim and lease rules
 
@@ -160,6 +227,8 @@ Real-world evidence and KREATE claims remain subject to the stricter evidence sy
 7. The same agent verifies the merged `master`, runs the exit gate, and records merge evidence.
 8. Only then does the task become `MERGED_VERIFIED` and release its lease.
 9. Deploy/verify runtime surfaces when deployment is part of the task scope.
+10. **IE/CS2:** if completed work exposes multiple meaningful strategic next directions, present the user decision checkpoint before claiming a new strategic workstream.
+11. **EE/CS1:** report the result, choose the next highest-value aligned technical task, and continue autonomously unless a genuine human gate applies.
 
 ## Bootstrap exception
 
