@@ -44,6 +44,9 @@ jobs:
       - name: Preserve registered features
         run: python scripts/verify_feature_preservation.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
+      - name: Validate autonomous agent fabric
+        run: python scripts/agent_fabric_check.py
+
       - name: Validate merge-before-exit gate
         run: python -m py_compile scripts/agent_exit_gate.py
 
@@ -91,6 +94,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate registered feature files
         run: python scripts/verify_feature_preservation.py
+      - name: Validate agent fabric policy
+        run: python scripts/agent_fabric_check.py
       - name: Compile merge-before-exit gate
         run: python -m py_compile scripts/agent_exit_gate.py
 
@@ -121,6 +126,10 @@ jobs:
           echo "$RUNNER_TEMP/bouncampus-python/bin" >> "$GITHUB_PATH"
       - name: Compile repository Python
         run: python -m compileall -q backend/app scripts
+      - name: Test autonomous agent fabric
+        run: python scripts/test_agent_fabric_check.py
+      - name: Validate autonomous agent fabric
+        run: python scripts/agent_fabric_check.py
       - name: Validate KREATE operating system
         run: python scripts/kreate_check.py
       - name: Validate critical JSON datasets
