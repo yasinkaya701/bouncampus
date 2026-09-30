@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "research_id": "BOGAZICI-FOOD-OPS-DEEP-DIVE-2026-10-01",
+  "title": "Boğaziçi Food Operations Deep Dive",
+  "research_date": "2026-10-01",
+  "evidence_class": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "claim_firewall": {
+    "not_pmr": true,
+    "not_customer_validation": true,
+    "not_pilot_evidence": true,
+    "no_private_data_access_claim": true,
+    "no_causal_attribution_from_public_waste_total": true
+  },
+  "decision_thesis": {
+    "current_hypothesis": "A human-reviewed production/allocation decision may be improved if aggregate demand signals are available before the quantity freeze deadline.",
+    "highest_value_unknown": "Who controls final production/allocation quantity, when it is frozen, what signals are available before that deadline, and what the operational cost of excess versus shortage is.",
+    "decision_boundary": [
+      "planned_portions",
+      "produced_portions",
+      "campus_allocation",
+      "service_channel_allocation",
+      "served_demand",
+      "unserved_surplus"
+    ]
+  },
+  "facts": [
+    {
+      "finding_id": "FOD-01",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "The 2025 SKS activity report lists six dining halls, 6,000 daily meals, packaged-meal service, 2,386 satisfaction-survey participants, a virtual-card system, a North Campus kiosk, a two-year meal tender, and BUCampus menu selection.",
+      "source_ids": ["SRC-SKS-2025"],
+      "caveats": ["The denominator/period for the source's '2,000 packaged meals' value is not sufficiently defined for reuse as a quantitative model field."],
+      "agent_use": ["IE", "EE", "CS1", "CS2"]
+    },
+    {
+      "finding_id": "FOD-02",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "The Food Services Branch Directorate formally prepares tender work and technical specifications, monitors contractor food service, handles meal-pricing processes, prepares/publishes menus, checks contract compliance, and serves the Food Services Executive Board.",
+      "source_ids": ["SRC-SKS-DIRECTIVE"],
+      "caveats": ["The directive does not identify who chooses production quantity or when the quantity is locked."],
+      "agent_use": ["IE", "CS2"]
+    },
+    {
+      "finding_id": "FOD-03",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "Food preparation, distribution and post-distribution cleaning are supplied through a contracted service under university monitoring/control structures.",
+      "source_ids": ["SRC-ADMIN-2025", "SRC-SKS-2025"],
+      "caveats": ["Payment basis, waste incentives, shortage penalties and quantity discretion are not established publicly."],
+      "agent_use": ["IE", "CS2"]
+    },
+    {
+      "finding_id": "FOD-04",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "BUCampus supports a weekly Wednesday-lunch menu vote with institutional identity and displays survey results; packaged menus and academic/event calendars are also exposed through the app ecosystem.",
+      "source_ids": ["SRC-MENU-POLL", "SRC-BUCAMPUS"],
+      "caveats": ["Menu preference votes are not attendance reservations or served-demand labels."],
+      "agent_use": ["CS1", "IE"]
+    },
+    {
+      "finding_id": "FOD-05",
+      "claim_type": "PUBLIC_SOURCE_WITH_SAFE_INFERENCE",
+      "claim": "Dining support workflows reference date, time, campus and turnstile information for BUCard incidents, and BUCampus QR can be used at dining turnstiles; aggregate dining-entry data are therefore a high-value data-access question.",
+      "source_ids": ["SRC-DINING-FAQ"],
+      "caveats": ["No public evidence establishes retention, exportability, team access, one-to-one meal semantics, or a unified QR/BUCard history."],
+      "agent_use": ["CS1", "EE", "IE"]
+    },
+    {
+      "finding_id": "FOD-06",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "Summer and campus-specific announcements materially change which meal services are available, creating structural service-regime changes that must be separated from low demand.",
+      "source_ids": ["SRC-SUMMER-2025", "SRC-KILYOS-2025", "SRC-ACADEMIC-CALENDAR"],
+      "caveats": [],
+      "agent_use": ["CS1", "EE"]
+    },
+    {
+      "finding_id": "FOD-07",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "Public dining pages expose menu context by date/meal/channel and can include kcal and cooked portion gram weights.",
+      "source_ids": ["SRC-MENU-SITE"],
+      "caveats": ["Public availability does not itself authorize unrestricted production scraping; terms and project policy must be respected."],
+      "agent_use": ["CS1"]
+    },
+    {
+      "finding_id": "FOD-08",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "The 2024 SKS report lists 157,697 student breakfasts, 1,157,911 student meals and 96,838 staff meals, totaling 1,412,446 reported servings across those categories.",
+      "source_ids": ["SRC-SKS-2024"],
+      "caveats": ["These are 2024 annual serving counts and must not be conflated with 2025 daily-meal or beneficiary figures."],
+      "agent_use": ["CS1", "CS2"]
+    },
+    {
+      "finding_id": "FOD-09",
+      "claim_type": "PUBLIC_SOURCE",
+      "claim": "The 2025 SKS report lists 1,091 meal-scholarship recipients and describes direct/in-kind meal support.",
+      "source_ids": ["SRC-SKS-2025"],
+      "caveats": ["Personally identifying scholarship status should not be used as a model input; only privacy-safe aggregate effects should be considered if operationally necessary and authorized."],
+      "agent_use": ["IE", "CS1", "CS2"]
+    }
+  ],
+  "source_conflicts": [
+    {
+      "conflict_id": "DQ-01-DINING-CAPACITY",
+      "source_a": "Sustainability food-waste page",
+      "value_a": 1734,
+      "source_b": "2025 University Administration Activity Report Table 106",
+      "value_b": 1652,
+      "unit": "persons/capacity units",
+      "rule": "Preserve both with source/year metadata; do not impose either as a hard pilot capacity constraint without owner confirmation."
+    },
+    {
+      "conflict_id": "DQ-02-SERVED-POPULATION",
+      "source_a": "Sustainability catering audience",
+      "value_a": "approximately 13,000 students + 2,000 staff",
+      "source_b": "2025 Administration Activity Report meal-service beneficiaries",
+      "value_b": "17,466 students + 2,478 staff = 19,944 beneficiaries",
+      "rule": "Do not derive participation ratios across differently defined audience/beneficiary metrics."
+    },
+    {
+      "conflict_id": "DQ-03-FOOD-WASTE-ISTAC",
+      "source_a": "2025 monthly food waste",
+      "value_a": "August 1,502 kg; October 1,334 kg",
+      "source_b": "2025 monthly İSTAÇ delivery",
+      "value_b": "August 3,550 kg; October 4,850 kg",
+      "rule": "Do not calculate monthly recycling rates until generation-date versus collection-date semantics are resolved."
+    },
+    {
+      "conflict_id": "DQ-04-PACKAGED-MEALS",
+      "source_a": "2025 SKS activity report",
+      "value_a": 2000,
+      "unit": "UNKNOWN",
+      "rule": "Keep period/denominator UNKNOWN until Food Services confirms the published metric definition."
+    }
+  ],
+  "candidate_data_sources": [
+    {
+      "signal": "served_or_entry_count",
+      "public_clue": "BUCard/QR dining turnstiles with date/time/campus/turnstile support metadata",
+      "access_status": "UNKNOWN",
+      "priority": "P0",
+      "required_validation": ["retention", "aggregate export", "meal-window mapping", "duplicate/refund semantics", "privacy-safe access"]
+    },
+    {
+      "signal": "menu_poll_count",
+      "public_clue": "weekly BUCampus Wednesday lunch menu survey",
+      "access_status": "UNKNOWN",
+      "priority": "P1",
+      "required_validation": ["historical export", "coverage", "response bias", "incremental out-of-sample value"]
+    },
+    {
+      "signal": "production_and_batch_counts",
+      "public_clue": "central kitchen and contracted preparation/distribution operation",
+      "access_status": "UNKNOWN",
+      "priority": "P0",
+      "required_validation": ["system of record", "timestamp", "campus allocation", "planned versus actual production"]
+    },
+    {
+      "signal": "service_regime",
+      "public_clue": "academic calendar plus dining service-change announcements",
+      "access_status": "PUBLIC_CONTEXT_AVAILABLE",
+      "priority": "P0",
+      "required_validation": ["historical completeness", "campus-specific overrides"]
+    },
+    {
+      "signal": "menu_context",
+      "public_clue": "public regular/breakfast/package menu pages",
+      "access_status": "PUBLIC_CONTEXT_AVAILABLE",
+      "priority": "P0",
+      "required_validation": ["historical completeness", "stable item taxonomy", "terms/policy before automation"]
+    },
+    {
+      "signal": "waste_kg",
+      "public_clue": "official monthly sustainability reporting",
+      "access_status": "COARSE_PUBLIC_ONLY",
+      "priority": "P0_FOR_PILOT_MEASUREMENT",
+      "required_validation": ["measurement boundary", "pre_vs_post_consumer", "campus", "meal", "generation_vs_collection_date"]
+    }
+  ],
+  "service_regime_categories": [
+    "normal_term",
+    "exam_period",
+    "registration_orientation",
+    "summer_reduced_service",
+    "holiday",
+    "ramadan_special_hours",
+    "campus_specific_closure",
+    "package_or_kiosk_special_mode",
+    "other_announced_exception"
+  ],
+  "model_rules": [
+    "Start with interpretable decision-compatible baselines before complex temporal models.",
+    "Use time-aware evaluation; do not use random row-wise train/test splitting for deployment claims.",
+    "Add calendar/service-regime, menu, poll and other context by ablation.",
+    "Evaluate excess and shortage/service-level consequences in addition to forecast accuracy.",
+    "Derive asymmetric excess-versus-shortage costs from operator evidence, not arbitrary coefficients.",
+    "Do not use university-level monthly food-waste totals as a production recommendation target.",
+    "Treat policy heuristic bands separately from calibrated uncertainty.",
+    "Include current operator forecasting as a baseline when it can be prospectively recorded."
+  ],
+  "minimum_pilot_export": {
+    "preferred_history": "8-12 weeks if available",
+    "required_or_high_value_fields": [
+      "date",
+      "campus",
+      "meal_type",
+      "service_channel",
+      "planned_portions",
+      "produced_portions",
+      "served_or_validated_entry_count",
+      "unserved_surplus",
+      "waste_kg_with_boundary_if_available",
+      "menu_id_or_main_course",
+      "service_regime"
+    ],
+    "optional_later": ["menu_poll_count", "special_event_flag", "weather"],
+    "privacy_rule": "Request aggregate operational data; do not require personal identifiers."
+  },
+  "research_hypotheses": [
+    {"id": "RH-F01", "hypothesis": "Food Services Branch is a key administrative decision stakeholder.", "status": "SUPPORTED_AS_GOVERNANCE_ROLE_NOT_BUYER_VALIDATION"},
+    {"id": "RH-F02", "hypothesis": "Aggregate BUCard/QR entry data can provide a historical served-demand proxy.", "status": "PLAUSIBLE_ACCESS_AND_SEMANTICS_UNKNOWN"},
+    {"id": "RH-F03", "hypothesis": "BUCampus menu votes contain predictive information beyond menu identity.", "status": "UNKNOWN"},
+    {"id": "RH-F04", "hypothesis": "Service-regime flags materially improve forecast robustness.", "status": "STRONGLY_PLAUSIBLE_REQUIRES_TEST"},
+    {"id": "RH-F05", "hypothesis": "Contractor incentives allow lower production recommendations to create economic value.", "status": "UNKNOWN"},
+    {"id": "RH-F06", "hypothesis": "Production can be adjusted in multiple batches after partial demand is observed.", "status": "UNKNOWN"},
+    {"id": "RH-F07", "hypothesis": "Packaged meals are a separate demand channel requiring separate forecasting/allocation.", "status": "PLAUSIBLE_REQUIRES_WORKFLOW_CONFIRMATION"}
+  ],
+  "role_handoffs": {
+    "IE": [
+      "Interview Food Services Branch before generic student discovery for the production-decision workflow.",
+      "Resolve contractor payment/incentive structure and quantity authority.",
+      "Use last-incident questions to establish freeze time, shortage consequences and excess consequences."
+    ],
+    "EE": [
+      "Map planned→produced→served→surplus→waste measurement boundaries and existing systems of record.",
+      "Prefer existing logs and manual audited measurements before proposing new hardware.",
+      "Define a source/units/timestamp/campus/meal data dictionary."
+    ],
+    "CS1": [
+      "Benchmark service-regime-aware baselines before complex models.",
+      "Treat BUCard/QR aggregates as a candidate served-demand proxy only after reconciliation.",
+      "Test menu votes/menu identity/calendar features by time-aware ablation.",
+      "Optimize decision cost under shortage guardrails, not MAE alone."
+    ],
+    "CS2": [
+      "Use governance and service-scale facts as public-source context, not PMR validation.",
+      "Frame the unresolved problem around production/allocation timing and existing aggregate signals.",
+      "Do not claim data access, causality or achieved savings before interviews/pilot evidence."
+    ]
+  },
+  "sources": [
+    {"source_id": "SRC-SKS-2025", "url": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-SKS-DIRECTIVE", "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/2106-bogazici-universitesi-saglik-kultur-ve-spor-d-20260521-143342.pdf", "kind": "OFFICIAL_UNIVERSITY_PDF"},
+    {"source_id": "SRC-ADMIN-2025", "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu(3).pdf", "kind": "OFFICIAL_UNIVERSITY_PDF"},
+    {"source_id": "SRC-SKS-2024", "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/303-2024-yili-faaliyet-raporu-yayin-20251205-150840.pdf", "kind": "OFFICIAL_UNIVERSITY_PDF"},
+    {"source_id": "SRC-MENU-POLL", "url": "https://yemekhane.bogazici.edu.tr/menu-anketi", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-BUCAMPUS", "url": "https://bilgiislem.bogazici.edu.tr/tr/news/kampus/2/bucampusun-yeni-versiyonu-yayinda/3351", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-DINING-FAQ", "url": "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-SUMMER-2025", "url": "https://yemekhane.bogazici.edu.tr/yaz-donemi-yemek-hizmeti-hakkinda", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-KILYOS-2025", "url": "https://yemekhane.bogazici.edu.tr/saritepe-kilyos-kampus-yemek-hizmeti-hakkinda", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-ACADEMIC-CALENDAR", "url": "https://akademiktakvim.bogazici.edu.tr/", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "SRC-MENU-SITE", "url": "https://yemekhane.bogazici.edu.tr/", "kind": "OFFICIAL_UNIVERSITY"},
+    {"source_id": "PAPER-ACI-2023", "url": "https://consensus.app/papers/demand-forecasting-for-food-production-using-machine-ac%C4%B1/53fc30fe33fe579f8949e9a42a0ecc14/?utm_source=chatgpt", "kind": "ACADEMIC_BENCHMARK"},
+    {"source_id": "PAPER-AYDIN-2025", "url": "https://consensus.app/papers/machine-learning-techniques-for-cafeteria-demand-ayd%C4%B1n-balc%C4%B1o%C4%9Flu/78329bb2e24e5c06a01d9f73bac74c0f/?utm_source=chatgpt", "kind": "ACADEMIC_BENCHMARK"},
+    {"source_id": "PAPER-RODRIGUES-2023", "url": "https://consensus.app/papers/machine-learning-models-for-shortterm-demand-forecasting-rodrigues-migu%C3%A9is/47d8e2ce5d015189bc052f02df2e3a47/?utm_source=chatgpt", "kind": "ACADEMIC_BENCHMARK"}
+  ]
+}
