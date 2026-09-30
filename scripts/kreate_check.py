@@ -486,17 +486,20 @@ def check_github_templates(errors: list[str]) -> None:
 
 
 def check_food_decision_integrity(errors: list[str]) -> None:
-    """Protect the CS1 truth boundary in active food-decision product surfaces."""
+    """Protect the CS1 truth boundary in every active food-decision surface."""
 
     required_paths = [
         "backend/app/decision/food_policy.py",
         "backend/app/decision/baselines.py",
         "backend/app/routers/food.py",
+        "backend/app/routers/dashboard.py",
+        "backend/app/routers/actions.py",
         "backend/app/optimizers/food_optimizer.py",
         "backend/app/models/food_demand.py",
         "backend/app/schemas.py",
         "frontend/src/lib/food-waste.ts",
         "frontend/src/app/api/v1/food/route.ts",
+        "frontend/src/app/api/v1/food/pilot-score/route.ts",
         "scripts/cs1_baseline_benchmark.py",
     ]
     for path in required_paths:
@@ -508,10 +511,13 @@ def check_food_decision_integrity(errors: list[str]) -> None:
     backend_policy = read("backend/app/decision/food_policy.py")
     frontend_policy = read("frontend/src/lib/food-waste.ts")
     backend_route = read("backend/app/routers/food.py")
+    dashboard_route = read("backend/app/routers/dashboard.py")
+    actions_route = read("backend/app/routers/actions.py")
     optimizer = read("backend/app/optimizers/food_optimizer.py")
     schemas = read("backend/app/schemas.py")
     food_schema = schemas.split("class FoodDemandForecast", 1)[-1].split("class ActionItem", 1)[0]
     next_route = read("frontend/src/app/api/v1/food/route.ts")
+    pilot_route = read("frontend/src/app/api/v1/food/pilot-score/route.ts")
     benchmark = read("scripts/cs1_baseline_benchmark.py")
 
     forbidden_food_terms = ("potential_waste_saved_kg", "waste_reduction", "cost_saved_tl")
@@ -523,6 +529,23 @@ def check_food_decision_integrity(errors: list[str]) -> None:
         for term in forbidden_food_terms:
             if term in content:
                 errors.append(f"food decision integrity: unsupported pre-pilot field {term!r} found in {path}")
+
+    dashboard_forbidden = ("food_waste_saved_kg", "food_waste_avoided_kg=40.0", "base_meals * 1.15")
+    for term in dashboard_forbidden:
+        if term in dashboard_route:
+            errors.append(f"food decision integrity: legacy food-impact claim {term!r} found in dashboard")
+    action_forbidden = ("Pre-portion 1,420", "impact_value=48.0", 'impact_unit="kg"')
+    for term in action_forbidden:
+        if term in actions_route:
+            errors.append(f"food decision integrity: legacy food-impact claim {term!r} found in actions route")
+
+    for marker in ("food_waste_avoided_kg=None", 'food_waste_impact_status="UNMEASURED"'):
+        if marker not in dashboard_route:
+            errors.append(f"food decision integrity: dashboard missing unmeasured-impact marker {marker!r}")
+    for path, content in (("dashboard", dashboard_route), ("actions", actions_route)):
+        for marker in ("MODEL_ESTIMATE", "POLICY_HEURISTIC", "automatic kitchen dispatch"):
+            if marker.lower() not in content.lower():
+                errors.append(f"food decision integrity: {path} surface missing {marker!r}")
 
     backend_markers = (
         "POLICY_HEURISTIC",
@@ -551,9 +574,19 @@ def check_food_decision_integrity(errors: list[str]) -> None:
         if marker not in frontend_policy:
             errors.append(f"food decision integrity: frontend policy missing {marker!r}")
 
-    for marker in ("humanApprovalRequired", "automaticKitchenDispatch", "forbiddenUntilMeasured"):
+    for marker in (
+        "humanApprovalRequired",
+        "automaticKitchenDispatch",
+        "forbiddenUntilMeasured",
+        "decisionAssessment",
+        "READY_FOR_MEASURED_DATA",
+    ):
         if marker not in next_route:
             errors.append(f"food decision integrity: Next food API missing truth-boundary marker {marker!r}")
+
+    for marker in ("dataQualityPassed", "promotableAsGeneralizedClimateImpact", "false"):
+        if marker not in pilot_route:
+            errors.append(f"food decision integrity: pilot evidence gate missing {marker!r}")
 
     if "OFFLINE_BENCHMARK_ONLY" not in benchmark or "TECH_TEST" not in benchmark:
         errors.append("food decision integrity: baseline benchmark must remain scoped to TECH_TEST/OFFLINE_BENCHMARK_ONLY")
@@ -608,7 +641,7 @@ def main() -> int:
     print("- mandatory template/application headings are present and non-empty")
     print("- local KREATE markdown links resolve")
     print("- GitHub task/PR anti-slop review gates are present")
-    print("- food decision policy, abstention, provenance, baseline scope, and claim firewall are intact")
+    print("- food decision policy, abstention, provenance, baseline scope, active-surface firewall, and pilot evidence gates are intact")
     if args.submission:
         print("- hard minimum PMR count and final submission gates are satisfied")
     return 0
