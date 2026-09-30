@@ -1,6 +1,6 @@
 # BOUNCAMPUS Autonomous Agent Fabric v2
 
-This document defines the low-overhead control plane for **four human-owned parent workstreams with arbitrarily many autonomous child agents**. It extends `AGENTS.md` and the KREATE evidence system.
+This document defines the low-overhead control plane for **four persistent human-owned parent workstreams with arbitrarily many autonomous child agents**. It extends `AGENTS.md` and the KREATE evidence system.
 
 ## Operating principle
 
@@ -21,7 +21,7 @@ The fabric has no configured child-agent count limit. Effective concurrency is c
 - Child task store: `.agents/coordination/tasks/`
 - Parent store: `.agents/coordination/parents/`
 
-Exactly one non-cancelled parent is allowed for each KREATE role: IE, EE, CS1, CS2. The parent is the accountability and master-integration boundary. Child tasks are the scalable execution units.
+Exactly one parent workstream is allowed for each KREATE role: IE, EE, CS1, CS2. The parent is a persistent accountability boundary across multiple master integration batches; child tasks are the scalable execution units.
 
 ## Parent / child hierarchy
 
@@ -34,9 +34,12 @@ A parent record contains:
 - objective and priority;
 - parent branch;
 - critical human gate, if any;
-- parent integration evidence.
+- current integration batch state;
+- append-only `integration_history` for verified master batches.
 
-The human owner is not required to dispatch ordinary work. Agents may decompose and spawn bounded child tasks autonomously while staying inside the parent objective.
+The human owner is not the routine dispatcher. Agents may decompose and spawn bounded child tasks autonomously while staying inside the parent objective.
+
+A verified master batch **does not terminate the parent workstream**. After post-merge verification, the batch is appended to `integration_history` and the parent returns to `ACTIVE` so a new child-agent wave can begin. The parent becomes complete only when its human workstream objective itself is complete.
 
 ### Child task
 
@@ -72,12 +75,15 @@ There is intentionally no `max_agents` field. A new child is admitted based on c
 
 To claim a child:
 
-1. parent exists and is not cancelled;
+1. parent exists and is not complete;
 2. child is `READY`;
 3. hard dependencies are `MERGED_VERIFIED`;
-4. its `touched_paths` do not overlap an active child;
-5. no pending/rejected human gate blocks the child;
-6. the agent records branch, claim timestamp, heartbeat, and lease owner.
+4. any consumed artifact with an in-fabric producer has at least one `MERGED_VERIFIED` producer;
+5. its `touched_paths` do not overlap an active child;
+6. no pending/rejected human gate blocks the child;
+7. the agent records branch, claim timestamp, heartbeat, and lease owner.
+
+A consumed identifier with no in-fabric producer is treated as an external evidence/artifact reference and remains governed by the KREATE evidence system.
 
 Material commits or validation checkpoints refresh the heartbeat. Stale leases may be reclaimed under the existing evidence rules; a human is not required merely because an agent disappeared.
 
@@ -87,7 +93,7 @@ Material commits or validation checkpoints refresh the heartbeat. Stale leases m
 
 - Active children may not overlap paths, even across different parents.
 - Parent/child directory ownership counts as overlap.
-- READY tasks may coexist until claim; the claim that would create an active collision is rejected and rolled back.
+- READY tasks may coexist until claim; a claim that would create an active collision is rejected and rolled back.
 - Read-only consumption does not create path ownership.
 - Coordination metadata is not product ownership.
 
@@ -106,29 +112,29 @@ READY -> CLAIMED -> ACTIVE -> READY_FOR_INTEGRATION
 
 For a v2 child:
 
-- generic legacy `INTEGRATING` / `MERGED_VERIFYING` / `MERGED_VERIFIED` transitions are forbidden;
+- generic legacy master-integration transitions are forbidden;
 - `integrate-child` must target the exact owning parent branch;
 - `master` is always an invalid child target;
 - `verify-child` requires validated child head + parent integrated commit evidence.
 
-A child `MERGED_VERIFIED` means **verified inside the parent branch**, not yet on final `master`.
+A child `MERGED_VERIFIED` means **verified inside the parent branch**. Its final master provenance is represented by the parent batch that later includes it.
 
-## Fan-out / fan-in
+## Fan-out / fan-in and batch readiness
 
-A parent may fan out from an explicit list of bounded child specifications. Agents may generate those child specifications when the decomposition is mechanically inside the accepted parent objective; they may not use fan-out to invent a product pivot.
+A parent may fan out from an explicit list of bounded child specifications. Agents may generate those child specifications when decomposition is mechanically inside the accepted parent objective; they may not use fan-out to invent a product pivot.
 
-Parent readiness is computed from coordination state:
+Parent readiness is computed against **pending children not already present in a verified integration-history batch**:
 
-- at least one child exists;
-- every `required_for_parent=true` child is `MERGED_VERIFIED` into the parent;
-- optional children do not block parent readiness;
-- unresolved hard dependencies or critical human gates still block their own required children.
+- at least one pending child is already `MERGED_VERIFIED` into the parent;
+- every pending `required_for_parent=true` child is `MERGED_VERIFIED`;
+- optional incomplete children do not block the batch;
+- previously integrated historical children do not make a new empty batch ready.
 
-No parent is declared ready merely because many child branches exist.
+This prevents the same work from being repeatedly promoted to `master` and allows the same human parent to produce multiple independent batches.
 
 ## Artifact contracts
 
-`produces` and `consumes` are repository-visible handoff contracts. Use them instead of synchronous human relay when one child/parent creates evidence or an artifact another worker needs.
+`produces` and `consumes` are repository-visible handoff contracts. Use them instead of synchronous human relay when one agent creates an artifact another worker needs.
 
 Examples:
 
@@ -137,7 +143,7 @@ Examples:
 - EE child produces `TECH_TEST-scale-repeatability-v1`;
 - CS2 child consumes that test artifact for a defensible draft.
 
-External human-attested evidence can be consumed without being produced by an agent task; authenticity remains governed by the KREATE evidence system.
+Agents do not self-attest external PMR/evidence. Authenticity remains governed by the KREATE evidence system.
 
 ## Human gates
 
@@ -151,7 +157,7 @@ The only valid human gates are:
 
 `WAITING_HUMAN` requires one of those five kinds, `PENDING` status, and one concrete question. Routine review, architecture, prioritization, model choice, drafting, branch operations, merge conflict resolution, or uncertainty are not human gates.
 
-All four roles continue autonomously outside these gates.
+The rule applies to both child agents and parent workstreams. All four roles continue autonomously outside these gates.
 
 ## Parent integration queue
 
@@ -164,13 +170,13 @@ Queue order is deterministic:
 3. oldest `ready_for_integration_at`;
 4. parent ID tie-break.
 
-A P0 recovery can therefore preempt lower-priority normal work without an ad-hoc human dispatcher.
+A P0 recovery can preempt lower-priority normal work without an ad-hoc human dispatcher.
 
 ## Parallel parent PRs, serialized master merge
 
-Up to four parent PRs may be open concurrently, normally one per human parent.
+Up to four parent/master PRs may be open concurrently, normally one per human parent.
 
-- At most one parent PR may be non-draft / hold the master integration slot.
+- At most one parent/master PR may be non-draft / hold the master integration slot.
 - Other parent PRs remain draft and may run advisory CI/review.
 - The integration-slot PR must include current `master` and rerun fresh exact-head CI.
 - CI from before another `master` merge is not merge evidence.
@@ -180,25 +186,26 @@ Up to four parent PRs may be open concurrently, normally one per human parent.
 
 This separates **review parallelism** from **merge serialization**.
 
-## Parent master integration
+## Persistent parent master integration
 
 Before acquiring the slot:
 
 1. parent is `READY_FOR_INTEGRATION`;
-2. required children are verified into the parent;
+2. pending required children are verified into the parent;
 3. the parent is first in the deterministic queue;
 4. no other parent is `INTEGRATING` or `MERGED_VERIFYING`;
 5. current master SHA is recorded;
 6. exact parent head to validate is recorded.
 
-After merge:
+After merge and post-merge checks:
 
-1. record PR, validated head, merge SHA, and post-merge verification time;
-2. verify merged-PR provenance and normal merge semantics;
-3. verify parent head containment in `master`;
-4. run repository/KREATE/feature/frontend/data checks;
-5. run `agent_exit_gate.py`;
-6. only then mark parent integration `MERGED_VERIFIED`.
+1. record PR, base master, validated head, merge SHA, verification time, and included child IDs;
+2. append that immutable batch record to `integration_history`;
+3. reset the current integration slot metadata;
+4. return the parent to `ACTIVE`;
+5. expose the next pending child wave.
+
+The human parent is therefore long-lived even though child tasks and integration batches are short-lived.
 
 ## Agent-to-agent communication
 
@@ -227,4 +234,4 @@ python scripts/agent_task.py summary
 python scripts/agent_task.py queue
 ```
 
-The test suite must include a fixture with at least **50 simultaneous non-conflicting child agents** and must still reject active path collisions.
+The test suite must include a fixture with at least **50 simultaneous non-conflicting child agents**, must reject active path collisions, and must demonstrate that a verified parent batch returns to `ACTIVE` and can accept a second child wave.
