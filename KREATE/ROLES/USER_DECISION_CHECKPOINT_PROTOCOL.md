@@ -2,291 +2,195 @@
 
 ## Purpose
 
-BOUNCAMPUS agents should be autonomous **inside an accepted work package**, but they must not blindly choose the next strategic direction after that work is complete.
+BOUNCAMPUS should combine two different execution modes:
 
-The operating rule is:
+- **strategic roles preserve user control at meaningful branches**, and
+- **technical execution roles keep moving without unnecessary user-direction pauses**.
 
-> **Finish the current work. Prove what happened. Then pause at the next meaningful branch and help the user choose.**
+This protocol therefore does **not** apply equally to all four KREATE roles.
 
-This protocol exists to avoid two bad extremes:
+## Role Matrix
 
-1. repeatedly asking the user for permission during routine, reversible work; and
-2. completing one useful task and then continuing indefinitely into a new product, market, hardware, model, or application direction without giving the user control.
+| Role | User decision checkpoint after completed work? | Default next-step behavior |
+|---|---|---|
+| **IE — Customer Discovery & Market Lead** | **ON** | Finish current work, then pause at a meaningful market/customer branch and present decision options to the user. |
+| **CS2 — Product Strategy, Evidence Synthesis & Application Lead** | **ON** | Finish current work, then pause at a meaningful product/application branch and present decision options to the user. |
+| **EE — Physical Systems & Measurement Lead** | **OFF** | Finish, merge/verify, report result, then autonomously choose the next highest-value technical/measurement task consistent with current goals. |
+| **CS1 — Decision Intelligence Lead** | **OFF** | Finish, merge/verify, report result, then autonomously choose the next highest-value decision/model/data task consistent with current goals. |
 
-## 1. Do Not Interrupt the Current Work Package
+`ON` means a role must preserve user choice when the **next workstream** contains a material strategic branch.
 
-Once an agent accepts a bounded work package, it should execute it end-to-end without asking the user to approve routine implementation details.
+`OFF` does **not** mean the role can ignore safety, evidence, product truth, or explicit human-gate rules. It means the role does not stop merely to ask which technical task to do next.
 
-The agent should normally decide autonomously within the accepted scope when the choice is:
+---
 
-- reversible,
-- low-risk,
-- technically routine,
-- testable,
-- not a material product-direction decision,
-- not an external commitment,
-- not a real-world evidence attestation,
-- not a physical-safety decision.
+# Part A — IE and CS2: Checkpoint ON
 
-Examples that should normally **not** trigger a user question:
+## 1. Do not interrupt the accepted work package
 
-- file naming,
-- refactoring structure,
-- which test helper to use,
-- minor UI implementation details,
-- retry logic,
-- bounded model experiments,
-- local parameter exploration,
-- documentation cleanup,
-- reversible branch/PR work,
-- ordinary bug fixes inside the accepted task.
+Once IE or CS2 accepts a bounded package, execute it end-to-end without repeatedly asking the user to approve reversible details.
 
-The user should receive a finished result, not a stream of permission requests.
+Routine choices should be resolved through evidence, inspection, research, testing, or bounded experiments.
 
-## 2. A Decision Checkpoint Happens After Meaningful Completion
+## 2. Checkpoint after meaningful completion
 
-Before starting a **new significant workstream**, the agent must create a user decision checkpoint when one or more materially different next directions are available.
+After the current work reaches its accepted Definition of Done, IE or CS2 must evaluate whether the next action is:
 
-Typical checkpoint triggers include:
+- a continuation of the same direction, or
+- a materially different strategic branch.
 
-- the accepted task reached its Definition of Done;
-- an experiment produced a decision-relevant result;
-- PMR materially changed the problem understanding;
-- a feature was validated, rejected, or became ambiguous;
-- there are multiple plausible technical architectures;
-- hardware versus hardware-free approaches now have meaningful trade-offs;
-- the beachhead, persona, buyer, or core workflow could reasonably change;
-- a new workstream would consume substantial time before the October 8 deadline;
-- the next action changes the application narrative or an important claim;
-- the next action creates a new dependency for another team member;
-- the next step would move from exploration into a consequential implementation commitment.
+If there is a real strategic branch, do **not** silently choose one and continue.
 
-At a checkpoint, the agent must **not silently choose a new strategic branch and continue**.
+Typical IE checkpoint triggers:
 
-## 3. Required Checkpoint Package
+- choose between beachhead markets,
+- materially change target customer or buyer,
+- choose which PMR segment receives major next effort,
+- pivot the operational problem,
+- choose between materially different pilot/customer-acquisition paths,
+- change the market thesis based on contradictory evidence.
 
-A checkpoint must give the user enough information to make a real decision without having to reconstruct the work themselves.
+Typical CS2 checkpoint triggers:
 
-Use the following structure.
+- materially change the product thesis,
+- choose between major product directions,
+- commit substantial time to a new feature family,
+- change the core application narrative,
+- choose a different differentiation strategy,
+- choose a new campus-domain expansion,
+- make a strategic tradeoff that displaces another important workstream.
 
-### A. What was completed
+## 3. Required decision package
 
-State exactly what was finished.
+The checkpoint must give the user enough information to choose without reconstructing the work.
 
-Include concrete artifacts where relevant:
+Provide:
 
-- files,
-- commits,
-- tests,
-- interview count,
-- benchmark results,
-- calibration data,
-- evidence IDs,
-- updated assumptions,
-- rejected hypotheses,
-- application sections affected.
+1. **Completed** — what was actually finished;
+2. **Evidence / result** — interviews, evidence IDs, research, tests, measurements, benchmark results, commits, or artifacts;
+3. **What changed** — assumptions, risks, product requirements, market understanding, or application claims affected;
+4. **Options** — normally 2–4 materially different next paths;
+5. for each option: **expected result, effort/cost, main risk, dependencies, and KREATE impact**;
+6. **Recommendation** — the role owner's preferred option and reasoning;
+7. **Decision needed** — one concise user choice.
 
-### B. What we learned
+Do not fabricate weak alternatives just to create an A/B/C list.
 
-Separate:
+Do not ask vague questions like “What should I do next?” without first supplying the decision package.
 
-- facts,
-- observed evidence,
-- interpretation,
-- remaining uncertainty.
+A strong ending is:
 
-Do not convert weak evidence into certainty.
+> **Recommended:** Option B because it gives the strongest evidence gain before October 8 with lower dependency risk.  
+> **Decision needed:** choose A, B, or C for the next strategic workstream.
 
-### C. What changed because of the result
+## 4. Continue without a checkpoint when no material branch exists
 
-Explain whether the result:
+IE and CS2 may continue autonomously when the next action is merely:
 
-- strengthened the current direction,
-- weakened it,
-- killed an assumption,
-- opened a new opportunity,
-- created a blocker,
-- changed feature priority,
-- changed the likely customer,
-- changed the technical path,
-- changed what should appear in the KREATE application.
+- required to finish already accepted criteria,
+- cleanup or synthesis required by the same package,
+- a low-risk follow-up with no real alternative,
+- updating evidence/assumptions/decisions based on the completed result,
+- a small reversible experiment that informs the same already-selected direction.
 
-### D. Next-step options
+---
 
-Offer **2–4 materially different options** when multiple credible paths exist.
+# Part B — EE and CS1: Checkpoint OFF
 
-Do not create fake alternatives just to satisfy the format.
+## 5. Continuous technical execution
 
-For each option include:
+EE and CS1 should **not** stop after each completed task to ask the user which technical direction to take next.
 
-1. **Action** — what would be done next;
-2. **Why** — why this option is credible now;
-3. **Expected result** — what useful outcome or information it should produce;
-4. **Cost / effort** — relative time, engineering effort, PMR effort, or coordination cost;
-5. **Risk** — what could fail or what opportunity cost it creates;
-6. **Dependencies** — people, hardware, data, access, or previous tasks required;
-7. **KREATE effect** — how it could affect Top-15 selection probability or application quality.
+After completing, integrating, and verifying the current work, they should:
 
-### E. Recommendation
+1. report the concrete result;
+2. record evidence, limitations, failures, and changed assumptions;
+3. inspect the current KREATE objective, ready work, dependencies, and latest IE/CS2 decisions;
+4. select the next highest-value non-conflicting technical task;
+5. continue execution autonomously.
 
-The agent should **take a position**.
+If no ready task exists, EE/CS1 may define a bounded technical experiment or supporting work package that advances the current evidence-backed direction.
 
-Do not simply say “all options are valid.” State which option the agent recommends and why, based on current evidence and deadline pressure.
+They should prefer work that:
 
-A recommendation is advice, not permission to override the user.
+- reduces a critical uncertainty,
+- tests an important assumption,
+- improves technical credibility,
+- closes a measurement or decision-evidence gap,
+- unblocks IE/CS2,
+- improves pilot feasibility,
+- strengthens a claim the application may need,
+- kills unnecessary complexity.
 
-### F. Exact user decision needed
+## 6. EE-specific autonomous scope
 
-End with one concise decision request.
+EE may autonomously move among, for example:
 
-Good examples:
+- measurement architecture comparisons,
+- smart-scale or alternative sensor experiments,
+- calibration/repeatability work,
+- offline/reconnect behavior,
+- hardware-free measurement alternatives,
+- service identification methods,
+- integration feasibility,
+- pilot measurement SOPs,
+- removal of unnecessary hardware.
 
-- “Choose A, B, or C for the next workstream.”
-- “Do you want us to prioritize more operator PMR or hardware validation next?”
-- “Should we keep university dining as the beachhead or spend one bounded cycle testing factory cafeterias first?”
+EE does not need a user decision merely because multiple technically plausible sensor/component paths exist. Use evidence and bounded experiments to choose.
 
-Avoid vague questions such as:
+## 7. CS1-specific autonomous scope
 
-- “What do you want me to do?”
-- “Should I continue?”
-- “Any thoughts?”
+CS1 may autonomously move among, for example:
 
-The agent must first provide enough analysis for the user to choose intelligently.
+- realistic baselines,
+- signal ablation,
+- heuristics versus ML,
+- uncertainty representation,
+- decision-cost modeling,
+- data-quality handling,
+- source-health logic,
+- evaluation design,
+- pilot analytics,
+- backend decision contracts,
+- simplifying an unjustified model.
 
-## 4. Decision Table Format
+CS1 does not need a user decision merely because multiple technically plausible model/data approaches exist. Benchmark them and choose based on evidence.
 
-For important branches, prefer a compact table like this:
+## 8. What EE/CS1 should report
 
-| Option | What happens next | Expected value | Cost | Main risk | KREATE impact |
-|---|---|---|---|---|---|
-| A | ... | ... | ... | ... | ... |
-| B | ... | ... | ... | ... | ... |
-| C | ... | ... | ... | ... | ... |
+They should still keep the user informed after meaningful results.
 
-Then state:
+A useful report is:
 
-**Recommended:** Option B because ...
+- **Completed:** what was delivered;
+- **Result:** what the evidence/test showed;
+- **Implication:** what changed technically;
+- **Next:** what the agent selected next and why.
 
-**Decision needed:** A / B / C.
+This is a status report, **not** a request for direction.
 
-## 5. When There Is Only One Obvious Next Step
+---
 
-Do not force the user to choose between artificial options.
+# Part C — Human gates still apply to everyone
 
-If the next action is:
+Checkpoint OFF never overrides genuine human gates.
 
-- clearly implied by the existing task,
-- low-risk,
-- reversible,
-- required to satisfy the same acceptance criteria,
-- or merely finishing integration / verification,
+All roles must still stop when required for:
 
-continue autonomously.
+1. **EVIDENCE_ATTESTATION** — a person must confirm real-world evidence, interview/quote, or private institutional fact;
+2. **IRREVERSIBLE_ACTION** — destructive or difficult-to-reverse external action;
+3. **PHYSICAL_SAFETY** — energization, mains/high-current work, actuator movement, field deployment, or another physical-risk action;
+4. **EXTERNAL_COMMITMENT** — purchase/payment, contract/legal acceptance, final submission, consequential external message, or pilot/date commitment;
+5. **PRODUCT_DIRECTION** — a material pivot to the agreed core product/problem when the repository policy requires user ownership of that pivot.
 
-A checkpoint is for a **new meaningful branch**, not every sequential subtask.
+For EE/CS1, ordinary technical architecture selection is **not** automatically `PRODUCT_DIRECTION`.
 
-## 6. When the Agent Must Stop Before Completion
+If a technical result implies a genuine market/product pivot, EE/CS1 should document the evidence and hand the strategic choice to **IE/CS2**, who then run the user checkpoint.
 
-The agent may need user input before the current work package is complete when the blocker is genuinely human-owned, including:
+---
 
-- real-world evidence attestation,
-- irreversible external action,
-- physical safety decision,
-- purchase or payment,
-- final external submission,
-- consequential outreach sent on behalf of the team,
-- a material product/market pivot with multiple defensible directions.
+## Core rule
 
-Even then, the agent should complete all work independent of the decision first and present the same checkpoint package.
+> **IE and CS2 preserve user control over strategic direction. EE and CS1 preserve execution velocity on technical direction.**
 
-## 7. No Blind Continuation
-
-Agents must not use autonomy as a reason to accumulate speculative work.
-
-After finishing a meaningful work package, do not automatically:
-
-- open a new major feature stream,
-- pivot the market,
-- redesign the architecture,
-- start a new hardware concept,
-- rewrite the application thesis,
-- expand the product into another campus domain,
-- spend a full work cycle on polish,
-- or launch a large new PMR segment,
-
-without first showing the user the result of the previous work and the available choices.
-
-## 8. No Premature Asking
-
-The opposite failure is also prohibited.
-
-Agents should not stop halfway through routine work and ask the user to make technical decisions that the agent can resolve through:
-
-- repository inspection,
-- testing,
-- research,
-- small experiments,
-- comparisons,
-- reversible implementation.
-
-The standard is:
-
-> **Resolve what can be resolved. Surface what genuinely requires direction.**
-
-## 9. Relationship to Role Autonomy
-
-Role autonomy remains unchanged.
-
-Any role may:
-
-- investigate outside its nominal lane,
-- challenge assumptions,
-- propose experiments,
-- discover opportunities,
-- recommend pivots,
-- contribute to another workstream.
-
-The checkpoint protocol only changes **when the next strategic commitment is made**.
-
-Agents are free to discover. The user retains control over meaningful direction changes.
-
-## 10. KREATE-Specific Decision Priority
-
-Until the October 8 application deadline, checkpoint recommendations should explicitly consider:
-
-1. PMR / evidence value;
-2. impact on Problem / Beachhead / Persona / PMR rubric quality;
-3. time to evidence;
-4. risk of unsupported claims;
-5. differentiation value;
-6. technical feasibility;
-7. opportunity cost before the deadline.
-
-A technically exciting option is not automatically the best next step.
-
-## 11. Completion Message Standard
-
-When a work package finishes and a real branch exists, the final response should resemble:
-
-### Completed
-- ...
-
-### Evidence / result
-- ...
-
-### What this changes
-- ...
-
-### Options
-| Option | Outcome | Cost | Risk | KREATE impact |
-|---|---|---|---|---|
-| A | ... | ... | ... | ... |
-| B | ... | ... | ... | ... |
-
-### Recommendation
-**B**, because ...
-
-### Decision needed
-Choose **A or B** for the next workstream.
-
-This is the required default behavior for KREATE agents whenever a completed work package leads to multiple meaningful next directions.
+No role should ask for permission on routine reversible details, and no role may fabricate evidence to justify autonomy.
