@@ -29,6 +29,7 @@
     "frontend/src/app/api/v1/food/pilot-template/route.ts",
     "frontend/src/app/food-waste/page.tsx",
     "frontend/src/app/demo/jury/page.tsx",
+    "scripts/agent_fabric_check.py",
     "scripts/cs1_baseline_benchmark.py",
     "scripts/kreate_check.py",
     "scripts/test_food_decision_policy.py",
@@ -54,6 +55,7 @@
     "Machine-readable policy metadata includes policy version, model provenance, decision provenance, method eligibility, limitations, and reason codes",
     "Python and Next decision-policy versions remain mechanically locked against drift",
     "KREATE validation fails on reintroduction of unsupported food-impact claims or removal of the human gate",
+    "The inherited human-gate lifecycle allows a recorded decision to remain WAITING_HUMAN until explicit owner resume, while ACTIVE resume still requires APPROVED",
     "Technical experiment documentation distinguishes repository capability, model estimates, policy heuristics, and measured pilot evidence",
     "Repository evidence records technical capability without promoting it to market or impact proof",
     "Focused regression tests and repository validation lock the full CS1 decision-integrity contract"
@@ -63,6 +65,8 @@
     "python scripts/test_cs1_decision_intelligence.py",
     "python scripts/test_cs1_method_eligibility.py",
     "python scripts/test_cs1_cross_contract.py",
+    "python scripts/test_agent_task.py",
+    "python scripts/test_agent_fabric_check.py",
     "python scripts/kreate_check.py",
     "python -m compileall -q backend/app scripts",
     "cd frontend && npm run typecheck && npm run lint && npm run build"
@@ -77,7 +81,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T21:22:00Z",
+    "heartbeat_at": "2026-09-30T21:29:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -96,8 +100,9 @@
     "Baseline ranking uses identical common support across all candidates and reports support coverage explicitly.",
     "Python and Next policy contracts are cross-checked mechanically; food-decision-v1.1 is the current shared version.",
     "Latest role-branch PR template retained semantically correct anti-fabrication wording but dropped two legacy validator literals; this task adds one automation-compatibility comment so current governance and KREATE validation agree.",
+    "Normal PR CI exposed a role-inherited validator/API mismatch in the human-gate lifecycle; d20d6165 fixes the validator while preserving explicit owner resume semantics.",
     "Temporary branch-only CS1 validation workflow was deleted before integration; PR #45 uses the normal role-targeted CI.",
-    "Final feature head 783ee20a8ede6fcab9be0e30b7991be7b2f6aaa4 triggered a successful Vercel preview deployment; normal PR CI remains the merge gate.",
+    "Feature head 783ee20a8ede6fcab9be0e30b7991be7b2f6aaa4 triggered a successful Vercel preview deployment; d20d6165 only changes repository validation logic and does not alter deployable product code.",
     "Does not intentionally modify .github/workflows/ci.yml; that file is inherited unchanged from the synchronized role branch."
   ]
 }
