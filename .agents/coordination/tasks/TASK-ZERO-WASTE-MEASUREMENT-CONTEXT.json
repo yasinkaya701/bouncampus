@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "TASK-ZERO-WASTE-MEASUREMENT-CONTEXT",
+  "title": "Research zero-waste campus measurement context",
+  "priority": "P0",
+  "lane": "campus-data-geo",
+  "state": "READY_FOR_INTEGRATION",
+  "owner_agent": "research-evidence",
+  "branch": "agent/campus-data-geo/zero-waste-measurement-context",
+  "depends_on": [],
+  "touched_paths": [
+    "KREATE/RESEARCH/README.md",
+    "KREATE/RESEARCH/TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md",
+    "KREATE/RESEARCH/turkiye_zero_waste_campus_measurement_context.json"
+  ],
+  "acceptance_criteria": [
+    "Official Türkiye Zero Waste sources are translated into prevention, monitoring and record-keeping implications without claiming software compliance",
+    "Current UNEP food-waste/climate context is clearly separated from local Boğaziçi impact",
+    "A pilot KPI hierarchy prioritizes physical decision and measured waste outcomes before economic/climate conversions",
+    "Waste prevention is explicitly distinguished from downstream diversion/recovery",
+    "Anti-greenwashing rules prevent generic global GHG/water statistics from becoming local savings claims",
+    "A machine-readable companion exposes framework facts, KPI tiers, measurement contract and PMR questions"
+  ],
+  "validation_commands": [
+    "python -m json.tool KREATE/RESEARCH/turkiye_zero_waste_campus_measurement_context.json",
+    "python scripts/kreate_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-10-01T00:31:00+03:00",
+    "heartbeat_at": "2026-10-01T00:31:00+03:00",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Secondary public-source research only; not legal advice or compliance certification.",
+    "UNEP global statistics are context only and are not local conversion factors.",
+    "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md."
+  ]
+}
