@@ -13,6 +13,10 @@ This directory contains source kept for historical reference only. Files under `
 
 The existing backend datasets are not moved by this cleanup because legacy backend model code still reads them at runtime. Their presence must not be interpreted as measured university telemetry.
 
+## Archived documentation
+
+- `docs/platform-walkthrough-pre-food-waste.md` — previous platform-wide walkthrough built around a four-stage Mission Control demo, a 30-day pilot and energy/CO₂ expansion metrics. The active KREATE release now uses the narrower five-beat food-waste jury flow and 14-day matched pilot documented in `docs/jury-demo-script.md`, `docs/hackathon-product-release.md` and the root README.
+
 ## Rule
 
-Do not revive legacy code by linking or importing it directly. If an idea becomes product-relevant again, rebuild it against current source/provenance rules and the product truth boundary instead of reactivating mock telemetry or synthetic training data.
+Do not revive legacy code or documentation by linking or importing it directly. If an idea becomes product-relevant again, rebuild it against current source/provenance rules and the product truth boundary instead of reactivating mock telemetry, synthetic training data, or superseded pitch flows.
