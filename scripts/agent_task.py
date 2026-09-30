@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Operate BOUNCAMPUS agent-fabric parent/child coordination records safely."""
+"""Operate BOUNCAMPUS agent-fabric parent/child coordination records safely.
+
+Fabric v2 keeps four persistent human-owned parent workstreams and allows an
+unbounded-by-policy number of independently leased child agents beneath them.
+All local mutations are written atomically and rolled back if repository
+invariants fail.
+"""
 
 from __future__ import annotations
 
@@ -44,17 +50,18 @@ def load_config(root: Path) -> dict[str, Any]:
     path = root / fabric.CONFIG_PATH
     if not path.is_file():
         raise TaskOperationError(f"missing fabric config: {path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise TaskOperationError("fabric config must be a JSON object")
+    return value
 
 
 def task_path(root: Path, task_id: str) -> Path:
-    config = load_config(root)
-    return root / config["coordination_task_dir"] / f"{task_id}.json"
+    return root / load_config(root)["coordination_task_dir"] / f"{task_id}.json"
 
 
 def parent_path(root: Path, parent_id: str) -> Path:
-    config = load_config(root)
-    directory = config.get("coordination_parent_dir")
+    directory = load_config(root).get("coordination_parent_dir")
     if not directory:
         raise TaskOperationError("fabric schema does not define parent workstreams")
     return root / directory / f"{parent_id}.json"
@@ -114,7 +121,12 @@ def _parents_or_raise(root: Path) -> dict[str, dict[str, Any]]:
     return parents
 
 
-def _write_validated(path: Path, previous: dict[str, Any] | None, candidate: dict[str, Any], root: Path) -> None:
+def _write_validated(
+    path: Path,
+    previous: dict[str, Any] | None,
+    candidate: dict[str, Any],
+    root: Path,
+) -> None:
     existed = path.exists()
     _atomic_write(path, candidate)
     errors, _, _ = fabric.validate_repository(root)
@@ -129,11 +141,21 @@ def _write_validated(path: Path, previous: dict[str, Any] | None, candidate: dic
         raise TaskOperationError("operation rejected by fabric invariants:\n- " + "\n- ".join(errors))
 
 
-def _write_task_validated(root: Path, task_id: str, previous: dict[str, Any] | None, candidate: dict[str, Any]) -> None:
+def _write_task_validated(
+    root: Path,
+    task_id: str,
+    previous: dict[str, Any] | None,
+    candidate: dict[str, Any],
+) -> None:
     _write_validated(task_path(root, task_id), previous, candidate, root)
 
 
-def _write_parent_validated(root: Path, parent_id: str, previous: dict[str, Any], candidate: dict[str, Any]) -> None:
+def _write_parent_validated(
+    root: Path,
+    parent_id: str,
+    previous: dict[str, Any],
+    candidate: dict[str, Any],
+) -> None:
     _write_validated(parent_path(root, parent_id), previous, candidate, root)
 
 
@@ -152,12 +174,45 @@ def _priority_rank(priority: str) -> int:
     return {"P0": 0, "P1": 1, "P2": 2}.get(priority, 99)
 
 
+def _declared_producers(tasks: dict[str, dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    producers: dict[str, list[dict[str, Any]]] = {}
+    for task in tasks.values():
+        for artifact in task.get("produces", []):
+            if isinstance(artifact, str) and artifact:
+                producers.setdefault(artifact, []).append(task)
+    return producers
+
+
+def unresolved_declared_consumes(
+    task: dict[str, Any],
+    tasks: dict[str, dict[str, Any]],
+) -> list[str]:
+    """Block only artifacts with an in-fabric producer that is not verified.
+
+    A consumed identifier with no declared producer is treated as an external
+    evidence/artifact reference and remains governed by KREATE evidence rules.
+    """
+    producers = _declared_producers(tasks)
+    unresolved: list[str] = []
+    for artifact in task.get("consumes", []):
+        if not isinstance(artifact, str) or artifact not in producers:
+            continue
+        if not any(producer.get("state") == "MERGED_VERIFIED" for producer in producers[artifact]):
+            unresolved.append(artifact)
+    return sorted(set(unresolved))
+
+
 def list_ready(root: Path, parent_id: str | None = None) -> list[str]:
     tasks = _validate_repo_or_raise(root)
-    ready = fabric.ready_task_ids(tasks)
-    if parent_id is None:
-        return ready
-    return [task_id for task_id in ready if tasks[task_id].get("parent_id") == parent_id]
+    ready: list[str] = []
+    for task_id in fabric.ready_task_ids(tasks):
+        task = tasks[task_id]
+        if parent_id is not None and task.get("parent_id") != parent_id:
+            continue
+        if unresolved_declared_consumes(task, tasks):
+            continue
+        ready.append(task_id)
+    return ready
 
 
 def summary(root: Path) -> dict[str, Any]:
@@ -178,7 +233,7 @@ def summary(root: Path) -> dict[str, Any]:
             by_parent[parent_id] = by_parent.get(parent_id, 0) + 1
     return {
         "states": dict(sorted(states.items())),
-        "ready": fabric.ready_task_ids(tasks),
+        "ready": list_ready(root),
         "waiting_human": waiting_human,
         "blocked": blocked,
         "children_by_parent": dict(sorted(by_parent.items())),
@@ -199,19 +254,26 @@ def _conflicts_with_active(tasks: dict[str, dict[str, Any]], candidate: dict[str
 
 def next_ready(root: Path, *, parent_id: str) -> list[str]:
     tasks = _validate_repo_or_raise(root)
-    candidates = []
+    candidates: list[dict[str, Any]] = []
     for task_id in fabric.ready_task_ids(tasks):
         task = tasks[task_id]
         if task.get("schema_version") != 2 or task.get("parent_id") != parent_id:
             continue
-        if _conflicts_with_active(tasks, task):
+        if unresolved_declared_consumes(task, tasks) or _conflicts_with_active(tasks, task):
             continue
         candidates.append(task)
     candidates.sort(key=lambda item: (_priority_rank(str(item.get("priority"))), str(item.get("id"))))
     return [str(item["id"]) for item in candidates]
 
 
-def claim_task(root: Path, task_id: str, *, owner: str, branch: str, at: str | None = None) -> dict[str, Any]:
+def claim_task(
+    root: Path,
+    task_id: str,
+    *,
+    owner: str,
+    branch: str,
+    at: str | None = None,
+) -> dict[str, Any]:
     tasks = _validate_repo_or_raise(root)
     if task_id not in tasks:
         raise TaskOperationError(f"task not found: {task_id}")
@@ -226,6 +288,9 @@ def claim_task(root: Path, task_id: str, *, owner: str, branch: str, at: str | N
     for dep in previous.get("depends_on", []):
         if tasks.get(dep, {}).get("state") != "MERGED_VERIFIED":
             raise TaskOperationError(f"dependency {dep} is not MERGED_VERIFIED")
+    unresolved = unresolved_declared_consumes(previous, tasks)
+    if unresolved:
+        raise TaskOperationError(f"declared consumed artifacts are not yet produced: {unresolved}")
 
     stamp = at or iso_now()
     candidate = deepcopy(previous)
@@ -241,7 +306,14 @@ def claim_task(root: Path, task_id: str, *, owner: str, branch: str, at: str | N
     return candidate
 
 
-def heartbeat_task(root: Path, task_id: str, *, owner: str, at: str | None = None, note: str | None = None) -> dict[str, Any]:
+def heartbeat_task(
+    root: Path,
+    task_id: str,
+    *,
+    owner: str,
+    at: str | None = None,
+    note: str | None = None,
+) -> dict[str, Any]:
     previous = load_task(root, task_id)
     if previous.get("state") not in fabric.ACTIVE_OWNERSHIP_STATES:
         raise TaskOperationError(f"heartbeat requires an active-owned state, found {previous.get('state')}")
@@ -380,17 +452,15 @@ def spawn_child(
     required_for_parent: bool = True,
 ) -> dict[str, Any]:
     _validate_repo_or_raise(root)
-    parents = _parents_or_raise(root)
-    parent = parents.get(parent_id)
+    parent = _parents_or_raise(root).get(parent_id)
     if parent is None:
         raise TaskOperationError(f"parent not found: {parent_id}")
-    if parent.get("state") == "CANCELLED":
-        raise TaskOperationError(f"cannot spawn child under CANCELLED parent {parent_id}")
+    if parent.get("state") == "COMPLETE":
+        raise TaskOperationError(f"cannot spawn child under COMPLETE parent {parent_id}")
     path = task_path(root, task_id)
     if path.exists():
         raise TaskOperationError(f"task already exists: {task_id}")
-    template_path = root / fabric.TEMPLATE_PATH
-    template = json.loads(template_path.read_text(encoding="utf-8"))
+    template = json.loads((root / fabric.TEMPLATE_PATH).read_text(encoding="utf-8"))
     if template.get("schema_version") != 2:
         raise TaskOperationError("spawn-child requires schema-v2 task template")
     candidate = deepcopy(template)
@@ -479,36 +549,77 @@ def verify_child(
 
 
 def children_for_parent(tasks: dict[str, dict[str, Any]], parent_id: str) -> list[dict[str, Any]]:
-    return [task for task in tasks.values() if task.get("schema_version") == 2 and task.get("parent_id") == parent_id]
+    return [
+        task
+        for task in tasks.values()
+        if task.get("schema_version") == 2 and task.get("parent_id") == parent_id
+    ]
+
+
+def _historically_integrated_child_ids(parent: dict[str, Any]) -> set[str]:
+    result: set[str] = set()
+    for entry in parent.get("integration_history", []):
+        if not isinstance(entry, dict):
+            continue
+        for child_id in entry.get("child_ids", []):
+            if isinstance(child_id, str):
+                result.add(child_id)
+    return result
+
+
+def pending_children_for_parent(
+    tasks: dict[str, dict[str, Any]],
+    parent: dict[str, Any],
+) -> list[dict[str, Any]]:
+    integrated = _historically_integrated_child_ids(parent)
+    return [task for task in children_for_parent(tasks, str(parent["id"])) if task.get("id") not in integrated]
 
 
 def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
     tasks = _validate_repo_or_raise(root)
     parent = load_parent(root, parent_id)
     children = children_for_parent(tasks, parent_id)
-    required = [task for task in children if task.get("required_for_parent", True)]
-    incomplete = sorted(str(task["id"]) for task in required if task.get("state") != "MERGED_VERIFIED")
-    blocked = sorted(str(task["id"]) for task in children if task.get("state") == "BLOCKED")
-    waiting = sorted(str(task["id"]) for task in children if task.get("state") == "WAITING_HUMAN")
+    pending = pending_children_for_parent(tasks, parent)
+    required_pending = [task for task in pending if task.get("required_for_parent", True)]
+    incomplete = sorted(
+        str(task["id"])
+        for task in required_pending
+        if task.get("state") != "MERGED_VERIFIED"
+    )
+    blocked = sorted(str(task["id"]) for task in pending if task.get("state") == "BLOCKED")
+    waiting = sorted(str(task["id"]) for task in pending if task.get("state") == "WAITING_HUMAN")
     states: dict[str, int] = {}
-    for task in children:
+    for task in pending:
         state = str(task.get("state"))
         states[state] = states.get(state, 0) + 1
+    verified_pending = sorted(
+        str(task["id"])
+        for task in pending
+        if task.get("state") == "MERGED_VERIFIED"
+    )
     return {
         "parent_id": parent_id,
         "role": parent.get("role"),
         "human_owner": parent.get("human_owner"),
         "children": len(children),
-        "required_children": len(required),
+        "pending_children": len(pending),
+        "required_pending_children": len(required_pending),
         "states": dict(sorted(states.items())),
         "blocked": blocked,
         "waiting_human": waiting,
         "incomplete_required": incomplete,
-        "ready_for_parent_integration": bool(children) and not incomplete,
+        "verified_pending": verified_pending,
+        "integration_batches": len(parent.get("integration_history", [])),
+        "ready_for_parent_integration": bool(verified_pending) and not incomplete,
     }
 
 
-def fanout_children(root: Path, *, parent_id: str, specs: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+def fanout_children(
+    root: Path,
+    *,
+    parent_id: str,
+    specs: Iterable[dict[str, Any]],
+) -> list[dict[str, Any]]:
     specs_list = list(specs)
     seen: set[str] = set()
     for spec in specs_list:
@@ -520,7 +631,7 @@ def fanout_children(root: Path, *, parent_id: str, specs: Iterable[dict[str, Any
         seen.add(task_id)
         if not isinstance(spec.get("touched_paths"), list) or not spec.get("touched_paths"):
             raise TaskOperationError(f"fanout child {task_id} requires touched_paths")
-    results = []
+    results: list[dict[str, Any]] = []
     for spec in specs_list:
         results.append(
             spawn_child(
@@ -647,22 +758,101 @@ def release_parent_integration(
 ) -> dict[str, Any]:
     previous = load_parent(root, parent_id)
     if previous.get("state") not in {"INTEGRATING", "MERGED_VERIFYING"}:
-        raise TaskOperationError(f"release-integration requires INTEGRATING/MERGED_VERIFYING, found {previous.get('state')}")
-    integration = previous.get("integration", {})
+        raise TaskOperationError(
+            f"release-integration requires INTEGRATING/MERGED_VERIFYING, found {previous.get('state')}"
+        )
+    integration = deepcopy(previous.get("integration", {}))
     if not isinstance(integration.get("pull_request"), int):
         raise TaskOperationError("parent integration is missing pull request evidence")
+    if not integration.get("base_master_sha"):
+        raise TaskOperationError("parent integration is missing base master evidence")
+    status = parent_status(root, parent_id)
+    included_child_ids = status["verified_pending"]
+    if not included_child_ids:
+        raise TaskOperationError("parent integration has no newly verified child work to record")
+
+    stamp = at or iso_now()
+    completed_batch = {
+        "pull_request": integration["pull_request"],
+        "base_master_sha": integration.get("base_master_sha"),
+        "validated_head_sha": validated_head_sha,
+        "merge_sha": merge_sha,
+        "post_merge_verified_at": stamp,
+        "child_ids": included_child_ids,
+    }
+    candidate = deepcopy(previous)
+    candidate.setdefault("integration_history", []).append(completed_batch)
+    candidate["state"] = "ACTIVE"
+    candidate["integration"] = {
+        "pull_request": None,
+        "pr_state": None,
+        "validated_head_sha": None,
+        "merge_sha": None,
+        "post_merge_verified_at": None,
+        "ready_for_integration_at": None,
+        "base_master_sha": None,
+    }
+    _append_note(
+        candidate,
+        f"Parent master batch verified at {stamp} ({merge_sha}); workstream returned to ACTIVE.",
+    )
+    _write_parent_validated(root, parent_id, previous, candidate)
+    return candidate
+
+
+def request_parent_human_gate(
+    root: Path,
+    parent_id: str,
+    *,
+    kind: str,
+    question: str,
+    at: str | None = None,
+) -> dict[str, Any]:
+    if kind not in fabric.CRITICAL_HUMAN_GATES or not question.strip():
+        raise TaskOperationError("parent human gate must be one of the five critical kinds with one concrete question")
+    previous = load_parent(root, parent_id)
+    if previous.get("state") not in {"ACTIVE", "BLOCKED"}:
+        raise TaskOperationError(f"parent gate request requires ACTIVE/BLOCKED, found {previous.get('state')}")
     stamp = at or iso_now()
     candidate = deepcopy(previous)
-    candidate["state"] = "MERGED_VERIFIED"
-    candidate["integration"].update(
-        {
-            "pr_state": "MERGED",
-            "validated_head_sha": validated_head_sha,
-            "merge_sha": merge_sha,
-            "post_merge_verified_at": stamp,
-        }
+    candidate["state"] = "WAITING_HUMAN"
+    candidate["human_gate"] = {
+        "kind": kind,
+        "status": "PENDING",
+        "question": question,
+        "decision": None,
+        "decided_by": None,
+        "decided_at": None,
+    }
+    _append_note(candidate, f"Critical parent human gate requested at {stamp}: {kind}.")
+    _write_parent_validated(root, parent_id, previous, candidate)
+    return candidate
+
+
+def decide_parent_human_gate(
+    root: Path,
+    parent_id: str,
+    *,
+    status: str,
+    decision: str,
+    decided_by: str,
+    at: str | None = None,
+) -> dict[str, Any]:
+    if status not in {"APPROVED", "REJECTED"}:
+        raise TaskOperationError("human decision status must be APPROVED or REJECTED")
+    previous = load_parent(root, parent_id)
+    gate = previous.get("human_gate", {})
+    if previous.get("state") != "WAITING_HUMAN" or gate.get("kind") not in fabric.CRITICAL_HUMAN_GATES:
+        raise TaskOperationError("parent does not have a pending critical human gate")
+    if gate.get("status") != "PENDING":
+        raise TaskOperationError("parent human gate is not pending")
+    stamp = at or iso_now()
+    candidate = deepcopy(previous)
+    candidate["human_gate"].update(
+        {"status": status, "decision": decision, "decided_by": decided_by, "decided_at": stamp}
     )
-    _append_note(candidate, f"Parent master integration verified at {stamp} ({merge_sha}).")
+    candidate["state"] = "ACTIVE"
+    _append_note(candidate, f"Parent human gate {status.lower()} by {decided_by} at {stamp}: {decision}")
     _write_parent_validated(root, parent_id, previous, candidate)
     return candidate
 
@@ -766,6 +956,19 @@ def parse_args() -> argparse.Namespace:
     release.add_argument("--merge-sha", required=True)
     release.add_argument("--validated-head-sha", required=True)
     release.add_argument("--at")
+
+    parent_gate = sub.add_parser("parent-human-gate")
+    parent_gate.add_argument("parent_id")
+    parent_gate.add_argument("--kind", required=True)
+    parent_gate.add_argument("--question", required=True)
+    parent_gate.add_argument("--at")
+
+    parent_decision = sub.add_parser("parent-human-decision")
+    parent_decision.add_argument("parent_id")
+    parent_decision.add_argument("--status", choices=["APPROVED", "REJECTED"], required=True)
+    parent_decision.add_argument("--decision", required=True)
+    parent_decision.add_argument("--by", required=True, dest="decided_by")
+    parent_decision.add_argument("--at")
     return parser.parse_args()
 
 
@@ -879,6 +1082,27 @@ def main() -> int:
                     args.parent_id,
                     merge_sha=args.merge_sha,
                     validated_head_sha=args.validated_head_sha,
+                    at=args.at,
+                )
+            )
+        elif args.command == "parent-human-gate":
+            _print(
+                request_parent_human_gate(
+                    args.root,
+                    args.parent_id,
+                    kind=args.kind,
+                    question=args.question,
+                    at=args.at,
+                )
+            )
+        elif args.command == "parent-human-decision":
+            _print(
+                decide_parent_human_gate(
+                    args.root,
+                    args.parent_id,
+                    status=args.status,
+                    decision=args.decision,
+                    decided_by=args.decided_by,
                     at=args.at,
                 )
             )
