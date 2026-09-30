@@ -133,7 +133,7 @@ export const FOOD_WASTE_BASELINE = {
 };
 
 export const FOOD_DECISION_POLICY = {
-  version: 'food-decision-v1.0',
+  version: 'food-decision-v1.1',
   provenance: 'POLICY_HEURISTIC' as const,
   forecastProvenance: 'MODEL_ESTIMATE' as const,
   bandSemantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL' as const,
@@ -409,10 +409,12 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   const interventionForecastCoveragePct = interventionMeasurements.length
     ? (interventionWithForecast / interventionMeasurements.length) * 100
     : null;
+  const minimumForecastCoveragePct = FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumInterventionForecastCoveragePct;
 
   const dataQualityPassed = invalidMeasurementCount === 0
     && duplicates.size === 0
-    && interventionForecastCoveragePct === FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumInterventionForecastCoveragePct;
+    && interventionForecastCoveragePct != null
+    && interventionForecastCoveragePct >= FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumInterventionForecastCoveragePct;
 
   const minimum = FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm;
   const enoughEvidence = dataQualityPassed
@@ -433,7 +435,9 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   const notes: string[] = [];
   if (invalidMeasurementCount) notes.push(`${invalidMeasurementCount} measurement row(s) fail the pilot measurement contract.`);
   if (duplicates.size) notes.push('Duplicate service rows must be resolved before evidence promotion.');
-  if (interventionForecastCoveragePct !== 100) notes.push('Every intervention service must retain its model forecast for evaluation.');
+  if (interventionForecastCoveragePct == null || interventionForecastCoveragePct < minimumForecastCoveragePct) {
+    notes.push(`Intervention forecast coverage must be at least ${minimumForecastCoveragePct}% for evidence promotion.`);
+  }
   if (!enoughEvidence) notes.push(`Need at least ${minimum} valid measured services in both CONTROL and INTERVENTION arms.`);
   if (wasteReductionTargetMet === false) notes.push('Pre-registered normalized waste-reduction target was not met.');
   if (earlySelloutGuardrailPassed === false) notes.push('Early-sellout incidence increased in the intervention arm.');
