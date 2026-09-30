@@ -20,22 +20,62 @@ This directory contains secondary/public-source research prepared for KREATE age
 | [Boğaziçi Food Procurement & Contract Research](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md) | Current 2026–2027 unit-price dining procurement, quantities, contractor, capacity requirement, cancelled predecessor, contract-semantics unknowns and PMR/data questions. | [`bogazici_food_procurement_2026_2027.json`](./bogazici_food_procurement_2026_2027.json) |
 | [Türkiye Public-University Dining Procurement Benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) | Cross-university 2026 procurement sample testing whether the buyer/quantity/contract workflow repeats beyond Boğaziçi; covers SKS buyer pattern, on-site vs transported service, meal/channel segmentation and candidate beachhead refinement. | [`turkiye_university_dining_procurement_benchmark.json`](./turkiye_university_dining_procurement_benchmark.json) |
 | [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) | Cross-source data-quality control: capacity, beneficiary, serving, packaged-meal, food-waste/İSTAÇ and service-regime semantics that agents must reconcile before joining metrics or training models. | See the `source_conflicts` section of [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json). |
+| [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) | YÖK, public-building energy policy, Climate Law, UI GreenMetric 2026 Governance & Digitalization, Türkiye benchmark campuses and safe why-now language. | — |
+| [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) | Cross-domain event/provenance model, food-pilot data contract, decision records, water/energy governance implications and verification levels. | — |
+| [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) | Peer-reviewed synthesis connecting food-waste causality, forecasting, smart-campus decision processes, measurement and model design. | — |
+| [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) | Role-specific execution handoff for IE, EE, CS1, CS2, frontend and backend agents, including kill/modify conditions. | — |
 
 ## Recommended reading order
 
-1. Start with the Sustainability 2025 pack for the broad campus problem landscape and claim firewall.
-2. Read the Food Operations Deep Dive before PMR, data requests, architecture or modeling around dining operations.
-3. Read the Procurement & Contract pack before making cost, buyer, contractor-incentive or quantity-control claims.
-4. Read the Türkiye procurement benchmark before beachhead, market-repeatability or cross-institution product-architecture work.
-5. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
+### Any new agent
+
+1. Start with [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) for the current research-to-execution handoff.
+2. Read [Boğaziçi Sustainability 2025](./BOGAZICI_SUSTAINABILITY_2025.md) for the broad campus baseline and claim firewall.
+3. Check [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) before using numeric fields.
+
+### Dining / PMR / model work
+
+4. Read the [Food Operations Deep Dive](./BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md).
+5. Read the [Procurement & Contract](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md) pack before making cost, buyer, contractor-incentive or quantity-control claims.
+6. Read the [Türkiye dining procurement benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) before beachhead or cross-institution architecture work.
+7. Use [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) for CS1/EE method choices, not for Boğaziçi impact claims.
+
+### Platform / expansion / pitch strategy
+
+8. Use [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) for safe why-now and market-context claims.
+9. Read [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) before defining durable schemas or cross-domain resource modules.
 
 ## How agents should consume a pack
 
 1. Read the **agent-critical takeaways** and **claim firewall** first.
-2. Use `fact_id` / `finding_id` references when creating downstream tasks or experiments.
+2. Use `fact_id` / `finding_id` references when creating downstream tasks or experiments where available.
 3. Before promoting a number into `../EVIDENCE.md`, reopen the source, verify wording/date/units, and write a claim no broader than the source supports.
 4. Route unknown workflow facts to PMR rather than filling them with assumptions.
 5. Route quantitative/model implications to reproducible technical tests rather than presenting them as measured campus performance.
 6. For dining data, preserve `source`, `year`, `unit`, `period`, `scope` and `counting_semantics`; use `UNKNOWN` rather than inferring missing semantics.
 7. Never translate procurement contract value into food-waste savings unless the payable/accepted quantity semantics are verified.
 8. Never extrapolate a purposive procurement sample into a national market size without an explicit market-sizing methodology and denominator.
+9. Treat policy and sustainability rankings as market/context pressure, not proof of willingness to pay.
+10. Treat external academic intervention effects as design references, never as BOUNCAMPUS or Boğaziçi measured outcomes.
+
+## Current cross-pack synthesis
+
+```text
+PUBLIC FACT:
+Boğaziçi already has sustainability measurement/governance and reports 48,251 kg food waste for 2025.
+
+RESEARCH INFERENCE:
+A first-time monitoring/dashboard pitch is weak for a mature campus.
+
+HYPOTHESIS:
+Demand mismatch materially contributes to avoidable dining waste and the production decision is reachable.
+
+PMR JOB:
+Find the real decision owner, timing, constraints, current data, failure cost and intervention authority.
+
+TECH JOB:
+Start with a simple baseline, preserve uncertainty/human approval, and verify outcomes against service-level guardrails.
+
+PLATFORM DIRECTION IF VALIDATED:
+Observe -> Reconcile -> Predict -> Diagnose -> Recommend -> Human Act -> Verify.
+```
