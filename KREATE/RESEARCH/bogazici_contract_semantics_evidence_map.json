@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH_ONLY",
+  "scope": "Boğaziçi 2026-2027 dining contract quantity/payment semantics",
+  "canonical_tender": {
+    "ikn": "2025/1727143",
+    "period": "2026-01-01/2027-12-31",
+    "authority": "Boğaziçi University Health, Culture and Sports Department",
+    "contractor": "TEMAŞ Gıda Sanayi ve Ticaret A.Ş.",
+    "contract_type": "UNIT_PRICE_SERVICE_CONTRACT",
+    "campuses": ["North", "South", "Kilyos", "Kandilli", "Hisar", "Anadolu Hisarı"],
+    "line_items": [
+      {"class": "student_meal", "quantity": 2500000, "unit": "meal"},
+      {"class": "breakfast_including_sahur", "quantity": 380000, "unit": "meal"},
+      {"class": "staff_meal", "quantity": 250000, "unit": "meal"}
+    ],
+    "total_listed_quantity": 3130000,
+    "approximate_cost_try": 873226063.59,
+    "contract_value_try": 759537563.59,
+    "bids_total": 14,
+    "bids_valid": 7,
+    "price_adjustment_indicated": true,
+    "capacity_requirement_meals_per_day": 5000,
+    "capacity_requirement_semantics": "stated as one-half of administration daily meal requirement",
+    "implied_procurement_design_daily_requirement": 10000,
+    "sources": [
+      "https://www.ihaledetay.com/2025-1727143",
+      "https://ekapveri.com/ihale/ekap-2025-1727143/"
+    ]
+  },
+  "evidence_tiers": [
+    {"tier": "C1", "source": "signed_current_contract_and_current_specs", "usable_for": ["payment_basis", "order_mechanics", "penalties", "acceptance", "adjustment_rules"]},
+    {"tier": "C2", "source": "successful_tender_notice_and_result", "usable_for": ["procurement_quantities", "unit_price_structure", "contractor", "campuses", "capacity_requirement", "contract_scale"]},
+    {"tier": "C3", "source": "current_bogazici_governance_and_activity_docs", "usable_for": ["organizational_responsibilities", "monitoring_control", "service_context"]},
+    {"tier": "C4", "source": "cancelled_predecessor_2025_1335958", "usable_for": ["procurement_provenance_only"]},
+    {"tier": "C5", "source": "other_university_contract_precedents", "usable_for": ["sector_mechanisms", "pmr_question_design"]},
+    {"tier": "C6", "source": "academic_literature", "usable_for": ["decision_model_design"]}
+  ],
+  "known": [
+    {"id": "CSEM-01", "claim": "The current procurement lists 3.13 million meal units across three meal classes and six campuses.", "tier": "C2"},
+    {"id": "CSEM-02", "claim": "The current procurement is explicitly a unit-price contract.", "tier": "C2"},
+    {"id": "CSEM-03", "claim": "Current approximate cost is 873,226,063.59 TRY and contract value is 759,537,563.59 TRY; these are procurement-scale figures, not waste cost.", "tier": "C2"},
+    {"id": "CSEM-04", "claim": "5,000 meals is stated as half the administration daily meal requirement, implying a 10,000-meal/day procurement design requirement.", "tier": "C2"},
+    {"id": "CSEM-05", "claim": "Food Services prepares technical specifications, monitors contractor service and checks contract/spec compliance.", "tier": "C3"},
+    {"id": "CSEM-06", "claim": "Predecessor IKN 2025/1335958 was cancelled because objections required specification changes; it must not be used as current-clause evidence.", "tier": "C4"}
+  ],
+  "critical_unknowns": [
+    "daily_request_quantity_exists",
+    "daily_request_owner",
+    "request_freeze_time",
+    "request_revision_window",
+    "production_quantity_owner",
+    "contract_accepted_quantity_definition",
+    "hakediş_quantity_definition",
+    "unserved_excess_payment_treatment",
+    "shortage_penalty_or_deduction",
+    "minimum_guaranteed_quantity",
+    "line_item_unit_prices",
+    "campus_allocation_contract_relevance",
+    "bucard_qr_to_acceptance_reconciliation"
+  ],
+  "quantity_state_machine": [
+    "expected_demand",
+    "initial_request_qty",
+    "final_request_qty",
+    "produced_qty",
+    "delivered_qty",
+    "aggregate_entry_or_served_qty",
+    "contract_accepted_qty",
+    "hakedis_qty",
+    "unserved_surplus_or_waste"
+  ],
+  "minimum_data_request": [
+    "DATE",
+    "MEAL_CLASS",
+    "CAMPUS",
+    "SERVICE_REGIME",
+    "INITIAL_REQUEST_QTY",
+    "FINAL_REQUEST_QTY",
+    "REQUEST_FREEZE_TIMESTAMP",
+    "PRODUCED_QTY",
+    "DELIVERED_QTY",
+    "AGGREGATE_ENTRY_COUNT",
+    "CONTRACT_ACCEPTED_QTY",
+    "HAKEDIS_QTY",
+    "UNSERVED_SURPLUS_QTY",
+    "SHORTAGE_EVENT",
+    "MANUAL_ADJUSTMENT_QTY",
+    "ADJUSTMENT_REASON_CODE"
+  ],
+  "p0_questions": [
+    "Which quantity is multiplied by the contract unit price in monthly hakediş?",
+    "What system/report is the source of that quantity?",
+    "Who approves/signs that quantity?",
+    "Is a daily expected/requested count communicated to TEMAŞ, by whom, and at what deadline?",
+    "Can that quantity be revised and until when?",
+    "Is excess produced but unserved food payable or contractor risk?",
+    "What happens when demand exceeds planned quantity?"
+  ],
+  "model_requirements_after_semantics": {
+    "forecast": "predictive distribution preferred over point-only forecast if data support it",
+    "decision_variable": "production/allocation quantity q",
+    "loss_components": ["overage_cost", "underage_cost", "service_guardrail", "contract_constraints"],
+    "human_review": true,
+    "mandatory_baselines": ["current_operator_heuristic", "same_weekday_or_rolling", "contextual_point_forecast"],
+    "promotion_gate": "a more accurate model must not worsen shortage/service or verified contract economics"
+  },
+  "academic_references": [
+    {
+      "title": "Cost-versus environmentally-optimal production in institutional food service operations",
+      "authors": "Esma Birişçi; R. McGarvey",
+      "year": 2021,
+      "journal": "Socio-Economic Planning Sciences",
+      "url": "https://consensus.app/papers/costversus-environmentallyoptimal-production-in-birişçi-mcgarvey/38f25b4bfef85d84a6b78abece26d125/?utm_source=chatgpt"
+    },
+    {
+      "title": "Potential for using guest attendance forecasting in Swedish public catering to reduce overcatering",
+      "authors": "C. Malefors; I. Strid; P. Hansson; Mattias Eriksson",
+      "year": 2020,
+      "journal": "Sustainable Production and Consumption",
+      "url": "https://consensus.app/papers/potential-for-using-guest-attendance-forecasting-in-malefors-strid/91eb65a9c8e65f39b6a33ffad04a2d86/?utm_source=chatgpt"
+    }
+  ],
+  "forbidden_inferences": [
+    "contract_value_equals_food_waste_cost",
+    "blended_contract_value_per_meal_equals_avoidable_meal_savings",
+    "10000_is_measured_average_daily_demand",
+    "temas_sets_daily_quantity_without_verification",
+    "produced_but_unserved_food_is_paid_or_unpaid_without_C1_evidence",
+    "cancelled_predecessor_clause_is_current_contract_clause",
+    "bucard_turnstile_event_is_contract_accepted_meal_without_verification"
+  ]
+}
