@@ -2,195 +2,73 @@
 
 ## Purpose
 
-BOUNCAMPUS should combine two different execution modes:
+All four KREATE workstreams operate **autonomously by default**. A human owns each parent workstream for accountability, evidence attestation, safety, external commitments, and true product-direction pivots; the human is not a routine dispatcher for the agents beneath that workstream.
 
-- **strategic roles preserve user control at meaningful branches**, and
-- **technical execution roles keep moving without unnecessary user-direction pauses**.
+## Parent workstreams
 
-This protocol therefore does **not** apply equally to all four KREATE roles.
+Exactly one human-owned parent workstream exists for each role:
 
-## Role Matrix
+- IE — Customer Discovery & Market Lead
+- EE — Physical Systems & Measurement Lead
+- CS1 — Decision Intelligence Lead
+- CS2 — Product Strategy, Evidence Synthesis & Application Lead
 
-| Role | User decision checkpoint after completed work? | Default next-step behavior |
-|---|---|---|
-| **IE — Customer Discovery & Market Lead** | **ON** | Finish current work, then pause at a meaningful market/customer branch and present decision options to the user. |
-| **CS2 — Product Strategy, Evidence Synthesis & Application Lead** | **ON** | Finish current work, then pause at a meaningful product/application branch and present decision options to the user. |
-| **EE — Physical Systems & Measurement Lead** | **OFF** | Finish, merge/verify, report result, then autonomously choose the next highest-value technical/measurement task consistent with current goals. |
-| **CS1 — Decision Intelligence Lead** | **OFF** | Finish, merge/verify, report result, then autonomously choose the next highest-value decision/model/data task consistent with current goals. |
+Each parent may fan out to any number of child agents when dependencies and `touched_paths` permit it. There is no artificial child-agent count limit.
 
-`ON` means a role must preserve user choice when the **next workstream** contains a material strategic branch.
+## Default behavior for every role
 
-`OFF` does **not** mean the role can ignore safety, evidence, product truth, or explicit human-gate rules. It means the role does not stop merely to ask which technical task to do next.
+IE, EE, CS1, and CS2 all follow the same default lifecycle:
 
----
+1. execute the accepted parent objective;
+2. decompose it into bounded child-agent tasks as useful;
+3. let agents resolve routine reversible choices through research, tests, experiments, and repository evidence;
+4. integrate verified child outputs into the parent workstream;
+5. continue to the next highest-value aligned work without asking the human for routine direction.
 
-# Part A — IE and CS2: Checkpoint ON
+Routine PMR planning, stakeholder prioritization, model choice, hardware alternative comparison, drafting, code architecture, testing, documentation, branch operations, conflict resolution, PR creation, and merge execution are not human checkpoints.
 
-## 1. Do not interrupt the accepted work package
+## The only human gates
 
-Once IE or CS2 accepts a bounded package, execute it end-to-end without repeatedly asking the user to approve reversible details.
+`WAITING_HUMAN` is valid only for one of these five gate kinds:
 
-Routine choices should be resolved through evidence, inspection, research, testing, or bounded experiments.
+1. **EVIDENCE_ATTESTATION** — confirm that a real interview, exact quote, private institutional fact, measured result, or other real-world evidence is genuine and represented correctly.
+2. **IRREVERSIBLE_ACTION** — approve destructive or difficult-to-reverse external operations such as data deletion, credential revocation/rotation, or repository/account administration.
+3. **PHYSICAL_SAFETY** — approve real hardware energization, actuator movement, mains/high-current work, or field deployment where physical risk exists.
+4. **EXTERNAL_COMMITMENT** — approve final application submission, purchase/payment, contract/legal acceptance, consequential external communication, or a binding pilot/date commitment.
+5. **PRODUCT_DIRECTION** — decide a material pivot to the agreed beachhead, primary problem, or core product thesis when evidence supports materially different credible directions.
 
-## 2. Checkpoint after meaningful completion
+A pending gate must contain exactly one concrete question. Agents must finish all independent work before entering `WAITING_HUMAN`.
 
-After the current work reaches its accepted Definition of Done, IE or CS2 must evaluate whether the next action is:
+## What is not PRODUCT_DIRECTION
 
-- a continuation of the same direction, or
-- a materially different strategic branch.
+The following remain autonomous unless they independently trigger another gate:
 
-If there is a real strategic branch, do **not** silently choose one and continue.
+- choosing a forecasting/model baseline;
+- selecting a reversible software architecture;
+- choosing between sensor/component candidates for analysis or non-energized prototyping;
+- prioritizing interviews inside the already-agreed market hypothesis;
+- refining application wording without changing factual claims;
+- choosing tests, metrics, experiments, or implementation order;
+- killing an unsupported feature while preserving the agreed core problem;
+- resolving merge conflicts or CI failures.
 
-Typical IE checkpoint triggers:
+## Evidence boundary
 
-- choose between beachhead markets,
-- materially change target customer or buyer,
-- choose which PMR segment receives major next effort,
-- pivot the operational problem,
-- choose between materially different pilot/customer-acquisition paths,
-- change the market thesis based on contradictory evidence.
+Agents may collect, structure, summarize, challenge, and synthesize PMR/evidence, but they may not self-attest that an interview occurred, invent a quote, invent a customer, or convert model/simulation output into a measured result.
 
-Typical CS2 checkpoint triggers:
+Application-relevant factual claims continue to require the human-review rules in the KREATE evidence system.
 
-- materially change the product thesis,
-- choose between major product directions,
-- commit substantial time to a new feature family,
-- change the core application narrative,
-- choose a different differentiation strategy,
-- choose a new campus-domain expansion,
-- make a strategic tradeoff that displaces another important workstream.
+## Human-owner reports
 
-## 3. Required decision package
+Agents should keep the human owner informed with concise status, not permission requests:
 
-The checkpoint must give the user enough information to choose without reconstructing the work.
+- **Completed** — what changed;
+- **Evidence/result** — tests, evidence IDs, measurements, commits, or artifacts;
+- **Implication** — what assumption/risk changed;
+- **Next** — the next autonomous action.
 
-Provide:
-
-1. **Completed** — what was actually finished;
-2. **Evidence / result** — interviews, evidence IDs, research, tests, measurements, benchmark results, commits, or artifacts;
-3. **What changed** — assumptions, risks, product requirements, market understanding, or application claims affected;
-4. **Options** — normally 2–4 materially different next paths;
-5. for each option: **expected result, effort/cost, main risk, dependencies, and KREATE impact**;
-6. **Recommendation** — the role owner's preferred option and reasoning;
-7. **Decision needed** — one concise user choice.
-
-Do not fabricate weak alternatives just to create an A/B/C list.
-
-Do not ask vague questions like “What should I do next?” without first supplying the decision package.
-
-A strong ending is:
-
-> **Recommended:** Option B because it gives the strongest evidence gain before October 8 with lower dependency risk.  
-> **Decision needed:** choose A, B, or C for the next strategic workstream.
-
-## 4. Continue without a checkpoint when no material branch exists
-
-IE and CS2 may continue autonomously when the next action is merely:
-
-- required to finish already accepted criteria,
-- cleanup or synthesis required by the same package,
-- a low-risk follow-up with no real alternative,
-- updating evidence/assumptions/decisions based on the completed result,
-- a small reversible experiment that informs the same already-selected direction.
-
----
-
-# Part B — EE and CS1: Checkpoint OFF
-
-## 5. Continuous technical execution
-
-EE and CS1 should **not** stop after each completed task to ask the user which technical direction to take next.
-
-After completing, integrating, and verifying the current work, they should:
-
-1. report the concrete result;
-2. record evidence, limitations, failures, and changed assumptions;
-3. inspect the current KREATE objective, ready work, dependencies, and latest IE/CS2 decisions;
-4. select the next highest-value non-conflicting technical task;
-5. continue execution autonomously.
-
-If no ready task exists, EE/CS1 may define a bounded technical experiment or supporting work package that advances the current evidence-backed direction.
-
-They should prefer work that:
-
-- reduces a critical uncertainty,
-- tests an important assumption,
-- improves technical credibility,
-- closes a measurement or decision-evidence gap,
-- unblocks IE/CS2,
-- improves pilot feasibility,
-- strengthens a claim the application may need,
-- kills unnecessary complexity.
-
-## 6. EE-specific autonomous scope
-
-EE may autonomously move among, for example:
-
-- measurement architecture comparisons,
-- smart-scale or alternative sensor experiments,
-- calibration/repeatability work,
-- offline/reconnect behavior,
-- hardware-free measurement alternatives,
-- service identification methods,
-- integration feasibility,
-- pilot measurement SOPs,
-- removal of unnecessary hardware.
-
-EE does not need a user decision merely because multiple technically plausible sensor/component paths exist. Use evidence and bounded experiments to choose.
-
-## 7. CS1-specific autonomous scope
-
-CS1 may autonomously move among, for example:
-
-- realistic baselines,
-- signal ablation,
-- heuristics versus ML,
-- uncertainty representation,
-- decision-cost modeling,
-- data-quality handling,
-- source-health logic,
-- evaluation design,
-- pilot analytics,
-- backend decision contracts,
-- simplifying an unjustified model.
-
-CS1 does not need a user decision merely because multiple technically plausible model/data approaches exist. Benchmark them and choose based on evidence.
-
-## 8. What EE/CS1 should report
-
-They should still keep the user informed after meaningful results.
-
-A useful report is:
-
-- **Completed:** what was delivered;
-- **Result:** what the evidence/test showed;
-- **Implication:** what changed technically;
-- **Next:** what the agent selected next and why.
-
-This is a status report, **not** a request for direction.
-
----
-
-# Part C — Human gates still apply to everyone
-
-Checkpoint OFF never overrides genuine human gates.
-
-All roles must still stop when required for:
-
-1. **EVIDENCE_ATTESTATION** — a person must confirm real-world evidence, interview/quote, or private institutional fact;
-2. **IRREVERSIBLE_ACTION** — destructive or difficult-to-reverse external action;
-3. **PHYSICAL_SAFETY** — energization, mains/high-current work, actuator movement, field deployment, or another physical-risk action;
-4. **EXTERNAL_COMMITMENT** — purchase/payment, contract/legal acceptance, final submission, consequential external message, or pilot/date commitment;
-5. **PRODUCT_DIRECTION** — a material pivot to the agreed core product/problem when the repository policy requires user ownership of that pivot.
-
-For EE/CS1, ordinary technical architecture selection is **not** automatically `PRODUCT_DIRECTION`.
-
-If a technical result implies a genuine market/product pivot, EE/CS1 should document the evidence and hand the strategic choice to **IE/CS2**, who then run the user checkpoint.
-
----
+Only append **Decision needed** when one of the five critical gates is actually pending.
 
 ## Core rule
 
-> **IE and CS2 preserve user control over strategic direction. EE and CS1 preserve execution velocity on technical direction.**
-
-No role should ask for permission on routine reversible details, and no role may fabricate evidence to justify autonomy.
+> **Humans own accountability and critical real-world decisions. Agents own routine execution, decomposition, experimentation, integration, and continuation.**
