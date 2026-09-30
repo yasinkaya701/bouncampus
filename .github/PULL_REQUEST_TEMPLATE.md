@@ -46,3 +46,24 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 - [ ] `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` will pass before the agent reports completion or exits.
 
 **A PR being open, review-ready, or green is not completion. The owning agent must merge and verify `master` before releasing the workstream.**
+
+## KREATE evidence and anti-slop gate
+
+Use this section for any PR that changes KREATE application, PMR, evidence, experiment, or claim-bearing material.
+
+- [ ] Linked issue is present.
+- [ ] Acceptance criteria passed.
+- [ ] Test and/or evidence artifact is attached or linked.
+- [ ] No unrelated changes are included.
+- [ ] Material claims are classified correctly (`FACT`, `PUBLIC SOURCE`, `INTERVIEW EVIDENCE`, `TECHNICAL TEST`, `MODEL ESTIMATE`, `POLICY HEURISTIC`, `HYPOTHESIS`, `UNKNOWN`).
+- [ ] Every material claim has an evidence ID or remains explicitly `HYPOTHESIS`/`UNKNOWN`.
+- [ ] AI-generated prose/code/research was verified by a human reviewer.
+- [ ] Known limitations are disclosed.
+- [ ] No fabricated interview, quote, persona, pilot result, model accuracy, climate impact, hardware performance, live data, or savings claim is present.
+- [ ] Reviewer is named below.
+
+**Human reviewer:** TODO
+
+**Evidence IDs / artifacts:** TODO
+
+**Known limitations:** TODO
