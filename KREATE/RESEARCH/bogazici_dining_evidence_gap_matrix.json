@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "status": "RESEARCH_SYNTHESIS_NOT_VALIDATION",
+  "scope": "Boğaziçi dining P0/P1 evidence gaps and research stop rules",
+  "p0_evidence": [
+    {
+      "id": "P0-01",
+      "artifact": "current_quantity_workflow_incident_interview",
+      "resolves": ["quantity_owner", "freeze_time", "current_heuristic", "adjustment_window", "batch_flexibility", "campus_allocation_control"],
+      "kill_condition": "no meaningful production or allocation decision exists before service"
+    },
+    {
+      "id": "P0-02",
+      "artifact": "current_contract_or_hakedis_quantity_semantics",
+      "resolves": ["daily_calloff", "contract_accepted_qty", "hakedis_qty", "excess_treatment", "shortage_penalty", "minimum_or_tolerance_rules"]
+    },
+    {
+      "id": "P0-03",
+      "artifact": "privacy_safe_aggregate_demand_sample",
+      "minimum_fields": ["DATE", "CAMPUS", "MEAL_WINDOW", "AGGREGATE_ENTRY_COUNT"],
+      "resolves": ["export_feasibility", "time_grain", "campus_semantics", "missingness", "service_alignment"]
+    },
+    {
+      "id": "P0-04",
+      "artifact": "waste_boundary_decomposition",
+      "categories": ["preparation_waste", "unserved_cooked_surplus", "service_line_leftover", "plate_waste", "edible_donation_transfer", "compost_recovery", "other"],
+      "kill_condition": "production mismatch is negligible relative to non-production causes"
+    },
+    {
+      "id": "P0-05",
+      "artifact": "current_operator_baseline",
+      "candidate_rules_to_test_not_assume": ["previous_same_weekday", "historical_average", "reservation_intent", "manual_judgment", "fixed_quantity", "contractor_heuristic", "university_calloff", "menu_specific_adjustment"]
+    }
+  ],
+  "p1_evidence": [
+    "menu_option_mix_counts",
+    "campus_allocation_records",
+    "batch_timing_and_adjustable_until",
+    "service_failure_logs",
+    "current_penalty_or_deduction_table"
+  ],
+  "defer": [
+    "generic_global_food_waste_statistics",
+    "random_university_reduction_percentages",
+    "model_architecture_shopping_before_target_semantics",
+    "TAM_from_procurement_search_counts",
+    "person_level_campus_activity_scraping"
+  ],
+  "pilot_ready_minimum": [
+    "named_current_decision_owner",
+    "known_freeze_deadline",
+    "documented_current_operator_baseline",
+    "privacy_safe_aggregate_demand_source_or_manual_alternative",
+    "measurable_produced_served_surplus_outcome",
+    "measurable_shortage_service_guardrail",
+    "defined_waste_boundary_relevant_to_production_mismatch",
+    "human_approval_override_workflow",
+    "economic_claims_excluded_until_settlement_semantics_verified"
+  ],
+  "economic_claim_minimum": [
+    "current_line_item_unit_price_or_settlement_rule_verified",
+    "contract_accepted_qty_and_hakedis_semantics_verified",
+    "excess_risk_owner_verified",
+    "shortage_deduction_penalty_verified_if_applicable",
+    "intervention_operating_cost_measured",
+    "calculation_reviewed_by_contract_or_budget_owner"
+  ],
+  "climate_claim_minimum": [
+    "measured_physical_food_waste_reduction",
+    "clear_waste_category_boundary",
+    "no_unacceptable_service_regression",
+    "documented_conversion_method_and_factor_source",
+    "MODEL_ESTIMATE_label",
+    "uncertainty_or_range_where_appropriate"
+  ],
+  "decision_updates": [
+    {"evidence": "quantity_discretion_and_frequent_mismatch", "decision": "KEEP_production_decision_wedge"},
+    {"evidence": "quantity_fixed_or_no_discretion", "decision": "MODIFY_intervention_point"},
+    {"evidence": "material_unserved_surplus", "decision": "KEEP_quantity_optimization_hypothesis"},
+    {"evidence": "waste_mostly_plate_waste", "decision": "MODIFY_toward_menu_service_behavior"},
+    {"evidence": "contractor_bears_excess_and_uses_heuristic", "decision": "strengthen_contractor_operator_persona"},
+    {"evidence": "university_settlement_decreases_with_accepted_qty", "decision": "strengthen_university_budget_owner_case"},
+    {"evidence": "aggregate_data_inaccessible_but_manual_pilot_feasible", "decision": "keep_pilot_simplify_tech"},
+    {"evidence": "aggregate_data_inaccessible_and_manual_measurement_prohibitive", "decision": "KILL_OR_DEFER_model_heavy_pilot"},
+    {"evidence": "reservation_removes_uncertainty_cheaply", "decision": "MODIFY_to_reservation_or_hybrid"},
+    {"evidence": "existing_forecast_near_operational_ceiling", "decision": "shift_to_allocation_mix_batch_or_other_domain"}
+  ],
+  "research_stop_rule": "new secondary research must answer a named P0 or P1 gap; generic food-waste, AI-forecasting or sustainability importance sources are low marginal value",
+  "next_decisive_bundle": [
+    "CURRENT_REAL_WORKFLOW",
+    "CURRENT_CONTRACT_SEMANTICS",
+    "CURRENT_AGGREGATE_DATA_SAMPLE",
+    "CURRENT_WASTE_BOUNDARY"
+  ]
+}
