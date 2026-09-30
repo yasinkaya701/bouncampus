@@ -1,103 +1,147 @@
-# BOUNCAMPUS Autonomous Agent Fabric
+# BOUNCAMPUS Autonomous Agent Fabric v2
 
-This document defines the control plane for parallel AI/human work. It extends `AGENTS.md`.
+This document defines the low-overhead control plane for **four human-owned parent workstreams with arbitrarily many autonomous child agents**. It extends `AGENTS.md` and the KREATE evidence system.
 
 ## Operating principle
 
-**Autonomous by default; parallel by role; verified on `master`.**
+**One human = one parent workstream. Many agents may execute beneath that parent. Humans intervene only at five critical gates.**
 
-Implementation and review can happen concurrently. Final product truth remains serialized by the requirement that every `master` integration PR contains the latest `master` and passes exact-head CI.
+The fabric has no configured child-agent count limit. Effective concurrency is constrained by dependencies, `touched_paths`, repository/runner capacity, and parent integration throughput.
 
 ## Control plane
 
-- Durable product truth: `master`
-- Role integration branches:
-  - `role/ie-customer-discovery`
-  - `role/ee-physical-systems`
-  - `role/cs1-decision-intelligence`
-  - `role/cs2-product-strategy`
-- Short-lived implementation branches: `agent/<lane>/<task>`
-- Coordination metadata branch: `agent-coordination`
-- Task store: `.agents/coordination/tasks/`
+- Durable repository/product truth: `master`
+- Parent work branches:
+  - `work/ie/<slug>`
+  - `work/ee/<slug>`
+  - `work/cs1/<slug>`
+  - `work/cs2/<slug>`
+- Child implementation branches: `agent/<lane>/<task>`
+- Coordination branch: `agent-coordination`
+- Child task store: `.agents/coordination/tasks/`
+- Parent store: `.agents/coordination/parents/`
 
-Task JSON remains the authority for ownership, dependencies, path claims, leases, human gates, and final integration evidence.
+Exactly one non-cancelled parent is allowed for each KREATE role: IE, EE, CS1, CS2. The parent is the accountability and master-integration boundary. Child tasks are the scalable execution units.
 
-## Parallel PR model
+## Parent / child hierarchy
 
-The repository-wide single-PR lock no longer exists.
+### Parent workstream
 
-Two PR classes are expected:
+A parent record contains:
 
-### Feature PR
+- human owner (`human:<identity>`);
+- role;
+- objective and priority;
+- parent branch;
+- critical human gate, if any;
+- parent integration evidence.
+
+The human owner is not required to dispatch ordinary work. Agents may decompose and spawn bounded child tasks autonomously while staying inside the parent objective.
+
+### Child task
+
+A schema-v2 child record contains:
+
+- `parent_id`;
+- one leased `owner_agent`;
+- dependencies;
+- `touched_paths`;
+- acceptance criteria and validation commands;
+- `produces` / `consumes` artifact contracts;
+- `required_for_parent` (default true);
+- child-to-parent integration evidence.
+
+Schema-v1 tasks remain readable during migration. Verified history does not need to be rewritten.
+
+## Scale model
+
+The system must support 50+ siblings under one parent when their work is independent.
 
 ```text
-agent/<lane>/<task> -> role/<role>
+HUMAN-CS1
+├── TASK-CS1-001 -> agent:model-a
+├── TASK-CS1-002 -> agent:model-b
+├── TASK-CS1-003 -> agent:data-quality
+├── ...
+└── TASK-CS1-050 -> agent:red-team-50
 ```
 
-Feature PRs allow each role to integrate independently. Up to 3 may be open against a role branch at once.
+There is intentionally no `max_agents` field. A new child is admitted based on contracts, not count.
 
-### Role integration PR
+## Child claim and lease
 
-```text
-role/<role> -> master
-```
+To claim a child:
 
-Each role may have at most one open integration PR to `master` at a time. Different roles may have integration PRs open concurrently.
+1. parent exists and is not cancelled;
+2. child is `READY`;
+3. hard dependencies are `MERGED_VERIFIED`;
+4. its `touched_paths` do not overlap an active child;
+5. no pending/rejected human gate blocks the child;
+6. the agent records branch, claim timestamp, heartbeat, and lease owner.
 
-A `master` PR is mergeable only if it contains the current `master` base SHA. Therefore, after any `master` merge, other open role PRs must sync and revalidate before merging.
-
-Repository-wide policy/bootstrap changes may use `agent/quality-release/<task> -> master`.
-
-## Task lifecycle
-
-`BACKLOG -> READY -> CLAIMED -> ACTIVE -> READY_FOR_INTEGRATION -> INTEGRATING -> MERGED_VERIFYING -> MERGED_VERIFIED`
-
-Side states:
-
-- `BLOCKED`
-- `WAITING_HUMAN`
-- `CANCELLED`
-
-There is no branch-only `DONE` state.
-
-A feature PR merged into a role branch does not make a task terminal. The task remains non-terminal until its commits reach verified `master`.
-
-## Claim and lease protocol
-
-To claim a task:
-
-1. read the task and current blob SHA from `agent-coordination`;
-2. require `READY` or satisfy stale-reclaim rules;
-3. require all hard dependencies to be `MERGED_VERIFIED`;
-4. verify declared `touched_paths` do not overlap another active task;
-5. set owner, feature branch, claim timestamp, heartbeat, and state;
-6. update using the current blob SHA precondition;
-7. create the feature branch from the correct role branch.
-
-A material commit or meaningful validation checkpoint should refresh the heartbeat.
-
-A stale lease may be reclaimed only when:
-
-- TTL expired;
-- the task is not actively integrating/verifying;
-- no repository evidence shows fresh execution;
-- the reclaim is recorded.
+Material commits or validation checkpoints refresh the heartbeat. Stale leases may be reclaimed under the existing evidence rules; a human is not required merely because an agent disappeared.
 
 ## File ownership
 
-`touched_paths` is an execution contract.
+`touched_paths` is the hard concurrency contract.
 
-- Two active tasks may not own overlapping product paths.
-- Parent/child paths count as overlap.
+- Active children may not overlap paths, even across different parents.
+- Parent/child directory ownership counts as overlap.
+- READY tasks may coexist until claim; the claim that would create an active collision is rejected and rolled back.
+- Read-only consumption does not create path ownership.
 - Coordination metadata is not product ownership.
-- If a new required path conflicts with another active owner, re-scope or coordinate explicitly.
-- Shared/high-conflict files require the broad merge checklist in `AGENTS.md`.
 
-Parallel PRs do not weaken path ownership.
+This is the principal safety mechanism that allows dozens of agents without merge chaos.
+
+## Child integration: fan-in to parent only
+
+Child branches never integrate directly to `master`.
+
+Lifecycle:
+
+```text
+READY -> CLAIMED -> ACTIVE -> READY_FOR_INTEGRATION
+      -> INTEGRATING(parent branch) -> MERGED_VERIFIED(parent-contained)
+```
+
+For a v2 child:
+
+- generic legacy `INTEGRATING` / `MERGED_VERIFYING` / `MERGED_VERIFIED` transitions are forbidden;
+- `integrate-child` must target the exact owning parent branch;
+- `master` is always an invalid child target;
+- `verify-child` requires validated child head + parent integrated commit evidence.
+
+A child `MERGED_VERIFIED` means **verified inside the parent branch**, not yet on final `master`.
+
+## Fan-out / fan-in
+
+A parent may fan out from an explicit list of bounded child specifications. Agents may generate those child specifications when the decomposition is mechanically inside the accepted parent objective; they may not use fan-out to invent a product pivot.
+
+Parent readiness is computed from coordination state:
+
+- at least one child exists;
+- every `required_for_parent=true` child is `MERGED_VERIFIED` into the parent;
+- optional children do not block parent readiness;
+- unresolved hard dependencies or critical human gates still block their own required children.
+
+No parent is declared ready merely because many child branches exist.
+
+## Artifact contracts
+
+`produces` and `consumes` are repository-visible handoff contracts. Use them instead of synchronous human relay when one child/parent creates evidence or an artifact another worker needs.
+
+Examples:
+
+- IE child produces `E-INT-012`;
+- CS1 child consumes `E-INT-012`;
+- EE child produces `TECH_TEST-scale-repeatability-v1`;
+- CS2 child consumes that test artifact for a defensible draft.
+
+External human-attested evidence can be consumed without being produced by an agent task; authenticity remains governed by the KREATE evidence system.
 
 ## Human gates
 
-Allowed human gates:
+The only valid human gates are:
 
 - `EVIDENCE_ATTESTATION`
 - `IRREVERSIBLE_ACTION`
@@ -105,83 +149,82 @@ Allowed human gates:
 - `EXTERNAL_COMMITMENT`
 - `PRODUCT_DIRECTION`
 
-Normal engineering decisions, branches, PRs, tests, conflict resolution, and reversible changes are autonomous.
+`WAITING_HUMAN` requires one of those five kinds, `PENDING` status, and one concrete question. Routine review, architecture, prioritization, model choice, drafting, branch operations, merge conflict resolution, or uncertainty are not human gates.
 
-`WAITING_HUMAN` is valid only when a real gate is pending, one concrete question is recorded, and independent work is already complete.
+All four roles continue autonomously outside these gates.
 
-## Integration protocol
+## Parent integration queue
 
-### Feature integration into a role branch
+Only parent workstreams enter the `master` integration queue.
 
-The owning workstream agent:
+Queue order is deterministic:
 
-1. updates from the latest role branch;
-2. resolves conflicts deliberately;
-3. passes targeted and repository-required checks;
-4. opens/updates the feature PR;
-5. drives exact-head CI green;
-6. merges into the role branch.
+1. priority: P0, then P1, then P2;
+2. greater dependency-unblocking value;
+3. oldest `ready_for_integration_at`;
+4. parent ID tie-break.
 
-This is staging, not final completion.
+A P0 recovery can therefore preempt lower-priority normal work without an ad-hoc human dispatcher.
 
-### Role integration into master
+## Parallel parent PRs, serialized master merge
 
-The role integration owner:
+Up to four parent PRs may be open concurrently, normally one per human parent.
 
-1. confirms the included workstreams are compatible;
-2. synchronizes the role branch from latest `master`;
-3. opens/updates the role-to-`master` PR;
-4. runs feature-preservation, fabric, KREATE, frontend, Python, and data gates as applicable;
-5. drives exact-head CI green;
-6. merges with a normal merge commit;
-7. verifies the resulting `master`;
-8. records the shared PR/head/merge evidence on each included task;
-9. moves included tasks to `MERGED_VERIFIED`.
+- At most one parent PR may be non-draft / hold the master integration slot.
+- Other parent PRs remain draft and may run advisory CI/review.
+- The integration-slot PR must include current `master` and rerun fresh exact-head CI.
+- CI from before another `master` merge is not merge evidence.
+- Only the integration-slot parent may merge.
+- Merge method remains a normal merge commit.
+- Post-merge verification and `agent_exit_gate.py` remain mandatory.
 
-Several tasks may share the same role integration PR number.
+This separates **review parallelism** from **merge serialization**.
 
-## Direct-master-push recovery
+## Parent master integration
 
-Direct push to `master` is a policy violation even though repository administration may not enforce branch protection.
+Before acquiring the slot:
 
-When detected:
+1. parent is `READY_FOR_INTEGRATION`;
+2. required children are verified into the parent;
+3. the parent is first in the deterministic queue;
+4. no other parent is `INTEGRATING` or `MERGED_VERIFYING`;
+5. current master SHA is recorded;
+6. exact parent head to validate is recorded.
 
-1. preserve/revert based on repository evidence;
-2. create a P0 recovery task;
-3. route the current state through a normal reviewed PR;
-4. require exact-head full validation;
-5. merge with a normal merge commit;
-6. verify `master`;
-7. keep the violation auditable.
+After merge:
+
+1. record PR, validated head, merge SHA, and post-merge verification time;
+2. verify merged-PR provenance and normal merge semantics;
+3. verify parent head containment in `master`;
+4. run repository/KREATE/feature/frontend/data checks;
+5. run `agent_exit_gate.py`;
+6. only then mark parent integration `MERGED_VERIFIED`.
 
 ## Agent-to-agent communication
 
-Prefer repository-visible state:
+Prefer durable repository-visible state:
 
-- task JSON
-- dependency IDs
-- branch/PR references
-- blocker evidence
-- explicit integration notes
+- parent/child JSON;
+- dependency IDs;
+- `produces` / `consumes`;
+- branch/PR references;
+- blocker evidence;
+- integration notes.
 
-Do not require synchronous human relay.
+Do not create a chat bus or require a human to relay messages among agents.
 
-## Mechanical checks
+## Direct-master-push recovery
 
-Run:
+Direct pushes remain policy violations. Preserve the existing incident procedure: create a P0 recovery work package, route current state through a normal integration PR, validate exact head, merge normally, verify `master`, and retain an audit trail.
+
+## Mechanical commands
 
 ```bash
-python scripts/agent_fabric_check.py
 python scripts/test_agent_fabric_check.py
+python scripts/test_agent_task.py
+python scripts/agent_fabric_check.py
+python scripts/agent_task.py summary
+python scripts/agent_task.py queue
 ```
 
-CI additionally enforces:
-
-- approved PR base/head topology;
-- latest-target-base ancestry;
-- per-role feature PR concurrency;
-- feature preservation;
-- exact-head repository validation;
-- merged-PR provenance for `master`;
-- normal merge-commit semantics;
-- post-merge containment through `agent_exit_gate.py`.
+The test suite must include a fixture with at least **50 simultaneous non-conflicting child agents** and must still reject active path collisions.
