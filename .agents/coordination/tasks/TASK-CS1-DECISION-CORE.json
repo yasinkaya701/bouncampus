@@ -9,6 +9,7 @@
   "branch": "agent/api-product/cs1-decision-core",
   "depends_on": [],
   "touched_paths": [
+    ".github/workflows/cs1-decision-validation.yml",
     "backend/app/decision/__init__.py",
     "backend/app/decision/food_policy.py",
     "backend/app/decision/baselines.py",
@@ -65,7 +66,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T20:32:00Z",
+    "heartbeat_at": "2026-09-30T20:45:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -80,6 +81,7 @@
     "No PMR, pilot, calibration, or achieved-impact result may be invented; infrastructure may be implemented before evidence exists.",
     "Model point estimation, policy heuristics, technical benchmarks, and measured pilot evidence are separate evidence classes.",
     "Active dashboard/actions and registered jury/food-waste UI surfaces are included to prevent provenance drift.",
+    "Temporary .github/workflows/cs1-decision-validation.yml is reserved only to run exact-head validation on the CS1 branch and will be deleted before integration.",
     "Does not touch .github/workflows/ci.yml because TASK-FABRIC-CLI currently owns that path."
   ]
 }
