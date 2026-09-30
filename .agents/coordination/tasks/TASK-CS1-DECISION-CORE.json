@@ -9,6 +9,7 @@
   "branch": "agent/api-product/cs1-decision-core",
   "depends_on": [],
   "touched_paths": [
+    ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/workflows/cs1-decision-validation.yml",
     "backend/app/decision/__init__.py",
     "backend/app/decision/food_policy.py",
@@ -20,6 +21,7 @@
     "backend/app/schemas.py",
     "backend/app/optimizers/food_optimizer.py",
     "frontend/src/lib/food-waste.ts",
+    "frontend/src/lib/food-decision-eligibility.ts",
     "frontend/src/lib/types.ts",
     "frontend/src/lib/realData.ts",
     "frontend/src/app/api/v1/food/route.ts",
@@ -31,20 +33,24 @@
     "scripts/kreate_check.py",
     "scripts/test_food_decision_policy.py",
     "scripts/test_cs1_decision_intelligence.py",
+    "scripts/test_cs1_method_eligibility.py",
     "KREATE/EXPERIMENTS/CS1_DECISION_INTELLIGENCE_V1.md",
     "KREATE/EVIDENCE.md",
     "KREATE/ASSUMPTIONS.md",
-    "docs/superpowers/plans/2026-09-30-cs1-decision-core.md"
+    "docs/superpowers/plans/2026-09-30-cs1-decision-core.md",
+    "docs/superpowers/specs/2026-09-30-cs1-decision-intelligence-design.md"
   ],
   "acceptance_criteria": [
     "Backend and Next food-decision surfaces share explicit versioned readiness, abstention, provenance, reason-code, and human-review semantics",
     "Pre-pilot product surfaces do not expose achieved food-waste, cost, carbon, or water savings claims",
     "All active food action/dashboard, fallback data, and registered decision UI surfaces respect the same claim firewall and provenance semantics",
     "Heuristic planning bands are explicitly labeled POLICY_HEURISTIC and never described as calibrated confidence intervals",
-    "Decision readiness degrades from PILOT_READY to REVIEW_REQUIRED to WITHHOLD based on source health and required context",
+    "Decision readiness combines source health and method evidence state; SANDBOX_ONLY can never become PILOT_READY",
+    "EVALUATED_OFFLINE can become at most REVIEW_REQUIRED until explicitly promoted by evidence",
     "A baseline evaluation framework supports naive historical and operator baselines without fabricating measured results",
+    "All forecast candidates are ranked on identical common-support service rows so sparse methods cannot omit difficult cases",
     "Pilot scorecards enforce sample sufficiency, normalized waste reduction, sellout guardrails, override visibility, and data-quality checks",
-    "Machine-readable policy metadata includes policy version, model provenance, decision provenance, limitations, and reason codes",
+    "Machine-readable policy metadata includes policy version, model provenance, decision provenance, method eligibility, limitations, and reason codes",
     "KREATE validation fails on reintroduction of unsupported food-impact claims or removal of the human gate",
     "Technical experiment documentation distinguishes repository capability, model estimates, policy heuristics, and measured pilot evidence",
     "Repository evidence records technical capability without promoting it to market or impact proof",
@@ -53,6 +59,7 @@
   "validation_commands": [
     "python scripts/test_food_decision_policy.py",
     "python scripts/test_cs1_decision_intelligence.py",
+    "python scripts/test_cs1_method_eligibility.py",
     "python scripts/kreate_check.py",
     "python -m compileall -q backend/app scripts",
     "cd frontend && npm run typecheck && npm run lint && npm run build"
@@ -67,7 +74,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T20:48:00Z",
+    "heartbeat_at": "2026-09-30T21:16:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -82,7 +89,10 @@
     "No PMR, pilot, calibration, or achieved-impact result may be invented; infrastructure may be implemented before evidence exists.",
     "Model point estimation, policy heuristics, technical benchmarks, and measured pilot evidence are separate evidence classes.",
     "Active dashboard/actions, fallback data, and registered jury/food-waste UI surfaces are included to prevent provenance drift.",
-    "Temporary .github/workflows/cs1-decision-validation.yml is reserved only to run exact-head validation on the CS1 branch and will be deleted before integration.",
-    "Does not touch .github/workflows/ci.yml because TASK-FABRIC-CLI currently owns that path."
+    "Method eligibility is a hard readiness gate: repository-generated XGBoost remains SANDBOX_ONLY until acceptable measured-target evaluation exists.",
+    "Baseline ranking uses identical common support across all candidates and reports support coverage explicitly.",
+    "Latest role-branch PR template retained semantically correct anti-fabrication wording but dropped two legacy validator literals; this task adds one automation-compatibility comment so current governance and KREATE validation agree.",
+    "Temporary .github/workflows/cs1-decision-validation.yml is reserved only to run exact-head validation on the CS1 branch and will be deleted before integration; final feature PR validation uses the normal role-targeted CI.",
+    "Does not intentionally modify .github/workflows/ci.yml; that file is inherited unchanged from the synchronized role branch."
   ]
 }
