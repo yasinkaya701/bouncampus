@@ -1,228 +1,155 @@
-# KREATE Roles — Autonomous Operating Model
+# KREATE Role Operating Model
 
-## Purpose
+BOUNCAMPUS uses **four persistent human-owned parent workstreams** with many autonomous child agents beneath each parent.
 
-These role files define **ownership, not confinement**.
+## Four humans, four parent workstreams
 
-Each role owns a critical question for the KREATE application and product thesis, but no role is restricted to a fixed task list. Team members and agents are expected to cross boundaries whenever doing so can materially improve evidence, product quality, technical credibility, or Top-15 selection probability.
+| Parent | Human role | Core accountability |
+| --- | --- | --- |
+| `HUMAN-IE` | Customer Discovery & Market Lead | problem/customer evidence, PMR, beachhead/persona testing |
+| `HUMAN-EE` | Physical Systems & Measurement Lead | measurement strategy, hardware feasibility, calibration, physical evidence |
+| `HUMAN-CS1` | Decision Intelligence Lead | decision logic, data/model baselines, uncertainty, evaluation |
+| `HUMAN-CS2` | Product Strategy, Evidence Synthesis & Application Lead | product synthesis, application claims, rubric closure, red-team |
 
-The four core questions are:
+Each human owns exactly one parent workstream. The parent persists across multiple integration batches; it is not recreated after every task.
 
-1. **IE — Customer Discovery & Market Lead:** What is actually happening in the market and operation?
-2. **EE — Physical Systems & Measurement Lead:** What can we reliably measure and deploy in the physical world?
-3. **CS1 — Decision Intelligence Lead:** Can we help the operator make a better decision and prove it?
-4. **CS2 — Product Strategy, Evidence Synthesis & Application Lead:** Given the evidence, what should we build and how do we defend the thesis?
+Detailed role briefs:
 
-These questions overlap by design.
+- [`01_IE_CUSTOMER_DISCOVERY_MARKET_LEAD.md`](01_IE_CUSTOMER_DISCOVERY_MARKET_LEAD.md)
+- [`02_EE_PHYSICAL_SYSTEMS_MEASUREMENT_LEAD.md`](02_EE_PHYSICAL_SYSTEMS_MEASUREMENT_LEAD.md)
+- [`03_CS1_DECISION_INTELLIGENCE_LEAD.md`](03_CS1_DECISION_INTELLIGENCE_LEAD.md)
+- [`04_CS2_PRODUCT_STRATEGY_EVIDENCE_APPLICATION_LEAD.md`](04_CS2_PRODUCT_STRATEGY_EVIDENCE_APPLICATION_LEAD.md)
 
-## Autonomy Principle
+## Many agents per human parent
 
-Agents and humans may:
+A parent may create as many bounded child-agent tasks as useful. There is no fixed 4/8/16-agent ceiling.
 
-- propose new tasks,
-- open bounded experiments,
-- investigate adjacent markets,
-- challenge the current beachhead,
-- test new product features,
-- remove existing features,
-- compare alternative hardware approaches,
-- change model strategy,
-- investigate competitors,
-- request work from another role,
-- contribute directly outside their nominal role,
-- stop low-value work,
-- surface contradictions,
-- recommend a pivot when evidence justifies it.
+Example:
 
-Routine, reversible exploration does not require prior permission.
+```text
+HUMAN-CS1
+├── baseline agent
+├── data-quality agent
+├── uncertainty agent
+├── heuristic-vs-ML agent
+├── evaluation agent
+├── red-team agent
+└── ... 50+ children when dependencies and path ownership allow it
+```
 
-The role owner remains responsible for keeping the relevant question coherent and evidence-backed.
+Child agents are admitted by contracts, not by count:
 
-## What Roles Are Not
+- hard dependencies must be ready;
+- active `touched_paths` may not overlap;
+- in-fabric produced artifacts must exist before consumers claim work;
+- each child has one lease owner;
+- every child has acceptance criteria and validation commands;
+- child work integrates into the owning parent branch, never directly into `master`.
 
-Roles are not:
+## Branch topology
 
-- silos,
-- permission boundaries,
-- fixed sprint backlogs,
-- exhaustive task lists,
-- reasons to ignore a problem outside one's file,
-- reasons to continue weak work because it was assigned earlier.
+```text
+agent/<lane>/<child-task>
+        ↓ verified fan-in
+work/<role>/<parent>
+        ↓ exact-head integration
+master
+```
 
-If the best next action falls between roles, whoever identifies it should move it forward and coordinate ownership.
+Parent branch families:
 
-## Evidence Over Compliance
+- IE: `work/ie/<slug>`
+- EE: `work/ee/<slug>`
+- CS1: `work/cs1/<slug>`
+- CS2: `work/cs2/<slug>`
 
-The team should optimize for learning and decision quality, not compliance with documentation.
+Up to four parent/master PRs may exist concurrently, normally as drafts. At most one may be non-draft and hold the master integration slot.
 
-A task is valuable if it produces one or more of:
+## Humans are not routine dispatchers
 
-- new evidence,
-- a better decision,
-- a stronger product requirement,
-- a rejected assumption,
-- a clearer customer or buyer,
-- a tested technical path,
-- a stronger pilot design,
-- a useful failure,
-- a changed feature priority,
-- a more defensible application claim.
+All four roles continue autonomously through routine research, decomposition, coding, testing, analysis, drafting, prioritization, conflict resolution, and merge work.
 
-Creating a document without changing understanding is not automatically progress.
+There is no longer an IE/CS2 post-task permission checkpoint.
 
-## Exploration Contract
+Human involvement is required only for:
 
-For significant new work, be able to answer:
+1. `EVIDENCE_ATTESTATION`
+2. `IRREVERSIBLE_ACTION`
+3. `PHYSICAL_SAFETY`
+4. `EXTERNAL_COMMITMENT`
+5. `PRODUCT_DIRECTION`
 
-1. **Question:** What are we trying to learn or improve?
-2. **Why now:** Why could this matter for KREATE or the product?
-3. **Evidence target:** What result would inform a decision?
-4. **Bound:** What is the cheapest useful experiment or investigation?
-5. **Decision:** What will we keep, modify, kill, or investigate next based on the result?
+See [`USER_DECISION_CHECKPOINT_PROTOCOL.md`](USER_DECISION_CHECKPOINT_PROTOCOL.md).
 
-This should remain lightweight. It is a thinking tool, not an approval process.
+## Shared PMR ownership
 
-## Cross-Role Collaboration
+The interview target remains a team responsibility. Human teammates conduct or attest real-world interviews; agents may help prepare interview guides, synthesize notes, classify evidence, identify contradictions, and update assumption/claim ledgers.
 
-### IE ↔ EE
+Agents must never self-attest that an interview occurred or invent a quote/customer.
 
-Operational reality should shape measurement design; measurement feasibility should shape PMR questions.
+Use:
 
-### IE ↔ CS1
+- [`../PMR/INTERVIEW_TEMPLATE.md`](../PMR/INTERVIEW_TEMPLATE.md)
+- [`../PMR/INTERVIEW_TRACKER.md`](../PMR/INTERVIEW_TRACKER.md)
+- [`../EVIDENCE.md`](../EVIDENCE.md)
+- [`../ASSUMPTIONS.md`](../ASSUMPTIONS.md)
+- [`../DECISIONS.md`](../DECISIONS.md)
 
-Customer workflow and error costs should define decision objectives; model limitations should generate new PMR questions.
+## Artifact handoffs instead of chat relay
 
-### IE ↔ CS2
+Cross-role collaboration should be repository-visible.
 
-Raw evidence should change product strategy; product contradictions should generate new customer-discovery work.
+A child may declare:
 
-### EE ↔ CS1
+- `produces`: evidence/artifact IDs it creates;
+- `consumes`: evidence/artifact IDs it requires.
 
-Physical data quality should inform model confidence; model evaluation should define which measurements actually matter.
+Examples:
 
-### EE ↔ CS2
+```text
+IE child       produces E-INT-012
+CS1 child      consumes E-INT-012
+EE child       produces TECH_TEST-scale-repeatability-v1
+CS2 child      consumes both when drafting a claim
+```
 
-Hardware should exist only where it creates product value; product strategy should reflect real deployment constraints.
+If an artifact has an in-fabric producer, consumers wait for verified production. External human evidence remains governed by the KREATE evidence system rather than being fabricated as an agent output.
 
-### CS1 ↔ CS2
+## Parent integration batches
 
-Technical evidence should constrain product claims; product priorities should determine which technical experiments are worth running.
+Parent workstreams are long-lived. A verified batch:
 
-## PMR Is Shared
+1. contains one or more new verified child outputs;
+2. syncs current `master`;
+3. passes exact-head CI;
+4. merges normally to `master`;
+5. passes post-merge verification;
+6. records PR/base/head/merge/child IDs in `integration_history`;
+7. returns the parent to `ACTIVE` for the next wave.
 
-PMR is a team responsibility, not an IE-only activity.
+Previously integrated children cannot be promoted again as a new empty batch.
 
-Working target: **16 distinct high-quality interviews**, approximately four lead interviews per person, adjusted as needed by access and relevance.
+## Evidence boundary
 
-Any role may conduct interviews. The best interviewer for a specific stakeholder is the person most capable of understanding the domain and following useful technical or operational threads.
+Role autonomy does not weaken KREATE evidence rules.
 
-IE owns research quality and coverage, not all execution.
+Application-relevant factual claims require traceable evidence. Real-world interviews, quotes, pilot measurements, achieved savings, model accuracy, and hardware performance may not be invented or upgraded beyond their real evidence class.
 
-## Scope Freedom
+## Daily human experience
 
-The current focus is university/institutional food operations because it is a promising KREATE wedge, not because the team is forbidden from exploring anything else.
+Humans should receive concise status rather than constant permission requests:
 
-The team may explore:
+- **Completed**
+- **Evidence / result**
+- **What changed**
+- **Next autonomous action**
 
-- adjacent institutional food segments,
-- alternative operational decisions,
-- different measurement paths,
-- new contextual signals,
-- hardware-free approaches,
-- additional hardware where justified,
-- workflow interventions,
-- stronger campus-climate expansion paths,
-- other ideas that could materially strengthen the thesis.
+Only add **Decision needed** when one of the five critical gates is actually pending.
 
-However, exploration should not become random feature accumulation. The test is simple:
+## Primary references
 
-> Does this work create evidence or strategic leverage that could change an important decision?
-
-If yes, explore it. If not, defer it.
-
-## Application Stage vs Hackathon Stage
-
-### Until October 8
-
-Optimize for:
-
-- PMR evidence,
-- problem clarity,
-- beachhead quality,
-- persona / buyer understanding,
-- credible solution logic,
-- measurement feasibility,
-- defensible decision intelligence,
-- differentiation,
-- coherent application narrative.
-
-A polished live demo is not a mandatory application deliverable.
-
-### If Selected for Top 15
-
-The team can shift aggressively toward:
-
-- integrated product implementation,
-- jury demo,
-- hardware polish,
-- UI/UX,
-- live data flow,
-- pitch choreography,
-- reliability testing.
-
-Role emphasis may change after selection.
-
-## Anti-AI-Slop Principle
-
-AI is encouraged as a force multiplier. It should increase speed, coverage, experimentation, and rigor—not create fake certainty.
-
-AI-generated work is acceptable when it helps produce or analyze real evidence. It is unacceptable when it fabricates evidence, results, user needs, market facts, or technical performance.
-
-Before an important claim becomes part of the application, ask:
-
-- What type of evidence supports this?
-- Can we show the source quickly?
-- Is this a fact, interpretation, estimate, or hypothesis?
-- Would a skeptical judge understand the limitation?
-
-If the answer is unclear, improve or downgrade the claim rather than hiding uncertainty.
-
-## Team Behavior
-
-Preferred behavior:
-
-- move without waiting for unnecessary approval,
-- communicate important changes early,
-- challenge assumptions directly,
-- share evidence across roles,
-- keep experiments bounded,
-- prefer real learning over cosmetic progress,
-- simplify when complexity adds no value,
-- escalate only genuinely ambiguous or irreversible decisions.
-
-The operating objective is not to keep four agents busy. It is to make the **best possible startup and application decisions before the deadline**.
-
-## Human Decision Checkpoints
-
-Role autonomy does **not** mean agents should blindly continue into a new strategic workstream after finishing the current one.
-
-The required pattern is:
-
-> **Finish the accepted work package → verify the result → explain what changed → present the real next options → recommend one → ask the user to choose the next meaningful direction.**
-
-Agents should not interrupt the user for routine, reversible details inside an accepted task. But when a completed task creates multiple materially different next directions, the agent must pause before committing substantial time to one of them.
-
-A checkpoint should include:
-
-1. **Completed** — exactly what was delivered;
-2. **Evidence / result** — tests, interview findings, benchmark results, calibration data, files, commits, or evidence IDs;
-3. **What changed** — which assumption, product requirement, risk, or application claim changed;
-4. **Options** — normally 2–4 real alternatives, each with expected value, effort, risk, dependencies, and KREATE impact;
-5. **Recommendation** — the agent's preferred option and why;
-6. **Decision needed** — one concise choice for the user.
-
-Do not invent artificial choices. If there is only one obvious, reversible next step required to finish the same accepted work package, continue autonomously.
-
-Do not ask vague questions such as “What should I do now?” before doing the analysis. Give the user enough information to decide intelligently.
-
-Full protocol: [`USER_DECISION_CHECKPOINT_PROTOCOL.md`](./USER_DECISION_CHECKPOINT_PROTOCOL.md).
+- Repository fabric: [`../../.agents/FABRIC.md`](../../.agents/FABRIC.md)
+- Repository working policy: [`../../AGENTS.md`](../../AGENTS.md)
+- Human-gate protocol: [`USER_DECISION_CHECKPOINT_PROTOCOL.md`](USER_DECISION_CHECKPOINT_PROTOCOL.md)
+- Hardware execution: [`../HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`](../HARDWARE/HARDWARE_AGENT_PLAYBOOK.md)
+- Application rubric: [`../APPLICATION_RUBRIC.md`](../APPLICATION_RUBRIC.md)
