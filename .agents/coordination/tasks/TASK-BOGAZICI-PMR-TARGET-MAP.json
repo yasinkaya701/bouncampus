@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "TASK-BOGAZICI-PMR-TARGET-MAP",
+  "title": "Map Boğaziçi PMR role targets",
+  "priority": "P0",
+  "lane": "campus-data-geo",
+  "state": "READY_FOR_INTEGRATION",
+  "owner_agent": "research-evidence",
+  "branch": "agent/campus-data-geo/bogazici-pmr-target-map",
+  "depends_on": [],
+  "touched_paths": [
+    "KREATE/RESEARCH/README.md",
+    "KREATE/RESEARCH/BOGAZICI_PMR_TARGET_MAP.md",
+    "KREATE/RESEARCH/bogazici_pmr_target_map.json"
+  ],
+  "acceptance_criteria": [
+    "Public professional/institutional contact surfaces are mapped only for role routing, with no claim of interview completion or endorsement",
+    "Food Services, current contractor, BİD, sustainability/Zero Waste, SKS escalation and operational support roles are distinguished",
+    "Each target has a narrow set of research questions tied to unresolved product assumptions",
+    "Recommended interview order minimizes generic outreach and prioritizes quantity ownership, freeze time, settlement and data access",
+    "The map explicitly prohibits requesting personal diner data and treats aggregate privacy-safe access as the desired boundary",
+    "A machine-readable companion supports IE/CS2 agents without converting contact data into evidence"
+  ],
+  "validation_commands": [
+    "python -m json.tool KREATE/RESEARCH/bogazici_pmr_target_map.json",
+    "python scripts/kreate_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-10-01T00:35:00+03:00",
+    "heartbeat_at": "2026-10-01T00:35:00+03:00",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Public role/contact mapping only; no outreach or interview has been performed by this task.",
+    "Direct public contacts are used only where published by the organization; no private/personal contact data are collected.",
+    "Does not touch KREATE/EVIDENCE.md, KREATE/ASSUMPTIONS.md or interview tracker files."
+  ]
+}
