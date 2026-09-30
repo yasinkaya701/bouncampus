@@ -75,15 +75,46 @@ export interface EnergyForecast {
   recommendations?: string[];
 }
 
+export interface FoodDecisionSignal {
+  id: string;
+  available: boolean;
+  policy_weight_pct: number;
+  weight_basis: 'POLICY_HEURISTIC';
+}
+
+export interface FoodMenuItem {
+  name: string;
+  name_en: string;
+  category: string;
+  popularity_score?: number | null;
+  avg_rating?: number | null;
+  popularity_provenance: 'POLICY_HEURISTIC' | 'UNAVAILABLE';
+}
+
 export interface FoodForecast {
+  date: string;
   cafeteria_id: string;
-  cafeteria_name: string;
-  baseline_portions: number;
+  meal_type: string;
   predicted_demand: number;
-  recommended_production: number;
-  avoided_waste_portions: number;
-  avoided_waste_kg: number;
-  menu_popularity_factor: number;
+  planning_lower: number;
+  recommended_production: number | null;
+  planning_upper: number;
+  menu_items: FoodMenuItem[];
+  policy_version: string;
+  model_id: string;
+  forecast_provenance: 'MODEL_ESTIMATE';
+  decision_provenance: 'POLICY_HEURISTIC';
+  band_semantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL';
+  calibration_status: 'NOT_CALIBRATED';
+  signal_coverage_pct: number;
+  decision_readiness: 'PILOT_READY' | 'REVIEW_REQUIRED' | 'WITHHOLD';
+  abstained: boolean;
+  operator_approval_required: boolean;
+  automatic_kitchen_dispatch: boolean;
+  signals: FoodDecisionSignal[];
+  reason_codes: string[];
+  limitations: string[];
+  model_metadata: Record<string, unknown>;
 }
 
 export interface ActionItem {
