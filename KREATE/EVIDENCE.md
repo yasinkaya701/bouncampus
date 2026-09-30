@@ -13,11 +13,29 @@ Evidence type is not the same as claim label. In application prose, use the expl
 Rules:
 
 1. Evidence IDs are immutable; add a new row rather than silently changing what an ID means.
-2. A source only supports the claim written in its row.
+2. A source only supports the claim written in its row. Do not stretch one interview or source into adjacent claims it did not establish.
 3. Interview evidence requires a real interview record and exact source artifact; never create an `INTERVIEW` row for a planned conversation.
 4. Model output is `MODEL_RESULT`/`MODEL ESTIMATE`, not measured impact.
 5. Repository copy is evidence of what the product/repo currently says or implements, not evidence that a market claim is true.
 6. Public-source values must be rechecked before final submission if date/currentness matters.
+7. Raw notes/test logs/model outputs become promotable only after a human creates a narrow evidence row with provenance and limitations.
+8. Evidence that contradicts a preferred hypothesis is registered with the same standard as supporting evidence.
+9. `SUPPORTED`, `REJECTED`, and `CONFLICTING` assumption states require traceable evidence IDs.
+10. A `READY` application claim must satisfy the evidence-admissibility rules in [APPLICATION_RUBRIC.md](./APPLICATION_RUBRIC.md).
+
+## ID/type contract
+
+Use prefixes consistently so mechanical validation can catch accidental relabeling:
+
+| Prefix | Required type |
+| --- | --- |
+| `E-PUB-*` | `PUBLIC_SOURCE` |
+| `E-INT-*` | `INTERVIEW` |
+| `E-TECH-*` | `TECH_TEST` |
+| `E-REP-*` | `REPO_ARTIFACT` |
+| `E-MODEL-*` | `MODEL_RESULT` |
+
+Do not recycle an old ID for a different source, interview, run, result, or claim.
 
 | Evidence ID | Type | Claim supported | Source/artifact | Date | Owner | Confidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -28,7 +46,9 @@ Rules:
 
 ## Adding interview evidence
 
-Use IDs such as `E-INT-001`, `E-INT-002`, ... only after a real interview is completed. Link the corresponding interview artifact and state the narrow claim it supports or contradicts.
+Use IDs such as `E-INT-001`, `E-INT-002`, ... only after a real interview is completed. Link the corresponding interview artifact and state the **narrow** claim it supports or contradicts.
+
+A completed interview is allowed to produce **no promotable evidence**. In that case, keep the interview record and write `NONE — no promotable claim` in the tracker rather than manufacturing an `E-INT-*` row.
 
 ## Adding technical/model evidence
 
