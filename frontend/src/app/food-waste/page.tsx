@@ -1,19 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import {
   AlertTriangle,
   ArrowRight,
-  BarChart3,
   CheckCircle2,
   Database,
-  Download,
   ExternalLink,
   Gauge,
-  Scale,
   ShieldCheck,
-  Sparkles,
   Utensils,
 } from 'lucide-react';
 import {
@@ -34,27 +29,14 @@ import {
   simulateFoodWasteScenario,
   YEAR_OVER_YEAR_REDUCTION_PCT,
   type DecisionReadiness,
+  type ProductionDecisionBand,
 } from '@/lib/food-waste';
 import { useLocale } from '@/lib/i18n';
-
-type ProductionBand = {
-  predictedMeals: number;
-  lowerBound: number;
-  recommendedTarget: number;
-  upperBound: number;
-  signalCoveragePct: number;
-  decisionReadiness: DecisionReadiness;
-  operatorApprovalRequired: true;
-  autoDispatchAllowed: false;
-  provenance: 'MODEL_ESTIMATE';
-  signals: Array<{ id: string; label: string; available: boolean; weightPct: number }>;
-  reasonCodes: string[];
-};
 
 type FoodApi = {
   demandContext: {
     available: boolean;
-    productionBand: ProductionBand | null;
+    productionBand: ProductionDecisionBand | null;
   };
   decisionPolicy: {
     humanApprovalRequired: boolean;
@@ -69,10 +51,11 @@ const formatKg = (value: number, locale: 'tr' | 'en') =>
 
 export default function FoodWastePage() {
   const { locale, t } = useLocale();
-  const [preventionRate, setPreventionRate] = useState(15);
-  const [recoveryRate, setRecoveryRate] = useState(85);
+  const numberLocale = locale === 'tr' ? 'tr-TR' : 'en-US';
   const [food, setFood] = useState<FoodApi | null>(null);
   const [operatorDecision, setOperatorDecision] = useState<OperatorDecision>('HOLD');
+  const [preventionRate, setPreventionRate] = useState(10);
+  const [recoveryRate, setRecoveryRate] = useState(Math.round(CURRENT_RECOVERY_RATE_PCT));
 
   useEffect(() => {
     fetch('/api/v1/food', { cache: 'no-store' })
@@ -80,11 +63,6 @@ export default function FoodWastePage() {
       .then(payload => setFood(payload))
       .catch(() => setFood(null));
   }, []);
-
-  const scenario = useMemo(
-    () => simulateFoodWasteScenario(preventionRate, recoveryRate),
-    [preventionRate, recoveryRate],
-  );
 
   const monthlyChart = useMemo(
     () => FOOD_WASTE_2025.map(item => ({
@@ -94,229 +72,372 @@ export default function FoodWastePage() {
     [locale],
   );
 
+  const scenario = useMemo(
+    () => simulateFoodWasteScenario(preventionRate, recoveryRate),
+    [preventionRate, recoveryRate],
+  );
+
   const band = food?.demandContext.productionBand ?? null;
   const canApprovePilot = band?.decisionReadiness === 'PILOT_READY';
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <section className="bc-panel-dark bc-grid-bg overflow-hidden rounded-[28px] p-6 text-white sm:p-8 lg:p-10">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,.75fr)] lg:items-end">
+    <div className="space-y-12 sm:space-y-16">
+      <section className="border-b border-[#111712]/10 pb-8 sm:pb-10">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-[#b8e467]">
-              <Utensils size={12} /> {t('KREATE odak problemi · yemek israfı', 'KREATE focus problem · food waste')}
+            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-[#687168]">
+              <Utensils size={11} /> {t('Next service / food waste', 'Next service / food waste')}
             </div>
-            <h1 className="mt-4 max-w-4xl text-[40px] font-black leading-[.98] tracking-[-0.06em] sm:text-[56px]">
-              {t('48.251 kg gerçek atığı, bir sonraki öğünde önlenecek karara çevir.', 'Turn 48,251 kg of measured waste into a decision that prevents the next kilogram.')}
+            <h1 className="mt-4 max-w-4xl text-[44px] font-black leading-[0.95] tracking-[-0.06em] text-[#111712] sm:text-[62px]">
+              {t('Önce kanıtı gör. Sonra üretim kararını ver.', 'See the evidence first. Then make the production decision.')}
             </h1>
-            <p className="mt-5 max-w-3xl text-[12px] leading-6 text-white/62 sm:text-[13px]">
+          </div>
+          <div className="max-w-md">
+            <p className="text-[11px] leading-5 text-[#687068]">
               {t(
-                'BOUNCAMPUS resmi atık geçmişini ders programı, akademik takvim, hava ve menü bağlamıyla birleştirir; veri eksikse öneriyi genişletir veya tamamen bekletir, operatör onayı olmadan hiçbir üretim komutu göndermez ve sonucu kontrollü pilotta ölçer.',
-                'BOUNCAMPUS combines the official waste baseline with schedules, academic calendar, weather and menu context; it widens or withholds advice when evidence is missing, never dispatches production without an operator, and measures the result in a controlled pilot.',
+                'Bu ekran otomatik üretim komutu göndermez. Model bir başlangıç bandı üretir; mutfak sorumlusu onaylar, düzenler veya bekletir.',
+                'This surface never auto-dispatches production. The model produces a starting band; the kitchen operator approves, edits or holds.',
               )}
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <a href={FOOD_WASTE_SOURCE.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-xl border border-white/12 bg-white/[0.08] px-3 py-2 text-[9px] font-black text-white transition hover:bg-white/[0.13]">
-                <Database size={11} /> {t('Resmi veriyi aç', 'Open official data')} <ExternalLink size={9} />
-              </a>
-              <Link href="/demo" className="inline-flex items-center gap-1.5 rounded-xl bg-[#b8e467] px-3 py-2 text-[9px] font-black text-[#071c33] transition hover:-translate-y-0.5">
-                <Sparkles size={11} /> {t('90 sn jüri akışı', '90 sec jury flow')} <ArrowRight size={10} />
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <MetricCard label={t('2025 resmi yemek atığı', 'Official 2025 food waste')} value={formatKg(FOOD_WASTE_BASELINE.year2025WasteKg, locale)} />
-            <MetricCard label={t('İSTAÇ geri kazanımına giden', 'Sent to İSTAÇ recovery')} value={formatKg(FOOD_WASTE_BASELINE.year2025RecoveredKg, locale)} />
-            <MetricCard label={t('2024 → 2025 değişim', '2024 → 2025 change')} value={`−${YEAR_OVER_YEAR_REDUCTION_PCT.toFixed(1)}%`} />
-            <MetricCard label={t('Pilot hedefi · iddia değil', 'Pilot target · not a claim')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} />
+            <a
+              href={FOOD_WASTE_SOURCE.url}
+              target="_blank"
+              rel="noreferrer"
+              className="bc-focus-ring mt-3 inline-flex items-center gap-1.5 rounded-sm text-[9px] font-black text-[#315846] hover:text-[#18372b]"
+            >
+              <Database size={10} /> {t('Resmi baz çizgisini aç', 'Open official baseline')} <ExternalLink size={9} />
+            </a>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.12fr_.88fr]">
-        <article className="bc-panel rounded-[24px] p-5 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.22fr)_minmax(360px,.78fr)]">
+        <article className="bc-workbench overflow-hidden rounded-2xl">
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#111712]/10 p-5 sm:p-6">
             <div>
-              <div className="bc-eyebrow">{t('Resmi baz çizgisi', 'Official baseline')}</div>
-              <h2 className="mt-2 text-[27px] font-black tracking-[-0.05em] text-slate-950">
-                {t('Problem ölçülmüş; ürün sonucu sahiplenmeden önce pilotta ölçmek zorunda.', 'The problem is measured; the product must measure the outcome before claiming impact.')}
+              <div className="bc-eyebrow">{t('Karar workbench’i', 'Decision workbench')}</div>
+              <h2 className="mt-2 text-[28px] font-black tracking-[-0.045em] text-[#111712]">
+                {t('Bir sonraki öğle servisi için üretim bandı', 'Production band for the next lunch service')}
               </h2>
             </div>
-            <span className="bc-chip border-emerald-900/10 bg-emerald-50 text-emerald-700"><ShieldCheck size={10} /> OFFICIAL_PUBLIC</span>
+            {band ? <ReadinessBadge readiness={band.decisionReadiness} /> : <StatusBadge label="WAITING FOR CONTEXT" tone="neutral" />}
           </div>
 
-          <div className="mt-6 h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyChart} margin={{ top: 8, right: 4, left: -12, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dfe5df" />
-                <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={value => [formatKg(Number(value ?? 0), locale), t('Yemek atığı', 'Food waste')]} />
-                <Bar dataKey="wasteKg" fill="#173f67" radius={[7, 7, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="grid lg:grid-cols-[minmax(0,.95fr)_minmax(300px,1.05fr)]">
+            <div className="border-b border-[#111712]/10 p-5 sm:p-6 lg:border-b-0 lg:border-r">
+              {band ? (
+                <>
+                  <div className="text-[9px] font-black uppercase tracking-[0.16em] text-[#7b827c]">{t('Operatör başlangıç noktası', 'Operator starting point')}</div>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="bc-mono text-[68px] font-black leading-[0.82] tracking-[-0.07em] text-[#111712] sm:text-[82px]">
+                      {band.recommendedTarget.toLocaleString(numberLocale)}
+                    </span>
+                    <span className="pb-1.5 text-[11px] font-black text-[#6d746e]">{t('öğün', 'meals')}</span>
+                  </div>
+                  <div className="mt-5 grid grid-cols-2 gap-3 border-y border-[#111712]/10 py-4">
+                    <BandMetric label={t('Alt sınır', 'Lower bound')} value={band.lowerBound.toLocaleString(numberLocale)} />
+                    <BandMetric label={t('Üst sınır', 'Upper bound')} value={band.upperBound.toLocaleString(numberLocale)} />
+                  </div>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-[9px] font-black uppercase tracking-[0.14em] text-[#7d847e]">{t('Sinyal kapsamı', 'Signal coverage')}</div>
+                      <div className="mt-1 font-mono text-[15px] font-black text-[#111712]">{band.signalCoveragePct}%</div>
+                    </div>
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#e4e0d7]">
+                      <div className="h-full bg-[#18372b]" style={{ width: `${band.signalCoveragePct}%` }} />
+                    </div>
+                  </div>
+                  <div className="mt-4 rounded-lg bg-[#efede6] px-3.5 py-3 text-[9px] leading-4 text-[#636b64]">
+                    <strong className="font-black text-[#303831]">MODEL_ESTIMATE.</strong>{' '}
+                    {t('Bu sayı ölçülmüş gerçek talep değildir. Eksik sinyaller belirsizliği artırır; WITHHOLD durumunda uygulanmaz.', 'This is not measured demand truth. Missing signals increase uncertainty; a WITHHOLD recommendation must not be applied.')}
+                  </div>
+                </>
+              ) : (
+                <div className="flex min-h-[280px] flex-col justify-center">
+                  <div className="text-[9px] font-black uppercase tracking-[0.16em] text-[#7d847e]">{t('Güvenli varsayılan', 'Safe default')}</div>
+                  <div className="mt-3 text-[34px] font-black leading-none tracking-[-0.045em] text-[#111712]">HOLD</div>
+                  <p className="mt-4 max-w-md text-[10px] leading-5 text-[#697169]">
+                    {t('Karar bağlamı gelmeden sistem üretim sayısı uydurmaz. Resmi baz çizgisi görünür kalır; operasyon önerisi bekletilir.', 'Until decision context is available, the system does not invent a production number. The official baseline remains visible and operational advice is withheld.')}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="bc-eyebrow">{t('Kararı taşıyan sinyaller', 'Signals behind the decision')}</div>
+                <span className="font-mono text-[8px] font-black text-[#858b85]">PROVENANCE ON</span>
+              </div>
+
+              <div className="mt-4 divide-y divide-[#111712]/10 border-y border-[#111712]/10">
+                {band ? band.signals.map(signal => (
+                  <div key={signal.id} className="grid grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-3 py-3.5">
+                    {signal.available ? <CheckCircle2 size={12} className="text-[#55794a]" /> : <AlertTriangle size={12} className="text-[#9a7536]" />}
+                    <div>
+                      <div className="text-[10px] font-black text-[#2d342e]">{signal.label}</div>
+                      <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.1em] text-[#858b85]">{signal.available ? t('mevcut', 'available') : t('eksik', 'missing')}</div>
+                    </div>
+                    <div className="font-mono text-[10px] font-black text-[#6c746d]">{signal.weightPct}%</div>
+                  </div>
+                )) : (
+                  <div className="py-5 text-[10px] leading-5 text-[#6d746e]">{t('Karar sinyalleri henüz yüklenmedi.', 'Decision signals have not loaded yet.')}</div>
+                )}
+              </div>
+
+              {band?.reasonCodes?.length ? (
+                <div className="mt-4">
+                  <div className="text-[8px] font-black uppercase tracking-[0.14em] text-[#878d87]">{t('Neden kodları', 'Reason codes')}</div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {band.reasonCodes.map(code => <span key={code} className="rounded bg-[#efede6] px-2 py-1 font-mono text-[7px] font-bold text-[#646c65]">{code}</span>)}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
-          <p className="mt-2 text-[9px] leading-4 text-slate-400">
-            {t('Aylık sütunlar yayımlanmış 2025 değerleridir; canlı sensör telemetrisi değildir.', 'Monthly bars are published 2025 values; they are not live sensor telemetry.')}
-          </p>
+
+          <div className="border-t border-[#111712]/10 bg-[#f0eee8] p-5 sm:p-6">
+            <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
+              <div>
+                <div className="bc-eyebrow">{t('Operatör kapısı', 'Operator gate')}</div>
+                <h3 className="mt-2 text-[21px] font-black tracking-[-0.035em] text-[#111712]">{t('Model önerir. İnsan karar verir.', 'Model recommends. Human decides.')}</h3>
+              </div>
+              <div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <DecisionButton
+                    active={operatorDecision === 'PILOT_APPROVED'}
+                    disabled={!canApprovePilot}
+                    onClick={() => setOperatorDecision('PILOT_APPROVED')}
+                    label={t('Pilot için onayla', 'Approve for pilot')}
+                    detail={canApprovePilot ? t('Kontrollü pilot', 'Controlled pilot') : t('PILOT_READY gerekli', 'Requires PILOT_READY')}
+                  />
+                  <DecisionButton
+                    active={operatorDecision === 'EDIT_REQUIRED'}
+                    onClick={() => setOperatorDecision('EDIT_REQUIRED')}
+                    label={t('Düzenleme iste', 'Request edit')}
+                    detail={t('Bandı / bağlamı gözden geçir', 'Review band / context')}
+                  />
+                  <DecisionButton
+                    active={operatorDecision === 'HOLD'}
+                    onClick={() => setOperatorDecision('HOLD')}
+                    label={t('Beklet', 'Hold')}
+                    detail={t('Güvenli varsayılan', 'Safe default')}
+                  />
+                </div>
+                <DecisionResult decision={operatorDecision} t={t} />
+              </div>
+            </div>
+          </div>
         </article>
 
-        <aside className="bc-panel rounded-[24px] p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-slate-400"><Gauge size={12} /> {t('Bir sonraki servis · karar kalitesi', 'Next service · decision quality')}</div>
-          <h2 className="mt-3 text-[25px] font-black tracking-[-0.045em] text-slate-950">
-            {band ? t('Sistem sadece bant değil, o bandın ne kadar kullanılabilir olduğunu da söyler.', 'The system exposes not just a band, but how usable that band is.') : t('Talep bağlamı yoksa sistem üretim sayısı uydurmuyor.', 'If demand context is unavailable, the system does not invent a production number.')}
-          </h2>
+        <aside className="rounded-2xl bg-[#18372b] p-5 text-white sm:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[9px] font-black uppercase tracking-[0.17em] text-[#b9da72]">{t('Resmi baz çizgisi', 'Official baseline')}</div>
+            <ShieldCheck size={15} className="text-white/40" />
+          </div>
+          <div className="mt-7">
+            <div className="font-mono text-[56px] font-black leading-none tracking-[-0.065em]">{FOOD_WASTE_BASELINE.year2025WasteKg.toLocaleString(numberLocale)}</div>
+            <div className="mt-1 text-[10px] font-bold text-white/55">kg · {t('2025 yemek atığı', '2025 food waste')}</div>
+          </div>
 
-          {band ? (
-            <div className="mt-5 space-y-4">
-              <div className="grid grid-cols-2 gap-2">
-                <MiniMetric label={t('Önerilen başlangıç', 'Operator starting point')} value={band.recommendedTarget.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} />
-                <MiniMetric label={t('Karar bandı', 'Decision band')} value={`${band.lowerBound.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}–${band.upperBound.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}`} />
-              </div>
+          <div className="mt-7 divide-y divide-white/12 border-y border-white/12">
+            <DarkMetric label={t('2024 → 2025', '2024 → 2025')} value={`−${YEAR_OVER_YEAR_REDUCTION_PCT.toFixed(1)}%`} />
+            <DarkMetric label={t('Geri kazanıma giden', 'Sent to recovery')} value={formatKg(FOOD_WASTE_BASELINE.year2025RecoveredKg, locale)} />
+            <DarkMetric label={t('Pilot başarı kapısı', 'Pilot success gate')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} note={t('hedef · sonuç değil', 'target · not result')} />
+            <DarkMetric label={t('Otomatik dispatch', 'Automatic dispatch')} value={food?.decisionPolicy.automaticKitchenDispatch ? 'ON' : 'OFF'} note={t('insan onayı zorunlu', 'human approval required')} />
+          </div>
 
-              <div className="rounded-2xl border border-slate-900/10 bg-[#f7f9f6] p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <ReadinessBadge readiness={band.decisionReadiness} />
-                  <span className="font-mono text-[10px] font-black text-slate-600">{band.signalCoveragePct}% {t('sinyal kapsamı', 'signal coverage')}</span>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  {band.signals.map(signal => (
-                    <div key={signal.id} className="flex items-center gap-2 rounded-xl border border-slate-900/[0.07] bg-white px-3 py-2 text-[8px] font-black text-slate-600">
-                      {signal.available ? <CheckCircle2 size={11} className="text-emerald-600" /> : <AlertTriangle size={11} className="text-amber-600" />}
-                      <span>{signal.label}</span>
-                      <span className="ml-auto font-mono text-slate-400">{signal.weightPct}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-[9px] leading-5 text-amber-900">
-                <strong>MODEL_ESTIMATE.</strong> {t('Bant pilot öncesi doğrulanmış gerçek üretim talebi değildir. Eksik sinyal belirsizliği artırır; WITHHOLD durumunda öneri uygulanmaz.', 'The band is not validated production demand before the pilot. Missing signals widen uncertainty; a WITHHOLD decision must not be applied.')}
-              </div>
-            </div>
-          ) : (
-            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-[10px] leading-5 text-slate-500">
-              {t('Resmi baz çizgisi görünür kalır; operasyon önerisi veri gelene kadar bekletilir.', 'The official baseline remains visible; operational advice is withheld until decision context is available.')}
-            </div>
-          )}
+          <p className="mt-5 text-[9px] leading-5 text-white/48">
+            {t('Yayımlanmış baz çizgisi üründen önce vardır. Ürün yalnız pilotta ölçülen farkı sahiplenebilir.', 'The published baseline exists independently of the product. The product can claim only the difference measured in the pilot.')}
+          </p>
         </aside>
       </section>
 
-      <section className="rounded-[26px] border border-slate-900/10 bg-white p-5 sm:p-6">
-        <div className="grid gap-6 xl:grid-cols-[.72fr_1.28fr] xl:items-start">
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,.7fr)_minmax(0,1.3fr)] lg:gap-12">
+        <div>
+          <div className="bc-eyebrow">{t('2025 resmi dağılım', 'Official 2025 distribution')}</div>
+          <h2 className="mt-2 text-[34px] font-black leading-[1] tracking-[-0.055em] text-[#111712]">
+            {t('Sorun tek bir kötü aya indirgenemez.', 'The problem is not one bad month.')}
+          </h2>
+          <p className="mt-4 max-w-md text-[10px] leading-5 text-[#697169]">
+            {t('Aylık değerler yayımlanmış 2025 kayıtlarıdır. Canlı kampüs sensörü veya mutfak POS telemetrisi değildir.', 'Monthly values are published 2025 records. They are not live campus sensor or kitchen POS telemetry.')}
+          </p>
+        </div>
+
+        <div className="h-[310px] min-w-0 border-y border-[#111712]/10 py-5">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyChart} margin={{ top: 8, right: 4, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="rgba(17,23,18,.10)" />
+              <XAxis dataKey="month" tick={{ fontSize: 9, fill: '#717871' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 9, fill: '#717871' }} axisLine={false} tickLine={false} />
+              <Tooltip formatter={value => [formatKg(Number(value ?? 0), locale), t('Yemek atığı', 'Food waste')]} />
+              <Bar dataKey="wasteKg" fill="#18372b" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      <section className="border-t border-[#111712]/10 pt-8">
+        <div className="grid gap-8 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)] xl:gap-14">
           <div>
-            <div className="bc-eyebrow">{t('Operatör kapısı', 'Operator gate')}</div>
-            <h2 className="mt-2 text-[28px] font-black tracking-[-0.05em] text-slate-950">{t('AI önerir. Mutfak sorumlusu karar verir.', 'AI recommends. The kitchen operator decides.')}</h2>
-            <p className="mt-3 text-[10px] leading-5 text-slate-500">{t('Bu demo state’i hiçbir harici mutfak sistemine bağlı değildir. Ama gerçek ürün davranışı nettir: onay, düzenleme veya bekletme olmadan aksiyon yok.', 'This demo state is not connected to any external kitchen system. The production behavior is still explicit: no action without approve, edit, or hold.')}</p>
+            <div className="bc-eyebrow">{t('Pilot simülatörü', 'Pilot simulator')}</div>
+            <h2 className="mt-2 text-[34px] font-black leading-[1] tracking-[-0.055em] text-[#111712] sm:text-[42px]">
+              {t('Hedefi değiştir. İddia değil, test edilecek hipotez üret.', 'Change the target. Produce a testable hypothesis, not a claim.')}
+            </h2>
+            <p className="mt-4 max-w-lg text-[10px] leading-5 text-[#697169]">
+              {t('Bu kontrol gerçek pilot sonucu değildir. 2025 baz çizgisi üzerinde “önleme” ve “geri kazanım” varsayımlarının ne ifade ettiğini gösterir.', 'This control is not a real pilot result. It shows what prevention and recovery assumptions mean against the 2025 baseline.')}
+            </p>
           </div>
-          <div>
-            <div className="grid gap-2 sm:grid-cols-3">
-              <DecisionButton active={operatorDecision === 'PILOT_APPROVED'} disabled={!canApprovePilot} onClick={() => setOperatorDecision('PILOT_APPROVED')} label={t('Pilot için onayla', 'Approve for pilot')} detail={canApprovePilot ? t('Sadece kontrollü pilot', 'Controlled pilot only') : t('PILOT_READY gerekli', 'Requires PILOT_READY')} />
-              <DecisionButton active={operatorDecision === 'EDIT_REQUIRED'} onClick={() => setOperatorDecision('EDIT_REQUIRED')} label={t('Düzenleme iste', 'Request edit')} detail={t('Bant / bağlamı gözden geçir', 'Review band / context')} />
-              <DecisionButton active={operatorDecision === 'HOLD'} onClick={() => setOperatorDecision('HOLD')} label={t('Beklet', 'Hold')} detail={t('Eksik veri veya operasyon riski', 'Missing data or operational risk')} />
+
+          <div className="bc-workbench rounded-2xl p-5 sm:p-6">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <RangeControl
+                id="prevention-rate"
+                label={t('Kaynakta önleme', 'Prevention at source')}
+                value={preventionRate}
+                min={0}
+                max={30}
+                onChange={setPreventionRate}
+              />
+              <RangeControl
+                id="recovery-rate"
+                label={t('Geri kazanım oranı', 'Recovery rate')}
+                value={recoveryRate}
+                min={0}
+                max={100}
+                onChange={setRecoveryRate}
+              />
             </div>
-            <div className="mt-3 rounded-xl bg-slate-950 px-4 py-3 text-[9px] font-bold text-white/70">
-              {operatorDecision === 'PILOT_APPROVED'
-                ? t('PILOT_APPROVED · UI-only. Harici üretim komutu gönderilmedi.', 'PILOT_APPROVED · UI-only. No external production command was sent.')
-                : operatorDecision === 'EDIT_REQUIRED'
-                  ? t('EDIT_REQUIRED · Öneri operatör revizyonuna döndü.', 'EDIT_REQUIRED · Recommendation returned for operator revision.')
-                  : t('HOLD · Varsayılan güvenli durum. Otomatik dispatch kapalı.', 'HOLD · Safe default state. Automatic dispatch is disabled.')}
+
+            <div className="mt-6 grid grid-cols-2 border-y border-[#111712]/10 lg:grid-cols-4">
+              <ScenarioMetric label={t('Önlenen', 'Prevented')} value={formatKg(scenario.preventedKg, locale)} />
+              <ScenarioMetric label={t('Kalan atık', 'Remaining waste')} value={formatKg(scenario.remainingWasteKg, locale)} />
+              <ScenarioMetric label={t('Geri kazanılan', 'Recovered')} value={formatKg(scenario.recoveredKg, locale)} />
+              <ScenarioMetric label={t('Rezidüel', 'Residual')} value={formatKg(scenario.residualKg, locale)} />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bc-panel-dark overflow-hidden rounded-[26px] p-6 text-white sm:p-8">
-        <div className="grid gap-8 xl:grid-cols-[.82fr_1.18fr] xl:items-start">
+      <section className="rounded-2xl border border-[#111712]/10 bg-[#e9e5dc] p-6 sm:p-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,.72fr)_minmax(0,1.28fr)] lg:gap-12">
           <div>
-            <div className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.17em] text-[#b8e467]"><Scale size={12} /> {t('Karar laboratuvarı', 'Decision lab')}</div>
-            <h2 className="mt-3 text-[32px] font-black leading-[1.02] tracking-[-0.05em]">{t('Hedefi değiştir; bunun senaryo olduğunu hiç gizleme.', 'Change the target; never hide that this is a scenario.')}</h2>
-            <p className="mt-3 text-[10px] leading-5 text-white/55">{t('2025 resmi baz çizgisine matematiksel senaryo uygulanır. Bu bölüm gerçek pilot sonucu veya gerçekleşmiş iklim tasarrufu değildir.', 'A mathematical scenario is applied to the official 2025 baseline. This is not a real pilot result or achieved climate saving.')}</p>
-            <Slider label={t('Üretimde önleme hedefi', 'Prevention target at production')} value={preventionRate} min={0} max={30} onChange={setPreventionRate} />
-            <Slider label={t('Kalan atıkta geri kazanım hedefi', 'Recovery target for remaining waste')} value={recoveryRate} min={Math.round(CURRENT_RECOVERY_RATE_PCT)} max={95} onChange={setRecoveryRate} />
+            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.17em] text-[#5f685f]"><Gauge size={11} /> {t('Pilot sözleşmesi', 'Pilot contract')}</div>
+            <h2 className="mt-3 text-[31px] font-black leading-[1] tracking-[-0.05em] text-[#111712]">{t('Başarı kriteri demodan önce sabit.', 'Success is defined before the demo result exists.')}</h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <ScenarioCard label={t('Kaynağında önlenen', 'Prevented at source')} value={formatKg(scenario.preventedKg, locale)} detail={t('Senaryo hedefi', 'Scenario target')} />
-            <ScenarioCard label={t('Kalan toplam atık', 'Remaining total waste')} value={formatKg(scenario.remainingWasteKg, locale)} detail={t('Önleme sonrası senaryo', 'Post-prevention scenario')} />
-            <ScenarioCard label={t('Geri kazanıma yönlenen', 'Directed to recovery')} value={formatKg(scenario.recoveredKg, locale)} detail={`${recoveryRate}% ${t('senaryo hedefi', 'scenario target')}`} />
-            <ScenarioCard label={t('Artık yük', 'Residual load')} value={formatKg(scenario.residualKg, locale)} detail={`${formatKg(scenario.residualReductionKg, locale)} ${t('senaryoda daha az artık', 'less residual in scenario')}`} />
+          <div className="divide-y divide-[#111712]/10 border-y border-[#111712]/10">
+            <ContractRow label={t('Süre', 'Duration')} value={`${FOOD_WASTE_PILOT_PROTOCOL.durationDays} ${t('gün', 'days')}`} />
+            <ContractRow label={t('Minimum kanıt', 'Minimum evidence')} value={`${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm} ${t('servis / kol', 'services / arm')}`} />
+            <ContractRow label={t('Birincil metrik', 'Primary metric')} value={FOOD_WASTE_PILOT_PROTOCOL.primaryMetric.label} />
+            <ContractRow label={t('Başarı kapısı', 'Success gate')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}% ${t('normalize atık azalması', 'normalized waste reduction')}`} />
+            <ContractRow label={t('Güvenlik', 'Safety')} value={t('Erken tükenme artmayacak; gıda güvenliği süreci bypass edilemez.', 'Early sell-out must not increase; food-safety process cannot be bypassed.')} />
           </div>
         </div>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-3">
-        <FlowCard step="01" title={t('TAHMİN ET', 'FORECAST')} body={t('Program + takvim + hava + menü sinyallerini kaynak sağlığıyla birlikte değerlendir.', 'Evaluate schedule + calendar + weather + menu signals together with source health.')} />
-        <FlowCard step="02" title={t('ONAYLA / BEKLET', 'APPROVE / WITHHOLD')} body={t('Karar kalitesi yetersizse sistem sayıyı uygulamaz. Operatör onayı her durumda zorunlu.', 'If decision quality is insufficient, the system withholds the recommendation. Operator approval is always required.')} />
-        <FlowCard step="03" title={t('ÖLÇ & ÖĞREN', 'MEASURE & LEARN')} body={t('Normalize edilmiş atık metriği ve operasyon guardrail’leriyle sonucu ölç; sonra modeli kalibre et.', 'Measure the outcome with normalized waste metrics and operational guardrails, then recalibrate the model.')} />
-      </section>
-
-      <section className="rounded-[26px] border border-slate-900/10 bg-[#f6f8f5] p-5 sm:p-7">
-        <div className="grid gap-7 lg:grid-cols-[.78fr_1.22fr]">
-          <div>
-            <div className="bc-eyebrow">{t('14 günlük falsifiable pilot', '14-day falsifiable pilot')}</div>
-            <h2 className="mt-2 text-[29px] font-black tracking-[-0.05em] text-slate-950">{t('Başarı tanımı demo öncesinde kayıtlı.', 'Success is defined before the demo result exists.')}</h2>
-            <p className="mt-3 text-[10px] leading-5 text-slate-500">{t('Ana KPI artık kg/servis değil, servis hacmine göre normalize edilmiş kg / 100 servis edilen öğün. Böylece daha sakin bir gün sahte başarı gibi görünmez.', 'The primary KPI is normalized to kg / 100 served meals, not just kg/service, so a quieter day cannot masquerade as success.')}</p>
-            <a href="/api/v1/food/pilot-template" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#173f67] px-4 py-2.5 text-[9px] font-black text-white">
-              <Download size={12} /> {t('14 günlük ölçüm CSV’sini indir', 'Download 14-day measurement CSV')}
-            </a>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <PilotCard label={t('Ana KPI', 'Primary KPI')} value={t('kg / 100 servis', 'kg / 100 served')} detail={FOOD_WASTE_PILOT_PROTOCOL.primaryMetric.formula} />
-            <PilotCard label={t('Ön-kayıtlı hedef', 'Pre-registered target')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} detail={t('Kontrole göre azalma · henüz sonuç değil', 'Reduction vs control · not an achieved result')} />
-            <PilotCard label={t('Hizmet guardrail’i', 'Service guardrail')} value={t('Erken tükenme artmasın', 'No early-sellout increase')} detail={t('Atığı azaltırken hizmet seviyesini bozmayı başarı saymıyoruz.', 'Waste reduction does not count as success if service reliability worsens.')} />
-            <PilotCard label={t('Minimum kanıt', 'Minimum evidence')} value={`${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm} + ${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}`} detail={t('Kontrol + müdahale ölçülmüş servis', 'Measured control + intervention services')} />
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-3 lg:grid-cols-3">
-        <TruthCard title={t('ŞİMDİ SÖYLEYEBİLİRİZ', 'WE CAN CLAIM NOW')} items={[t('48.251 kg resmi 2025 baz çizgisi', '48,251 kg official 2025 baseline'), t('Kaynak sağlığı / provenance', 'Source health / provenance'), t('Model tahmini ve senaryo olduğunu açıkça', 'Model estimates and scenarios, explicitly labeled')]} tone="good" />
-        <TruthCard title={t('PİLOTTA TEST EDECEĞİZ', 'WE WILL TEST IN PILOT')} items={[t('Üretim bandı atığı azaltıyor mu?', 'Does the production band reduce waste?'), t('Erken tükenme artıyor mu?', 'Does early sell-out increase?'), t('Operatör ne sıklıkla override ediyor?', 'How often does the operator override?')]} tone="neutral" />
-        <TruthCard title={t('ÖLÇMEDEN SÖYLEMEYİZ', 'WE WILL NOT CLAIM BEFORE MEASUREMENT')} items={[t('“X kg tasarruf ettik”', '“We saved X kg”'), t('“Y kg CO₂ azalttık”', '“We avoided Y kg CO₂”'), t('“Gerçek öğrenci talebini görüyoruz”', '“We observe actual student demand”')]} tone="warn" />
       </section>
     </div>
   );
 }
 
 function ReadinessBadge({ readiness }: { readiness: DecisionReadiness }) {
-  const classes = readiness === 'PILOT_READY'
-    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-    : readiness === 'REVIEW_REQUIRED'
-      ? 'border-amber-200 bg-amber-50 text-amber-700'
-      : 'border-rose-200 bg-rose-50 text-rose-700';
-  return <span className={`rounded-full border px-2.5 py-1 font-mono text-[8px] font-black ${classes}`}>{readiness}</span>;
+  if (readiness === 'PILOT_READY') return <StatusBadge label="PILOT_READY" tone="ready" />;
+  if (readiness === 'REVIEW_REQUIRED') return <StatusBadge label="REVIEW_REQUIRED" tone="review" />;
+  return <StatusBadge label="WITHHOLD" tone="hold" />;
 }
 
-function MetricCard({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-2xl border border-white/10 bg-white/[0.065] p-4 backdrop-blur-sm"><div className="text-[8px] font-black uppercase tracking-[0.12em] text-white/45">{label}</div><div className="mt-2 font-mono text-[24px] font-black tracking-[-0.04em] text-white">{value}</div></div>;
+function StatusBadge({ label, tone }: { label: string; tone: 'ready' | 'review' | 'hold' | 'neutral' }) {
+  const className = {
+    ready: 'border-[#66895a]/30 bg-[#edf3e8] text-[#47683d]',
+    review: 'border-[#9c7a40]/25 bg-[#f6efdf] text-[#7b5e30]',
+    hold: 'border-[#875951]/25 bg-[#f4e8e5] text-[#744840]',
+    neutral: 'border-[#111712]/10 bg-[#efede7] text-[#6c736d]',
+  }[tone];
+
+  return <span className={`rounded-md border px-2 py-1 font-mono text-[8px] font-black ${className}`}>{label}</span>;
 }
 
-function MiniMetric({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-xl border border-slate-900/10 bg-[#f7f9f6] p-3"><div className="text-[8px] font-black uppercase tracking-[0.1em] text-slate-400">{label}</div><div className="mt-1 font-mono text-lg font-black text-slate-900">{value}</div></div>;
+function BandMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-[8px] font-black uppercase tracking-[0.14em] text-[#858b85]">{label}</div>
+      <div className="bc-mono mt-1 text-[20px] font-black tracking-[-0.035em] text-[#111712]">{value}</div>
+    </div>
+  );
 }
 
 function DecisionButton({ active, disabled = false, onClick, label, detail }: { active: boolean; disabled?: boolean; onClick: () => void; label: string; detail: string }) {
-  return <button type="button" disabled={disabled} onClick={onClick} className={`rounded-2xl border p-4 text-left transition ${active ? 'border-[#173f67] bg-[#173f67] text-white' : 'border-slate-900/10 bg-[#f7f9f6] text-slate-800'} ${disabled ? 'cursor-not-allowed opacity-40' : 'hover:-translate-y-0.5'}`}><div className="text-[10px] font-black">{label}</div><div className={`mt-2 text-[8px] leading-4 ${active ? 'text-white/55' : 'text-slate-400'}`}>{detail}</div></button>;
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`bc-focus-ring min-h-[78px] rounded-lg border p-3 text-left transition ${disabled ? 'cursor-not-allowed border-[#111712]/8 bg-[#e8e5de] text-[#9a9f9a]' : active ? 'border-[#18372b] bg-[#18372b] text-white' : 'border-[#111712]/10 bg-white text-[#293129] hover:border-[#18372b]/35'}`}
+    >
+      <div className="text-[10px] font-black">{label}</div>
+      <div className={`mt-1 text-[8px] font-bold leading-4 ${active ? 'text-white/55' : 'text-[#838983]'}`}>{detail}</div>
+    </button>
+  );
 }
 
-function Slider({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (value: number) => void }) {
-  return <label className="mt-6 block"><div className="flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-[0.12em] text-white/65"><span>{label}</span><span className="font-mono text-[#b8e467]">{value}%</span></div><input className="mt-3 w-full accent-[#b8e467]" type="range" min={min} max={max} value={value} onChange={event => onChange(Number(event.target.value))} /></label>;
+function DecisionResult({ decision, t }: { decision: OperatorDecision; t: (tr: string, en: string) => string }) {
+  const message = decision === 'PILOT_APPROVED'
+    ? t('PILOT_APPROVED · UI-only. Harici üretim komutu gönderilmedi.', 'PILOT_APPROVED · UI-only. No external production command was sent.')
+    : decision === 'EDIT_REQUIRED'
+      ? t('EDIT_REQUIRED · Öneri operatör revizyonuna döndü.', 'EDIT_REQUIRED · Recommendation returned for operator revision.')
+      : t('HOLD · Güvenli varsayılan. Otomatik dispatch kapalı.', 'HOLD · Safe default. Automatic dispatch is disabled.');
+
+  return (
+    <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#111712]/10 bg-white px-3.5 py-3 text-[9px] font-bold leading-4 text-[#626a63]">
+      <ArrowRight size={11} className="mt-0.5 shrink-0 text-[#315846]" /> {message}
+    </div>
+  );
 }
 
-function ScenarioCard({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5"><div className="text-[8px] font-black uppercase tracking-[0.12em] text-white/42">{label}</div><div className="mt-3 font-mono text-[28px] font-black tracking-[-0.05em] text-white">{value}</div><div className="mt-2 text-[9px] leading-4 text-white/45">{detail}</div></div>;
+function DarkMetric({ label, value, note }: { label: string; value: string; note?: string }) {
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-4">
+      <div>
+        <div className="text-[9px] font-bold text-white/48">{label}</div>
+        {note && <div className="mt-0.5 text-[7px] font-black uppercase tracking-[0.1em] text-[#b9da72]/70">{note}</div>}
+      </div>
+      <div className="bc-mono text-[14px] font-black text-white">{value}</div>
+    </div>
+  );
 }
 
-function FlowCard({ step, title, body }: { step: string; title: string; body: string }) {
-  return <article className="bc-panel rounded-[22px] p-5"><div className="flex items-center justify-between gap-3"><span className="font-mono text-[9px] font-black text-emerald-700">{step}</span><BarChart3 size={14} className="text-slate-300" /></div><h3 className="mt-6 text-[12px] font-black tracking-[0.06em] text-slate-950">{title}</h3><p className="mt-2 text-[10px] leading-5 text-slate-500">{body}</p></article>;
+function RangeControl({ id, label, value, min, max, onChange }: { id: string; label: string; value: number; min: number; max: number; onChange: (value: number) => void }) {
+  return (
+    <label htmlFor={id} className="block">
+      <div className="flex items-end justify-between gap-3">
+        <span className="text-[9px] font-black uppercase tracking-[0.14em] text-[#747c75]">{label}</span>
+        <span className="bc-mono text-[22px] font-black tracking-[-0.04em] text-[#111712]">{value}%</span>
+      </div>
+      <input
+        id={id}
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={event => onChange(Number(event.target.value))}
+        className="mt-3 w-full accent-[#18372b]"
+      />
+      <div className="mt-1 flex justify-between font-mono text-[7px] font-bold text-[#969b96]"><span>{min}%</span><span>{max}%</span></div>
+    </label>
+  );
 }
 
-function PilotCard({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return <div className="rounded-2xl border border-slate-900/10 bg-white p-5"><div className="text-[8px] font-black uppercase tracking-[0.11em] text-slate-400">{label}</div><div className="mt-3 text-[19px] font-black tracking-[-0.04em] text-slate-950">{value}</div><div className="mt-2 font-mono text-[8px] leading-4 text-slate-400">{detail}</div></div>;
+function ScenarioMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-[#111712]/10 py-4 pr-3 sm:[&:nth-child(even)]:border-l sm:[&:nth-child(even)]:pl-4 lg:border-l lg:px-4 lg:first:border-l-0 lg:first:pl-0">
+      <div className="text-[8px] font-black uppercase tracking-[0.14em] text-[#858b85]">{label}</div>
+      <div className="bc-mono mt-1.5 text-[17px] font-black tracking-[-0.03em] text-[#111712]">{value}</div>
+    </div>
+  );
 }
 
-function TruthCard({ title, items, tone }: { title: string; items: string[]; tone: 'good' | 'neutral' | 'warn' }) {
-  const icon = tone === 'good' ? <CheckCircle2 size={14} /> : tone === 'warn' ? <AlertTriangle size={14} /> : <ShieldCheck size={14} />;
-  const accent = tone === 'good' ? 'text-emerald-700' : tone === 'warn' ? 'text-amber-700' : 'text-[#173f67]';
-  return <article className="rounded-[22px] border border-slate-900/10 bg-white p-5"><div className={`flex items-center gap-2 text-[9px] font-black tracking-[0.08em] ${accent}`}>{icon}{title}</div><div className="mt-4 space-y-2">{items.map(item => <div key={item} className="rounded-xl bg-[#f7f9f6] px-3 py-2 text-[9px] font-semibold leading-4 text-slate-600">{item}</div>)}</div></article>;
+function ContractRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid gap-1 py-4 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-5">
+      <div className="text-[8px] font-black uppercase tracking-[0.14em] text-[#7a827b]">{label}</div>
+      <div className="text-[10px] font-bold leading-5 text-[#303831]">{value}</div>
+    </div>
+  );
 }
