@@ -2,375 +2,264 @@
 
 ## Mission
 
-Turn BOUNCAMPUS from a software-only hypothesis into a credible physical measurement and pilot system. The EE role proves whether the product can observe the real world accurately enough to support a defensible intervention.
+Own the question: **Can BOUNCAMPUS observe the physical world reliably enough to support better operational decisions, and what is the most practical way to do that?**
 
-The goal is **not** to build hardware for visual impact. Hardware exists only if it closes a measurement gap discovered through PMR or improves pilot credibility.
+This role is not limited to building a smart scale. The EE lead owns physical measurement strategy, instrumentation feasibility, hardware/software boundaries, sensor selection, installation constraints, data integrity, and pilot measurement design.
 
-**Application deadline:** 8 October 2026, 23:59  
-**Primary optimization target:** measurement credibility and deployability.
+The right answer may be a custom device, an existing kitchen scale, a POS integration, a manual measurement protocol, a sensor fusion approach, or no new hardware at all.
 
----
+The mission is to create the strongest evidence loop with the least unnecessary complexity.
 
-## Core question
+## North Star
 
-> Can we measure the operational outcome reliably, cheaply, and with low enough friction that a real institutional kitchen could run a pilot?
+Improve the team's ability to answer:
 
----
+1. what actually happened in the physical operation,
+2. whether the data is trustworthy,
+3. whether measurement can be deployed without disrupting staff,
+4. whether a pilot can produce defensible evidence,
+5. whether hardware adds enough value to justify itself,
+6. whether the resulting system can scale beyond a one-off prototype.
 
-## Scope
+## Core Ownership
 
-### P0 — Must be completed before application freeze
+Primary ownership areas include:
 
-1. Measurement requirements derived from PMR.
-2. Physical measurement architecture.
-3. Smart-waste-node feasibility.
-4. BOM and component alternatives.
-5. Calibration/test methodology.
-6. Hardware-to-software data contract with CS1/CS2.
-7. Pilot instrumentation plan.
-8. Failure modes, safety boundaries, and operational constraints.
+- physical measurement architecture,
+- waste / surplus measurement strategy,
+- sensor and instrumentation experiments,
+- calibration and repeatability,
+- measurement uncertainty,
+- edge-device reliability,
+- connectivity and offline behavior,
+- installation / power / enclosure feasibility,
+- data provenance at the physical layer,
+- pilot measurement SOPs,
+- physical-system failure modes,
+- hardware-vs-software tradeoffs,
+- identifying what should be measured versus what can be inferred.
 
-### P1 — Allowed experiments
+## Current Candidate: Smart Waste Measurement Node
 
-- ESP32 + load cell + HX711 prototype.
-- Tare / filtering / local status indication.
-- Wi-Fi data transmission.
-- Offline buffering.
-- OLED or simple operator interaction.
-- Portion/service counting experiments.
-- ToF/IR sensing.
-- NFC/RFID service or operator tagging.
-- Environmental sensing if PMR demonstrates relevance.
+A current candidate architecture is:
 
-### Out of scope unless evidence changes priorities
+`load cell / scale → amplifier / interface → MCU or gateway → network → BOUNCAMPUS measurement API`
 
-- Custom PCB before breadboard evidence.
-- Complex enclosure work before measurement validity.
-- Computer vision waste classification merely because it looks advanced.
-- Sensors with no validated operational use.
-- Claims of production readiness from a bench prototype.
+Possible implementation components include:
 
----
+- load cell,
+- HX711 or other ADC / scale interface,
+- ESP32 or equivalent controller,
+- tare / confirmation input,
+- local status indication,
+- Wi-Fi or other connectivity,
+- optional local buffering,
+- optional display,
+- optional enclosure.
 
-## Shared PMR responsibility
+This architecture is **not mandatory**. It should survive comparison with simpler or better approaches.
 
-EE is expected to lead approximately **4 interviews** as part of the team's target of 16 distinct interviews.
+## Measurement Questions Before Hardware
 
-Priority interview targets:
+Before committing to any device, establish:
 
-- Food engineers
-- Kitchen managers
-- Kitchen staff
-- Catering technical/operations staff
-- Waste-measurement owners
-- POS / scale / facilities data owners
-
-Questions should focus on physical reality:
-
-- What is actually weighed today?
+- What exactly needs to be measured?
 - At what point in the workflow?
 - By whom?
-- How often is measurement skipped?
-- What containers are used?
-- Is tare known?
-- What categories matter?
-- What precision is useful operationally?
-- Would a scale create hygiene, safety, cleaning, or workflow problems?
-- Is Wi-Fi available where measurement occurs?
-- What happens during connectivity loss?
+- How often?
+- What accuracy is operationally meaningful?
+- What categories matter: edible surplus, preparation waste, plate waste, total waste, produced quantity, served quantity?
+- Does an existing device already produce the data?
+- Would integration be easier than new hardware?
+- What human action would measurement require?
+- Would that action change behavior and bias the data?
+- What happens when connectivity fails?
+- How will measurements be associated with the correct service?
 
-Do not pitch the smart node before understanding the current workflow.
+The hardware should follow the measurement requirement, not the other way around.
 
----
+## Prototype Freedom
 
-## Workstreams
+The EE lead is free to explore alternative physical-system concepts where they could create more value.
 
-### 1. Measurement requirements
+Examples include:
 
-Translate PMR into explicit requirements.
+- smart weighing node,
+- existing digital-scale integration,
+- load-cell platform,
+- service throughput sensing,
+- portion-counting mechanisms,
+- button / NFC / RFID service labeling,
+- simple edge display,
+- environmental sensing if PMR/model evidence supports it,
+- local storage and delayed sync,
+- camera-assisted measurement if there is a defensible reason,
+- low-tech measurement procedures when they outperform custom electronics,
+- integration with existing POS or kitchen systems.
 
-Example fields:
+Experiments should be cheap and reversible until evidence supports deeper investment.
 
-- Measurement type
-- Range
-- Desired resolution
-- Desired repeatability
-- Measurement frequency
-- User interaction
-- Cleaning requirement
-- Power availability
-- Connectivity
-- Installation constraints
-- Food-safety boundary
-- Failure behavior
+## Bench Validation
 
-### Acceptance gate
+For any measurement device, establish the relevant performance envelope.
 
-A requirement must have either:
+Depending on the device this may include:
 
-- PMR evidence,
-- technical necessity,
-- regulatory/safety necessity,
-- or a clearly labeled hypothesis.
+- zero stability,
+- tare behavior,
+- known-reference accuracy,
+- repeatability,
+- hysteresis,
+- drift,
+- sensitivity to placement,
+- temperature effects,
+- power interruption behavior,
+- reconnect behavior,
+- local buffering,
+- invalid-reading detection,
+- duplicate-event handling.
 
-Do not invent arbitrary engineering specifications and present them as customer needs.
+Do not use arbitrary engineering thresholds if the operational requirement is unknown. First determine what accuracy or reliability is actually needed for the decision or pilot.
 
----
+## Data Contract
 
-### 2. First hardware hypothesis — Smart Waste Measurement Node
-
-Default experiment:
-
-`load cell -> HX711 -> ESP32 -> Wi-Fi/offline buffer -> BOUNCAMPUS measurement API`
-
-Potential measurement categories:
-
-- Edible surplus
-- Preparation waste
-- Plate waste
-- Other operator-defined category
-
-The exact categories must be reconciled with PMR and pilot design.
-
-### Required data fields
+A useful physical measurement should carry enough context to be auditable. Candidate fields include:
 
 ```json
 {
-  "station_id": "BOUN-NH-01",
-  "service_id": "2026-10-03-lunch",
-  "measurement_type": "edible_surplus",
+  "stationId": "...",
+  "serviceId": "...",
+  "measurementType": "edible_surplus",
   "value": 4.82,
   "unit": "kg",
   "timestamp": "...",
-  "quality": "VALID"
+  "quality": "VALID",
+  "source": "PHYSICAL_MEASUREMENT"
 }
 ```
 
-CS1/CS2 may evolve the contract, but hardware firmware must not silently invent missing context.
+The exact schema may change with the measurement architecture. Coordinate with CS1/CS2 rather than optimizing the hardware in isolation.
 
----
+## Measurement Quality and Provenance
 
-### 3. BOM and fallback design
+The system should be able to distinguish, where relevant:
 
-Document:
+- directly measured,
+- manually entered,
+- estimated,
+- derived,
+- missing,
+- rejected / invalid.
 
-- Primary component
-- Function
-- Why selected
-- Expected limitation
-- Alternative/fallback
-- Whether already available
+A physical sensor does not automatically create ground truth. Calibration, labeling, operator workflow, and data association matter just as much.
 
-Initial likely BOM:
+## Pilot Design Contribution
 
-- ESP32
-- Load cell appropriate to target range
-- HX711 or equivalent ADC/amplifier
-- Stable power source
-- Tare/input button
-- Status LED
-- Breadboard / wiring
+The EE lead should help design a pilot that can actually be executed.
 
-Optional only after core measurement works:
+Questions include:
 
-- OLED
-- Enclosure
-- Local storage
-- Second sensor modality
+- what will be measured per service,
+- which measurements are mandatory,
+- who records them,
+- how control/intervention services are compared,
+- what happens when a reading is missing,
+- what constitutes invalid measurement,
+- how early sell-out or stockout is observed,
+- how operator overrides are captured,
+- how measurement burden is minimized.
 
-### Acceptance gate
+The role should challenge pilots that look statistically neat but operationally unrealistic.
 
-Every optional component must answer:
+## Hardware Is Not Automatically a Differentiator
 
-> What failure, workflow need, or measurement-quality problem does this component solve?
+The team should not build hardware merely because an EE member exists.
 
-If the answer is mainly "it looks better," defer it.
+A custom device is justified when it materially improves one or more of:
 
----
+- data availability,
+- trustworthiness,
+- timeliness,
+- operator burden,
+- intervention loop closure,
+- pilotability,
+- defensibility,
+- scalability.
 
-### 4. Calibration protocol
+If a commercial scale + simple data-entry workflow is better for the application stage, say so. If a custom node creates a strong measurable advantage, build it.
 
-A prototype is not evidence until calibrated.
+## Freedom to Explore
 
-Minimum test set should cover several known reference masses spanning the useful range.
+The EE lead may independently initiate small experiments that answer high-value questions without waiting for permission.
 
-Record:
+Examples:
 
-- Reference mass
-- Measured mass
-- Absolute error
-- Relative error
-- Repeated readings
-- Standard deviation or spread
-- Drift over time
-- Tare behavior
+- test whether a low-cost load cell is stable enough,
+- compare manual vs automatic tare,
+- benchmark two sensor options,
+- prototype offline buffering,
+- inspect existing scale interfaces,
+- estimate installation burden,
+- test whether service identification needs a button/NFC flow,
+- prove that a proposed sensor is unnecessary,
+- identify a better physical variable than waste mass.
 
-Recommended test sequence:
+Exploration should produce evidence and a decision, not endless prototyping.
 
-1. Warm-up / stabilization.
-2. Tare.
-3. At least 3 distinct reference masses.
-4. At least 10 repeated readings at selected masses.
-5. Remove/reapply load to test repeatability.
-6. Re-tare and repeat.
-7. Record environmental/bench conditions relevant to anomalies.
+## Collaboration
 
-### Acceptance gate
+### With IE
 
-PASS only when:
+Use PMR to understand measurement reality, operator burden, workflow, and existing equipment.
 
-- Calibration coefficient is documented.
-- Repeatability is quantified.
-- Known limitations are visible.
-- Raw test evidence is retained.
+### With CS1
 
-A single successful reading is FAIL.
+Define what measurements are needed to evaluate predictions and interventions, and agree on quality/status semantics.
 
----
+### With CS2
 
-### 5. Firmware behavior
+Explain what physical evidence can support product claims, pilot design, differentiation, and application language.
 
-Minimum firmware behavior for a P1 integrated prototype:
+## Anti-AI-Slop Standard
 
-- Boot self-state.
-- Sensor initialization.
-- Tare.
-- Stable weight reading.
-- Filtering without hiding instability.
-- Measurement confirmation.
-- Connectivity state.
-- API POST.
-- Retry/backoff or explicit failure.
-- No fabricated successful transmission.
+AI can assist with datasheets, firmware drafts, calculations, experiment design, and documentation. It cannot substitute for bench evidence or physical constraints.
 
-### Failure handling
+Reject:
 
-Explicitly test:
+- hardware specs invented without checking components,
+- claimed accuracy without calibration evidence,
+- fake sensor readings,
+- simulated results presented as measured,
+- generic IoT architecture diagrams with no operational need,
+- unnecessary sensors added for appearance,
+- enclosure / PCB work that consumes time before the measurement question is established,
+- climate-impact claims inferred directly from sensor existence.
 
-- Sensor disconnected.
-- Wi-Fi unavailable.
-- Backend unavailable.
-- Malformed server response.
-- Sudden load changes.
-- Negative/invalid reading.
-- Reboot during measurement.
+## Strong Outputs
 
-The device must expose uncertainty/failure rather than silently report a plausible number.
+Useful deliverables may include:
 
----
-
-### 6. Pilot instrumentation plan
-
-Work with IE and CS1 to define how a real pilot could capture:
-
-- Produced quantity
-- Served quantity
-- Edible surplus
-- Waste mass
-- Early sell-out
-- Operator override
-- Service context
-- Measurement completeness
-
-Not all signals need custom hardware. Manual entry, POS export, or existing scales may be better.
-
-### Acceptance gate
-
-The instrumentation plan must minimize operator burden. A scientifically elegant plan that a kitchen will not follow is FAIL.
-
----
-
-## Hardware experiment rule
-
-P1 hardware experiments must be time-boxed and falsifiable.
-
-Before starting, create or reference an experiment entry containing:
-
-- Question
-- Hypothesis
-- Why it matters
-- Method
-- Success condition
-- Failure condition
-- Time budget
-- Result
-- KEEP / MODIFY / KILL
-
-Do not spend multiple days rescuing a low-value hardware feature without new evidence.
-
----
-
-## Cross-team handoffs
-
-### From IE
-
-Need:
-
-- Measurement workflow.
-- Operator constraints.
-- Existing tools/scales.
-- Required categories.
-- Pilot acceptance conditions.
-
-### To CS1
-
-Provide:
-
-- Measurement schema.
-- Error characteristics.
-- Quality flags.
-- Missing-data behavior.
-- Calibration evidence.
-
-### To CS2
-
-Provide:
-
-- What hardware proves.
-- What remains unproven.
-- Deployment constraints.
-- Evidence that hardware is or is not necessary.
-- Technical feasibility paragraph for application synthesis.
-
----
-
-## Anti-AI-slop rules
-
-Automatic FAIL if:
-
-- A CAD render is presented as a working prototype.
-- A BOM implies purchased/available components that the team does not have.
-- Accuracy is claimed without calibration evidence.
-- "IoT-enabled" is used as a value proposition by itself.
-- A sensor is added with no PMR or technical rationale.
-- A simulated payload is presented as physical telemetry.
-- A breadboard is described as production-ready.
-- Unsupported safety, hygiene, or compliance claims are made.
-
----
-
-## Definition of Done — 8 October
-
-The EE role is DONE only if:
-
-- [ ] EE led roughly 4 relevant PMR interviews, unless team coverage justified redistribution.
-- [ ] Measurement requirements are linked to PMR/technical evidence.
-- [ ] Smart-node architecture is documented.
-- [ ] BOM and fallbacks are documented.
-- [ ] Calibration methodology exists.
-- [ ] If hardware is available, real bench evidence is recorded; if unavailable, feasibility is clearly separated from implementation.
-- [ ] Hardware/software data contract is agreed with CS1/CS2.
-- [ ] Pilot instrumentation plan exists.
-- [ ] Major failure modes are documented.
-- [ ] Hardware is explicitly KEEP / MODIFY / KILL based on evidence.
-- [ ] No prototype capability is overstated in the application.
-
----
-
-## Success standard
-
-The best outcome is not necessarily "we built a device."
-
-The best outcome is:
-
-> We know exactly what must be measured, why it matters, how reliably we can measure it, how it fits the kitchen workflow, and whether custom hardware is actually justified.
+- measurement architecture comparison,
+- calibrated prototype,
+- experiment CSV,
+- photos / bench evidence,
+- firmware with clear failure behavior,
+- measurement quality model,
+- pilot measurement SOP,
+- integration contract,
+- deployment constraint list,
+- decision proving that a proposed hardware component should be removed.
+
+## Application-Stage Success Criteria
+
+By October 8, the physical-systems side should ideally demonstrate:
+
+- a credible measurement strategy,
+- understanding of current operational measurement gaps,
+- at least one tested technical path where feasible,
+- explicit limitations and failure modes,
+- a defensible hardware-vs-integration decision,
+- a pilot measurement approach that could be run in reality,
+- no claim that prototype hardware is production-ready unless evidence supports it.
+
+A polished physical prototype is valuable, but a well-supported decision that a simpler solution is superior is also a success.
