@@ -1,0 +1,318 @@
+{
+  "schema_version": "1.0",
+  "research_date": "2026-10-01",
+  "status": "secondary_public_source_research",
+  "claim_firewall": [
+    "This file does not prove normal-term reservation use.",
+    "This file does not identify the current daily production quantity owner.",
+    "User meal charges are not contractor settlement semantics.",
+    "Historical special-period thresholds are not current universal policy.",
+    "Public role membership does not establish willingness to buy or use BOUNCAMPUS."
+  ],
+  "sources": {
+    "SRC_BU_RES_2024": {
+      "url": "https://yemekhane.bogazici.edu.tr/ara-tatil-yemek-hizmeti-hakkinda",
+      "type": "official_university_announcement",
+      "supports": ["reservation_capability", "historical_service_mode_rule", "previous_day_cutoff"]
+    },
+    "SRC_BU_RES_2026": {
+      "url": "https://yemekhane.bogazici.edu.tr/node/493",
+      "type": "official_university_announcement",
+      "supports": ["reservation_capability", "cancellation", "uncancelled_no_show_balance_rule", "previous_day_cutoff"]
+    },
+    "SRC_BU_FAQ": {
+      "url": "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0",
+      "type": "official_university_faq",
+      "supports": ["bucard_entry", "bucampus_qr_entry", "turnstile_context"]
+    },
+    "SRC_BU_MENU_VOTE": {
+      "url": "https://yemekhane.bogazici.edu.tr/menu-anketi",
+      "type": "official_university_announcement",
+      "supports": ["explicit_menu_preference_signal", "future_menu_decision"]
+    },
+    "SRC_BU_CONTROL": {
+      "url": "https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246",
+      "type": "official_university_governance",
+      "supports": ["control_organisation_exists", "current_public_membership"]
+    },
+    "SRC_BU_FOOD_POLICY": {
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/1522-sustainably-farmed-food-on-campus/1958",
+      "type": "official_university_policy_surface",
+      "supports": ["safe_sustainable_food_governance", "production_planning_policy", "food_flow_measurement_policy"]
+    },
+    "SRC_BU_FOOD_POLICY_PDF": {
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/48-bogazici-universitesi-guvenli-ve-surdurulebil-20250407-160443.pdf",
+      "type": "official_university_directive",
+      "supports": ["production_planning_policy", "monthly_produced_consumed_discarded_reporting", "surplus_strategy", "annual_governance_reporting"]
+    },
+    "SRC_BU_FOOD_POLICY_DRAFT": {
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/bogazici_universitesi_guvenli_ve_surdurulebilir_gida_yonetimi_yonergesi_19_07_2024_-taslak.pdf",
+      "type": "official_hosted_draft_or_versioned_document",
+      "supports": ["historical_broader_governance_composition"],
+      "warning": "Do not use this source alone to assert current commission membership."
+    },
+    "SRC_BU_EXEC_BOARD": {
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf",
+      "type": "official_university_directive",
+      "supports": ["food_service_payment_control_governance", "bucard_office_definition"]
+    },
+    "SRC_BU_PERSONNEL_CHARGE": {
+      "url": "https://yemekhane.bogazici.edu.tr/node/225",
+      "type": "official_university_announcement",
+      "supports": ["personnel_meal_charge_accounting", "bucard_bucampus_detail_surface"]
+    },
+    "SRC_BU_PROCUREMENT": {
+      "url": "https://ekapveri.com/ihale/ekap-2025-1727143/",
+      "type": "ekap_derived_procurement_record",
+      "supports": ["current_contractor", "unit_price_procurement", "meal_quantity_scale", "six_campus_scope"]
+    }
+  },
+  "public_facts": [
+    {
+      "fact_id": "BDC-F01",
+      "claim": "Boğaziçi used previous-day explicit meal reservation in a 2026 Kilyos holiday service regime.",
+      "source_ids": ["SRC_BU_RES_2026"],
+      "confidence": "HIGH",
+      "scope": "special_period_kilyos_2026"
+    },
+    {
+      "fact_id": "BDC-F02",
+      "claim": "In the 2026 special regime, users could cancel reservations and uncancelled no-shows were treated as taken for balance deduction.",
+      "source_ids": ["SRC_BU_RES_2026"],
+      "confidence": "HIGH",
+      "scope": "special_period_kilyos_2026"
+    },
+    {
+      "fact_id": "BDC-F03",
+      "claim": "In the 2024 inter-semester regime, reservation counts below 15 triggered packaged service.",
+      "source_ids": ["SRC_BU_RES_2024"],
+      "confidence": "HIGH",
+      "scope": "intersemester_2024",
+      "warning": "Historical special-regime rule; not current universal policy."
+    },
+    {
+      "fact_id": "BDC-F04",
+      "claim": "BUCard and BUCampus QR are used for dining turnstile access.",
+      "source_ids": ["SRC_BU_FAQ"],
+      "confidence": "HIGH",
+      "scope": "current_public_dining_access"
+    },
+    {
+      "fact_id": "BDC-F05",
+      "claim": "Boğaziçi has used BUCampus institutional voting to choose a future weekly meal option.",
+      "source_ids": ["SRC_BU_MENU_VOTE"],
+      "confidence": "HIGH",
+      "scope": "menu_preference_process"
+    },
+    {
+      "fact_id": "BDC-F06",
+      "claim": "Boğaziçi currently lists a Dining Hall, Cooking and Food Distribution Control Organisation.",
+      "source_ids": ["SRC_BU_CONTROL"],
+      "confidence": "HIGH",
+      "scope": "current_public_governance"
+    },
+    {
+      "fact_id": "BDC-F07",
+      "claim": "Current food-governance material explicitly includes production planning and monthly recording/reporting of produced, consumed and discarded food quantities/types as part of food-loss/waste reduction.",
+      "source_ids": ["SRC_BU_FOOD_POLICY", "SRC_BU_FOOD_POLICY_PDF"],
+      "confidence": "HIGH",
+      "scope": "university_food_governance"
+    },
+    {
+      "fact_id": "BDC-F08",
+      "claim": "The current 2026-2027 meal-service contractor is TEMAŞ under a unit-price procurement covering six campuses.",
+      "source_ids": ["SRC_BU_PROCUREMENT"],
+      "confidence": "HIGH",
+      "scope": "2026_2027_contract"
+    }
+  ],
+  "roles": [
+    {
+      "role_id": "ROLE_FOOD_SERVICES",
+      "name": "Yemek Hizmetleri Şube Müdürlüğü",
+      "candidate_responsibilities": ["service_governance", "contractor_coordination", "menu_and_service_administration"],
+      "validated_daily_quantity_owner": false
+    },
+    {
+      "role_id": "ROLE_CONTRACTOR",
+      "name": "TEMAŞ Boğaziçi project/kitchen operations",
+      "candidate_responsibilities": ["production_execution", "campus_distribution", "possible_daily_quantity_planning"],
+      "validated_daily_quantity_owner": false
+    },
+    {
+      "role_id": "ROLE_CONTROL",
+      "name": "Yemekhane, Yemek Pişirme ve Yemek Dağıtım Kontrol Teşkilatı",
+      "candidate_responsibilities": ["service_control", "quality_hygiene_compliance", "possible_accepted_truth_owner"],
+      "validated_daily_quantity_owner": false
+    },
+    {
+      "role_id": "ROLE_BID",
+      "name": "Bilgi İşlem / BUCard / BUCampus",
+      "candidate_responsibilities": ["digital_access_events", "reservation_event_storage", "aggregate_export", "payment_identity_system"],
+      "validated_operational_decision_owner": false
+    },
+    {
+      "role_id": "ROLE_FOOD_GOVERNANCE",
+      "name": "Güvenli ve Sürdürülebilir Gıda governance",
+      "candidate_responsibilities": ["food_loss_waste_strategy", "production_planning_policy", "monthly_food_flow_reporting", "annual_evaluation"],
+      "validated_daily_quantity_owner": false
+    }
+  ],
+  "signals": [
+    {
+      "signal_id": "SIG_RESERVATION",
+      "name": "active_reservations_at_cutoff",
+      "public_existence": true,
+      "normal_term_availability": "UNKNOWN",
+      "decision_time_relation": "previous_day_in_special_regimes"
+    },
+    {
+      "signal_id": "SIG_CANCELLATION",
+      "name": "reservation_cancellations",
+      "public_existence": true,
+      "historical_export_available": "UNKNOWN"
+    },
+    {
+      "signal_id": "SIG_TURNSTILE",
+      "name": "validated_bucard_or_qr_entry_count",
+      "public_existence": true,
+      "historical_export_available": "UNKNOWN",
+      "warning": "Entry event may not equal meal consumed."
+    },
+    {
+      "signal_id": "SIG_MENU_VOTE",
+      "name": "bucampus_menu_vote_count",
+      "public_existence": true,
+      "historical_export_available": "UNKNOWN",
+      "warning": "Preference is not attendance."
+    },
+    {
+      "signal_id": "SIG_HISTORY",
+      "name": "historical_served_or_accepted_count",
+      "public_existence": "PARTIAL",
+      "granular_access": "UNKNOWN"
+    }
+  ],
+  "decision_surfaces": [
+    {
+      "decision_id": "DEC_QUANTITY",
+      "name": "production_quantity",
+      "current_owner": "UNKNOWN",
+      "current_freeze_time": "UNKNOWN",
+      "priority": "P0"
+    },
+    {
+      "decision_id": "DEC_SERVICE_MODE",
+      "name": "dining_hall_vs_packaged_service",
+      "historical_public_evidence": true,
+      "current_owner": "UNKNOWN",
+      "current_rule": "UNKNOWN",
+      "priority": "P0"
+    },
+    {
+      "decision_id": "DEC_ALLOCATION",
+      "name": "campus_or_channel_allocation",
+      "current_owner": "UNKNOWN",
+      "current_freeze_time": "UNKNOWN",
+      "priority": "P0"
+    },
+    {
+      "decision_id": "DEC_MENU_MIX",
+      "name": "menu_or_dietary_mix_quantity",
+      "current_owner": "UNKNOWN",
+      "priority": "P1"
+    },
+    {
+      "decision_id": "DEC_BATCH",
+      "name": "batch_or_replenishment_policy",
+      "current_owner": "UNKNOWN",
+      "priority": "P1"
+    }
+  ],
+  "event_semantics": [
+    "reservation_created",
+    "reservation_cancelled",
+    "active_reservation_at_cutoff",
+    "uncancelled_no_show",
+    "unreserved_or_late_demand",
+    "planned_portions",
+    "produced_portions",
+    "delivered_portions",
+    "validated_entry_or_served_count",
+    "accepted_service_quantity",
+    "user_charge",
+    "contract_settled_quantity",
+    "edible_surplus",
+    "preparation_waste",
+    "plate_waste",
+    "collected_waste"
+  ],
+  "unknowns": [
+    {
+      "unknown_id": "U01",
+      "question": "Who sets daily production quantity under the current Boğaziçi-TEMAŞ workflow?",
+      "owner_to_ask": ["ROLE_FOOD_SERVICES", "ROLE_CONTRACTOR"],
+      "priority": "P0"
+    },
+    {
+      "unknown_id": "U02",
+      "question": "What is the exact production quantity freeze time and which actions remain adjustable afterward?",
+      "owner_to_ask": ["ROLE_CONTRACTOR", "ROLE_FOOD_SERVICES"],
+      "priority": "P0"
+    },
+    {
+      "unknown_id": "U03",
+      "question": "Is reservation used or technically activatable in normal academic-term service and what residual uncertainty remains after it?",
+      "owner_to_ask": ["ROLE_FOOD_SERVICES", "ROLE_BID", "ROLE_CONTRACTOR"],
+      "priority": "P0"
+    },
+    {
+      "unknown_id": "U04",
+      "question": "Which record is the accepted operational truth for contractor service and shortage/deviation handling?",
+      "owner_to_ask": ["ROLE_CONTROL", "ROLE_FOOD_SERVICES"],
+      "priority": "P0"
+    },
+    {
+      "unknown_id": "U05",
+      "question": "Which quantity becomes contractor hakediş/payment?",
+      "owner_to_ask": ["ROLE_FOOD_SERVICES", "ROLE_CONTROL"],
+      "priority": "P0"
+    },
+    {
+      "unknown_id": "U06",
+      "question": "What source systems create the monthly produced, consumed and discarded food quantities required by governance?",
+      "owner_to_ask": ["ROLE_FOOD_GOVERNANCE", "ROLE_FOOD_SERVICES", "ROLE_CONTROL"],
+      "priority": "P1"
+    }
+  ],
+  "pilot_ladder": [
+    {
+      "pilot_id": "P0_RECONCILE",
+      "description": "Retrospectively compare active reservations at cutoff with validated service count for one historical special period.",
+      "success_condition": "Event semantics can be reconciled at meal/service level."
+    },
+    {
+      "pilot_id": "P1_SIMPLE_CORRECTION",
+      "description": "Compare raw reservation count with simple show-rate plus walk-in buffer.",
+      "success_condition": "Simple correction materially improves decision loss over raw intent without increasing shortage guardrails."
+    },
+    {
+      "pilot_id": "P2_CONTEXTUAL_RESIDUAL",
+      "description": "Add campus/menu/calendar context only if predictable residual error remains.",
+      "success_condition": "Out-of-sample decision utility improves over simple correction."
+    },
+    {
+      "pilot_id": "P3_ACTION_POLICY",
+      "description": "Test whether the estimate changes a real quantity, allocation, batch or service-mode decision.",
+      "success_condition": "Operator takes a traceable action and outcome is prospectively measured."
+    }
+  ],
+  "kill_or_modify_conditions": [
+    "Reservation already removes nearly all meaningful uncertainty and forecasting adds no material decision value.",
+    "Normal-term reservation is operationally unacceptable due to friction or exclusion costs.",
+    "Quantity, allocation, mix and service mode are all fixed before usable signals arrive.",
+    "Operational records cannot be reconciled into a defensible ground truth.",
+    "No actor has both authority and incentive to change the decision.",
+    "Existing production-planning tooling already solves the identified decision with no meaningful pain."
+  ]
+}
