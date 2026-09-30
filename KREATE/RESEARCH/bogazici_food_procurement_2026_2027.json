@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "research_id": "BOGAZICI-FOOD-PROCUREMENT-2026-2027",
+  "research_date": "2026-10-01",
+  "evidence_class": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "canonical_successful_tender": {
+    "ikn": "2025/1727143",
+    "authority": "Boğaziçi University Health, Culture and Sports Department",
+    "service_start": "2026-01-01",
+    "service_end": "2027-12-31",
+    "procurement_type": "SERVICE",
+    "procedure": "OPEN_TENDER",
+    "contract_type": "UNIT_PRICE",
+    "campuses": ["North", "South", "Kilyos", "Kandilli", "Hisar", "Anadolu Hisarı"],
+    "quantities": {
+      "student_meals": 2500000,
+      "breakfast_including_sahur": 380000,
+      "staff_meals": 250000,
+      "total_listed_meal_units": 3130000
+    },
+    "approximate_cost_try": 873226063.59,
+    "contract_value_try": 759537563.59,
+    "contract_date": "2025-12-25",
+    "contractor": "TEMAŞ Gıda Sanayi ve Ticaret A.Ş.",
+    "bids_total": 14,
+    "bids_valid": 7,
+    "price_adjustment_indicated": true,
+    "source_urls": [
+      "https://www.ihaledetay.com/2025-1727143",
+      "https://ekapveri.com/ihale/ekap-2025-1727143/"
+    ]
+  },
+  "capacity_requirement": {
+    "required_capacity_report_meals_per_day": 5000,
+    "source_wording_semantics": "5000 meals is described as one-half of the administration's daily meal requirement",
+    "implied_procurement_daily_design_requirement_meals": 10000,
+    "interpretation_rule": "Treat 10000 as procurement design/capacity scale, not observed average daily consumption."
+  },
+  "cancelled_predecessor": {
+    "ikn": "2025/1335958",
+    "status": "CANCELLED",
+    "cancel_date": "2025-10-07",
+    "reason_summary": "Objections to tender documentation required specification changes, but an EKAP amendment could not be issued at that stage.",
+    "source_url": "https://ekapveri.com/ihale/ekap-2025-1335958/",
+    "agent_rule": "Do not merge clauses from the cancelled and successful tenders without verifying they survived into the final procedure."
+  },
+  "established": [
+    "Meal categories and quantities are explicit procurement line-item quantities.",
+    "The successful procurement uses a unit-price contract structure.",
+    "The current contract covers six campuses and 3.13 million listed meal units over 2026-2027.",
+    "The tender requires production capacity at a 10000-meal daily design scale by defining 5000 meals as half the daily requirement.",
+    "The successful contractor is TEMAŞ Gıda Sanayi ve Ticaret A.Ş.",
+    "Price adjustment is indicated in EKAP-derived tender data."
+  ],
+  "unknown_contract_semantics": [
+    "daily_call_off_or_order_process",
+    "quantity_freeze_deadline",
+    "which_quantity_is_payable_or_accepted",
+    "winning_unit_price_per_line_item",
+    "whether_unserved_production_is_payable",
+    "minimum_guaranteed_quantities",
+    "shortage_and_service_failure_penalties",
+    "quantity_revision_rules",
+    "progress_payment_quantity_source"
+  ],
+  "forbidden_claims": [
+    "The university loses the full contract value to food waste.",
+    "Each avoided meal saves a blended contract-value-per-meal amount.",
+    "The contractor sets daily quantities.",
+    "The university pays for every produced but unserved meal.",
+    "Actual daily consumption is 10000 meals."
+  ],
+  "highest_value_pmr_questions": [
+    "What quantity is communicated to the contractor for tomorrow's meal and when is it frozen?",
+    "Can the quantity be revised after the initial communication?",
+    "Which quantity is used for monthly acceptance/payment: ordered, produced, delivered, served, or another field?",
+    "How are student meal, breakfast and staff meal unit prices represented in the signed contract?",
+    "What penalties/deductions apply to shortage or service failure?",
+    "Is unserved production payable?",
+    "What records reconcile quantity for progress payments?",
+    "Who owns daily production and campus allocation decisions?"
+  ],
+  "pilot_fields": [
+    "date",
+    "meal_type",
+    "campus",
+    "service_channel",
+    "forecast_or_requested_qty",
+    "revised_request_qty",
+    "produced_qty",
+    "delivered_qty",
+    "served_or_accepted_qty",
+    "contract_accepted_qty_if_releasable",
+    "unserved_surplus",
+    "waste_qty_with_boundary",
+    "shortage_or_service_failure"
+  ],
+  "research_hypotheses": [
+    {"id": "RH-P01", "hypothesis": "Daily meal quantity is an explicit controllable call-off under the unit-price contract.", "status": "UNKNOWN"},
+    {"id": "RH-P02", "hypothesis": "Improving quantity accuracy creates direct university financial value.", "status": "PLAUSIBLE_BUT_UNPROVEN"},
+    {"id": "RH-P03", "hypothesis": "The contractor also benefits from better demand forecasts.", "status": "UNKNOWN"},
+    {"id": "RH-P04", "hypothesis": "The procurement's 10000-meal daily capacity scale creates meaningful leverage for small percentage improvements.", "status": "PLAUSIBLE_REQUIRES_ACTUAL_VOLUME_AND_DISCRETION"},
+    {"id": "RH-P05", "hypothesis": "Payment/acceptance records provide a usable historical quantity signal.", "status": "UNKNOWN"}
+  ]
+}
