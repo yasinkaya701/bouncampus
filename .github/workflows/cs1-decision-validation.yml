@@ -30,6 +30,9 @@ jobs:
       - name: Method eligibility and fair-baseline regressions
         run: python scripts/test_cs1_method_eligibility.py
 
+      - name: Cross-language decision contract regressions
+        run: python scripts/test_cs1_cross_contract.py
+
       - name: KREATE integrity gate
         run: python scripts/kreate_check.py
 
