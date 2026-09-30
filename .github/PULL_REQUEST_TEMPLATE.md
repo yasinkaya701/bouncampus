@@ -1,10 +1,27 @@
 ## Integration batch
 
-Owning Workstream Agent / temporary Merge Coordinator:
+Owning Workstream Agent / temporary Integration Owner:
+
+Agent task ID:
 
 Agent branch:
 
+Coordination task state before PR: `READY_FOR_INTEGRATION`
+
+Human gate: `NONE` / gate kind + decision evidence
+
 Additional compatible branches included, if any:
+
+## Agent fabric
+
+- [ ] Task/lease metadata exists on `agent-coordination` or this is an explicitly documented fabric-bootstrap PR.
+- [ ] Declared `touched_paths` cover every intentional changed product path.
+- [ ] No active task owns an overlapping product path.
+- [ ] Hard dependencies are `MERGED_VERIFIED`.
+- [ ] Human gate is `NONE` unless an explicit critical gate in `AGENTS.md` applies.
+- [ ] If a human gate applies, the task records one concrete decision and its evidence; routine engineering judgment was not escalated.
+- [ ] `python scripts/agent_fabric_check.py` passes.
+- [ ] `python scripts/test_agent_fabric_check.py` passes when agent-fabric code changes.
 
 ## Feature preservation
 
@@ -12,7 +29,7 @@ Additional compatible branches included, if any:
 - [ ] Every included agent branch is listed above.
 - [ ] Every deletion/rename was reviewed intentionally.
 - [ ] Conflict resolution preserved both sides where both carried valid behavior.
-- [ ] New durable features were added to `.github/feature-registry.json`.
+- [ ] New durable features were added to `.github/feature-registry.json` when applicable.
 - [ ] No existing feature-registry entry or required path was removed/weakened.
 
 ### Feature additions / changes
@@ -26,12 +43,13 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 ## Validation
 
 - [ ] `python scripts/verify_feature_preservation.py --base-ref <master-sha>`
+- [ ] `python scripts/agent_fabric_check.py`
 - [ ] `python scripts/kreate_check.py`
 - [ ] `cd frontend && npm ci --no-audit --no-fund`
 - [ ] `cd frontend && npm run typecheck`
 - [ ] `cd frontend && npm run lint`
 - [ ] `cd frontend && npm run build`
-- [ ] `python -m compileall -q backend/app`
+- [ ] `python -m compileall -q backend/app scripts`
 - [ ] Critical JSON datasets validate.
 - [ ] CI is green on the exact PR head SHA.
 
@@ -45,12 +63,13 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 - [ ] The owning agent will perform the merge using a normal merge commit.
 - [ ] The owning agent will verify the resulting `master` commit after merge.
 - [ ] `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` will pass before the agent reports completion or exits.
+- [ ] Coordination state will reach `MERGED_VERIFIED` with PR/head/merge/post-merge evidence before the lease is released.
 
-**A PR being open, review-ready, or green is not completion. The owning agent must merge and verify `master` before releasing the workstream.**
+**A PR being open, review-ready, or green is not completion. The owning agent must merge and verify `master` before releasing the task.**
 
 ## KREATE evidence and anti-slop gate
 
-Use this section for any PR that changes KREATE application, PMR, evidence, experiment, or claim-bearing material.
+Use this section only for PRs that change KREATE application, PMR, evidence, experiment, or claim-bearing material. This is stricter than the normal autonomous engineering path because real-world evidence cannot be self-attested by an AI agent.
 
 - [ ] Linked issue is present.
 - [ ] Acceptance criteria passed.
@@ -58,13 +77,13 @@ Use this section for any PR that changes KREATE application, PMR, evidence, expe
 - [ ] No unrelated changes are included.
 - [ ] Material claims are classified correctly (`FACT`, `PUBLIC SOURCE`, `INTERVIEW EVIDENCE`, `TECHNICAL TEST`, `MODEL ESTIMATE`, `POLICY HEURISTIC`, `HYPOTHESIS`, `UNKNOWN`).
 - [ ] Every material claim has an evidence ID or remains explicitly `HYPOTHESIS`/`UNKNOWN`.
-- [ ] AI-generated prose/code/research was verified by a human reviewer.
+- [ ] AI-generated application prose/research that asserts real-world facts was verified under the applicable evidence-attestation gate.
 - [ ] Known limitations are disclosed.
 - [ ] No fabricated interview, quote, persona, pilot result, model accuracy, climate impact, hardware performance, live data, or savings claim is present.
-- [ ] Reviewer is named below.
+- [ ] Human reviewer is named below when this section applies.
 
-**Human reviewer:** TODO
+**Human reviewer:** N/A unless KREATE claim/evidence material changed
 
-**Evidence IDs / artifacts:** TODO
+**Evidence IDs / artifacts:** N/A unless applicable
 
-**Known limitations:** TODO
+**Known limitations:** TODO / None
