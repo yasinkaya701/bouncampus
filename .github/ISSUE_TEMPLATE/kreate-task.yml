@@ -85,6 +85,15 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: reviewer
+    attributes:
+      label: Human reviewer
+      description: Name the second human who will verify application-relevant claims or AI-assisted output before DONE. Use N/A only when the task cannot affect application claims, evidence, research, or code used for the application.
+      placeholder: "Named teammate / N/A with reason in acceptance criteria"
+    validations:
+      required: true
+
   - type: textarea
     id: kill
     attributes:
