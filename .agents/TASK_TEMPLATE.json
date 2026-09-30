@@ -6,6 +6,7 @@
   "lane": "quality-release",
   "state": "BACKLOG",
   "parent_id": null,
+  "required_for_parent": true,
   "owner_agent": null,
   "branch": null,
   "depends_on": [],
