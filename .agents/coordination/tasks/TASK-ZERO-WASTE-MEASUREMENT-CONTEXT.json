@@ -4,7 +4,7 @@
   "title": "Research zero-waste campus measurement context",
   "priority": "P0",
   "lane": "campus-data-geo",
-  "state": "READY_FOR_INTEGRATION",
+  "state": "BLOCKED",
   "owner_agent": "research-evidence",
   "branch": "agent/campus-data-geo/zero-waste-measurement-context",
   "depends_on": [],
@@ -35,19 +35,23 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T00:31:00+03:00",
-    "heartbeat_at": "2026-10-01T00:31:00+03:00",
+    "heartbeat_at": "2026-10-01T00:34:00+03:00",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "Feature PR #48 is merged into role/cs2-product-strategy, but durable master promotion remains blocked by unrelated ancestor policy PR #40 failing repository-data CI.",
+    "evidence": "PR #48 merged at 7c4f8f84ac98ae0cb3b4fad2c0236bc3ab3722a6. The ancestor CI regression is in scripts/test_agent_task.py WAITING_HUMAN gate invariants and is outside KREATE/RESEARCH/**.",
+    "next_action": "After the unrelated policy/agent-task regression is repaired or superseded, sync role/cs2-product-strategy from master, run role integration gates, merge to master and record post-merge verification."
+  },
   "integration": {
-    "pull_request": null,
-    "validated_head_sha": null,
-    "merge_sha": null,
+    "pull_request": 48,
+    "validated_head_sha": "37b41d831443ec4b4cae4f0b1f9067566da917e6",
+    "merge_sha": "7c4f8f84ac98ae0cb3b4fad2c0236bc3ab3722a6",
     "post_merge_verified_at": null
   },
   "notes": [
     "Secondary public-source research only; not legal advice or compliance certification.",
     "UNEP global statistics are context only and are not local conversion factors.",
-    "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md."
+    "All files are already available to agents on role/cs2-product-strategy; only durable master promotion is blocked."
   ]
 }
