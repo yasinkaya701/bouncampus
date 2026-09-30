@@ -17,28 +17,34 @@ export type FoodWasteScenario = {
 };
 
 export type DemandSignalId = 'schedule' | 'weather' | 'menu' | 'calendar';
+export type DecisionReadiness = 'PILOT_READY' | 'REVIEW_REQUIRED' | 'WITHHOLD';
 
 export type DemandSignal = {
   id: DemandSignalId;
   label: string;
   available: boolean;
   weightPct: number;
+  weightBasis: 'POLICY_HEURISTIC';
 };
 
-export type DecisionReadiness = 'PILOT_READY' | 'REVIEW_REQUIRED' | 'WITHHOLD';
-
 export type ProductionDecisionBand = {
+  policyVersion: string;
   predictedMeals: number;
   lowerBound: number;
-  recommendedTarget: number;
+  recommendedTarget: number | null;
   upperBound: number;
   signalCoveragePct: number;
   decisionReadiness: DecisionReadiness;
+  abstained: boolean;
   operatorApprovalRequired: true;
   autoDispatchAllowed: false;
   provenance: 'MODEL_ESTIMATE';
+  decisionProvenance: 'POLICY_HEURISTIC';
+  bandSemantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL';
+  calibrationStatus: 'NOT_CALIBRATED';
   signals: DemandSignal[];
   reasonCodes: string[];
+  limitations: string[];
 };
 
 export type PilotServiceMeasurement = {
@@ -75,9 +81,15 @@ export type PilotScorecard = {
   normalizedWasteReductionPct: number | null;
   gates: {
     enoughEvidence: boolean;
+    dataQualityPassed: boolean;
     wasteReductionTargetMet: boolean | null;
     earlySelloutGuardrailPassed: boolean | null;
     foodSafetyManualReviewRequired: true;
+  };
+  dataQuality: {
+    invalidMeasurementCount: number;
+    duplicateServiceKeys: string[];
+    interventionForecastCoveragePct: number | null;
   };
   notes: string[];
 };
@@ -120,8 +132,32 @@ export const FOOD_WASTE_BASELINE = {
   campusesWithDining: 6,
 };
 
+export const FOOD_DECISION_POLICY = {
+  version: 'food-decision-v1.0',
+  provenance: 'POLICY_HEURISTIC' as const,
+  forecastProvenance: 'MODEL_ESTIMATE' as const,
+  bandSemantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL' as const,
+  calibrationStatus: 'NOT_CALIBRATED' as const,
+  signalWeightsPct: {
+    schedule: 50,
+    weather: 20,
+    menu: 20,
+    calendar: 10,
+  } satisfies Record<DemandSignalId, number>,
+  requiredSignals: ['schedule'] as const,
+  reviewMinCoveragePct: 50,
+  pilotReadyMinCoveragePct: 70,
+  operatorApprovalRequired: true as const,
+  autoDispatchAllowed: false as const,
+  limitations: [
+    'NO_CAFETERIA_POS_OR_SERVED_MEAL_TELEMETRY',
+    'HEURISTIC_BAND_NOT_CALIBRATED',
+    'PILOT_OUTCOMES_NOT_YET_MEASURED',
+  ],
+};
+
 export const FOOD_WASTE_PILOT_PROTOCOL = {
-  version: '1.0',
+  version: '1.1',
   durationDays: 14,
   design: 'MATCHED_CONTROL_INTERVENTION' as const,
   hypothesis: 'Operator-reviewed demand bands reduce normalized food waste without increasing early sell-out risk.',
@@ -155,10 +191,12 @@ export const FOOD_WASTE_PILOT_PROTOCOL = {
   successGate: {
     minimumMeasuredServicesPerArm: 5,
     targetWasteReductionPct: 10,
+    minimumInterventionForecastCoveragePct: 100,
     serviceGuardrail: 'No increase in early-sellout incidence versus the matched control arm.',
     safetyGuardrail: 'No food-safety process may be bypassed by a production recommendation.',
     interpretation: 'The 10% reduction is a pre-registered pilot target, not an achieved result.',
   },
+  evidenceBoundary: 'PROMISING is pilot evidence only; it is not a generalized climate-impact or savings claim.',
   privacy: 'No personal or student-level data is required for the pilot.',
 };
 
@@ -210,19 +248,33 @@ export function simulateFoodWasteScenario(
   };
 }
 
+function planningFactors(signalCoveragePct: number) {
+  if (signalCoveragePct >= 80) return { lower: 0.96, upper: 1.06 };
+  if (signalCoveragePct >= 60) return { lower: 0.93, upper: 1.09 };
+  return { lower: 0.9, upper: 1.13 };
+}
+
 export function buildProductionBand(
   predictedMeals: number,
   availability: Partial<Record<DemandSignalId, boolean>> = {},
-): ProductionDecisionBand | null {
-  const demand = Math.max(0, Math.round(predictedMeals));
-  if (!demand) return null;
+): ProductionDecisionBand {
+  const demand = Number.isFinite(predictedMeals) && predictedMeals > 0
+    ? Math.max(0, Math.round(predictedMeals))
+    : 0;
 
-  const signals: DemandSignal[] = [
-    { id: 'schedule', label: 'Course schedule', available: Boolean(availability.schedule), weightPct: 50 },
-    { id: 'weather', label: 'Weather', available: Boolean(availability.weather), weightPct: 20 },
-    { id: 'menu', label: 'Menu context', available: Boolean(availability.menu), weightPct: 20 },
-    { id: 'calendar', label: 'Academic calendar', available: Boolean(availability.calendar), weightPct: 10 },
-  ];
+  const labels: Record<DemandSignalId, string> = {
+    schedule: 'Course schedule',
+    weather: 'Weather',
+    menu: 'Menu context',
+    calendar: 'Academic calendar',
+  };
+  const signals = (Object.keys(FOOD_DECISION_POLICY.signalWeightsPct) as DemandSignalId[]).map(id => ({
+    id,
+    label: labels[id],
+    available: Boolean(availability[id]),
+    weightPct: FOOD_DECISION_POLICY.signalWeightsPct[id],
+    weightBasis: FOOD_DECISION_POLICY.provenance,
+  }));
 
   const signalCoveragePct = signals.reduce(
     (total, signal) => total + (signal.available ? signal.weightPct : 0),
@@ -231,27 +283,43 @@ export function buildProductionBand(
   const scheduleAvailable = signals.find(signal => signal.id === 'schedule')?.available ?? false;
 
   let decisionReadiness: DecisionReadiness = 'WITHHOLD';
-  if (scheduleAvailable && signalCoveragePct >= 70) decisionReadiness = 'PILOT_READY';
-  else if (scheduleAvailable && signalCoveragePct >= 50) decisionReadiness = 'REVIEW_REQUIRED';
+  if (demand <= 0) decisionReadiness = 'WITHHOLD';
+  else if (!scheduleAvailable) decisionReadiness = 'WITHHOLD';
+  else if (signalCoveragePct >= FOOD_DECISION_POLICY.pilotReadyMinCoveragePct) decisionReadiness = 'PILOT_READY';
+  else if (signalCoveragePct >= FOOD_DECISION_POLICY.reviewMinCoveragePct) decisionReadiness = 'REVIEW_REQUIRED';
 
-  const lowerFactor = signalCoveragePct >= 80 ? 0.96 : signalCoveragePct >= 60 ? 0.93 : 0.9;
-  const upperFactor = signalCoveragePct >= 80 ? 1.06 : signalCoveragePct >= 60 ? 1.09 : 1.13;
-  const reasonCodes = signals.filter(signal => !signal.available).map(signal => `MISSING_${signal.id.toUpperCase()}`);
-  if (decisionReadiness === 'WITHHOLD') reasonCodes.unshift('INSUFFICIENT_DECISION_CONTEXT');
-  if (decisionReadiness === 'REVIEW_REQUIRED') reasonCodes.unshift('CONTEXT_PARTIAL_OPERATOR_REVIEW_REQUIRED');
+  const factors = planningFactors(signalCoveragePct);
+  const reasonCodes = ['HEURISTIC_BAND_NOT_CALIBRATED'];
+  reasonCodes.push(
+    ...signals
+      .filter(signal => !signal.available)
+      .map(signal => `MISSING_${signal.id.toUpperCase()}`),
+  );
+  if (demand <= 0) reasonCodes.unshift('NO_POSITIVE_DEMAND_ESTIMATE');
+  else if (!scheduleAvailable) reasonCodes.unshift('MISSING_REQUIRED_SCHEDULE');
+  else if (decisionReadiness === 'REVIEW_REQUIRED') reasonCodes.unshift('CONTEXT_PARTIAL_OPERATOR_REVIEW_REQUIRED');
+  else if (decisionReadiness === 'WITHHOLD') reasonCodes.unshift('INSUFFICIENT_DECISION_CONTEXT');
+
+  const abstained = decisionReadiness === 'WITHHOLD';
 
   return {
+    policyVersion: FOOD_DECISION_POLICY.version,
     predictedMeals: demand,
-    lowerBound: Math.max(0, Math.round(demand * lowerFactor)),
-    recommendedTarget: demand,
-    upperBound: Math.round(demand * upperFactor),
+    lowerBound: Math.max(0, Math.round(demand * factors.lower)),
+    recommendedTarget: abstained ? null : demand,
+    upperBound: Math.max(0, Math.round(demand * factors.upper)),
     signalCoveragePct,
     decisionReadiness,
+    abstained,
     operatorApprovalRequired: true,
     autoDispatchAllowed: false,
-    provenance: 'MODEL_ESTIMATE',
+    provenance: FOOD_DECISION_POLICY.forecastProvenance,
+    decisionProvenance: FOOD_DECISION_POLICY.provenance,
+    bandSemantics: FOOD_DECISION_POLICY.bandSemantics,
+    calibrationStatus: FOOD_DECISION_POLICY.calibrationStatus,
     signals,
     reasonCodes,
+    limitations: [...FOOD_DECISION_POLICY.limitations],
   };
 }
 
@@ -272,14 +340,25 @@ export function pilotWasteReductionPct(controlWastePer100: number, interventionW
 
 export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
   const errors: string[] = [];
-  if (!measurement.date) errors.push('date is required');
-  if (!measurement.serviceId) errors.push('serviceId is required');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(measurement.date)) errors.push('date must be YYYY-MM-DD');
+  if (!measurement.serviceId.trim()) errors.push('serviceId is required');
   if (measurement.arm !== 'CONTROL' && measurement.arm !== 'INTERVENTION') errors.push('arm must be CONTROL or INTERVENTION');
   if (!Number.isFinite(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0');
   if (!Number.isFinite(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0');
+  if (
+    Number.isFinite(measurement.producedPortions)
+    && Number.isFinite(measurement.servedPortions)
+    && measurement.servedPortions > measurement.producedPortions
+  ) errors.push('servedPortions cannot exceed producedPortions');
   if (!Number.isFinite(measurement.edibleSurplusKg) || measurement.edibleSurplusKg < 0) errors.push('edibleSurplusKg must be >= 0');
   if (!Number.isFinite(measurement.wasteKg) || measurement.wasteKg < 0) errors.push('wasteKg must be >= 0');
-  if (measurement.modelForecastMeals != null && (!Number.isFinite(measurement.modelForecastMeals) || measurement.modelForecastMeals < 0)) errors.push('modelForecastMeals must be null or >= 0');
+  if (
+    measurement.modelForecastMeals != null
+    && (!Number.isFinite(measurement.modelForecastMeals) || measurement.modelForecastMeals < 0)
+  ) errors.push('modelForecastMeals must be null or >= 0');
+  if (measurement.arm === 'INTERVENTION' && measurement.modelForecastMeals == null) {
+    errors.push('INTERVENTION requires modelForecastMeals for decision-support evaluation');
+  }
   if (typeof measurement.earlySellout !== 'boolean') errors.push('earlySellout must be boolean');
   if (typeof measurement.operatorOverride !== 'boolean') errors.push('operatorOverride must be boolean');
   return errors;
@@ -313,12 +392,32 @@ function summarizePilotArm(measurements: PilotServiceMeasurement[]): PilotArmSum
 }
 
 export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): PilotScorecard {
+  const invalidMeasurementCount = measurements.filter(item => validatePilotMeasurement(item).length > 0).length;
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  measurements.forEach(item => {
+    const key = `${item.date}|${item.serviceId}|${item.arm}`;
+    if (seen.has(key)) duplicates.add(key);
+    seen.add(key);
+  });
+
   const controlMeasurements = measurements.filter(item => item.arm === 'CONTROL');
   const interventionMeasurements = measurements.filter(item => item.arm === 'INTERVENTION');
   const control = summarizePilotArm(controlMeasurements);
   const intervention = summarizePilotArm(interventionMeasurements);
+  const interventionWithForecast = interventionMeasurements.filter(item => item.modelForecastMeals != null).length;
+  const interventionForecastCoveragePct = interventionMeasurements.length
+    ? (interventionWithForecast / interventionMeasurements.length) * 100
+    : null;
+
+  const dataQualityPassed = invalidMeasurementCount === 0
+    && duplicates.size === 0
+    && interventionForecastCoveragePct === FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumInterventionForecastCoveragePct;
+
   const minimum = FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm;
-  const enoughEvidence = control.measuredServices >= minimum && intervention.measuredServices >= minimum;
+  const enoughEvidence = dataQualityPassed
+    && control.measuredServices >= minimum
+    && intervention.measuredServices >= minimum;
 
   const reduction = control.meanWasteKgPer100Served != null && intervention.meanWasteKgPer100Served != null
     ? pilotWasteReductionPct(control.meanWasteKgPer100Served, intervention.meanWasteKgPer100Served)
@@ -332,7 +431,10 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
 
   const notes: string[] = [];
-  if (!enoughEvidence) notes.push(`Need at least ${minimum} measured services in both CONTROL and INTERVENTION arms.`);
+  if (invalidMeasurementCount) notes.push(`${invalidMeasurementCount} measurement row(s) fail the pilot measurement contract.`);
+  if (duplicates.size) notes.push('Duplicate service rows must be resolved before evidence promotion.');
+  if (interventionForecastCoveragePct !== 100) notes.push('Every intervention service must retain its model forecast for evaluation.');
+  if (!enoughEvidence) notes.push(`Need at least ${minimum} valid measured services in both CONTROL and INTERVENTION arms.`);
   if (wasteReductionTargetMet === false) notes.push('Pre-registered normalized waste-reduction target was not met.');
   if (earlySelloutGuardrailPassed === false) notes.push('Early-sellout incidence increased in the intervention arm.');
   notes.push('Food-safety compliance requires manual operational review and cannot be inferred from service-level numeric fields alone.');
@@ -349,9 +451,15 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     normalizedWasteReductionPct,
     gates: {
       enoughEvidence,
+      dataQualityPassed,
       wasteReductionTargetMet,
       earlySelloutGuardrailPassed,
       foodSafetyManualReviewRequired: true,
+    },
+    dataQuality: {
+      invalidMeasurementCount,
+      duplicateServiceKeys: [...duplicates].sort(),
+      interventionForecastCoveragePct: roundMetric(interventionForecastCoveragePct),
     },
     notes,
   };
