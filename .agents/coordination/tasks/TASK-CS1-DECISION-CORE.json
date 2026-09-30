@@ -14,6 +14,8 @@
     "backend/app/decision/baselines.py",
     "backend/app/models/food_demand.py",
     "backend/app/routers/food.py",
+    "backend/app/routers/dashboard.py",
+    "backend/app/routers/actions.py",
     "backend/app/schemas.py",
     "backend/app/optimizers/food_optimizer.py",
     "frontend/src/lib/food-waste.ts",
@@ -33,6 +35,7 @@
   "acceptance_criteria": [
     "Backend and Next food-decision surfaces share explicit versioned readiness, abstention, provenance, reason-code, and human-review semantics",
     "Pre-pilot product surfaces do not expose achieved food-waste, cost, carbon, or water savings claims",
+    "All active food action/dashboard surfaces respect the same claim firewall and abstention contract",
     "Heuristic planning bands are explicitly labeled POLICY_HEURISTIC and never described as calibrated confidence intervals",
     "Decision readiness degrades from PILOT_READY to REVIEW_REQUIRED to WITHHOLD based on source health and required context",
     "A baseline evaluation framework supports naive historical and operator baselines without fabricating measured results",
@@ -60,7 +63,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T20:08:00Z",
+    "heartbeat_at": "2026-09-30T20:20:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -74,6 +77,7 @@
     "Scope expanded by user request from minimal core to the broad CS1 Decision Intelligence v1 workstream.",
     "No PMR, pilot, calibration, or achieved-impact result may be invented; infrastructure may be implemented before evidence exists.",
     "Model point estimation, policy heuristics, technical benchmarks, and measured pilot evidence are separate evidence classes.",
+    "Active dashboard/actions surfaces are included because they previously emitted unsupported food-impact claims.",
     "Does not touch .github/workflows/ci.yml because TASK-FABRIC-CLI currently owns that path."
   ]
 }
