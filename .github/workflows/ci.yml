@@ -121,6 +121,8 @@ jobs:
           echo "$RUNNER_TEMP/bouncampus-python/bin" >> "$GITHUB_PATH"
       - name: Compile repository Python
         run: python -m compileall -q backend/app scripts
+      - name: Validate KREATE operating system
+        run: python scripts/kreate_check.py
       - name: Validate critical JSON datasets
         run: |
           python -m json.tool backend/app/data/campus_config.json >/dev/null
