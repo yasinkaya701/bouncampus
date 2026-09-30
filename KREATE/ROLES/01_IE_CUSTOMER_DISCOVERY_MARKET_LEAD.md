@@ -2,368 +2,271 @@
 
 ## Mission
 
-Maximize BOUNCAMPUS's probability of reaching the KREATE Top 15 by proving that the team is solving a real, repeated, valuable problem for a sharply defined first market.
+Own the question: **Is this a real, important, reachable problem for a clearly defined customer, and what must BOUNCAMPUS become to solve it?**
 
-The IE role is **not** "the person who does all interviews." Customer discovery is a team responsibility. The IE owns the **method, research quality, market logic, and operational synthesis**.
+This role is not a narrow interview coordinator. It is the team's market-learning engine. The IE lead may explore adjacent customer segments, operating models, procurement paths, workflow bottlenecks, pricing logic, pilot structures, process redesign opportunities, and new hypotheses whenever the evidence suggests they matter.
 
-**Application deadline:** 8 October 2026, 23:59  
-**Primary optimization target:** evidence quality, not document volume.
+The goal is not to defend the current product concept. The goal is to discover the strongest possible KREATE case and help the team change direction when reality disagrees with us.
 
----
+## North Star
 
-## Core question
+Every major conclusion should improve at least one of these:
 
-> What is actually happening in institutional food operations, for whom is it painful, how is the decision made today, and which first market gives BOUNCAMPUS the strongest entry point?
+1. problem clarity,
+2. beachhead clarity,
+3. customer access,
+4. strength of PMR evidence,
+5. product relevance,
+6. pilotability,
+7. commercial credibility,
+8. probability of being selected for the KREATE Top 15.
 
----
+## Core Ownership
 
-## Scope
+The IE lead owns the quality of the customer-discovery system, but **does not own all interviews**. PMR is distributed across the full four-person team.
 
-### P0 — Must be completed before application freeze
+Primary ownership areas:
 
-1. PMR research protocol and interview quality standard.
-2. Problem hypotheses and falsification questions.
-3. Market segmentation and beachhead selection.
-4. End-user / economic-buyer / champion / influencer map.
-5. Current operational workflow and decision map.
-6. Status-quo alternatives and switching friction.
-7. Persona grounded in actual interviews.
-8. PMR evidence synthesis supporting the application.
-9. Market and operational inputs for the product requirements.
+- customer discovery methodology,
+- beachhead market reasoning,
+- end-user / buyer / champion mapping,
+- current workflow and process mapping,
+- current alternatives and status quo,
+- market-segmentation logic,
+- operating and procurement constraints,
+- pilot adoption requirements,
+- business-model hypotheses,
+- synthesis of operational pain,
+- identifying contradictions between what we assume and what users actually do.
 
-### P1 — Allowed when supported by evidence
+## Interview Model — Distributed PMR
 
-- Adjacent segment discovery: factory cafeterias, hospitals, municipal kitchens, contract catering.
-- Procurement and pilot-process research.
-- Unit-economics hypotheses.
-- Institutional dining process benchmarking.
-- TAM/SAM estimation after beachhead definition.
-- Pilot recruitment and partner mapping.
+Target: **16 distinct high-quality interviews before application freeze**, roughly four lead interviews per team member.
 
-### Out of scope unless evidence changes priorities
+Any team member may conduct interviews. The IE lead maintains quality standards, helps improve scripts, reviews evidence quality, and identifies coverage gaps.
 
-- Owning frontend implementation.
-- Owning forecasting/model development.
-- Building hardware.
-- Writing generic sustainability market reports with no decision consequence.
-- Producing invented personas, synthetic interviews, or unsupported market numbers.
+Preferred interview configuration when practical:
 
----
+- one lead interviewer,
+- one note-taker / observer,
+- rotate roles across interviews.
 
-## Shared PMR model
+Do not optimize for raw interview count. One detailed operational interview can be more valuable than five superficial calls.
 
-Target before the 8 October application: **16 distinct, high-quality interviews**.
+Useful stakeholder classes include, but are not limited to:
 
-Each team member is expected to lead approximately **4 interviews**. A second team member should join as note-taker/observer when practical.
+- university dining operations,
+- food engineers,
+- kitchen managers,
+- contracted catering operators,
+- SKS / sustainability units,
+- procurement and administration,
+- facilities or data owners,
+- factory / hospital / institutional food-service operators when useful for segment comparison,
+- other stakeholders discovered through referrals.
 
-Suggested coverage:
+The team is free to pursue an unexpected stakeholder category if it could materially change the product or market thesis.
 
-- University dining managers / operators
-- Food engineers / kitchen managers
-- Catering operators
-- Sustainability / SKS / facilities stakeholders
-- Procurement / administration stakeholders
-- Institutional food-service operators outside universities
-- Data / POS / measurement stakeholders
+## Discovery Standard
 
-The IE coordinates coverage so the team does not accidentally conduct 16 interviews with the same persona.
+Prioritize stories and observed behavior over opinions about hypothetical features.
 
-### Interview rule
+Strong prompts include:
 
-For the first part of an interview, do **not pitch the product**. Investigate the last real occurrence of the problem.
+- Tell me about the last time you had too much food left after service.
+- How did you decide how much to prepare that day?
+- What happened when demand was lower or higher than expected?
+- Who makes the final production decision?
+- What information do they trust?
+- What gets measured today?
+- What is not measured?
+- What is the cost of being wrong in each direction?
+- What happens after food is left over?
+- Who would need to approve a pilot?
+- What would make a pilot unacceptable?
+- What existing process or tool would we be replacing?
+- Who else should we speak to?
 
-Prefer:
+The script is a starting point, not a cage. Follow important unexpected threads.
 
-> Tell me about the last lunch service where demand was significantly different from what you expected.
+## Evidence Quality
 
-Avoid:
+A PMR conclusion should preserve the distinction between:
 
-> Would you use an AI system that predicts demand?
+- direct observation,
+- participant statement,
+- repeated pattern,
+- interpretation,
+- hypothesis,
+- quantitative evidence,
+- public / official data.
 
----
+Important claims should be linked into `KREATE/EVIDENCE.md` and relevant assumptions updated in `KREATE/ASSUMPTIONS.md`.
 
-## Required interview record
+Do not convert one anecdote into a universal conclusion.
 
-Every interview must create a structured PMR record under `KREATE/PMR/` or the repository's current PMR registry.
+## Market Exploration
 
-Minimum fields:
+The current working beachhead may be university dining, but the IE lead has authority to challenge it.
 
-- Interview ID
-- Date
-- Interviewer(s)
-- Role
-- Organization type
-- Current planning workflow
-- Last concrete incident
-- Pain / consequence
-- Frequency
-- Current workaround
-- Data currently available
-- Decision owner
-- Approval / buying structure
-- Key operational constraint
-- Exact quote(s), where permission and notes allow
-- Referral / who else to speak with
-- Hypotheses strengthened
-- Hypotheses weakened
-- New hypothesis
-- Product implication
+Compare plausible segments when useful, such as:
 
-A transcript alone is **not** sufficient.
+- university dining,
+- factory cafeterias,
+- hospitals,
+- institutional catering,
+- municipal kitchens,
+- schools,
+- other high-volume kitchens discovered during PMR.
 
----
+Useful comparison dimensions:
 
-## Workstreams
+- severity and frequency of pain,
+- customer accessibility,
+- decision frequency,
+- data availability,
+- budget / economic authority,
+- ability to pilot quickly,
+- procurement friction,
+- operational risk,
+- measurable climate outcome,
+- repeatability across sites,
+- competitive intensity,
+- expansion potential.
 
-### 1. Hypothesis map
+Do not preserve university dining merely because it was our first idea. Preserve it only if it remains the strongest evidence-backed wedge.
 
-Maintain explicit hypotheses in `KREATE/ASSUMPTIONS.md`.
+## Customer System Map
 
-At minimum test:
+The IE lead should establish who actually plays each role:
 
-- Demand mismatch is a meaningful contributor to avoidable food waste.
-- Production planning contains a recurring pre-service decision that can be improved.
-- Current planning uses incomplete or manual information.
-- Operators care about both overproduction and early sell-out risk.
-- Human-in-the-loop recommendations are operationally more acceptable than autonomous dispatch.
-- Service-level food-waste measurement is incomplete, expensive, manual, or fragmented enough that better measurement has value.
-- A university dining operation can realistically run a short controlled pilot.
-- The end user, economic buyer, and champion may be different people.
+- end user,
+- decision maker,
+- economic buyer,
+- champion,
+- blocker,
+- data owner,
+- operational owner,
+- pilot approver.
 
-Allowed statuses:
+These may be different people.
 
-- UNKNOWN
-- TESTING
-- SUPPORTED
-- CONFLICTING
-- REJECTED
+Map the actual workflow from planning through service and waste handling. A useful map may include:
 
-Do not casually use `VALIDATED` for weak qualitative evidence.
+`forecast / expectation → production decision → preparation → service → leftover handling → waste measurement → reporting → next planning cycle`
 
-### Acceptance gate
+Add owners, information used, failure modes, delays, workarounds, and decision rights.
 
-A hypothesis may move to `SUPPORTED` only when:
+## Product Influence
 
-1. Evidence IDs are attached.
-2. Evidence comes from more than one source or a single unusually authoritative source.
-3. Contradicting evidence is recorded, not hidden.
-4. The statement is no stronger than the evidence.
+The IE role is expected to change the product.
 
----
+Examples:
 
-### 2. Current-state workflow map
+- If operators care more about stockout risk than waste, that changes recommendation logic.
+- If production decisions happen one day earlier than expected, the data pipeline must change.
+- If waste data exists but is too delayed to influence decisions, measurement architecture changes.
+- If the buyer is a catering contractor rather than the university, market and pilot strategy changes.
+- If a non-food use case unexpectedly scores much higher and fits the KREATE climate brief, raise it to the team rather than suppressing it.
 
-Map the actual institutional food-service process:
+When PMR changes product direction, record the change in `KREATE/DECISIONS.md`.
 
-`forecast -> production planning -> preparation -> service -> surplus/waste -> measurement -> reporting -> next decision`
+## Business and Pilot Reasoning
 
-For each step identify:
+Explore, where relevant:
 
-- Owner
-- Inputs
-- Decision
-- Tool / workaround
-- Failure mode
-- Data generated
-- Pain
-- Constraint
+- current operational cost of the problem,
+- what is already paid for,
+- switching costs,
+- procurement path,
+- who controls budget,
+- willingness to run a pilot,
+- acceptable pilot duration,
+- operational guardrails,
+- success metrics,
+- failure conditions,
+- adoption friction,
+- potential pricing basis.
 
-### Acceptance gate
+These can remain hypotheses until evidence exists. Do not fabricate numbers merely to complete a business model.
 
-The workflow is FAIL if it is based mainly on assumptions from the team rather than interview evidence.
+## Freedom to Explore
 
----
+This role may initiate new work when it uncovers a high-leverage question.
 
-### 3. Beachhead market selection
+Examples:
 
-Compare at least:
+- investigate a newly discovered buyer class,
+- compare an adjacent beachhead,
+- run a short observation study,
+- inspect public waste or procurement datasets,
+- test a workflow with a service blueprint,
+- propose a different pilot design,
+- challenge whether hardware is necessary,
+- challenge whether forecasting is the right intervention,
+- identify an entirely different decision point within food operations.
 
-- University dining
-- Factory cafeterias
-- Hospital kitchens
-- Municipal / public kitchens
-- Contract catering
+New work should have a clear question, expected decision impact, and evidence target. It does **not** require prior permission for routine reversible exploration.
 
-Score using consistent criteria:
+## Collaboration
 
-- Pain strength
-- Pain frequency
-- Access to users
-- Ability to pilot
-- Data availability
-- Budget / willingness to allocate resources
-- Decision speed
-- Need for the whole product
-- Competitive intensity
-- Expansion potential
-- Team access / unfair advantage
+### With EE
 
-### Acceptance gate
+Share operational measurement needs, physical constraints, staff burden, installation realities, and data-quality gaps.
 
-The selected beachhead must have:
+### With CS1
 
-- A specific end user.
-- A repeated decision.
-- A measurable outcome.
-- A plausible pilot path.
-- Evidence explaining why this segment wins over alternatives.
+Translate observed decision workflows into model requirements and identify which input signals users actually have access to.
 
-"Universities because we are students" is not sufficient.
+### With CS2
 
----
+Provide structured evidence, contradictions, customer language, beachhead reasoning, and changes in assumptions so the product/application story reflects reality.
 
-### 4. Persona and buying structure
+## Anti-AI-Slop Standard
 
-Do not invent demographic fiction.
+AI may accelerate research, transcription, synthesis, analysis, and writing. It may not replace evidence.
 
-Build an interview-derived persona containing:
+Reject outputs that:
 
-- Job-to-be-done
-- Operational KPI
-- Daily workflow
-- Repeated pain
-- Worst failure
-- Risk tolerance
-- Current workaround
-- Decision authority
-- Buying influence
-- Objections
-- Trigger to try a pilot
-- Required trust/evidence
+- invent interview findings,
+- infer customer needs without evidence and present them as facts,
+- contain unsourced market numbers,
+- create fictional personas and pass them off as research,
+- flatten contradictory interviews into a fake consensus,
+- use generic startup language in place of operational detail,
+- claim climate or financial impact that has not been measured or defensibly estimated.
 
-Separately map:
+Generic phrasing should be rewritten into specific operational language whenever possible.
 
-- End user
-- Economic buyer
-- Champion
-- Influencer
-- Blocker
+## Evidence-Based Completion Standard
 
-### Acceptance gate
+Work is considered useful when it changes or strengthens a decision, not merely when a document exists.
 
-Every material persona statement must trace back to PMR evidence.
+Strong outputs may include:
 
----
+- interview records with specific evidence,
+- a validated or rejected assumption,
+- a new stakeholder map,
+- a changed beachhead ranking,
+- a quantified process constraint,
+- a clearer pilot path,
+- a discovered blocker,
+- a customer-language insight that changes product design,
+- evidence that an earlier product feature should be killed.
 
-### 5. Status quo and switching logic
+The IE lead is encouraged to challenge the team's current thesis aggressively. A rejected assumption is valuable progress.
 
-The most important competitor may not be a startup.
+## Application-Stage Success Criteria
 
-Research:
+By the October 8 application freeze, the market/customer side should ideally support:
 
-- Manager experience
-- Last-week / same-weekday heuristic
-- Excel / manual sheets
-- POS reports
-- Catering software
-- Existing waste-measurement processes
-- Winnow
-- Leanpath
-- Orbisk
-- Other relevant systems discovered during PMR
+- a sharply stated climate-relevant operational problem,
+- a justified initial beachhead,
+- evidence from a diverse set of relevant stakeholders,
+- an interview-derived end-user / persona description,
+- buyer and decision-path understanding,
+- an explicit record of what the team originally believed and what changed,
+- a credible pilot path,
+- a clear statement of what is still unknown.
 
-Questions to answer:
-
-- Why is the current method still used?
-- What does it do well?
-- Where does it fail?
-- What would make switching too risky?
-- What data or integration would be required?
-- Who pays for the failure today?
-
----
-
-## Daily operating expectations
-
-Each day produce concrete artifacts, not activity descriptions.
-
-Daily update format:
-
-```text
-DONE:
-EVIDENCE CREATED:
-ASSUMPTION CHANGED:
-BLOCKER:
-NEXT:
-```
-
-"Did market research" is not a valid DONE statement.
-
----
-
-## Cross-team handoffs
-
-### To EE
-
-Provide:
-
-- What is actually measured today.
-- Who performs measurement.
-- Required accuracy / workflow constraints learned from operators.
-- Whether smart-scale hardware solves a real pain or only looks impressive.
-
-### To CS1
-
-Provide:
-
-- Decision timing.
-- Inputs operators actually use.
-- Cost of forecast errors.
-- Asymmetric risks: overproduction vs early sell-out.
-- Baselines used today.
-
-### To CS2
-
-Provide:
-
-- Raw PMR records.
-- Market comparison.
-- Buyer/user structure.
-- Contradictions and rejected assumptions.
-- Operational requirements.
-
-CS2 owns cross-interview product synthesis and application narrative; IE owns the quality of market/customer research feeding it.
-
----
-
-## Anti-AI-slop rules
-
-Automatic FAIL if any of the following appears without evidence:
-
-- Invented interview or customer quote.
-- Invented market size.
-- Invented willingness to pay.
-- Generic persona demographics presented as research.
-- "AI-powered", "revolutionary", "seamless", "transformative", "cutting-edge" used instead of a precise claim.
-- A survey/interview count that cannot be traced to individual records.
-- Unsupported statement that demand mismatch explains all or most measured food waste.
-- PMR summary that hides contradicting interviews.
-
-AI may assist with organization, coding, comparison, or drafting. It may not create facts.
-
----
-
-## Definition of Done — 8 October
-
-The IE role is DONE only if:
-
-- [ ] The shared PMR target has meaningful coverage across relevant stakeholder types.
-- [ ] IE personally led roughly 4 high-quality interviews, unless team coverage required a justified redistribution.
-- [ ] All interviews have structured evidence records.
-- [ ] Major assumptions have explicit statuses and evidence links.
-- [ ] At least one important team assumption was challenged or changed by PMR, or the evidence explains why none changed.
-- [ ] Current operational workflow is evidence-backed.
-- [ ] One beachhead market is selected and alternatives are explicitly rejected with reasons.
-- [ ] End user, buyer, champion, influencer and blocker are distinguished.
-- [ ] Persona is interview-derived.
-- [ ] Status quo is understood, not caricatured.
-- [ ] CS2 has everything needed to write a strong Problem, Beachhead, Persona and PMR application narrative.
-- [ ] No important claim depends on fabricated or unattributed evidence.
-
----
-
-## Success standard
-
-The goal is not to prove the team's initial idea correct.
-
-The goal is to make the strongest possible evidence-backed decision about **which problem, customer, and intervention BOUNCAMPUS should pursue** before the KREATE application freezes.
+The goal is not certainty. The goal is a disciplined, evidence-rich startup thesis that the team can defend under questioning.
