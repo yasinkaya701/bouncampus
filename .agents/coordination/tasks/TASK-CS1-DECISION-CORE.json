@@ -9,8 +9,10 @@
   "branch": "agent/api-product/cs1-decision-core",
   "depends_on": [],
   "touched_paths": [
+    "backend/app/decision/__init__.py",
     "backend/app/decision/food_policy.py",
     "backend/app/decision/baselines.py",
+    "backend/app/models/food_demand.py",
     "backend/app/routers/food.py",
     "backend/app/schemas.py",
     "backend/app/optimizers/food_optimizer.py",
@@ -24,6 +26,8 @@
     "scripts/test_food_decision_policy.py",
     "scripts/test_cs1_decision_intelligence.py",
     "KREATE/EXPERIMENTS/CS1_DECISION_INTELLIGENCE_V1.md",
+    "KREATE/EVIDENCE.md",
+    "KREATE/ASSUMPTIONS.md",
     "docs/superpowers/plans/2026-09-30-cs1-decision-core.md"
   ],
   "acceptance_criteria": [
@@ -36,6 +40,7 @@
     "Machine-readable policy metadata includes policy version, model provenance, decision provenance, limitations, and reason codes",
     "KREATE validation fails on reintroduction of unsupported food-impact claims or removal of the human gate",
     "Technical experiment documentation distinguishes repository capability, model estimates, policy heuristics, and measured pilot evidence",
+    "Repository evidence records technical capability without promoting it to market or impact proof",
     "Focused regression tests and repository validation lock the full CS1 decision-integrity contract"
   ],
   "validation_commands": [
@@ -55,7 +60,7 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-09-30T19:55:00Z",
+    "heartbeat_at": "2026-09-30T20:08:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
@@ -68,6 +73,7 @@
   "notes": [
     "Scope expanded by user request from minimal core to the broad CS1 Decision Intelligence v1 workstream.",
     "No PMR, pilot, calibration, or achieved-impact result may be invented; infrastructure may be implemented before evidence exists.",
+    "Model point estimation, policy heuristics, technical benchmarks, and measured pilot evidence are separate evidence classes.",
     "Does not touch .github/workflows/ci.yml because TASK-FABRIC-CLI currently owns that path."
   ]
 }
