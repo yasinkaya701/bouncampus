@@ -32,7 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| frontend-ux + quality-release | `agent/frontend-ux/archive-stale-flow-mock` | Workstream Agent / temporary Merge Coordinator | ACTIVE | Remove the orphan hard-coded `/flow` mock from the active Next.js route tree, preserve its source under `legacy/`, and document the active/legacy boundary without changing production behavior elsewhere. | `.agents/WORKSTREAMS.md`, `frontend/src/app/flow/page.tsx`, `legacy/README.md`, `legacy/frontend/src/app/flow/page.tsx`, `README.md` |
+| frontend-ux + quality-release | `agent/frontend-ux/archive-stale-flow-mock` | Workstream Agent / temporary Merge Coordinator | INTEGRATING | Remove the orphan hard-coded `/flow` mock from the active Next.js route tree, preserve its source under `legacy/`, and document the active/legacy boundary without changing production behavior elsewhere. | `.agents/WORKSTREAMS.md`, `frontend/src/app/flow/page.tsx`, `legacy/README.md`, `legacy/frontend/src/app/flow/page.tsx` |
 
 The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
 
