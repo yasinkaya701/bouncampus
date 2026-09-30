@@ -4,7 +4,7 @@
   "title": "Research university dining contract decision precedents",
   "priority": "P0",
   "lane": "campus-data-geo",
-  "state": "READY_FOR_INTEGRATION",
+  "state": "BLOCKED",
   "owner_agent": "research-evidence",
   "branch": "agent/campus-data-geo/dining-contract-precedents",
   "depends_on": [],
@@ -35,14 +35,18 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T00:25:00+03:00",
-    "heartbeat_at": "2026-10-01T00:25:00+03:00",
+    "heartbeat_at": "2026-10-01T00:30:00+03:00",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "Feature PR #46 is merged into role/cs2-product-strategy, but durable master promotion remains blocked by unrelated ancestor policy PR #40 failing repository-data CI.",
+    "evidence": "PR #46 merged at 6da1e5f830652cfc877b65fb4279ca617fe54dcd. PR #40 failure is in scripts/test_agent_task.py WAITING_HUMAN gate invariants and is outside KREATE/RESEARCH/**; prior frontend, feature-registry and merge-discipline checks passed.",
+    "next_action": "After the unrelated agent-task/policy regression is repaired or superseded, sync role/cs2-product-strategy from master, run role integration validation, merge to master and record post-merge verification."
+  },
   "integration": {
-    "pull_request": null,
-    "validated_head_sha": null,
-    "merge_sha": null,
+    "pull_request": 46,
+    "validated_head_sha": "c5a9683ec33af8aebd1e0dfe4129729a7ea6d56b",
+    "merge_sha": "6da1e5f830652cfc877b65fb4279ca617fe54dcd",
     "post_merge_verified_at": null
   },
   "notes": [
@@ -50,6 +54,6 @@
     "Strongest precedent: Uşak contract mechanics combine previous-week quantity heuristic, smart-card/fallback actual diner count, actual-diner hakediş and contractor excess risk.",
     "Current 2026 Kırıkkale precedent independently links previous-demand forecasting, academic calendar/menu context, actual-consumption hakediş and contractor excess/shortage risk.",
     "Sakarya precedent establishes historical-preference-driven production-mix adjustment.",
-    "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md."
+    "All files are already available to agents on role/cs2-product-strategy; only durable master promotion is blocked."
   ]
 }
