@@ -47,7 +47,8 @@ export async function GET(request: Request) {
 
   const preventionRatePct = Number(requestUrl.searchParams.get('prevention_rate_pct') ?? 15);
   const recoveryRatePct = Number(requestUrl.searchParams.get('recovery_rate_pct') ?? 85);
-  const productionBand = buildProductionBand(predictedMeals, signalAvailability);
+  const decisionAssessment = buildProductionBand(predictedMeals, signalAvailability);
+  const productionBand = decisionAssessment.abstained ? null : decisionAssessment;
 
   return NextResponse.json({
     contractVersion: 'food-intelligence-v1',
@@ -60,11 +61,12 @@ export async function GET(request: Request) {
       evidenceClass: 'PUBLIC_SOURCE',
     },
     demandContext: {
-      available: dashboardAvailable && productionBand.predictedMeals > 0,
-      actionable: dashboardAvailable && !productionBand.abstained,
+      available: dashboardAvailable && decisionAssessment.predictedMeals > 0,
+      actionable: dashboardAvailable && !decisionAssessment.abstained,
       productionBand,
+      decisionAssessment,
       provenance: FOOD_DECISION_POLICY.forecastProvenance,
-      note: 'Schedule/weather/menu/calendar-derived planning context; not cafeteria POS, production, or served-meal telemetry.',
+      note: 'Schedule/weather/menu/calendar-derived planning context; not cafeteria POS, production, or served-meal telemetry. WITHHOLD assessments expose no production target.',
     },
     decisionPolicy: {
       version: FOOD_DECISION_POLICY.version,
