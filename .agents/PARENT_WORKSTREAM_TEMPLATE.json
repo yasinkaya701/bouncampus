@@ -22,9 +22,11 @@
     "validated_head_sha": null,
     "merge_sha": null,
     "post_merge_verified_at": null,
-    "ready_for_integration_at": null
+    "ready_for_integration_at": null,
+    "base_master_sha": null
   },
+  "integration_history": [],
   "notes": [
-    "EXAMPLE/TODO template only. Exactly one active parent workstream is allowed per KREATE human role."
+    "EXAMPLE/TODO template only. Exactly one parent workstream is allowed per KREATE human role; verified master batches return the parent to ACTIVE until its objective is COMPLETE."
   ]
 }
