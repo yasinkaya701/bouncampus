@@ -32,9 +32,9 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| quality-release | `agent/quality-release/kreate-team-os` | Execution systems engineer | BLOCKED | Bootstrap the minimal KREATE application/PMR collaboration and evidence system without changing product behavior. | `.agents/WORKSTREAMS.md`; `KREATE/**`; `.github/ISSUE_TEMPLATE/kreate-task.yml`; `.github/PULL_REQUEST_TEMPLATE.md`; `.github/workflows/ci.yml`; `scripts/kreate_check.py` |
+| quality-release | `agent/quality-release/kreate-team-os` | Execution systems engineer | INTEGRATING | Bootstrap the minimal KREATE application/PMR collaboration and evidence system without changing product behavior. | `.agents/WORKSTREAMS.md`; `KREATE/**`; `.github/ISSUE_TEMPLATE/kreate-task.yml`; `.github/PULL_REQUEST_TEMPLATE.md`; `.github/workflows/ci.yml`; `scripts/kreate_check.py` |
 
-**Blocker evidence (2026-09-30):** PR #27 CI run #220 is queued on required labels `self-hosted`, `macOS`, `ARM64`, `bouncampus` with no runner assigned. Repository policy requires green CI before merge. **Next executable action:** make the matching self-hosted runner available, let the exact PR head run all gates (including `python scripts/kreate_check.py`), resolve any failures, then return this workstream to `INTEGRATING`, merge with a normal merge commit, and verify `master`.
+**Integration evidence (2026-09-30):** PR #27 is the repository's single integration PR. CI run #240 completed successfully on head `1a76ad75a9bdc2f922eb790daa5609581456316b`, including feature preservation, merge discipline, frontend typecheck/lint/build, repository Python compile, `python scripts/kreate_check.py`, and critical JSON validation. This ledger-only state update must also pass CI on the new exact head before merge.
 
 The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
 
