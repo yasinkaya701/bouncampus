@@ -2,502 +2,360 @@
 
 ## Mission
 
-Convert raw customer evidence, technical findings, hardware feasibility, and market research into the strongest possible KREATE application and product strategy.
+Own the question: **Given everything we are learning, what should BOUNCAMPUS actually become, how should we prioritize it, and can we defend the resulting startup thesis under skeptical review?**
 
-CS2 is the team's **synthesis and contradiction owner**. The role is not primarily frontend work and not the team-platform maintainer. The repository operating system can be automated; CS2's human time should be spent deciding **what BOUNCAMPUS should become and what can honestly be claimed**.
+This role is not a frontend or demo role for the October 8 application stage. It is the synthesis and product-direction role that turns raw PMR, technical evidence, hardware findings, competitor research, and uncertainty into a coherent product strategy.
 
-**Application deadline:** 8 October 2026, 23:59  
-**Primary optimization target:** maximize Top-15 selection probability through evidence-backed product clarity.
+The CS2 lead is expected to challenge assumptions, change priorities, kill weak features, identify missing evidence, propose stronger product directions, and ensure the application tells the truth without underselling the team's potential.
 
----
+## North Star
 
-## Core question
+Improve the probability that the team presents a startup thesis that is:
 
-> Given everything we learned, what should we build, for whom, why is it better than the status quo, and can we prove every important statement in the application?
+1. evidence-backed,
+2. differentiated,
+3. technically credible,
+4. operationally useful,
+5. climate-relevant,
+6. pilotable,
+7. commercially plausible,
+8. coherent across all four team members,
+9. strong enough to earn a KREATE Top-15 position.
 
----
+## Core Ownership
 
-## Scope
+Primary ownership areas include:
 
-### P0 — Must be completed before application freeze
+- product thesis,
+- evidence synthesis,
+- assumption management,
+- product requirements,
+- feature prioritization,
+- competitor / status-quo intelligence,
+- differentiation,
+- product architecture at the decision/workflow level,
+- climate-impact logic,
+- application narrative and consistency,
+- contradiction hunting,
+- red-team facilitation,
+- identifying missing questions the rest of the team should investigate.
 
-1. Cross-interview PMR synthesis.
-2. Assumption-status discipline.
-3. Product requirements derived from evidence.
-4. Feature prioritization and scope control.
-5. Competitor + status-quo intelligence.
-6. Differentiation and positioning.
-7. Product-level architecture and causal logic.
-8. Climate-impact claim discipline.
-9. KREATE rubric coverage.
-10. Single-voice final application.
-11. Red-team / contradiction review.
+CS2 should not become a documentation secretary. The job is to make high-quality product decisions from incomplete evidence.
 
-### P1 — Allowed experiments
+## Evidence Synthesis
 
-- Alternative product positioning.
-- Feature-scoring refinements.
-- New segment comparison if PMR reveals stronger evidence.
-- Product requirement experiments.
-- Lightweight prototypes that answer a strategic question.
-- Application narrative A/B versions for internal review.
-- Competitive research extensions.
+Raw interview notes are not product strategy.
 
-### Out of scope unless evidence changes priorities
+Synthesize across sources:
 
-- Pixel-perfect frontend redesign before selection.
-- Jury-demo polishing before the 8 October application.
-- Owning repository automation as a full-time task.
-- Creating generic startup decks or strategy documents with no rubric consequence.
-- Adding features because they sound innovative.
+`evidence → pattern / contradiction → assumption update → product implication → next test`
 
----
+Examples:
 
-## Shared PMR responsibility
+- Multiple operators report that stockout risk dominates waste concerns → decision objective changes.
+- Staff already use a reliable scale but never connect data to planning → focus shifts from building a scale to closing the feedback loop.
+- University procurement is too slow for a first pilot while a catering operator can approve quickly → beachhead or buyer strategy may change.
+- Weather is frequently mentioned but does not improve retrospective estimates → keep it out of the core model until stronger evidence appears.
 
-CS2 is expected to lead approximately **4 interviews** as part of the team's target of 16 distinct interviews.
+Do not force contradictory evidence into a false consensus.
 
-Priority interview targets:
+## Assumption Management
 
-- Decision-makers and champions
-- Sustainability / operations stakeholders
-- Potential buyers
-- Operators who can articulate product trust and adoption constraints
-- Stakeholders useful for competitor/status-quo comparison
+Use `KREATE/ASSUMPTIONS.md` as an active decision tool.
 
-CS2 should deliberately seek **contradictory evidence**, not only friendly confirmation.
+Useful states include:
 
-Example probes:
+- UNKNOWN,
+- TESTING,
+- SUPPORTED,
+- REJECTED,
+- CONFLICTING.
 
-- What would make you refuse to use this system?
-- What do existing tools already solve well?
-- Why would you not run a pilot?
-- Who would block this internally?
-- Which part of this problem is actually not important?
-- When is overproduction acceptable?
-- What would make a recommendation untrustworthy?
+An assumption should move states because of evidence, not because the team wants the story to look complete.
 
----
+CS2 has authority to surface and prioritize new assumptions that become strategically important.
 
-## Workstreams
+## Product Requirements
 
-### 1. Evidence synthesis
-
-IE owns customer-discovery method and market research quality. CS2 owns cross-source synthesis into product decisions.
-
-For every major pattern, produce:
-
-`raw evidence -> repeated pattern -> assumption impact -> product implication -> application implication`
+Translate customer evidence into requirements, not feature requests.
 
 Example:
 
-```text
-Evidence:
-Several operators prioritize avoiding early sell-out over minimizing small surplus.
+Customer evidence:
+> operators need protection from early sell-out and cannot blindly follow an automated quantity.
 
-Pattern:
-Forecast error has asymmetric operational cost.
+Possible requirement:
+> the system must expose a safe operating range, risk tradeoff, and human decision point rather than a single opaque number.
 
-Product implication:
-Do not return a single aggressive minimum-production number.
-Expose a recommendation band and risk trade-off.
+That requirement may be implemented in many ways. Do not prematurely lock the team into a specific UI or algorithm.
 
-Application implication:
-Human approval and risk-aware planning are product requirements, not demo decoration.
-```
+## Feature Portfolio
 
-### Acceptance gate
+Features are hypotheses about value.
 
-A synthesis statement must reference evidence IDs or clearly state that it remains a hypothesis.
+The team may explore software, hardware, workflow, measurement, market, or operational features beyond the current plan if they could materially strengthen the product.
 
----
+For each significant feature or experiment, ask:
 
-### 2. Assumption discipline
+- Which problem or opportunity does it address?
+- What evidence suggests it matters?
+- What new capability or learning does it create?
+- What is the cheapest way to test it?
+- What would make us keep, modify, or kill it?
+- Does it distract from stronger work?
 
-Use `KREATE/ASSUMPTIONS.md` as the canonical assumption ledger.
+A scoring framework can help but should not become bureaucracy. Useful dimensions include:
 
-Statuses:
+- evidence strength,
+- customer impact,
+- differentiation,
+- pilotability,
+- technical feasibility,
+- climate relevance,
+- strategic leverage.
 
-- UNKNOWN
-- TESTING
-- SUPPORTED
-- CONFLICTING
-- REJECTED
+CS2 can approve exploration of unconventional ideas when the upside is meaningful and the experiment is bounded.
 
-CS2 is responsible for asking:
+## Competitor and Status-Quo Intelligence
 
-- What would falsify this?
-- Is the wording stronger than the evidence?
-- Are we confusing preference with behavior?
-- Are we generalizing one interview to a market?
-- Are we ignoring contradicting evidence?
+Competitor research should answer how customers solve the problem today, not merely produce logo slides.
 
-### Acceptance gate
+Analyze where relevant:
 
-No critical application claim may depend on an assumption still marked UNKNOWN without being explicitly framed as a hypothesis.
+- workflow,
+- customer segment,
+- data inputs,
+- intervention timing,
+- hardware requirements,
+- decision support,
+- measurement approach,
+- buyer,
+- deployment model,
+- strengths,
+- weaknesses,
+- likely switching friction.
 
----
+Important comparison classes may include:
 
-### 3. Product requirement synthesis
+- kitchen-manager experience,
+- spreadsheets,
+- historical production rules,
+- POS / catering software,
+- waste-monitoring systems,
+- Winnow,
+- Leanpath,
+- Orbisk,
+- adjacent institutional-operations products.
 
-Translate PMR and technical evidence into requirements.
+The largest competitor may be the status quo rather than another startup.
 
-Every important requirement should include:
+## Differentiation
 
-- Requirement ID
-- User/operational problem
-- Evidence ID(s)
-- Required behavior
-- Success condition
-- Owner
-- Open risk
+Do not freeze a slogan before evidence supports it.
+
+Current possible direction:
+
+> BOUNCAMPUS helps institutional food operations improve decisions before waste occurs and closes the loop with measured outcomes.
+
+This is a working thesis, not doctrine.
+
+CS2 should continuously ask:
+
+- Why would this customer adopt us?
+- Why are current tools insufficient?
+- What can we do uniquely well?
+- Is that uniqueness actually valuable?
+- Is our advantage software, workflow, data, measurement, integration, speed of deployment, or something else?
+
+If competitor research invalidates the current differentiation, change it.
+
+## Product Architecture
+
+Own the user/business-level system logic.
+
+A current candidate loop is:
+
+`KNOW → DECIDE → ACT → MEASURE → LEARN`
+
+For example:
+
+- **KNOW:** operational and contextual signals,
+- **DECIDE:** estimate / recommendation / risk,
+- **ACT:** operator action,
+- **MEASURE:** physical or operational outcome,
+- **LEARN:** evaluation / calibration / next decision.
+
+This architecture may evolve if PMR reveals a stronger intervention point.
+
+CS1 owns algorithmic logic; EE owns physical measurement; CS2 ensures the pieces form a product rather than disconnected technologies.
+
+## Climate Logic
+
+Climate claims must follow a causal chain.
 
 Example:
 
-```text
-PR-07
-Problem: operator cannot trust a recommendation when source coverage is incomplete.
-Evidence: E-014, E-021, technical failure analysis.
-Requirement: recommendation must expose source health and may WITHHOLD when critical signals are missing.
-Success: missing-source scenario produces visible degraded state rather than a normal recommendation.
-```
+`better operational decision → less avoidable overproduction → less discarded food → measured reduction → defensible climate-impact estimate`
 
-### Acceptance gate
+Do not jump directly from a prediction model or sensor to carbon claims.
 
-No evidence/problem link -> requirement is P1 experiment, not P0 product requirement.
+CS2 should identify what evidence would eventually be required to make stronger climate-impact statements.
 
----
+## Application Ownership
 
-### 4. Feature prioritization
+CS2 is the single narrative owner for the final October 8 submission.
 
-Score candidate features using a consistent framework.
+That does **not** mean writing everything alone.
 
-Recommended dimensions:
+- IE provides PMR, customer, beachhead, market and operational evidence.
+- EE provides physical feasibility, measurement strategy, limitations and pilot instrumentation.
+- CS1 provides decision logic, baselines, evaluation and technical limitations.
+- CS2 integrates these into one coherent voice.
 
-| Criterion | Weight |
-|---|---:|
-| PMR evidence | 30% |
-| Problem impact | 25% |
-| Differentiation | 15% |
-| Pilotability | 15% |
-| Technical feasibility | 10% |
-| Climate relevance | 5% |
+The application should make it obvious:
 
-Possible decisions:
+- what we believed initially,
+- what we actually investigated,
+- what surprised us,
+- what changed because of PMR,
+- why the chosen customer / problem / solution now makes sense,
+- what remains uncertain,
+- why this four-person team is suited to continue.
 
-- BUILD NOW
-- TEST FIRST
-- DEFER
-- KILL FOR KREATE
+## Rubric Strategy
 
-### Acceptance gate
+The application rubric should inform priorities without turning the product into a checkbox exercise.
 
-Every BUILD NOW feature must identify:
+PMR has exceptionally high weight, so evidence quality should influence product strategy heavily.
 
-- Evidence.
-- Owner.
-- User/decision affected.
-- Success condition.
-- Kill condition.
+Use `KREATE/APPLICATION_RUBRIC.md` to identify weak sections and missing evidence. The goal is not to stuff every possible claim into the form; it is to make every included claim earn its place.
 
-"It would look impressive" scores zero.
+## Contradiction Hunter
 
----
+CS2 should actively attack team assumptions.
 
-### 5. Competitor and status-quo intelligence
-
-Analyze both commercial products and non-product alternatives.
-
-Minimum comparison set should include, when relevant:
-
-- Winnow
-- Leanpath
-- Orbisk
-- Manager experience
-- Excel/manual planning
-- Last-week/same-day heuristic
-- POS/reporting systems
-- Existing kitchen scales/waste processes
-
-For each competitor/status quo capture:
-
-- Target customer
-- Job solved
-- Inputs
-- Intervention timing
-- Hardware dependency
-- Outputs
-- Decision supported
-- Strengths
-- Limitations
-- Adoption friction
-- Why a customer stays with it
-- Potential coexistence/integration path
-
-### Acceptance gate
-
-Do not manufacture weaknesses to make BOUNCAMPUS look better.
-
-The required question is:
-
-> Why BOUNCAMPUS instead of doing nothing, continuing the current workflow, or buying an established solution?
-
----
-
-### 6. Differentiation and positioning
-
-A candidate positioning hypothesis is:
-
-> BOUNCAMPUS helps institutional food operations make a better production decision before food becomes waste, keeps the operator in control, and closes the loop with measured outcomes.
-
-This is a hypothesis until PMR and competitor evidence support it.
-
-### Acceptance gate
-
-Differentiation must be:
-
-- Relevant to the selected beachhead.
-- Meaningful in an actual workflow.
-- Supported by evidence.
-- Difficult to confuse with a generic "AI sustainability platform."
-
----
-
-### 7. Product architecture
-
-CS1 owns technical decision architecture. EE owns physical measurement architecture. CS2 owns the product-level narrative:
-
-```text
-KNOW
-context + operational signals
-
--> DECIDE
-risk-aware production recommendation
-
--> ACT
-human operator decision
-
--> MEASURE
-real service outcome / waste measurement
-
--> LEARN
-pilot evidence + calibration
-
--> IMPROVE
-next service decision
-```
-
-### Acceptance gate
-
-Every block must correspond to a real user/operational need or a clearly defined experiment.
-
----
-
-### 8. Climate-impact causal chain
-
-Maintain claim discipline:
-
-```text
-better production decision
--> less avoidable overproduction, if hypothesis holds
--> less food discarded, if measured
--> measured waste reduction
--> only then climate-impact estimation using documented conversion methodology
-```
-
-### Automatic FAIL
-
-Any unsupported claim such as:
-
-> BOUNCAMPUS reduces carbon emissions by 30%.
-
-without measured evidence and a documented conversion method.
-
----
-
-## KREATE application ownership
-
-CS2 is the **single owner of the final application narrative**.
-
-Other roles provide evidence and technical sign-off, but the final form must read as one coherent argument rather than four pasted sections.
-
-### Rubric targets
-
-#### Team — 20%
-
-Explain why 1 IE + 1 EE + 2 CS is structurally suited to this problem:
-
-- Customer/operations evidence
-- Physical measurement
-- Decision intelligence
-- Product/evidence synthesis
-
-Do not rely on generic "multidisciplinary team" language.
-
-#### Problem — 20%
-
-Must be:
-
-- Narrow
-- Quantified where evidence exists
-- Causally careful
-- Operationally specific
-
-Official food-waste baseline is problem evidence; do not claim the full waste amount is caused by demand mismatch.
-
-#### Beachhead Market — 10%
-
-Show:
-
-- Alternatives considered
-- Selection criteria
-- Evidence
-- Why the segment is pilotable
-
-#### Persona — 10%
-
-Persona must be interview-derived and operational, not fictional storytelling.
-
-#### PMR — 40%
-
-This is the dominant section.
-
-The strongest PMR narrative has the form:
-
-> We initially believed X. We spoke with Y. We observed Z. Evidence contradicted/strengthened our assumption. Therefore we changed A in the product/market strategy.
-
-Interview count without learning is weak PMR.
-
----
-
-## Contradiction Hunter duty
-
-At least daily during the final application period, challenge the team with questions such as:
+Questions to ask repeatedly:
 
 - How do we know this?
-- Is this source primary or secondary?
-- Is this a fact, estimate, assumption, target, or demo value?
-- Did a customer actually say/do this?
-- Does a competitor already solve it?
-- Why does hardware need to exist?
-- Why does AI/ML need to exist?
-- Why university dining first?
-- What is the strongest reason not to adopt?
-- What result would make us kill the feature?
+- Is this interview evidence, measured evidence, public data, or our interpretation?
+- What would falsify this?
+- Are we overgeneralizing?
+- Does the customer actually care?
+- Is the customer also the buyer?
+- Why hardware?
+- Why software?
+- Why AI?
+- Why this segment?
+- Why now?
+- Is a competitor already doing this better?
+- Could a spreadsheet solve 80% of the problem?
+- Which part of our current product should disappear?
 
-If the team cannot answer, downgrade/remove the claim or create a test.
+These questions are not blockers. They are tools for discovering a stronger thesis.
 
----
+## Red-Team Leadership
 
-## Red-team ownership
+Run short red-team reviews when they can change decisions.
 
-Every ~48 hours during the sprint, run a short red-team review.
+Attack examples:
 
-Required outputs:
+- demand mismatch may not be the dominant cause of food waste,
+- the proposed signals may not outperform operator judgment,
+- a new smart scale may add no value,
+- the beachhead may have no fast purchasing path,
+- competitors may already offer pre-production forecasting,
+- the climate effect may be too hard to measure,
+- the proposed workflow may add staff burden.
 
-- At least one attacked assumption.
-- Evidence for/against it.
-- A KEEP / CHANGE / KILL decision, or a clearly defined experiment needed to decide.
+A useful red-team session ends with a decision or next test, not just criticism.
 
-Example attacks:
+## Freedom to Explore
 
-> A kitchen manager using last week's count may perform just as well as BOUNCAMPUS.
+CS2 has broad authority to open bounded research or product experiments that could materially improve the thesis.
 
-> A custom smart scale may add no value over an existing commercial scale.
+Examples:
 
-> Demand mismatch may not be a major cause of avoidable food waste in the selected environment.
+- investigate a different product wedge,
+- compare an alternative beachhead,
+- propose a new decision point,
+- test a different value proposition,
+- explore a procurement strategy,
+- research competitors more deeply,
+- prototype a requirement quickly,
+- ask CS1 for a technical experiment,
+- ask EE to compare a hardware-free measurement path,
+- ask IE to test a newly discovered buyer hypothesis,
+- identify a stronger cross-campus expansion story.
 
-> Universities may be easy to access but a poor economic beachhead.
+Do not wait for a formal role boundary when an unanswered question is strategically important. Coordinate ownership and move.
 
-The team gets stronger when these attacks survive honest testing.
+## Collaboration
 
----
+### With IE
 
-## Cross-team handoffs
+Receive structured PMR evidence, market contradictions, customer language, stakeholder maps and new hypotheses.
 
-### From IE
+### With EE
 
-Need:
+Understand what can actually be measured, what physical deployment costs, and whether hardware creates strategic advantage.
 
-- Structured PMR records.
-- Beachhead comparison.
-- Workflow map.
-- Buyer/user/champion structure.
-- Contradictions.
+### With CS1
 
-### From EE
+Understand what decision logic is technically justified, how uncertainty is represented, what benchmarks show, and which claims are premature.
 
-Need:
+### Across the Team
 
-- Measurement feasibility.
-- Hardware evidence.
-- Deployment constraints.
-- What hardware does and does not prove.
+Keep the product thesis synchronized. If one workstream changes a core assumption, ensure the other workstreams know the implication.
 
-### From CS1
+## Anti-AI-Slop Standard
 
-Need:
+AI may accelerate synthesis, research, drafting, comparison, ideation, and red-teaming. It must not manufacture evidence or certainty.
 
-- Baselines.
-- Decision contract.
-- Uncertainty logic.
-- Technical limitations.
-- Pilot metric design.
+Reject:
 
-### Back to all roles
+- invented interview quotes or findings,
+- generic startup language that could describe any sustainability project,
+- fictional personas presented as PMR,
+- unsourced market sizing,
+- false competitor claims,
+- fabricated pilot results,
+- carbon / cost savings without defensible evidence,
+- copy that says `AI-powered`, `revolutionary`, `seamless`, `transformative`, etc. instead of explaining the actual mechanism,
+- application prose that hides rejected assumptions or technical limitations.
 
-CS2 returns:
+Strong writing is specific, falsifiable, and grounded.
 
-- Product requirements.
-- Feature priorities.
-- Claims requiring sign-off.
-- Rejected claims.
-- Missing evidence requests.
-- Final application draft.
+## Strong Outputs
 
----
+Useful outputs may include:
 
-## Anti-AI-slop rules
+- an updated product thesis,
+- a changed feature priority,
+- a killed feature with evidence,
+- a new product requirement,
+- an assumption-state change,
+- competitor insight that changes positioning,
+- a revised beachhead recommendation,
+- a coherent application section,
+- a red-team attack that exposes a real weakness,
+- a cross-team question that triggers a valuable experiment,
+- an explicit statement of what remains unknown.
 
-Automatic FAIL if:
+## Application-Stage Success Criteria
 
-- Application prose contains facts without evidence ownership.
-- The team uses adjectives in place of differentiation.
-- PMR findings read like generic LLM-generated customer pain statements.
-- A persona contains invented age, biography, habits, or motivations not supported by interviews.
-- Competitor weaknesses are guessed.
-- Product features are listed without showing which customer problem they solve.
-- Technical prototypes are described as deployed systems.
-- Climate outcomes are claimed before measurement.
-- Four role outputs are pasted together without a consistent thesis.
+By October 8, CS2 should be able to defend a coherent answer to:
 
-Words such as `revolutionary`, `groundbreaking`, `seamless`, `transformative`, `cutting-edge`, and `AI-powered` should be treated as warning signs. Replace them with precise mechanisms and evidence.
+- What problem are we solving?
+- For whom?
+- Why this beachhead?
+- What evidence did we gather?
+- What did we learn that changed our thinking?
+- What is the current product thesis?
+- Why is it better than the status quo?
+- Why are we different from relevant alternatives?
+- What can the technology credibly do today?
+- What remains unvalidated?
+- How would a pilot test the critical assumptions?
+- Why is this team unusually suited to execute?
 
----
-
-## Definition of Done — 8 October
-
-The CS2 role is DONE only if:
-
-- [ ] CS2 led roughly 4 relevant PMR interviews, unless team coverage justified redistribution.
-- [ ] Cross-interview PMR synthesis exists.
-- [ ] Major assumptions have evidence-aware statuses.
-- [ ] Important contradictions are visible.
-- [ ] Product requirements trace to evidence or explicit experiments.
-- [ ] Features are prioritized with BUILD/TEST/DEFER/KILL decisions.
-- [ ] Status quo and relevant competitors are honestly compared.
-- [ ] Differentiation is specific and defensible.
-- [ ] Product architecture is coherent across IE, EE and CS1 outputs.
-- [ ] Climate causal chain does not overclaim.
-- [ ] Every KREATE rubric section has evidence coverage.
-- [ ] Final application has one voice and one thesis.
-- [ ] Factual/technical claims have role-owner sign-off.
-- [ ] A final red-team pass has removed unsupported claims.
-
----
-
-## Success standard
-
-CS2 succeeds when the application makes a reviewer think:
-
-> This team did not fall in love with a feature. They investigated a real operational problem, changed their assumptions when evidence demanded it, built a coherent intervention around that evidence, and know exactly what still needs to be proven.
+The goal is not a perfectly polished story. The goal is a startup thesis strong enough that every important sentence can survive the question: **What evidence supports that?**
