@@ -1,23 +1,52 @@
 # BOUNCAMPUS Autonomous Agent Fabric
 
-This document defines the low-overhead control plane for parallel AI work in BOUNCAMPUS. It extends `AGENTS.md`; it does not replace the repository's single-PR integration discipline or merge-before-exit contract.
+This document defines the control plane for parallel AI/human work. It extends `AGENTS.md`.
 
 ## Operating principle
 
-**Autonomous by default; human-gated by exception.**
+**Autonomous by default; parallel by role; verified on `master`.**
 
-Agents do not ask a human for routine implementation choices, branch operations, decomposition, testing, reversible refactors, documentation updates, ordinary conflict resolution, or merge execution when repository evidence is sufficient.
-
-A human is required only for one of the explicit gate kinds below. Uncertainty alone is not a human gate: the agent must investigate, test, choose the safest reversible option, or mark the task `BLOCKED` with evidence.
+Implementation and review can happen concurrently. Final product truth remains serialized by the requirement that every `master` integration PR contains the latest `master` and passes exact-head CI.
 
 ## Control plane
 
-- Durable product/repository truth lives on `master`.
-- Work executes on short-lived `agent/<lane>/<task>` branches.
-- Shared coordination metadata lives on the long-lived `agent-coordination` branch under `.agents/coordination/tasks/`.
-- Each task is one JSON file. Updating an existing task requires the current blob SHA, so competing claims on the same task are serialized by GitHub rather than by a human dispatcher.
-- The repository still permits at most one open integration PR. That PR is the integration lock.
-- `.agents/WORKSTREAMS.md` remains a human-readable compatibility/history view. New autonomous coordination must not rely on editing that single file for every heartbeat or task claim.
+- Durable product truth: `master`
+- Role integration branches:
+  - `role/ie-customer-discovery`
+  - `role/ee-physical-systems`
+  - `role/cs1-decision-intelligence`
+  - `role/cs2-product-strategy`
+- Short-lived implementation branches: `agent/<lane>/<task>`
+- Coordination metadata branch: `agent-coordination`
+- Task store: `.agents/coordination/tasks/`
+
+Task JSON remains the authority for ownership, dependencies, path claims, leases, human gates, and final integration evidence.
+
+## Parallel PR model
+
+The repository-wide single-PR lock no longer exists.
+
+Two PR classes are expected:
+
+### Feature PR
+
+```text
+agent/<lane>/<task> -> role/<role>
+```
+
+Feature PRs allow each role to integrate independently. Up to 3 may be open against a role branch at once.
+
+### Role integration PR
+
+```text
+role/<role> -> master
+```
+
+Each role may have at most one open integration PR to `master` at a time. Different roles may have integration PRs open concurrently.
+
+A `master` PR is mergeable only if it contains the current `master` base SHA. Therefore, after any `master` merge, other open role PRs must sync and revalidate before merging.
+
+Repository-wide policy/bootstrap changes may use `agent/quality-release/<task> -> master`.
 
 ## Task lifecycle
 
@@ -25,158 +54,117 @@ A human is required only for one of the explicit gate kinds below. Uncertainty a
 
 Side states:
 
-- `BLOCKED`: hard dependency/infrastructure blocker with exact evidence and next executable action.
-- `WAITING_HUMAN`: only when one of the explicit human gate kinds applies.
-- `CANCELLED`: intentionally abandoned task with rationale; never equivalent to success.
+- `BLOCKED`
+- `WAITING_HUMAN`
+- `CANCELLED`
 
 There is no branch-only `DONE` state.
 
-## Autonomous dispatcher behavior
-
-An orchestrating agent may, without human approval:
-
-1. inspect issues, repository state, CI, and current task files;
-2. decompose a goal into independently reviewable tasks;
-3. mark tasks `READY` when hard dependencies are satisfied;
-4. choose a lane and priority;
-5. identify non-overlapping `touched_paths`;
-6. claim a `READY` task atomically;
-7. create its work branch;
-8. execute, test, self-review, and update task state;
-9. reclaim a stale lease when the lease TTL has expired, no task PR is open, and repository evidence does not show fresh work;
-10. acquire the integration slot when no other PR is open;
-11. update from `master`, resolve conflicts, drive CI green, merge, and verify `master`;
-12. release the lease only after `MERGED_VERIFIED`.
-
-Agents should prefer multiple narrow, non-overlapping tasks over one broad task that serializes unrelated work.
+A feature PR merged into a role branch does not make a task terminal. The task remains non-terminal until its commits reach verified `master`.
 
 ## Claim and lease protocol
 
-Task files follow `.agents/TASK_TEMPLATE.json` and live on `agent-coordination`.
-
 To claim a task:
 
-1. read the current task file and blob SHA from `agent-coordination`;
-2. require state `READY` (or a reclaimable stale state);
-3. verify every `depends_on` task is `MERGED_VERIFIED`;
-4. verify `touched_paths` do not overlap an active task;
-5. set `owner_agent`, `branch`, state `CLAIMED`, `lease.claimed_at`, and `lease.heartbeat_at`;
-6. update the task file using the blob SHA precondition;
-7. if the update loses a race, do not retry blindly; choose another `READY` task or reread the task.
+1. read the task and current blob SHA from `agent-coordination`;
+2. require `READY` or satisfy stale-reclaim rules;
+3. require all hard dependencies to be `MERGED_VERIFIED`;
+4. verify declared `touched_paths` do not overlap another active task;
+5. set owner, feature branch, claim timestamp, heartbeat, and state;
+6. update using the current blob SHA precondition;
+7. create the feature branch from the correct role branch.
 
-A material commit or meaningful validation checkpoint should refresh `lease.heartbeat_at`. The default TTL is defined in `.agents/fabric.json`.
+A material commit or meaningful validation checkpoint should refresh the heartbeat.
 
-A stale lease can be reclaimed autonomously only when all are true:
+A stale lease may be reclaimed only when:
 
 - TTL expired;
-- state is not `INTEGRATING` or `MERGED_VERIFYING`;
-- no open PR exists for that task branch;
-- no newer branch commit or other repository evidence shows active execution;
-- the reclaim is recorded in the task notes.
+- the task is not actively integrating/verifying;
+- no repository evidence shows fresh execution;
+- the reclaim is recorded.
 
-## File ownership and conflict prevention
+## File ownership
 
-`touched_paths` is an execution contract, not a rough guess.
+`touched_paths` is an execution contract.
 
 - Two active tasks may not own overlapping product paths.
-- Parent/child path ownership counts as overlap (`frontend/src` conflicts with `frontend/src/app/page.tsx`).
-- Coordination metadata paths are not product ownership.
-- If a newly discovered necessary path overlaps another active task, the agent must either wait/re-scope or combine the tasks through explicit coordination; it must not silently edit the overlapping path.
-- Integration remains serialized even when implementation is parallel.
+- Parent/child paths count as overlap.
+- Coordination metadata is not product ownership.
+- If a new required path conflicts with another active owner, re-scope or coordinate explicitly.
+- Shared/high-conflict files require the broad merge checklist in `AGENTS.md`.
+
+Parallel PRs do not weaken path ownership.
 
 ## Human gates
 
-Allowed human gate kinds are intentionally narrow.
+Allowed human gates:
 
-### `EVIDENCE_ATTESTATION`
+- `EVIDENCE_ATTESTATION`
+- `IRREVERSIBLE_ACTION`
+- `PHYSICAL_SAFETY`
+- `EXTERNAL_COMMITMENT`
+- `PRODUCT_DIRECTION`
 
-Use only when a human must attest that real-world evidence is genuine or correctly represented, for example interview notes/quotes, private institutional facts supplied by a person, or application claims that require human factual sign-off.
+Normal engineering decisions, branches, PRs, tests, conflict resolution, and reversible changes are autonomous.
 
-Agents may summarize evidence but may not self-attest that an interview happened or that a quote is genuine.
+`WAITING_HUMAN` is valid only when a real gate is pending, one concrete question is recorded, and independent work is already complete.
 
-### `IRREVERSIBLE_ACTION`
+## Integration protocol
 
-Use for destructive or difficult-to-reverse external actions, including deleting production data, rotating/revoking credentials, changing repository/account administration, or equivalent irreversible changes.
+### Feature integration into a role branch
 
-Normal git commits, branches, PRs, merges, and reversible code changes are **not** irreversible actions.
+The owning workstream agent:
 
-### `PHYSICAL_SAFETY`
+1. updates from the latest role branch;
+2. resolves conflicts deliberately;
+3. passes targeted and repository-required checks;
+4. opens/updates the feature PR;
+5. drives exact-head CI green;
+6. merges into the role branch.
 
-Use before real-world hardware energization, actuator movement, mains/high-current work, field deployment, or another action where a software decision can create physical risk. Simulation, CAD, firmware development, and non-energized review remain autonomous.
+This is staging, not final completion.
 
-### `EXTERNAL_COMMITMENT`
+### Role integration into master
 
-Use before actions that bind the team externally: final application submission, purchase/payment, contract/legal acceptance, sending a consequential external message, or committing to a pilot/date on behalf of the team.
+The role integration owner:
 
-Drafting and preparing these artifacts remains autonomous.
+1. confirms the included workstreams are compatible;
+2. synchronizes the role branch from latest `master`;
+3. opens/updates the role-to-`master` PR;
+4. runs feature-preservation, fabric, KREATE, frontend, Python, and data gates as applicable;
+5. drives exact-head CI green;
+6. merges with a normal merge commit;
+7. verifies the resulting `master`;
+8. records the shared PR/head/merge evidence on each included task;
+9. moves included tasks to `MERGED_VERIFIED`.
 
-### `PRODUCT_DIRECTION`
+Several tasks may share the same role integration PR number.
 
-Use only for a material strategic pivot that changes the agreed beachhead, primary problem, or core product direction when available evidence supports multiple materially different choices. Routine feature prioritization, architecture, implementation details, and reversible experiments remain autonomous.
+## Direct-master-push recovery
 
-## `WAITING_HUMAN` standard
+Direct push to `master` is a policy violation even though repository administration may not enforce branch protection.
 
-A task may enter `WAITING_HUMAN` only if:
+When detected:
 
-- `human_gate.kind` is not `NONE`;
-- `human_gate.status` is `PENDING`;
-- `human_gate.question` asks for one concrete decision;
-- the agent has already completed all work that does not depend on that decision;
-- the task notes include the recommended option and evidence.
-
-Never use `WAITING_HUMAN` as a substitute for investigation or engineering judgment.
-
-## Blockers
-
-`BLOCKED` is reserved for blockers the agent cannot resolve with available repository/tool access. The `blocker` field must state exact failed dependency/action, evidence, work already attempted, and the next executable action.
-
-If an alternate safe route exists, the task is not blocked.
-
-## Integration
-
-Implementation can be parallel; integration is serialized.
-
-- At most one integration PR may be open.
-- The task that owns the integration PR is `INTEGRATING`.
-- Other agents continue non-overlapping work while the slot is occupied.
-- The integration owner updates from latest `master`, runs feature preservation and required validators, and drives exact-head CI green.
-- Use a normal merge commit.
-- After merge, move to `MERGED_VERIFYING`, verify the resulting `master`, then move to `MERGED_VERIFIED`.
-- A task may not release its lease before `MERGED_VERIFIED`.
-
-## Direct-master-push incident recovery
-
-Branch protection is the preferred preventive control. Until GitHub administration enforces it, CI remains a detection control and a direct push can mutate `master` before `master-merge-audit` rejects the provenance.
-
-When a direct push is detected:
-
-1. do **not** silently mark the failed master CI as acceptable;
-2. inspect the direct commit and preserve/revert it based on repository evidence rather than authorship;
-3. create an autonomous P0 recovery task in `agent-coordination` with the exact offending SHA and CI run;
-4. branch from the current `master`, make the smallest useful recovery/policy artifact change, and send the entire current master state through the normal single integration PR;
-5. require exact-head feature preservation, agent-fabric checks, KREATE/repository-data checks, and frontend regression gates;
-6. merge with a normal merge commit and require post-merge `master-merge-audit` success;
-7. record PR/head/merge/post-merge evidence and move the recovery task to `MERGED_VERIFIED`;
-8. keep or create a separate `IRREVERSIBLE_ACTION` human/admin task for enabling branch protection/rulesets if repository administration is not exposed to the agent.
-
-The recovery PR does not retroactively make the original direct push compliant; it restores a validated merge boundary around the current repository state and keeps the violation auditable.
+1. preserve/revert based on repository evidence;
+2. create a P0 recovery task;
+3. route the current state through a normal reviewed PR;
+4. require exact-head full validation;
+5. merge with a normal merge commit;
+6. verify `master`;
+7. keep the violation auditable.
 
 ## Agent-to-agent communication
 
-Prefer repository-visible state over chat messages. Agents communicate through task JSON state and notes on `agent-coordination`, dependency IDs, branch commits, issue/PR discussion when relevant, and explicit blocker evidence.
+Prefer repository-visible state:
 
-Do not require synchronous human relay between agents.
+- task JSON
+- dependency IDs
+- branch/PR references
+- blocker evidence
+- explicit integration notes
 
-## Minimal agent roles
-
-The fabric needs only four logical roles; one model/session may perform more than one when paths do not conflict:
-
-- **Dispatcher**: decomposes goals, maintains dependencies, exposes `READY` work.
-- **Workstream Agent**: claims and executes one task end-to-end.
-- **Verifier / Red Team**: independently checks high-risk diffs, tests, evidence boundaries, or acceptance criteria when useful.
-- **Integration Owner**: the workstream agent currently holding the single PR slot and responsible for merge/post-merge verification.
-
-No permanent hierarchy or large agent framework is required.
+Do not require synchronous human relay.
 
 ## Mechanical checks
 
@@ -187,4 +175,13 @@ python scripts/agent_fabric_check.py
 python scripts/test_agent_fabric_check.py
 ```
 
-The validator checks the fabric configuration, task schema, dependency graph, active path ownership, lease fields, human gates, and terminal integration evidence. The normal CI pipeline must run it before integration.
+CI additionally enforces:
+
+- approved PR base/head topology;
+- latest-target-base ancestry;
+- per-role feature PR concurrency;
+- feature preservation;
+- exact-head repository validation;
+- merged-PR provenance for `master`;
+- normal merge-commit semantics;
+- post-merge containment through `agent_exit_gate.py`.

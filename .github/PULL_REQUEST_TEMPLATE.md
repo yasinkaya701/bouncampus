@@ -1,88 +1,89 @@
-## Integration batch
+## PR type
 
-Owning Workstream Agent / temporary Integration Owner:
+- [ ] Feature PR: `agent/<lane>/<task>` -> `role/<role>`
+- [ ] Role integration PR: `role/<role>` -> `master`
+- [ ] Repository-wide governance/bootstrap PR -> `master`
 
-Agent task ID:
+Owning role / governance owner:
 
-Agent branch:
+Agent task ID(s):
 
-Coordination task state before PR: `READY_FOR_INTEGRATION`
+Feature branch(es):
 
 Human gate: `NONE` / gate kind + decision evidence
 
-Additional compatible branches included, if any:
+## Parallel-safety
 
-## Agent fabric
-
-- [ ] Task/lease metadata exists on `agent-coordination` or this is an explicitly documented fabric-bootstrap PR.
 - [ ] Declared `touched_paths` cover every intentional changed product path.
-- [ ] No active task owns an overlapping product path.
+- [ ] No active incompatible task owns overlapping product paths.
 - [ ] Hard dependencies are `MERGED_VERIFIED`.
-- [ ] Human gate is `NONE` unless an explicit critical gate in `AGENTS.md` applies.
-- [ ] If a human gate applies, the task records one concrete decision and its evidence; routine engineering judgment was not escalated.
-- [ ] `python scripts/agent_fabric_check.py` passes.
-- [ ] `python scripts/test_agent_fabric_check.py` passes when agent-fabric code changes.
+- [ ] This PR is within the per-role concurrency limit.
+- [ ] Cross-role/shared-file impact is listed below.
+
+**Cross-role/shared-file impact:** None / describe affected roles and shared surfaces.
+
+## Base freshness
+
+- [ ] PR head contains the exact current target-branch base SHA.
+- [ ] Conflicts were resolved by reviewing both sides; no blind whole-file `ours`/`theirs`.
+- [ ] Every deletion/rename was reviewed intentionally.
+
+A green but stale PR is not mergeable. If another `master` PR lands first, resync and rerun CI.
 
 ## Feature preservation
 
-- [ ] This PR starts from the latest `master`.
-- [ ] Every included agent branch is listed above.
-- [ ] Every deletion/rename was reviewed intentionally.
-- [ ] Conflict resolution preserved both sides where both carried valid behavior.
 - [ ] New durable features were added to `.github/feature-registry.json` when applicable.
-- [ ] No existing feature-registry entry or required path was removed/weakened.
+- [ ] No existing registered feature or required path was removed/weakened unintentionally.
+- [ ] `python scripts/verify_feature_preservation.py --base-ref <target-base-sha>` passes.
 
 ### Feature additions / changes
 
-Describe user-visible features, routes, data sources, assets, and behavior added or changed.
+Describe user-visible features, routes, data sources, assets, and behavior.
 
 ### Intentional removals
 
-`None` unless the repository owner explicitly approved a removal. Include the approval context when non-empty.
+`None` unless explicitly approved and documented.
 
 ## Validation
 
-- [ ] `python scripts/verify_feature_preservation.py --base-ref <master-sha>`
+- [ ] Targeted tests pass.
 - [ ] `python scripts/agent_fabric_check.py`
 - [ ] `python scripts/kreate_check.py`
+- [ ] `python -m compileall -q backend/app scripts`
+- [ ] Critical JSON datasets validate.
 - [ ] `cd frontend && npm ci --no-audit --no-fund`
 - [ ] `cd frontend && npm run typecheck`
 - [ ] `cd frontend && npm run lint`
 - [ ] `cd frontend && npm run build`
-- [ ] `python -m compileall -q backend/app scripts`
-- [ ] Critical JSON datasets validate.
 - [ ] CI is green on the exact PR head SHA.
 
-## Mandatory merge-before-exit contract
+Mark non-applicable checks explicitly in the PR description rather than silently skipping them.
 
-- [ ] The agent that accepted this work is the agent driving this PR.
-- [ ] This is the repository's only open PR.
-- [ ] PR head contains the current `master` base commit.
-- [ ] No follow-up branch is required to make this batch functionally complete.
-- [ ] The owning agent will resolve conflicts and CI failures rather than hand the merge to another agent.
-- [ ] The owning agent will perform the merge using a normal merge commit.
-- [ ] The owning agent will verify the resulting `master` commit after merge.
-- [ ] `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` will pass before the agent reports completion or exits.
-- [ ] Coordination state will reach `MERGED_VERIFIED` with PR/head/merge/post-merge evidence before the lease is released.
+## Master integration contract
 
-**A PR being open, review-ready, or green is not completion. The owning agent must merge and verify `master` before releasing the task.**
+Required for any PR targeting `master`:
+
+- [ ] Head contains current `master`.
+- [ ] Included workstreams are compatible.
+- [ ] Cross-role/shared changes have been reconciled.
+- [ ] Full required CI is green on the exact head.
+- [ ] Merge will use a normal merge commit.
+- [ ] Resulting `master` will be post-merge verified.
+- [ ] Included tasks will not be marked `MERGED_VERIFIED` until their commits are proven present on verified `master`.
+
+A feature PR merged only into a role branch is staging, not final completion.
 
 ## KREATE evidence and anti-slop gate
 
-Use this section only for PRs that change KREATE application, PMR, evidence, experiment, or claim-bearing material. This is stricter than the normal autonomous engineering path because real-world evidence cannot be self-attested by an AI agent.
+Use this section for application, PMR, evidence, experiment, or claim-bearing changes.
 
-- [ ] Linked issue is present.
-- [ ] Acceptance criteria passed.
-- [ ] Test and/or evidence artifact is attached or linked.
-- [ ] No unrelated changes are included.
-- [ ] Material claims are classified correctly (`FACT`, `PUBLIC SOURCE`, `INTERVIEW EVIDENCE`, `TECHNICAL TEST`, `MODEL ESTIMATE`, `POLICY HEURISTIC`, `HYPOTHESIS`, `UNKNOWN`).
+- [ ] Material claims are classified correctly.
 - [ ] Every material claim has an evidence ID or remains explicitly `HYPOTHESIS`/`UNKNOWN`.
-- [ ] AI-generated application prose/research that asserts real-world facts was verified under the applicable evidence-attestation gate.
+- [ ] AI did not fabricate interviews, quotes, personas, pilot results, accuracy, climate impact, hardware performance, live data, or savings.
+- [ ] Human evidence attestation is recorded when required.
 - [ ] Known limitations are disclosed.
-- [ ] No fabricated interview, quote, persona, pilot result, model accuracy, climate impact, hardware performance, live data, or savings claim is present.
-- [ ] Human reviewer is named below when this section applies.
 
-**Human reviewer:** N/A unless KREATE claim/evidence material changed
+**Human reviewer:** N/A unless required
 
 **Evidence IDs / artifacts:** N/A unless applicable
 

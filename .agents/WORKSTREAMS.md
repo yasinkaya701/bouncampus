@@ -1,60 +1,54 @@
 # Active Workstreams
 
-This file is the coordination ledger for parallel agents.
+This file is a human-readable compatibility/history view. High-frequency claims and heartbeats belong in task JSON under `agent-coordination`.
 
-## Hard lifecycle rule
+## Lifecycle
 
-A workstream owner keeps ownership from first edit through merge and post-merge verification. There is no `DONE` state before verified `master`.
+A workstream remains non-terminal until its accepted changes exist on verified `master`.
 
-Allowed lifecycle states:
+Valid states:
 
-- `ACTIVE` — implementation/testing in progress on the agent branch.
-- `READY_FOR_INTEGRATION` — branch validation complete, but work is still unmerged and the agent must remain responsible.
-- `INTEGRATING` — the same owning agent holds the Merge Coordinator lock and is driving the single PR.
-- `MERGED_VERIFYING` — PR merged; the same owning agent is checking the resulting `master` commit.
-- `MERGED_VERIFIED` — work exists on verified `master`; only now may ownership be released and the row archived/removed.
-- `BLOCKED` — only for a hard external blocker the agent cannot resolve with repository access. This is not completion.
+- `ACTIVE`
+- `READY_FOR_INTEGRATION`
+- `INTEGRATING`
+- `MERGED_VERIFYING`
+- `MERGED_VERIFIED`
+- `BLOCKED`
+- `WAITING_HUMAN`
+- `CANCELLED`
 
-`HANDOFF`, `PR_READY`, `AWAITING_MERGE`, and branch-only `DONE` are invalid terminal states.
+`HANDOFF`, `PR_READY`, `AWAITING_MERGE`, and branch-only `DONE` are not success states.
 
-## Rules
+## Parallel integration rules
 
-- Every active workstream must declare a lane, branch, owner role, scope, and touched paths before implementation begins.
-- File ownership is exclusive while a workstream is active.
-- The agent that accepts a workstream owns implementation, validation, integration, conflict resolution, merge, and post-merge verification.
-- The Merge Coordinator is a repository-wide lock acquired temporarily by the ready workstream owner; it is not a separate agent handoff.
-- Only the lock holder may own the repository's single open integration PR.
-- Other agents may keep implementing non-overlapping work while the lock is occupied, but may not exit or declare success with unmerged accepted work.
-- Ownership is released only after the workstream reaches `MERGED_VERIFIED`.
-- Remove or archive a row immediately after `MERGED_VERIFIED` so stale ownership does not block future work.
+- There is no repository-wide single-PR lock.
+- Each KREATE role has a long-lived `role/*` integration branch.
+- Short-lived `agent/<lane>/<task>` branches normally PR into the owning role branch.
+- Up to 3 feature PRs may be open against one role branch.
+- Each role may have at most one open role-to-`master` integration PR.
+- Different roles may have `master` PRs open concurrently.
+- Any `master` PR that becomes stale after another merge must sync current `master` and rerun required validation before merge.
+- Active task path ownership remains exclusive.
+- A role-branch merge is staging; only verified `master` is final delivery.
+
+## Role branches
+
+| Role | Branch |
+| --- | --- |
+| IE | `role/ie-customer-discovery` |
+| EE | `role/ee-physical-systems` |
+| CS1 | `role/cs1-decision-intelligence` |
+| CS2 | `role/cs2-product-strategy` |
 
 ## Active
 
-| Lane | Branch | Owner role | State | Scope | Touched paths |
-| --- | --- | --- | --- | --- | --- |
+| Lane | Feature branch | Role branch | Owner | State | Scope | Touched paths |
+| --- | --- | --- | --- | --- | --- | --- |
 
-The `quality-release / agent-fabric-v1` workstream was merged through PR #32 at merge commit `81e3259d10f9c87e2e6038fd3dc5b95ba83612af` and verified on `master` by CI run #250. Verification included the autonomous-agent unit tests, fabric schema/dependency/path-ownership validator, frontend npm install/typecheck/lint/build, feature preservation, repository Python compile, KREATE validation, critical JSON validation, merged-PR provenance, and confirmation that the validated agent head is contained in `master`. It established autonomous-by-default task leases, explicit human-by-exception gates, a metadata-only `agent-coordination` control plane contract, machine-readable task intake, and CI enforcement while preserving the single-PR merge discipline. Ownership is released from this legacy ledger; future autonomous claims use the agent fabric.
+New work should be represented in `.agents/coordination/tasks/*.json`; this table is for human visibility when useful.
 
-The `frontend-ux + api-product + quality-release / stale-path-cleanup` workstream was merged through PR #30 at merge commit `6cedf9c55949271972fde340554abd394230bc6c` and verified on `master` by CI run #246. Verification included frontend npm install/typecheck/lint/build, feature preservation, repository Python compile, KREATE operating-system validation, critical JSON validation, merged-PR provenance, and confirmation that the integrated agent head is contained in `master`. It moved the orphan hard-coded `/flow` route, unused synthetic backend generator/training entrypoints, and superseded platform walkthrough under `legacy/`, replaced stale frontend boilerplate documentation, preserved active KREATE/jury/product surfaces, and released ownership after verification.
+## Historical note
 
-The `quality-release / kreate-team-os` workstream was merged through PR #27 at merge commit `557cb53eea229a999dec265ac076067b82922f94` and verified on `master` by CI run #241. Verification included feature preservation, frontend typecheck/lint/build, repository Python compile, `python scripts/kreate_check.py`, critical JSON validation, merged-PR provenance, and confirmation that the integrated agent head is contained in `master`. Ownership is released; the stale pre-runner blocker state has been removed.
+Work completed before the role-branch model may reference the former single integration PR discipline. Those records are historical evidence only and do not define current policy.
 
-The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
-
-The `frontend-ux + api-product + quality-release / jury-mode-v3` workstream was merged through PR #22 and verified on `master` at merge commit `31dafb6256130e3730d047e9541a8561c758cb60` by CI run #212 before ownership was released. It delivered the guided 90-second fail-safe Jury Mode, source-health and `WITHHOLD` behavior, decision explainability, strict measured CSV import/export in Pilot Evidence Lab, KREATE application answers, stage runbook, and feature-registry protection while preserving the jury-facing UI polish from PR #21.
-
-The `api-product + frontend-ux + quality-release / kreate-winning-v2` workstream was merged through PR #19 and verified on `master` at merge commit `a2fe37c9d3c3507f5f8ae2f56de049707fdbbd1b` by CI run #204 before ownership was released. It delivered readiness-aware food-waste decisions, the operator gate, 14-day falsifiable pilot contract, measurement template, measured pilot scorer, Pilot Evidence Lab, claim firewall, aligned jury/product docs, and repository cleanup.
-
-The `api-product + frontend-ux / food-waste-winning-focus` workstream was merged through PR #17 and verified on `master` at merge commit `573385b7a703ec845021e8fdbfc2546496d70b1b` by CI run #198 before ownership was released.
-
-The `frontend-ux / jury-visual-assets-v3` workstream was merged through PR #15 and verified on `master` at merge commit `a51252e59a6856d7db945ba2d9073defe2645c5e` by CI run #192 before ownership was released.
-
-The `campus-geo / photogrammetry-assets` workstream was merged through PR #13 and verified on `master` at merge commit `4ae611ecf394e3cdf05b21b4eeda0dd998526c54` by CI run #188 before ownership was released.
-
-## Suggested lanes
-
-- `frontend-ux`: pages, components, styles, accessibility, responsive UI.
-- `campus-geo`: campus directory, building locations, geometry, maps, 3D/assets.
-- `api-product`: Next.js API routes, product logic, data contracts, live-source adapters.
-- `quality-release`: CI, tests, build gates, deployment/release evidence.
-- `integration`: temporary lock state used by whichever workstream owner is actively merging.
+Current authoritative policy is `AGENTS.md`, `.agents/FABRIC.md`, and `.agents/fabric.json`.
