@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "research_pack_id": "BOGAZICI-SUSTAINABILITY-2025",
+  "research_date": "2026-09-30",
+  "claim_boundary": {
+    "classification": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+    "counts_as_pmr": false,
+    "counts_as_customer_validation": false,
+    "counts_as_pilot_evidence": false,
+    "promotion_rule": "Reopen and verify a source, then promote only a narrow claim into KREATE/EVIDENCE.md when path ownership allows."
+  },
+  "primary_sources": [
+    {
+      "id": "SRC-BOUN-SUST-2025",
+      "title": "Boğaziçi University Sustainability 2025",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20260430-104238.pdf",
+      "type": "official_report"
+    },
+    {
+      "id": "SRC-FOOD-WASTE-2025",
+      "title": "Campus food waste tracking",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "type": "official_webpage"
+    },
+    {
+      "id": "SRC-SUST-FOOD",
+      "title": "Sustainable food choices on campus",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/233-sustainable-food-choices-on-campus/1313",
+      "type": "official_webpage"
+    },
+    {
+      "id": "SRC-HEALTHY-FOOD",
+      "title": "Healthy and affordable food choices",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/234-healthy-and-affordable-food-choices/1314",
+      "type": "official_webpage"
+    },
+    {
+      "id": "SRC-WATER",
+      "title": "Water reuse policy",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/641-water-reuse-policy/1354",
+      "type": "official_webpage"
+    },
+    {
+      "id": "SRC-TRANSPORT",
+      "title": "Sustainable practices targets",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/1141-sustainable-practices-targets/1406",
+      "type": "official_webpage"
+    },
+    {
+      "id": "SRC-GHG-2025",
+      "title": "Boğaziçi University Greenhouse Gas Inventory Report 2025",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/566-bogazici-university-greenhouse-gas-inventory--yayin-20260414-160244.pdf",
+      "type": "official_report"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "R-01",
+      "label": "PUBLIC_SOURCE",
+      "claim": "Boğaziçi reports 48,251 kg total food waste in 2025.",
+      "source_ids": ["SRC-FOOD-WASTE-2025"],
+      "confidence": "HIGH",
+      "caveat": "Does not establish avoidability, causal mechanism or forecast error."
+    },
+    {
+      "fact_id": "R-02",
+      "label": "PUBLIC_SOURCE",
+      "claim": "The university states that it provides catering to approximately 13,000 students and 2,000 staff and lists six dining halls with 1,734 total listed capacity.",
+      "source_ids": ["SRC-FOOD-WASTE-2025"],
+      "confidence": "HIGH",
+      "caveat": "Nominal community size and dining-hall capacity are not meal attendance counts."
+    },
+    {
+      "fact_id": "R-03",
+      "label": "PUBLIC_SOURCE",
+      "claim": "An official food-service page states that meals served by dining halls are prepared in the North Campus kitchen, with backup kitchens for technical failure/disaster.",
+      "source_ids": ["SRC-HEALTHY-FOOD", "SRC-SUST-FOOD"],
+      "confidence": "HIGH",
+      "caveat": "Centralized preparation does not identify the production-quantity decision owner, buyer or approval timing."
+    },
+    {
+      "fact_id": "R-04",
+      "label": "PUBLIC_SOURCE",
+      "claim": "Boğaziçi publicly describes existing food-waste actions including portion control, removal of unpopular dishes, composting, surplus handling/donation and recycling.",
+      "source_ids": ["SRC-FOOD-WASTE-2025", "SRC-SUST-FOOD"],
+      "confidence": "HIGH",
+      "caveat": "The public sources do not quantify the marginal effectiveness of each action."
+    },
+    {
+      "fact_id": "R-05",
+      "label": "DERIVED_PUBLIC_SERIES_STATISTIC",
+      "claim": "Published 2025 monthly food-waste totals range from 1,334 kg to 7,811 kg; max/min is approximately 5.86 and coefficient of variation approximately 52.6%.",
+      "source_ids": ["SRC-FOOD-WASTE-2025"],
+      "confidence": "HIGH",
+      "caveat": "Variation does not prove unpredictable demand; calendar, service days, occupancy, menu mix or accounting timing may explain it."
+    },
+    {
+      "fact_id": "R-06",
+      "label": "SOURCE_DATA_QUALITY_FLAG",
+      "claim": "The food-waste table contains months where reported amount delivered to İSTAÇ exceeds the same month's total food waste despite a note that delivered amounts are included in totals.",
+      "source_ids": ["SRC-FOOD-WASTE-2025"],
+      "confidence": "HIGH",
+      "caveat": "August is 1,502 kg total vs 3,550 kg delivered; October is 1,334 kg total vs 4,850 kg delivered. Do not infer the cause."
+    },
+    {
+      "fact_id": "R-07",
+      "label": "PUBLIC_SOURCE",
+      "claim": "Menus are announced ahead of service, food engineers prepare menus, and nutritional/portion information is specified or published.",
+      "source_ids": ["SRC-FOOD-WASTE-2025", "SRC-SUST-FOOD", "SRC-HEALTHY-FOOD"],
+      "confidence": "HIGH",
+      "caveat": "Public documentation does not prove historical row-level data are accessible for modeling."
+    },
+    {
+      "fact_id": "R-WATER-01",
+      "label": "PUBLIC_SOURCE",
+      "claim": "Boğaziçi publicly documents grey-water and rainwater recovery and states that grey water supplies 15% of total water consumption in the 1st Men's Dormitory.",
+      "source_ids": ["SRC-WATER"],
+      "confidence": "HIGH",
+      "caveat": "The same page contains differing descriptions of the 16 m3/day figure, so that number needs clarification before submission use."
+    },
+    {
+      "fact_id": "R-TRANSPORT-01",
+      "label": "PUBLIC_SOURCE",
+      "claim": "The 2025 sustainable-practices table reports 65 personnel shuttles, 7 campus shuttle services, capacity 1,429, occupancy 93%, and 1,332 users.",
+      "source_ids": ["SRC-TRANSPORT"],
+      "confidence": "HIGH",
+      "caveat": "These figures do not by themselves establish a mobility pain point or optimization gap."
+    },
+    {
+      "fact_id": "R-GHG-01",
+      "label": "PUBLIC_SOURCE",
+      "claim": "The 2025 GHG inventory reports total emissions of 14,664.76 tCO2e, with 45.61% electricity, 34.73% natural gas, 3.57% stationary/mobile combustion and 16.09% Scope 3/value-chain emissions.",
+      "source_ids": ["SRC-GHG-2025"],
+      "confidence": "HIGH",
+      "caveat": "Corporate inventory context; it does not allocate a food-waste intervention impact."
+    }
+  ],
+  "food_waste_monthly_2025_kg": [
+    {"month": "January", "total_food_waste": 3992, "delivered_to_istac": 2250, "waste_oil": 475},
+    {"month": "February", "total_food_waste": 7811, "delivered_to_istac": 1555, "waste_oil": 250},
+    {"month": "March", "total_food_waste": 7004, "delivered_to_istac": 2285, "waste_oil": 900},
+    {"month": "April", "total_food_waste": 4772, "delivered_to_istac": 3090, "waste_oil": 825},
+    {"month": "May", "total_food_waste": 3832, "delivered_to_istac": 2900, "waste_oil": 450},
+    {"month": "June", "total_food_waste": 2777, "delivered_to_istac": 1450, "waste_oil": 550},
+    {"month": "July", "total_food_waste": 1923, "delivered_to_istac": 1850, "waste_oil": 150},
+    {"month": "August", "total_food_waste": 1502, "delivered_to_istac": 3550, "waste_oil": 350},
+    {"month": "September", "total_food_waste": 2072, "delivered_to_istac": 1450, "waste_oil": 830},
+    {"month": "October", "total_food_waste": 1334, "delivered_to_istac": 4850, "waste_oil": 600},
+    {"month": "November", "total_food_waste": 4784, "delivered_to_istac": 3300, "waste_oil": 550},
+    {"month": "December", "total_food_waste": 6448, "delivered_to_istac": 4900, "waste_oil": 375}
+  ],
+  "published_totals_2025_kg": {
+    "total_food_waste": 48251,
+    "delivered_to_istac": 33430,
+    "waste_oil": 6305,
+    "recycled_waste_oil": 6305
+  },
+  "derived_food_waste_statistics": {
+    "mean_monthly_kg": 4020.9,
+    "median_monthly_kg": 3912.0,
+    "min_monthly_kg": 1334,
+    "min_month": "October",
+    "max_monthly_kg": 7811,
+    "max_month": "February",
+    "max_to_min_ratio": 5.86,
+    "population_std_kg": 2114.4,
+    "coefficient_of_variation_pct": 52.6,
+    "interpretation_limit": "Descriptive only; do not treat as forecast-error evidence."
+  },
+  "academic_benchmarks": [
+    {
+      "id": "A-01",
+      "paper": "Preventing food waste in subsidy-based university dining systems: An artificial neural network-aided model under uncertainty",
+      "authors": "Mohammadali Faezirad; A. Pooya; Zahra Naji-Azimi",
+      "year": 2021,
+      "journal": "Waste Management & Research",
+      "url": "https://consensus.app/papers/preventing-food-waste-in-subsidybased-university-dining-faezirad-pooya/23aef70d39095db990688f4d358c5af9/?utm_source=chatgpt",
+      "usable_for": ["reservation/show-no-show feature hypothesis", "uncertainty-aware demand planning", "asymmetric waste-vs-shortage objective"],
+      "not_usable_for": ["Boğaziçi impact percentage", "proof that Boğaziçi has reservation data", "proof that ANN is best"]
+    },
+    {
+      "id": "A-02",
+      "paper": "Food Waste Management Practices and Barriers to Progress in U.S. University Foodservice",
+      "authors": "A. Musicus; R. McKenzie; E. Rimm; S. Blondin",
+      "year": 2022,
+      "journal": "International Journal of Environmental Research and Public Health",
+      "url": "https://consensus.app/papers/food-waste-management-practices-and-barriers-to-progress-musicus-mckenzie/d2ef8eef200855aeb7fd97a088d1cef5/?utm_source=chatgpt",
+      "usable_for": ["forecasting as recognized overproduction-prevention practice", "smaller-batch PMR question", "operational barrier prompts"],
+      "not_usable_for": ["proof of Boğaziçi workflow"]
+    },
+    {
+      "id": "A-03",
+      "paper": "Toward food waste reduction at universities",
+      "authors": "W. Leal et al.",
+      "year": 2023,
+      "journal": "Environment, Development and Sustainability",
+      "url": "https://consensus.app/papers/toward-food-waste-reduction-at-universities-leal-ribeiro/ccb8fe652ec75ed58b6b030afe3423d6/?utm_source=chatgpt",
+      "usable_for": ["multi-causal food-waste framing", "avoid single-cause overclaim"],
+      "not_usable_for": ["Boğaziçi-specific causal attribution"]
+    }
+  ],
+  "critical_unknowns_for_pmr": [
+    "Who decides production quantities?",
+    "When is the production quantity frozen or hard to change?",
+    "What inputs are used today?",
+    "Does a reservation/pre-order system exist?",
+    "If reservations exist, what is the no-show behavior?",
+    "What share of waste is preparation, unserved surplus, serving loss, or post-consumer plate waste?",
+    "What happens operationally when demand exceeds production?",
+    "What is the relative penalty of shortage versus excess?",
+    "Are planned, produced, served and discarded quantities recorded at campus-meal granularity?",
+    "Can operators cook in multiple batches or change quantities during service?",
+    "Why do August and October İSTAÇ delivery figures exceed same-month total food-waste figures?"
+  ],
+  "role_handoffs": {
+    "IE": [
+      "Interview Food Services/HKS operations, central-kitchen contractor/manager, food engineers, campus service managers and waste/procurement owners.",
+      "Test decision timing/discretion, demand-mismatch causality and real decision authority using last-incident questions.",
+      "Do not turn 48,251 kg into a causal forecasting claim."
+    ],
+    "EE": [
+      "Map planned portions -> produced/batches -> served -> unserved surplus -> preparation/plate waste -> destination.",
+      "Record unit, timestamp, campus, meal, owner, burden and auditability for each measurement.",
+      "Prefer existing logs and manual weighing/counts before proposing new hardware."
+    ],
+    "CS1": [
+      "Start with simple campus-meal-calendar baselines before complex ML.",
+      "Use asymmetric waste/shortage loss and explicit abstention/override semantics.",
+      "Do not use the monthly public waste table as training data without a reconciled data dictionary and finer-grained operational data.",
+      "Benchmark reservation/show-no-show features only if PMR confirms they exist."
+    ],
+    "CS2": [
+      "Frame the 48,251 kg total and existing mitigation as PUBLIC SOURCE context.",
+      "Keep the remaining production-mismatch opportunity explicitly HYPOTHESIS until PMR validates it.",
+      "Never claim the literature's reported reductions as expected or achieved Boğaziçi impact."
+    ]
+  },
+  "opportunity_comparison": [
+    {
+      "domain": "food_production_waste",
+      "public_source_fit": "strong",
+      "existing_action": "strong",
+      "clear_unresolved_decision": "plausible_but_unverified",
+      "pmr_access_burden": "medium",
+      "research_priority": "highest_current"
+    },
+    {
+      "domain": "water",
+      "public_source_fit": "strong",
+      "existing_action": "strong",
+      "clear_unresolved_decision": "not_identified",
+      "pmr_access_burden": "medium_high",
+      "research_priority": "comparison_domain"
+    },
+    {
+      "domain": "energy_buildings",
+      "public_source_fit": "very_strong",
+      "existing_action": "strong",
+      "clear_unresolved_decision": "unclear",
+      "pmr_access_burden": "high",
+      "research_priority": "comparison_domain"
+    },
+    {
+      "domain": "mobility",
+      "public_source_fit": "structured",
+      "existing_action": "strong",
+      "clear_unresolved_decision": "possible_but_pain_unverified",
+      "pmr_access_burden": "medium",
+      "research_priority": "conditional"
+    }
+  ]
+}
