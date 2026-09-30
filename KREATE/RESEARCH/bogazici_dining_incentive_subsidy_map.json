@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH_ONLY",
+  "scope": "Boğaziçi dining price, subsidy, access and incentive semantics",
+  "current_student_prices": {
+    "effective_from": "2026-07-01",
+    "breakfast_try": 65,
+    "lunch_try": 75,
+    "dinner_try": 75,
+    "source": "https://yemekhane.bogazici.edu.tr/ogrenci-yemek-ucretlerinin-guncellenmesi-2",
+    "semantics": "diner_charge_not_system_cost"
+  },
+  "student_price_history": [
+    {"effective_from": "2024-09-01", "breakfast_try": 20, "lunch_try": 30, "dinner_try": 30},
+    {"effective_from": "2025-02-01", "breakfast_try": 30, "lunch_try": 40, "dinner_try": 40},
+    {"effective_from": "2025-09-05", "breakfast_try": 40, "lunch_try": 50, "dinner_try": 50},
+    {"effective_from": "2026-02-01", "breakfast_try": 50, "lunch_try": 60, "dinner_try": 60},
+    {"effective_from": "2026-07-01", "breakfast_try": 65, "lunch_try": 75, "dinner_try": 75}
+  ],
+  "historical_cost_statement": {
+    "status": "TIME_BOUND_HISTORICAL_OFFICIAL_STATEMENT",
+    "meal_cost_including_vat_try": 210,
+    "student_meal_charge_try": 40,
+    "safe_inference": "student charge can be materially below full service cost and is not a marginal-cost proxy",
+    "forbidden_inference": "210 TRY is current 2026 meal cost",
+    "source": "https://cdn.tbmm.gov.tr/KKBSPublicFile/D28/Y3/T7/WebOnergeMetni/fbbc0f26-dcbf-41ef-b353-576cb61b7d4d.pdf"
+  },
+  "food_access_support": [
+    {
+      "id": "meal_scholarship_2025",
+      "recipients": 1091,
+      "description": "in-kind meal scholarship; SKS states all meals became free for recipients",
+      "source": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096"
+    },
+    {
+      "id": "bubizden_2026",
+      "effective_from": "2026-02-26",
+      "description": "free student meal support through university mobile application; one defined right per day and confidentiality-based application process",
+      "source": "https://yemekhane.bogazici.edu.tr/bubizden-uygulamasi"
+    }
+  ],
+  "demand_regime_candidates": [
+    "student_price_regime",
+    "staff_price_regime",
+    "meal_scholarship_policy_regime",
+    "bubizden_active",
+    "payment_promotion_regime",
+    "service_regime",
+    "academic_calendar_state",
+    "menu_context"
+  ],
+  "actor_map": [
+    {"actor": "university_sks", "role": "service owner / procurement authority / access mission", "critical_unknown": "does lower production reduce university expenditure under current settlement?"},
+    {"actor": "food_services_branch", "role": "operational governance / contractor control", "critical_unknown": "does it control daily quantity and shortage tolerance?"},
+    {"actor": "temas_contractor", "role": "current service provider", "critical_unknown": "which excess costs are contractor risk and which shortages trigger deductions?"},
+    {"actor": "students_and_supported_diners", "role": "service beneficiaries", "critical_unknown": "what service-access failure threshold is unacceptable?"},
+    {"actor": "staff_and_guests", "role": "separate price/access classes", "critical_unknown": "should their demand be modeled separately?"}
+  ],
+  "economic_formula_after_verification": [
+    "change_in_contract_settlement",
+    "change_in_verified_contractor_variable_cost_if_relevant",
+    "verified_disposal_or_handling_change",
+    "minus_verified_shortage_or_service_penalty",
+    "minus_incremental_intervention_cost"
+  ],
+  "service_guardrails": [
+    "shortage_event_count",
+    "sellout_minutes",
+    "queue_or_service_delay",
+    "forced_substitution",
+    "privacy_safe_unserved_entitlement_measure_if_approved",
+    "operator_override_rate"
+  ],
+  "p0_pmr_questions": [
+    "If 100 fewer meals are produced and nobody goes hungry, who financially benefits and through which ledger or contract line?",
+    "Does university payment change with served or accepted quantity?",
+    "Which costs of an excess meal are unrecoverable to the contractor?",
+    "Who decides acceptable shortage/sellout risk?",
+    "How are scholarship and support rights protected when quantities are tight?",
+    "Do price/support regime changes materially affect production planning?"
+  ],
+  "forbidden_inferences": [
+    "avoided_meal_saves_current_student_price",
+    "avoided_meal_saves_historical_210_try",
+    "current_subsidy_equals_historical_cost_minus_current_price",
+    "current_subsidy_ratio_can_be_calculated_from_historical_cost",
+    "contractor_loses_full_cost_of_each_excess_meal_without_current_contract_evidence",
+    "individual_scholarship_status_should_be_used_as_model_feature"
+  ]
+}
