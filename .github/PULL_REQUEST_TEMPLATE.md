@@ -1,4 +1,62 @@
+## Contribution summary
+
+**Owner type:** `HUMAN` / `AGENT`
+
+**Owner / role:**
+
+**Branch:**
+
+**Linked issue / task:**
+
+### What changed?
+
+Describe the bounded change in 2–5 bullets.
+
+### Why does it matter?
+
+Explain the product, KREATE, evidence, reliability, or developer-workflow impact.
+
+### Validation performed
+
+List the exact commands/checks you ran and their result.
+
+### Evidence / assumptions / limitations
+
+- Evidence IDs: `N/A` unless this change contains claim-bearing material.
+- Assumption labels: `N/A` unless applicable.
+- Known limitations: `None` / describe.
+
+### UI evidence
+
+Screenshots/video: `N/A` unless a material UI flow changed.
+
+---
+
 ## Integration batch
+
+**Integration Owner:**
+
+**This is the repository's only open integration PR:** `YES` / `NO`
+
+**Human gate:** `NONE` / gate kind + decision evidence
+
+**Additional compatible branches included, if any:**
+
+### Human-owned contribution
+
+Use this subsection when `Owner type = HUMAN`.
+
+- Human role: `IE` / `EE` / `CS1` / `CS2` / other documented maintainer
+- Human branch: `human/<role>/<task>`
+- [ ] Work started from a recent `master`.
+- [ ] The linked issue/task has a bounded outcome and acceptance criteria.
+- [ ] I checked for overlapping active agent/human work before editing shared paths.
+- [ ] I did not open a second parking-lot PR while another integration PR was active.
+- [ ] I will keep driving this integration until merged or document a real external blocker.
+
+### Agent-owned contribution
+
+Use this subsection when `Owner type = AGENT`.
 
 Owning Workstream Agent / temporary Integration Owner:
 
@@ -7,12 +65,6 @@ Agent task ID:
 Agent branch:
 
 Coordination task state before PR: `READY_FOR_INTEGRATION`
-
-Human gate: `NONE` / gate kind + decision evidence
-
-Additional compatible branches included, if any:
-
-## Agent fabric
 
 - [ ] Task/lease metadata exists on `agent-coordination` or this is an explicitly documented fabric-bootstrap PR.
 - [ ] Declared `touched_paths` cover every intentional changed product path.
@@ -25,8 +77,8 @@ Additional compatible branches included, if any:
 
 ## Feature preservation
 
-- [ ] This PR starts from the latest `master`.
-- [ ] Every included agent branch is listed above.
+- [ ] This PR starts from / contains the latest required `master` base before final merge validation.
+- [ ] Every included branch is listed above.
 - [ ] Every deletion/rename was reviewed intentionally.
 - [ ] Conflict resolution preserved both sides where both carried valid behavior.
 - [ ] New durable features were added to `.github/feature-registry.json` when applicable.
@@ -34,7 +86,7 @@ Additional compatible branches included, if any:
 
 ### Feature additions / changes
 
-Describe user-visible features, routes, data sources, assets, and behavior added or changed.
+Describe user-visible features, routes, data sources, assets, behavior, or team workflow added or changed.
 
 ### Intentional removals
 
@@ -42,7 +94,9 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 
 ## Validation
 
-- [ ] `python scripts/verify_feature_preservation.py --base-ref <master-sha>`
+Run the checks that apply to the changed paths. The Integration Owner is responsible for the final merge gate.
+
+- [ ] `python scripts/verify_feature_preservation.py --base-ref <master-sha>` when feature-preservation validation applies.
 - [ ] `python scripts/agent_fabric_check.py`
 - [ ] `python scripts/kreate_check.py`
 - [ ] `cd frontend && npm ci --no-audit --no-fund`
@@ -53,23 +107,29 @@ Describe user-visible features, routes, data sources, assets, and behavior added
 - [ ] Critical JSON datasets validate.
 - [ ] CI is green on the exact PR head SHA.
 
-## Mandatory merge-before-exit contract
+Mark truly non-applicable checks as `N/A` in the validation notes rather than pretending they ran.
 
-- [ ] The agent that accepted this work is the agent driving this PR.
+## Merge-before-exit contract
+
+Applies to the current Integration Owner, human or agent:
+
 - [ ] This is the repository's only open PR.
-- [ ] PR head contains the current `master` base commit.
+- [ ] PR head contains the current required `master` base commit before final validation.
 - [ ] No follow-up branch is required to make this batch functionally complete.
-- [ ] The owning agent will resolve conflicts and CI failures rather than hand the merge to another agent.
-- [ ] The owning agent will perform the merge using a normal merge commit.
-- [ ] The owning agent will verify the resulting `master` commit after merge.
-- [ ] `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` will pass before the agent reports completion or exits.
-- [ ] Coordination state will reach `MERGED_VERIFIED` with PR/head/merge/post-merge evidence before the lease is released.
+- [ ] The Integration Owner will resolve conflicts and CI failures rather than abandon a mergeable batch.
+- [ ] The Integration Owner will perform the repository's normal merge into `master`.
+- [ ] The merged `master` commit will be verified before the work is reported as integrated.
 
-**A PR being open, review-ready, or green is not completion. The owning agent must merge and verify `master` before releasing the task.**
+Agent-owned work additionally requires:
+
+- [ ] `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` passes before the agent reports completion or exits.
+- [ ] Coordination state reaches `MERGED_VERIFIED` with PR/head/merge/post-merge evidence before the lease is released.
+
+**A PR being open, review-ready, or green is not the same as being integrated.**
 
 ## KREATE evidence and anti-slop gate
 
-Use this section only for PRs that change KREATE application, PMR, evidence, experiment, or claim-bearing material. This is stricter than the normal autonomous engineering path because real-world evidence cannot be self-attested by an AI agent.
+Use this section for PRs that change KREATE application, PMR, evidence, experiment, or claim-bearing material. Real-world evidence cannot be fabricated or self-attested by an AI agent.
 
 - [ ] Linked issue is present.
 - [ ] Acceptance criteria passed.
