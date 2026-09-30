@@ -4,7 +4,7 @@
   "title": "Build agent-ready Boğaziçi sustainability research pack",
   "priority": "P0",
   "lane": "campus-data-geo",
-  "state": "ACTIVE",
+  "state": "BLOCKED",
   "owner_agent": "research-evidence",
   "branch": "agent/campus-data-geo/bogazici-sustainability-research",
   "depends_on": [],
@@ -35,19 +35,25 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T20:55:00Z",
-    "heartbeat_at": "2026-09-30T20:55:00Z",
+    "heartbeat_at": "2026-09-30T21:02:00Z",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "The research feature is merged into role/cs2-product-strategy, but that role branch also contains the still-open hardware-policy PR #40 commits. Opening/merging a CS2 role-to-master PR now would duplicate unrelated hardware-policy changes and violate clean cross-role integration.",
+    "evidence": "Feature PR #41 merged successfully into role/cs2-product-strategy. PR #40 targets master from commit 354acf750395b1e0bff2e70a7e07a2c24dbb0300; its CI run #294 is still queued, and the CS2 role branch contains that same hardware-policy commit ancestry plus the research merge.",
+    "next_action": "After PR #40 lands on master (or its hardware changes are otherwise reconciled), sync role/cs2-product-strategy with current master, run required CS2 integration gates, open the role-to-master PR containing only the remaining research delta, merge normally, then record post-merge verification."
+  },
   "integration": {
     "pull_request": null,
-    "validated_head_sha": null,
+    "validated_head_sha": "af21be5771d70ce695b8496642303349793ca42e",
     "merge_sha": null,
     "post_merge_verified_at": null
   },
   "notes": [
     "Do not edit KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md while TASK-CS1-DECISION-CORE owns those paths.",
     "This package is secondary/public-source research only; it must never be counted as PMR or customer validation.",
-    "Source values are transcribed with semantic caveats where the university tables appear internally inconsistent."
+    "Source values are transcribed with semantic caveats where the university tables appear internally inconsistent.",
+    "Feature PR #41 merged into role/cs2-product-strategy with only three new KREATE/RESEARCH files (807 additions, 0 deletions).",
+    "Local/container validation was unavailable because the chat runtime could not resolve github.com; exact-head repository validation remains required before master integration."
   ]
 }
