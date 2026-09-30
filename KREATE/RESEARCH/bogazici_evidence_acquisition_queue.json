@@ -1,0 +1,212 @@
+{
+  "schema_version": "1.0",
+  "research_date": "2026-10-01",
+  "status": "UNREQUESTED",
+  "purpose": "Route unresolved Boğaziçi dining P0 unknowns to the smallest authoritative artifact, aggregate dataset or owner confirmation.",
+  "rules": [
+    "Do not mass-contact multiple roles with the same generic request.",
+    "Ask for the smallest artifact or field definition that resolves one product gate.",
+    "Prefer source-owner aggregation over person-level BUCard or reservation exports.",
+    "A refusal, non-retention or ownership redirect is a valid research result.",
+    "Do not infer contractor settlement from user meal charges, published diner prices or procurement totals.",
+    "Do not promote current contract-payment claims without current authoritative contract/specification evidence or current-owner confirmation tied to that artifact.",
+    "Formal information-acquisition channels are a narrow public-document fallback, not a bypass around legitimate access restrictions."
+  ],
+  "public_routes": {
+    "FOOD_SERVICES": {
+      "role": "Yemek Hizmetleri Şube Müdürlüğü",
+      "use_for": ["quantity_owner", "freeze_time", "reservation_workflow", "contract_owner_routing", "service_mode"]
+    },
+    "TEMAS_LOCAL": {
+      "role": "TEMAŞ Boğaziçi local project/kitchen operations",
+      "use_for": ["production_plan", "buffer_logic", "batching", "campus_allocation", "produced_delivered_surplus_records"]
+    },
+    "CONTROL_ORG": {
+      "role": "Yemekhane, Yemek Pişirme ve Yemek Dağıtım Kontrol Teşkilatı",
+      "use_for": ["accepted_operational_truth", "service_deviation", "shortage_record", "approval_boundary", "contract_control"]
+    },
+    "TAHAKKUK": {
+      "role": "Tahakkuk Şube Müdürlüğü",
+      "source": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "public_duty": "İhale, Doğrudan Temin, Transfer ve Hak Ediş Ödemeleri",
+      "use_for": ["hakediş_payment_packet", "payment_basis_document", "financial_record_origin"]
+    },
+    "PROCUREMENT": {
+      "role": "İhale ve Satınalma Şube Müdürlüğü",
+      "source": "https://imid.bogazici.edu.tr/",
+      "use_for": ["current_contract_specification", "authoritative_document_version", "quantity_acceptance_payment_clause"]
+    },
+    "BID_BUCARD": {
+      "role": "Bilgi İşlem / BUCard / BUCampus source owner",
+      "use_for": ["reservation_event_schema", "aggregate_turnstile_qr_counts", "retention", "source_owner_aggregation"]
+    },
+    "FOOD_GOVERNANCE": {
+      "role": "Safe & Sustainable Food monthly reporting owner",
+      "use_for": ["produced_consumed_discarded_schema", "monthly_report_template", "source_systems", "review_flow"]
+    },
+    "INFO_ACQUISITION": {
+      "role": "Boğaziçi Bilgi Edinme / Yazı İşleri",
+      "source": "https://bilgiedinme.bogazici.edu.tr/tr/pages/bilgi-edinme-basvuru-sayfasi/5333",
+      "use_for": ["narrow_public_document_fallback"],
+      "warning": "Use after normal owner/document route fails; not for personal transaction data or bypassing access restrictions."
+    }
+  },
+  "queue": [
+    {
+      "acquisition_id": "EA-01",
+      "priority": "P0",
+      "title": "Current production quantity owner and freeze time",
+      "status": "UNREQUESTED",
+      "resolves_unknown_ids": ["U01", "U02"],
+      "primary_routes": ["FOOD_SERVICES", "TEMAS_LOCAL"],
+      "verification_route": "CONTROL_ORG",
+      "minimum_request": {
+        "artifact_or_example": "One recent normal meal-service workflow or redacted planning/request record",
+        "fields": [
+          "quantity_field_name",
+          "decision_owner_role",
+          "first_communication_timestamp",
+          "final_revision_or_freeze_timestamp",
+          "adjustable_dimensions",
+          "source_system_or_document"
+        ]
+      },
+      "sensitive_data_excluded": ["student_identity", "user_level_transactions"],
+      "acceptable_evidence": [
+        "Owner-confirmed workflow tied to a current named artifact",
+        "Redacted planning/request record plus field definitions"
+      ],
+      "downstream_gate": "Reachable decision/control-point gate",
+      "stop_condition": "If quantity, allocation, service mode and batch cannot be changed before usable signals arrive, stop quantity-forecast work and test another control surface."
+    },
+    {
+      "acquisition_id": "EA-02",
+      "priority": "P0",
+      "title": "Current accepted-service and hakediş quantity semantics",
+      "status": "UNREQUESTED",
+      "resolves_unknown_ids": ["U04", "U05"],
+      "primary_routes": ["CONTROL_ORG", "TAHAKKUK", "PROCUREMENT"],
+      "fallback_route": "INFO_ACQUISITION",
+      "minimum_request": {
+        "artifact_or_example": "The smallest current clause/template/data dictionary identifying accepted quantity and hakediş basis",
+        "fields": [
+          "field_or_clause_name",
+          "quantity_semantics",
+          "authoritative_source_document",
+          "originating_unit",
+          "approving_unit",
+          "aggregation_period",
+          "correction_or_adjustment_policy"
+        ]
+      },
+      "sensitive_data_excluded": ["bank_details", "personnel_financial_data", "individual_diner_records"],
+      "acceptable_evidence": [
+        "Current signed contract/specification clause",
+        "Blank/redacted hakediş summary template with quantity definition",
+        "Current owner confirmation tied to the authoritative artifact"
+      ],
+      "downstream_gate": "Economic objective / contract decision-loss gate",
+      "stop_condition": "No TRY-savings, per-meal economic value or contractor-P&L claim until current semantics and relevant unit-price/variable-cost meaning are verified."
+    },
+    {
+      "acquisition_id": "EA-03",
+      "priority": "P0",
+      "title": "Historical reservation-to-realized-service aggregate sample",
+      "status": "UNREQUESTED",
+      "resolves_unknown_ids": ["U03"],
+      "primary_routes": ["FOOD_SERVICES", "BID_BUCARD"],
+      "verification_route": "CONTROL_ORG",
+      "candidate_periods": ["2024_intersemester", "2026_Kilyos_holiday"],
+      "minimum_request": {
+        "artifact_or_example": "Source-owner aggregate service rows for a bounded historical reservation period",
+        "fields": [
+          "service_date",
+          "campus",
+          "meal_period",
+          "reservation_created_count",
+          "reservation_cancelled_before_cutoff",
+          "active_reservations_at_cutoff",
+          "aggregate_validated_served_or_entry_count",
+          "service_regime"
+        ]
+      },
+      "sensitive_data_excluded": ["student_id", "name", "email", "individual_card_history", "individual_reservation_history"],
+      "acceptable_evidence": ["Aggregate source-owner export with event definitions", "Aggregate manually reconciled table validated by owner"],
+      "downstream_gate": "Reservation residual-uncertainty / Pilot 0 gate",
+      "stop_condition": "If reservation already meets accepted operational tolerance and no other reachable decision remains, do not build residual ML for its own sake."
+    },
+    {
+      "acquisition_id": "EA-04",
+      "priority": "P0",
+      "title": "Physical surplus and waste-stage measurement boundary",
+      "status": "UNREQUESTED",
+      "primary_routes": ["FOOD_SERVICES", "CONTROL_ORG"],
+      "secondary_route": "FOOD_GOVERNANCE",
+      "minimum_request": {
+        "artifact_or_example": "Current data dictionary or one prospective measurement sheet",
+        "fields": [
+          "produced_portions",
+          "served_portions",
+          "edible_unserved_surplus",
+          "preparation_waste_kg",
+          "plate_waste_kg",
+          "collected_waste_kg",
+          "measurement_method",
+          "measurement_timestamp",
+          "campus_meal_linkability"
+        ]
+      },
+      "sensitive_data_excluded": ["individual_diner_identity"],
+      "acceptable_evidence": ["Owner data dictionary", "Prospective one-service measurement protocol accepted by operator"],
+      "downstream_gate": "Physical impact / addressable waste-stage gate",
+      "stop_condition": "If pre-consumer surplus cannot be distinguished at the decision boundary, claim only demand/service optimization until prospective waste measurement exists."
+    },
+    {
+      "acquisition_id": "EA-05",
+      "priority": "P1",
+      "title": "Directive-required produced/consumed/discarded monthly report schema",
+      "status": "UNREQUESTED",
+      "resolves_unknown_ids": ["U06"],
+      "primary_routes": ["FOOD_GOVERNANCE", "FOOD_SERVICES"],
+      "minimum_request": {
+        "artifact_or_example": "Blank/redacted monthly food-flow report template or metric data dictionary",
+        "fields": [
+          "metric_definitions",
+          "source_systems",
+          "reporting_granularity",
+          "reporting_period",
+          "manual_reconciliation_steps",
+          "review_owner"
+        ]
+      },
+      "sensitive_data_excluded": ["personal_data"],
+      "acceptable_evidence": ["Current template", "Current data dictionary", "Owner-confirmed workflow tied to named systems"],
+      "downstream_gate": "Governance/reporting value proposition gate",
+      "stop_condition": "If the process is already automated and decision-useful, do not duplicate it; if manual but low-pain, do not mistake reporting work for a market."
+    },
+    {
+      "acquisition_id": "EA-06",
+      "priority": "P1",
+      "title": "Current contract/specification authoritative version locator",
+      "status": "UNREQUESTED",
+      "primary_routes": ["PROCUREMENT", "FOOD_SERVICES"],
+      "fallback_route": "INFO_ACQUISITION",
+      "minimum_request": {
+        "artifact_or_example": "Authoritative current document/version identifiers and the narrow quantity/acceptance/payment clauses for İKN 2025/1727143",
+        "fields": ["document_name", "version_or_date", "IKN", "clause_identifier", "public_access_path_if_any"]
+      },
+      "sensitive_data_excluded": ["bidder_confidential_information", "unrelated_procurement_records"],
+      "acceptable_evidence": ["Current authoritative document", "Official locator/access direction from owner unit"],
+      "downstream_gate": "C1 current-contract evidence gate",
+      "stop_condition": "Stop derivative web search once owner confirms the current authoritative document is non-public or requires formal request."
+    }
+  ],
+  "recommended_sequence": ["EA-01", "EA-02", "EA-03", "EA-04", "EA-05", "EA-06"],
+  "evidence_promotion": {
+    "PUBLIC_SOURCE": "Inspected current/public artifact supports the narrow claim.",
+    "INTERVIEW": "Completed interview artifact supports only the role-appropriate narrow claim.",
+    "CURRENT_CONTRACT_EVIDENCE": "Current authoritative contract/specification or current-owner confirmation tied to it.",
+    "TECH_TEST": "Actual run output with method version, dataset provenance, evaluation period and limitations.",
+    "MODEL_RESULT": "Model output only; never measured impact by default."
+  }
+}
