@@ -27,11 +27,29 @@ The machine-readable contract lives in `.agents/fabric.json`; the execution prot
 - Parallel task state lives on the long-lived `agent-coordination` branch under `.agents/coordination/tasks/`.
 - Each task is one JSON file based on `.agents/TASK_TEMPLATE.json`.
 - Claims/heartbeats update only that task file. GitHub blob-SHA preconditions serialize competing claims without a human dispatcher.
-- Product implementation stays on short-lived `agent/<lane>/<task>` branches.
+- Agent product implementation stays on short-lived `agent/<lane>/<task>` branches.
 - At most one integration PR may be open; that PR remains the repository-wide integration lock.
 - `.agents/WORKSTREAMS.md` is a compatibility/history view, not the high-frequency coordination database. Do not make all parallel agents contend on that single markdown file for routine claims/heartbeats.
 
 The `agent-coordination` branch is a deliberate policy exception: agents may write **coordination metadata only** under `.agents/coordination/**` directly to that branch. They may not put product code, application claims, secrets, binaries, or release artifacts there.
+
+## Human teammate contribution path
+
+The autonomous fabric must not make the repository unusable for the four human KREATE teammates.
+
+Human-owned work is therefore a documented parallel path:
+
+- human contributors use short-lived `human/<role>/<task>` branches;
+- human-owned work does **not** need an `agent-coordination` lease or task JSON unless an autonomous agent actually takes ownership of the implementation;
+- before editing shared paths, the human contributor must check active GitHub work and active agent `touched_paths` so human and agent work do not silently overlap;
+- the same repository-wide **one-open-PR integration lock** applies to human and agent work;
+- a human-owned branch may continue non-conflicting implementation while the integration slot is occupied, but it must not open a second parking-lot PR;
+- when a human-owned PR acquires the integration slot, its human owner is the temporary Integration Owner and is responsible for updating from `master`, resolving conflicts, getting CI green, merging, and verifying the resulting `master` state;
+- human-owned work must still satisfy feature-preservation, KREATE evidence, claim-boundary, and applicable validation gates;
+- the autonomous `MERGED_VERIFIED` task-state requirement applies only to agent-owned work. Human-owned work records its issue/PR/merge evidence through normal GitHub history;
+- if an autonomous agent takes over a human task, the agent must create/claim proper fabric metadata before it begins agent-owned implementation on product paths.
+
+Human onboarding and contribution details live in `docs/ONBOARDING.md` and `CONTRIBUTING.md`. This human path is an exception only to agent lease/branch mechanics; it does **not** weaken the single-PR rule, evidence rules, validation, or merge discipline.
 
 ## Human-by-exception policy
 
@@ -163,12 +181,15 @@ The only permitted non-merged exit is a **hard external blocker** that the agent
 ## Branch and ownership rules
 
 - `master` is protected by process: normal engineering work MUST NOT be committed directly to `master`.
-- Product work uses short-lived branches named `agent/<lane>/<task>`.
+- Agent-owned product work uses short-lived branches named `agent/<lane>/<task>`.
+- Human-owned product work uses short-lived branches named `human/<role>/<task>` and follows `CONTRIBUTING.md`.
 - `agent-coordination` is the only long-lived agent branch and is metadata-only as defined above.
 - New autonomous work claims ownership in task JSON on `agent-coordination`. `.agents/WORKSTREAMS.md` may continue to record legacy/in-flight work and verified history but is not required for high-frequency lease changes.
-- Two active tasks must not edit the same product path unless ownership is explicitly re-scoped.
+- Human contributors must check active agent `touched_paths` and current human issues/branches before editing shared product paths.
+- Two active work packages must not knowingly edit the same product path unless ownership is explicitly re-scoped or coordinated.
 - An agent does not hand completed code to another agent merely to perform the merge. The owning Workstream Agent becomes the temporary Integration Owner when its task reaches the integration slot.
-- Ownership remains active until work is merged to `master`, post-merge verification passes, and the task reaches `MERGED_VERIFIED`.
+- A human contributor who acquires the integration slot becomes the temporary Integration Owner for that human-owned PR.
+- Agent ownership remains active until work is merged to `master`, post-merge verification passes, and the task reaches `MERGED_VERIFIED`.
 
 ## One-PR integration rule
 
@@ -176,19 +197,20 @@ BOUNCAMPUS must not accumulate pull requests.
 
 - There may be **at most one open pull request** in the repository.
 - That PR is the current Integration Owner's integration PR targeting `master`.
-- Other agents may continue non-overlapping implementation on their branches while the slot is occupied.
-- They may not mark their work complete or exit with unmerged accepted work.
-- When the integration slot becomes free, the next `READY_FOR_INTEGRATION` task updates from latest `master`, acquires the slot, integrates, and merges.
-- The integration PR must contain the latest `master` before final validation; stale heads are not mergeable.
+- Other agents and human teammates may continue non-overlapping implementation on their branches while the slot is occupied.
+- Agent-owned tasks may not be marked complete or abandoned with unmerged accepted work.
+- Human-owned work must not open a second parking-lot PR; it waits for the integration slot while continuing non-conflicting branch work.
+- When the integration slot becomes free, the next ready human or agent work package updates from latest `master`, acquires the slot, integrates, and merges.
+- The integration PR must contain the latest required `master` before final validation; stale heads are not mergeable.
 - A PR is never a parking lot. Its owner keeps driving it until merged or a genuine hard external blocker is documented.
 
 ## Feature-preservation rule
 
 A merge is invalid if an existing feature, route, data source, UI surface, asset, or validation gate disappears unintentionally.
 
-Before merge, the owning agent acting as Integration Owner MUST:
+Before merge, the current Integration Owner MUST:
 
-1. start from the latest `master`;
+1. start from / incorporate the latest required `master`;
 2. resolve conflicts manually; never use whole-file `ours`/`theirs` on product files without reviewing both sides;
 3. compare the integration head with `master` and account for every deletion or rename;
 4. update `.github/feature-registry.json` when a new durable feature is introduced;
@@ -198,17 +220,20 @@ Before merge, the owning agent acting as Integration Owner MUST:
 8. compile backend/scripts Python and validate critical JSON datasets;
 9. merge only after all required CI gates are green on the exact head;
 10. re-run release checks on the merged `master` commit;
-11. run the agent exit gate before declaring completion.
+11. run the repository exit/provenance check required by CI before declaring integration complete.
+
+For agent-owned work, the Workstream Agent additionally records all required `MERGED_VERIFIED` coordination evidence and satisfies the agent exit gate before releasing its lease.
 
 Existing feature-registry entries may not be removed or weakened in a normal feature PR. Intentional removals require an explicit repository-owner decision documented in the PR.
 
 ## Merge semantics
 
-- **Merge is mandatory and owned by the Workstream Agent that accepted the task.**
-- Completed work is not delivered while it exists only on a branch or PR.
-- Use a normal merge commit so the validated agent head remains an ancestor of `master` and can be verified by the exit gate.
+- **Merge is mandatory for accepted integration work and is owned by the current Integration Owner.**
+- Completed integration is not delivered while it exists only on a branch or PR.
+- Use a normal merge commit so the validated PR head remains an ancestor of `master` and repository provenance checks can verify it.
 - After successful merge and post-merge verification, merged work branches are disposable and should be deleted when practical.
 - No agent may report `DONE` for work that is not present on verified `master` and reflected as `MERGED_VERIFIED` in coordination state.
+- Human-owned work is considered integrated only after it is present on verified `master`; it does not require an autonomous task-state record when no agent owned the task.
 
 ## Product truth boundary
 
@@ -217,6 +242,8 @@ BOUNCAMPUS must not present model estimates as live university telemetry. Unless
 Real-world evidence and KREATE claims remain subject to the stricter evidence system under `KREATE/`; multi-agent autonomy never permits fabricating or self-attesting PMR.
 
 ## Release sequence
+
+### Agent-owned work
 
 1. Dispatcher exposes independent `READY` tasks.
 2. Workstream Agents atomically claim non-overlapping tasks and execute in parallel.
@@ -229,6 +256,17 @@ Real-world evidence and KREATE claims remain subject to the stricter evidence sy
 9. Deploy/verify runtime surfaces when deployment is part of the task scope.
 10. **IE/CS2:** if completed work exposes multiple meaningful strategic next directions, present the user decision checkpoint before claiming a new strategic workstream.
 11. **EE/CS1:** report the result, choose the next highest-value aligned technical task, and continue autonomously unless a genuine human gate applies.
+
+### Human-owned work
+
+1. Select or create a bounded issue/task and check for overlapping agent/human ownership.
+2. Branch from a recent `master` using `human/<role>/<task>`.
+3. Implement and run relevant local validation.
+4. Wait for the single integration slot if another PR is open; do not open a second parking-lot PR.
+5. Update from the latest required `master`, open the single PR, and complete the PR template.
+6. Resolve conflicts and CI failures on the same work package.
+7. Merge with the repository's normal merge-commit semantics.
+8. Verify the resulting `master` state and record relevant issue/PR/evidence links.
 
 ## Bootstrap exception
 
