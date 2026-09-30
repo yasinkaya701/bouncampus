@@ -8,8 +8,17 @@
   "parent_roles": ["IE", "EE", "CS1", "CS2"],
   "human_parent_limit_per_role": 1,
   "child_agent_limit": null,
+  "parent_states": [
+    "ACTIVE",
+    "BLOCKED",
+    "WAITING_HUMAN",
+    "READY_FOR_INTEGRATION",
+    "INTEGRATING",
+    "MERGED_VERIFYING",
+    "COMPLETE"
+  ],
   "hardware": {
-    "primary_role": "EE",
+    "primary_role": "ee",
     "playbook": "KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md",
     "recommended_lanes": [
       "hw-measurement",
