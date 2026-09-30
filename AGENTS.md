@@ -49,67 +49,72 @@ Everything else is autonomous by default **inside the accepted work package**, i
 
 `WAITING_HUMAN` is valid only when the task has a non-`NONE` human gate, asks one concrete decision, and all work independent of that decision is already complete. Uncertainty alone is not a human gate.
 
-## Post-work user decision checkpoint
+## Post-work user decision checkpoint — role scoped
 
-Autonomy inside a work package does **not** authorize an agent to finish one meaningful task and then blindly select the next strategic workstream.
+The post-work user decision checkpoint is **not universal**.
 
-The required lifecycle is:
+For KREATE role work, the policy is:
 
-> **Accept work → finish it end-to-end → merge and verify → explain the result → surface real next options → recommend one → ask the user to choose the next meaningful direction when a material branch exists.**
+- **IE — Customer Discovery & Market Lead: CHECKPOINT ON**
+- **CS2 — Product Strategy, Evidence Synthesis & Application Lead: CHECKPOINT ON**
+- **EE — Physical Systems & Measurement Lead: CHECKPOINT OFF**
+- **CS1 — Decision Intelligence Lead: CHECKPOINT OFF**
 
-After a work package reaches `MERGED_VERIFIED`, or after a bounded research/PMR/experiment package reaches its accepted Definition of Done, the agent MUST evaluate whether the next step is merely completion of the same direction or a new meaningful branch.
+The detailed role-specific protocol lives in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
 
-### Continue autonomously when
+### IE and CS2 — preserve user control over strategic branches
 
-The next action is:
+Autonomy inside a work package does **not** authorize IE or CS2 to finish one meaningful task and then blindly select the next strategic workstream.
 
-- required to finish the same accepted acceptance criteria;
-- a routine integration or verification step;
-- low-risk and reversible;
-- an obvious sequential subtask with no material strategic alternative;
-- a small technical choice that can be resolved by tests or inspection.
+Their required lifecycle is:
 
-Do not interrupt the user for those cases.
+> **Accept work → finish it end-to-end → merge/verify when applicable → explain the result → surface real next options → recommend one → ask the user to choose when a material strategic branch exists.**
 
-### Stop and request direction when
+After a completed package, IE/CS2 should stop for user direction when the next action would commit substantial effort to one of multiple credible strategic directions, for example:
 
-The current work is complete and the next action would commit substantial effort to one of multiple credible directions, for example:
-
-- a new major feature stream;
-- a new PMR segment;
-- a different beachhead or persona;
-- hardware versus hardware-free direction;
-- a new hardware architecture;
-- a materially different model/data strategy;
+- a different beachhead, persona, buyer, or PMR segment;
+- a major product-thesis change;
+- a new major feature family that displaces other important work;
 - a substantial application narrative change;
-- a new campus domain expansion;
-- a large polish/demo workstream before the application deadline;
-- any other next workstream where choosing one path meaningfully delays or excludes another.
+- a new campus-domain expansion;
+- a major market/pilot path choice;
+- any other branch where choosing one path materially delays or excludes another.
 
-### Required decision package
+Their decision package must include:
 
-Before asking the user for direction, the agent MUST provide enough information to support an informed choice:
-
-1. **Completed** — what was actually delivered;
+1. **Completed** — what was delivered;
 2. **Evidence / result** — tests, commits, measurements, interview findings, benchmark results, or evidence IDs;
 3. **What changed** — assumptions, risks, product requirements, feature priority, or KREATE claims affected;
-4. **Options** — normally 2–4 materially different next paths, without fake alternatives;
+4. **Options** — normally 2–4 materially different next paths without fake alternatives;
 5. for each option: **expected result, effort/cost, main risk, dependencies, and KREATE impact**;
 6. **Recommendation** — which option the agent prefers and why;
 7. **Decision needed** — one concise user choice.
 
-The agent MUST take a position. “All options are equally good” is not useful unless the evidence genuinely supports that conclusion.
+IE/CS2 should not ask vague questions such as “What should I do next?” without first supplying the result and decision context.
 
-Do not ask vague questions such as “What should I do next?” or “Should I continue?” without first supplying the result and decision context.
+### EE and CS1 — continuous technical execution
 
-A good checkpoint ends with something like:
+EE and CS1 must **not** pause after completed technical work merely to ask the user which technical direction to take next.
 
-> **Recommended:** Option B because it produces the highest PMR/evidence value before October 8 with lower dependency risk.  
-> **Decision needed:** choose A, B, or C for the next workstream.
+After a work package reaches `MERGED_VERIFIED`, or after a bounded experiment reaches its accepted Definition of Done, EE/CS1 should:
 
-For KREATE-specific work, follow the detailed protocol in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
+1. report the concrete result and evidence;
+2. record limitations, failures, and changed assumptions;
+3. inspect current KREATE objectives, dependencies, ready work, and latest IE/CS2 strategic decisions;
+4. choose the next highest-value non-conflicting technical task;
+5. continue autonomously.
 
-This checkpoint occurs **after the current work package is complete**. It does not weaken the merge-before-exit contract and must not be used as an excuse to stop with accepted code unmerged or unverified.
+EE may autonomously choose among measurement architectures, component/sensor approaches, calibration work, hardware-free alternatives, integration methods, or pilot-instrumentation tasks.
+
+CS1 may autonomously choose among realistic baselines, model/heuristic experiments, signal ablation, uncertainty methods, decision-cost formulations, data-quality work, evaluation, or pilot analytics.
+
+Multiple technically plausible paths are **not** by themselves a reason to ask the user. EE/CS1 should use tests and bounded experiments to choose.
+
+If EE/CS1 uncover evidence that implies a genuine market/product pivot rather than a technical choice, they should document the finding and surface it to IE/CS2. The strategic role then runs the user checkpoint if needed.
+
+Checkpoint OFF does not override `EVIDENCE_ATTESTATION`, `IRREVERSIBLE_ACTION`, `PHYSICAL_SAFETY`, `EXTERNAL_COMMITMENT`, or a genuine `PRODUCT_DIRECTION` human gate.
+
+This role split does not weaken the merge-before-exit contract and must not be used as an excuse to stop with accepted code unmerged or unverified.
 
 ## Task claim and lease rules
 
@@ -222,7 +227,8 @@ Real-world evidence and KREATE claims remain subject to the stricter evidence sy
 7. The same agent verifies the merged `master`, runs the exit gate, and records merge evidence.
 8. Only then does the task become `MERGED_VERIFIED` and release its lease.
 9. Deploy/verify runtime surfaces when deployment is part of the task scope.
-10. If the completed work exposes multiple meaningful next directions, present the user decision checkpoint before claiming a new strategic workstream.
+10. **IE/CS2:** if completed work exposes multiple meaningful strategic next directions, present the user decision checkpoint before claiming a new strategic workstream.
+11. **EE/CS1:** report the result, choose the next highest-value aligned technical task, and continue autonomously unless a genuine human gate applies.
 
 ## Bootstrap exception
 
