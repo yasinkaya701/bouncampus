@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "TASK-CS1-DECISION-CORE",
+  "title": "Build CS1 food decision integrity core",
+  "priority": "P0",
+  "lane": "api-product",
+  "state": "READY",
+  "owner_agent": null,
+  "branch": null,
+  "depends_on": [],
+  "touched_paths": [
+    "backend/app/decision/food_policy.py",
+    "backend/app/routers/food.py",
+    "backend/app/schemas.py",
+    "backend/app/optimizers/food_optimizer.py",
+    "scripts/kreate_check.py",
+    "scripts/test_food_decision_policy.py",
+    "docs/superpowers/plans/2026-09-30-cs1-decision-core.md"
+  ],
+  "acceptance_criteria": [
+    "Pre-pilot food decision responses do not expose achieved food-waste or cost savings",
+    "Food decision output carries explicit readiness, abstention, human-review, provenance, and reason-code semantics",
+    "Heuristic planning bands are labeled POLICY_HEURISTIC rather than calibrated confidence",
+    "WITHHOLD is possible when required decision context is missing",
+    "Focused regression tests lock the decision policy and claim firewall"
+  ],
+  "validation_commands": [
+    "python scripts/test_food_decision_policy.py",
+    "python scripts/kreate_check.py",
+    "python -m compileall -q backend/app scripts"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": null,
+    "heartbeat_at": null,
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Scope intentionally limited to the main decision-integrity core; baseline benchmarking, calibration, ablation, and broad UI work are deferred.",
+    "Does not touch .github/workflows/ci.yml because TASK-FABRIC-CLI currently owns that path."
+  ]
+}
