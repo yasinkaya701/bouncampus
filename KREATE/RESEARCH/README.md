@@ -12,6 +12,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 - Procurement samples in this directory are **not** TAM/SAM/SOM unless a separate systematic market-sizing method explicitly establishes that scope.
 - Contract clauses from another university are **sector precedents, not Boğaziçi contract facts**.
 - Global climate/food-waste statistics are context, **not local conversion factors or measured Boğaziçi impact**.
+- Public professional contact information is for role routing only; it is **not interview evidence, endorsement, availability or permission for repeated outreach**.
 
 ## Available packs
 
@@ -23,6 +24,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 | [Türkiye Public-University Dining Procurement Benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) | Cross-university 2026 procurement sample testing whether the buyer/quantity/contract workflow repeats beyond Boğaziçi; covers SKS buyer pattern, on-site vs transported service, meal/channel segmentation and candidate beachhead refinement. | [`turkiye_university_dining_procurement_benchmark.json`](./turkiye_university_dining_procurement_benchmark.json) |
 | [Türkiye University Dining Contract Decision Precedents](./TURKIYE_DINING_CONTRACT_DECISION_PRECEDENTS.md) | KİK-backed precedents showing historical-demand quantity heuristics, contractor forecast responsibility, smart-card/actual-consumption settlement, excess/shortage risk and historical-preference menu-mix adjustment. | [`turkiye_dining_contract_decision_precedents.json`](./turkiye_dining_contract_decision_precedents.json) |
 | [Türkiye Zero-Waste & Campus Food-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) | Official Türkiye Zero Waste and UNEP context translated into pilot KPI hierarchy, measurement boundary and anti-greenwashing rules for food-waste/climate claims. | [`turkiye_zero_waste_campus_measurement_context.json`](./turkiye_zero_waste_campus_measurement_context.json) |
+| [Boğaziçi PMR Target Map](./BOGAZICI_PMR_TARGET_MAP.md) | Public role-routing map for Food Services, current contractor, BİD data owner, sustainability/Zero Waste measurement owner, SKS escalation and operational-data support; includes question ownership and recommended interview sequence. | [`bogazici_pmr_target_map.json`](./bogazici_pmr_target_map.json) |
 | [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) | Cross-source data-quality control: capacity, beneficiary, serving, packaged-meal, food-waste/İSTAÇ and service-regime semantics that agents must reconcile before joining metrics or training models. | See the `source_conflicts` section of [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json). |
 
 ## Recommended reading order
@@ -33,12 +35,13 @@ This directory contains secondary/public-source research prepared for KREATE age
 4. Read the Türkiye procurement benchmark before beachhead, market-repeatability or cross-institution product-architecture work.
 5. Read the Contract Decision Precedents before designing PMR around quantity ownership, hakediş, excess/shortage incentives, current heuristics or menu-mix decisions.
 6. Read the Zero-Waste Measurement Context before defining pilot waste KPIs, climate/resource conversions or application impact language.
-7. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
+7. Use the PMR Target Map to route each unresolved question to the smallest relevant owner set; do not shotgun generic outreach.
+8. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
 
 ## How agents should consume a pack
 
 1. Read the **agent-critical takeaways** and **claim firewall** first.
-2. Use `fact_id` / `finding_id` / `case_id` references when creating downstream tasks or experiments.
+2. Use `fact_id` / `finding_id` / `case_id` / `target_id` references when creating downstream tasks or experiments.
 3. Before promoting a number into `../EVIDENCE.md`, reopen the source, verify wording/date/units, and write a claim no broader than the source supports.
 4. Route unknown workflow facts to PMR rather than filling them with assumptions.
 5. Route quantitative/model implications to reproducible technical tests rather than presenting them as measured campus performance.
@@ -47,3 +50,4 @@ This directory contains secondary/public-source research prepared for KREATE age
 8. Never extrapolate a purposive procurement sample into a national market size without an explicit market-sizing methodology and denominator.
 9. Never copy another university's contract clause into a Boğaziçi claim; use precedents only to sharpen the exact question that Boğaziçi PMR/contract verification must answer.
 10. Never convert global food-waste GHG/resource statistics into local saved CO2e/water without measured physical change, a documented conversion method and explicit `MODEL ESTIMATE` labeling.
+11. A contact, scheduled call or unanswered outreach is not PMR evidence; only completed conversation artifacts can enter the interview evidence pipeline.
