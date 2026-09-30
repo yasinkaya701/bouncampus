@@ -19,7 +19,7 @@ Allowed lifecycle states:
 
 ## Rules
 
-- Every active workstream must declare a lane, branch, owner role, scope, and touched paths before implementation begins.
+- Every active workstream must declare a lane, branch, owner role, state, scope, and touched paths before implementation begins.
 - File ownership is exclusive while a workstream is active.
 - The agent that accepts a workstream owns implementation, validation, integration, conflict resolution, merge, and post-merge verification.
 - The Merge Coordinator is a repository-wide lock acquired temporarily by the ready workstream owner; it is not a separate agent handoff.
@@ -32,6 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
+| frontend-ux + quality-release | `agent/frontend-ux/archive-stale-flow-mock` | Workstream Agent / temporary Merge Coordinator | ACTIVE | Remove the orphan hard-coded `/flow` mock from the active Next.js route tree, preserve its source under `legacy/`, and document the active/legacy boundary without changing production behavior elsewhere. | `.agents/WORKSTREAMS.md`, `frontend/src/app/flow/page.tsx`, `legacy/README.md`, `legacy/frontend/src/app/flow/page.tsx`, `README.md` |
 
 The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
 
