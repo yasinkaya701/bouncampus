@@ -87,13 +87,21 @@ TODO
 
 ## Evidence IDs created
 
-Create IDs in `KREATE/EVIDENCE.md` only for claims actually supported or contradicted by this interview.
+Create IDs in `KREATE/EVIDENCE.md` only for claims actually supported **or contradicted** by this interview.
 
-- TODO
+- **Supports:** TODO assumption/claim IDs or `NONE`
+- **Contradicts:** TODO assumption/claim IDs or `NONE`
+- **Evidence IDs:** TODO `E-INT-*` IDs, or `NONE — no promotable claim`
+
+Do not manufacture an evidence row just because the conversation was completed.
 
 ## What changed in our assumptions / product
 
-For each change, cite the affected assumption/decision ID. `NO CHANGE` is acceptable if justified.
+For each change, cite the affected assumption/decision ID. `NO CHANGE` is acceptable if justified. Distinguish:
+
+- what the interviewee directly reported;
+- the team's interpretation;
+- the actual assumption/decision change, if any.
 
 TODO
 
@@ -109,8 +117,10 @@ Before marking the interview record complete:
 
 - [ ] This was a real conversation with a distinct stakeholder.
 - [ ] Notes separate observed/reported facts from interviewer interpretation.
+- [ ] The most recent concrete incident was requested; if none was available, that limitation is explicit.
 - [ ] Exact quotes are verbatim or marked `NONE`.
 - [ ] No invented name, organization, incident, quote, result, or number appears.
-- [ ] Claims promoted to `INTERVIEW EVIDENCE` have evidence IDs.
+- [ ] Claims promoted to `INTERVIEW EVIDENCE` have `E-INT-*` evidence IDs.
+- [ ] An interview with no promotable claim is recorded honestly as `NONE — no promotable claim`.
 - [ ] Contradictory evidence is recorded rather than smoothed over.
 - [ ] Any AI-assisted summary has been checked against the human notes by a human reviewer.
