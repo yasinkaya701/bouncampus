@@ -27,6 +27,9 @@ jobs:
       - name: Comprehensive CS1 decision intelligence tests
         run: python scripts/test_cs1_decision_intelligence.py
 
+      - name: Method eligibility and fair-baseline regressions
+        run: python scripts/test_cs1_method_eligibility.py
+
       - name: KREATE integrity gate
         run: python scripts/kreate_check.py
 
