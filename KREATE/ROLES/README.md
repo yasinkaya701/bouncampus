@@ -201,3 +201,28 @@ Preferred behavior:
 - escalate only genuinely ambiguous or irreversible decisions.
 
 The operating objective is not to keep four agents busy. It is to make the **best possible startup and application decisions before the deadline**.
+
+## Human Decision Checkpoints
+
+Role autonomy does **not** mean agents should blindly continue into a new strategic workstream after finishing the current one.
+
+The required pattern is:
+
+> **Finish the accepted work package → verify the result → explain what changed → present the real next options → recommend one → ask the user to choose the next meaningful direction.**
+
+Agents should not interrupt the user for routine, reversible details inside an accepted task. But when a completed task creates multiple materially different next directions, the agent must pause before committing substantial time to one of them.
+
+A checkpoint should include:
+
+1. **Completed** — exactly what was delivered;
+2. **Evidence / result** — tests, interview findings, benchmark results, calibration data, files, commits, or evidence IDs;
+3. **What changed** — which assumption, product requirement, risk, or application claim changed;
+4. **Options** — normally 2–4 real alternatives, each with expected value, effort, risk, dependencies, and KREATE impact;
+5. **Recommendation** — the agent's preferred option and why;
+6. **Decision needed** — one concise choice for the user.
+
+Do not invent artificial choices. If there is only one obvious, reversible next step required to finish the same accepted work package, continue autonomously.
+
+Do not ask vague questions such as “What should I do now?” before doing the analysis. Give the user enough information to decide intelligently.
+
+Full protocol: [`USER_DECISION_CHECKPOINT_PROTOCOL.md`](./USER_DECISION_CHECKPOINT_PROTOCOL.md).
