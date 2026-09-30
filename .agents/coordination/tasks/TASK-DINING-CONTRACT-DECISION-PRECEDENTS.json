@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "TASK-DINING-CONTRACT-DECISION-PRECEDENTS",
+  "title": "Research university dining contract decision precedents",
+  "priority": "P0",
+  "lane": "campus-data-geo",
+  "state": "READY_FOR_INTEGRATION",
+  "owner_agent": "research-evidence",
+  "branch": "agent/campus-data-geo/dining-contract-precedents",
+  "depends_on": [],
+  "touched_paths": [
+    "KREATE/RESEARCH/README.md",
+    "KREATE/RESEARCH/TURKIYE_DINING_CONTRACT_DECISION_PRECEDENTS.md",
+    "KREATE/RESEARCH/turkiye_dining_contract_decision_precedents.json"
+  ],
+  "acceptance_criteria": [
+    "Official KİK decisions are used to document sector precedents for historical-demand production heuristics, actual-consumption settlement and excess/shortage risk",
+    "Uşak, Kırıkkale, Sakarya and Marmara clauses are kept separate and source-traceable",
+    "Another university's contract mechanics are never promoted to Boğaziçi contract facts",
+    "Contract precedents sharpen buyer/user role separation and PMR questions for Boğaziçi",
+    "CS1 requirements include current-heuristic baselines, asymmetric decision loss, settlement-aware evaluation and separate total/menu-mix decisions",
+    "A machine-readable companion exposes each precedent, cross-case pattern and forbidden Boğaziçi inference"
+  ],
+  "validation_commands": [
+    "python -m json.tool KREATE/RESEARCH/turkiye_dining_contract_decision_precedents.json",
+    "python scripts/kreate_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-10-01T00:25:00+03:00",
+    "heartbeat_at": "2026-10-01T00:25:00+03:00",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Secondary public-source/KİK research only; not legal advice, PMR or Boğaziçi-specific contract evidence.",
+    "Strongest precedent: Uşak contract mechanics combine previous-week quantity heuristic, smart-card/fallback actual diner count, actual-diner hakediş and contractor excess risk.",
+    "Current 2026 Kırıkkale precedent independently links previous-demand forecasting, academic calendar/menu context, actual-consumption hakediş and contractor excess/shortage risk.",
+    "Sakarya precedent establishes historical-preference-driven production-mix adjustment.",
+    "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md."
+  ]
+}
