@@ -32,6 +32,7 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
+| quality-release | `agent/quality-release/agent-fabric-v1-r2` | Execution systems engineer / Workstream Agent | ACTIVE | Add a lightweight autonomous multi-agent control plane: machine-readable task leases, dependency/path-conflict validation, human-by-exception gates, agent task intake, CI enforcement, and compatibility with the existing single-PR merge discipline. | `.agents/WORKSTREAMS.md`, `.agents/FABRIC.md`, `.agents/fabric.json`, `.agents/TASK_TEMPLATE.json`, `AGENTS.md`, `scripts/agent_fabric_check.py`, `scripts/test_agent_fabric_check.py`, `.github/ISSUE_TEMPLATE/agent-task.yml`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/workflows/ci.yml` |
 
 The `frontend-ux + api-product + quality-release / stale-path-cleanup` workstream was merged through PR #30 at merge commit `6cedf9c55949271972fde340554abd394230bc6c` and verified on `master` by CI run #246. Verification included frontend npm install/typecheck/lint/build, feature preservation, repository Python compile, KREATE operating-system validation, critical JSON validation, merged-PR provenance, and confirmation that the integrated agent head is contained in `master`. It moved the orphan hard-coded `/flow` route, unused synthetic backend generator/training entrypoints, and superseded platform walkthrough under `legacy/`, replaced stale frontend boilerplate documentation, preserved active KREATE/jury/product surfaces, and released ownership after verification.
 
