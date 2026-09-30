@@ -7,7 +7,7 @@ const now = new Date();
 const currentDayIdx = (now.getDay() + 6) % 7; // Monday = 0
 const currentHour = now.getHours();
 
-// 1. Real 21 Boğaziçi Buildings with Real OBIKAS Occupancy
+// 1. Schedule-derived Boğaziçi building occupancy estimates.
 export const realBuildings: Building[] = campusConfig.buildings.map(b => {
   const occData = computeBuildingOccupancy(b.id, currentDayIdx);
   const hourState = occData.total_hourly[currentHour] || occData.total_hourly[12];
@@ -29,7 +29,7 @@ export const realBuildings: Building[] = campusConfig.buildings.map(b => {
   };
 });
 
-// 2. Real Hourly Occupancy Forecasts (06:00 - 22:00)
+// 2. Schedule-derived hourly occupancy forecasts (06:00 - 22:00).
 export const realOccupancy: OccupancyForecast[] = campusConfig.buildings.map(b => {
   const occData = computeBuildingOccupancy(b.id, currentDayIdx);
   return {
@@ -45,7 +45,7 @@ export const realOccupancy: OccupancyForecast[] = campusConfig.buildings.map(b =
   };
 });
 
-// 3. Real Energy Forecasts with Floor Physics
+// 3. Energy model outputs. These are estimates, not measured savings.
 export const realEnergy: EnergyForecast[] = campusConfig.buildings.map(b => {
   const nrg = computeBuildingEnergy(b.id, currentDayIdx);
   return {
@@ -59,31 +59,68 @@ export const realEnergy: EnergyForecast[] = campusConfig.buildings.map(b => {
   };
 });
 
-// 4. Real Cafeteria Demand Forecasts (Kuzey 810 seats, Güney 159 seats)
+const FALLBACK_POLICY_VERSION = 'food-decision-v1.0';
+const FALLBACK_SIGNAL_COVERAGE_PCT = 50;
+
+function fallbackFoodForecast(cafeteriaId: string, predictedDemand: number): FoodForecast {
+  return {
+    date: now.toISOString().split('T')[0],
+    cafeteria_id: cafeteriaId,
+    meal_type: 'lunch',
+    predicted_demand: predictedDemand,
+    planning_lower: Math.round(predictedDemand * 0.9),
+    recommended_production: predictedDemand,
+    planning_upper: Math.round(predictedDemand * 1.13),
+    menu_items: [],
+    policy_version: FALLBACK_POLICY_VERSION,
+    model_id: 'repository-fallback-demand-estimate',
+    forecast_provenance: 'MODEL_ESTIMATE',
+    decision_provenance: 'POLICY_HEURISTIC',
+    band_semantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL',
+    calibration_status: 'NOT_CALIBRATED',
+    signal_coverage_pct: FALLBACK_SIGNAL_COVERAGE_PCT,
+    decision_readiness: 'REVIEW_REQUIRED',
+    abstained: false,
+    operator_approval_required: true,
+    automatic_kitchen_dispatch: false,
+    signals: [
+      { id: 'schedule', available: true, policy_weight_pct: 50, weight_basis: 'POLICY_HEURISTIC' },
+      { id: 'weather', available: false, policy_weight_pct: 20, weight_basis: 'POLICY_HEURISTIC' },
+      { id: 'menu', available: false, policy_weight_pct: 20, weight_basis: 'POLICY_HEURISTIC' },
+      { id: 'calendar', available: false, policy_weight_pct: 10, weight_basis: 'POLICY_HEURISTIC' },
+    ],
+    reason_codes: [
+      'CONTEXT_PARTIAL_OPERATOR_REVIEW_REQUIRED',
+      'HEURISTIC_BAND_NOT_CALIBRATED',
+      'MISSING_WEATHER',
+      'MISSING_MENU',
+      'MISSING_CALENDAR',
+    ],
+    limitations: [
+      'STATIC_REPOSITORY_FALLBACK_NOT_LIVE',
+      'NO_CAFETERIA_POS_OR_SERVED_MEAL_TELEMETRY',
+      'HEURISTIC_BAND_NOT_CALIBRATED',
+      'PILOT_OUTCOMES_NOT_YET_MEASURED',
+    ],
+    model_metadata: {
+      source: 'REPOSITORY_FALLBACK',
+      result_scope: 'MODEL_SANDBOX',
+      impact_validation_status: 'NOT_PILOT_VALIDATED',
+    },
+  };
+}
+
+// 4. Fallback cafeteria demand estimates. They are never treated as measured demand
+// or as evidence of achieved food-waste reduction.
 export const realFood: FoodForecast[] = [
-  {
-    cafeteria_id: 'B-NORTH-KY',
-    cafeteria_name: 'Kuzey Kampüs Yemekhanesi + Piramit',
-    baseline_portions: 3800,
-    predicted_demand: 3240,
-    recommended_production: 3340,
-    avoided_waste_portions: 460,
-    avoided_waste_kg: 184.0,
-    menu_popularity_factor: 1.08,
-  },
-  {
-    cafeteria_id: 'B-SOUTH-GY',
-    cafeteria_name: 'Güney Kampüs Yemekhanesi',
-    baseline_portions: 950,
-    predicted_demand: 820,
-    recommended_production: 850,
-    avoided_waste_portions: 100,
-    avoided_waste_kg: 40.0,
-    menu_popularity_factor: 1.02,
-  }
+  fallbackFoodForecast('B-NORTH-KY', 3240),
+  fallbackFoodForecast('B-SOUTH-GY', 820),
 ];
 
-// 5. Real Prioritized Campus Actions based on Schedule Analysis
+const fallbackFoodDemandMeals = realFood.reduce((sum, item) => sum + item.predicted_demand, 0);
+
+// 5. Prioritized campus actions derived from repository models/policy. Every action
+// is review-only; this fallback module cannot dispatch changes to physical systems.
 export const realActions: ActionItem[] = [
   {
     id: 'ACT-01',
@@ -92,22 +129,24 @@ export const realActions: ActionItem[] = [
     title: 'New Hall (NH) 5. ve 6. Kat Konsolidasyonu',
     time: '17:00 - 21:00',
     location: 'Kuzey Kampüs New Hall',
-    description: 'Saat 17:00 sonrası 5. ve 6. katlarda ders bulunmamaktadır. 32 öğrenci 2. kata yönlendirilerek üst katların AHU ve aydınlatması kapatılabilir.',
+    description: 'Schedule-derived occupancy estimates suggest reviewing evening floor consolidation before any HVAC or lighting action.',
     impact_value: 148,
-    impact_unit: 'kWh',
-    icon: 'Zap'
+    impact_unit: 'kWh model potential',
+    icon: 'Zap',
+    provenance: 'MODEL_ESTIMATE',
   },
   {
     id: 'ACT-02',
     priority: 'HIGH',
     type: 'food',
-    title: 'Kuzey Yemekhane Akşam Porsiyon Optimizasyonu',
+    title: 'Kuzey Yemekhane Üretim Planını Gözden Geçir',
     time: '16:30',
     location: 'Kuzey Yemekhanesi',
-    description: 'Akşam OBIKAS ders yoğunluğu analizi (%28 düşüş) doğrultusunda yemek hazırlığı 3.340 porsiyonla sınırlandırılmalıdır.',
-    impact_value: 224,
-    impact_unit: 'kg gıda',
-    icon: 'Utensils'
+    description: 'Fallback demand is MODEL_ESTIMATE and the planning range is POLICY_HEURISTIC. Decision state is REVIEW_REQUIRED; operator approval is mandatory, automatic kitchen dispatch is disabled, and no food-waste saving is claimed.',
+    impact_value: FALLBACK_SIGNAL_COVERAGE_PCT,
+    impact_unit: '% decision signal coverage',
+    icon: 'Utensils',
+    provenance: 'POLICY_HEURISTIC',
   },
   {
     id: 'ACT-03',
@@ -116,43 +155,47 @@ export const realActions: ActionItem[] = [
     title: 'Perkins Hall (M) 1. Kat Derslik Birleştirme',
     time: '14:00 - 17:00',
     location: 'Güney Kampüs M-1100 Amfisi',
-    description: 'M-2100 ve M-2150 sınıflarındaki 28 ve 34 kişilik iki ders M-1100 amfisine taşınarak B-Blok koridor aydınlatması tasarruf moduna alınabilir.',
+    description: 'Schedule-derived occupancy estimates suggest a consolidation option; verify room use before any operational change.',
     impact_value: 82,
-    impact_unit: 'kWh',
-    icon: 'Building2'
+    impact_unit: 'kWh model potential',
+    icon: 'Building2',
+    provenance: 'MODEL_ESTIMATE',
   },
   {
     id: 'ACT-04',
     priority: 'MEDIUM',
     type: 'energy',
-    title: 'Kare Blok (KB) AHU-2 Eko Mod Geçişi',
+    title: 'Kare Blok (KB) AHU-2 Eko Mod İncelemesi',
     time: '13:30',
     location: 'Kare Blok Bodrum Katı',
-    description: 'Hava kalitesi sensörleri CO₂ seviyesinin 420 ppm olduğunu göstermektedir. Taze hava emiş oranı %80\'den %50\'ye düşürülebilir.',
+    description: 'Review the modeled ventilation opportunity with real building telemetry before changing AHU state.',
     impact_value: 65,
-    impact_unit: 'kWh',
-    icon: 'Zap'
+    impact_unit: 'kWh model potential',
+    icon: 'Zap',
+    provenance: 'MODEL_ESTIMATE',
   },
   {
     id: 'ACT-05',
     priority: 'LOW',
     type: 'space',
-    title: 'Aptullah Kuran Kütüphanesi Kat 3 Isıtma Dengeleme',
+    title: 'Aptullah Kuran Kütüphanesi Kat 3 Isıtma İncelemesi',
     time: '20:00 - 02:00',
     location: 'Kütüphane 3. Kat',
-    description: 'Termal kamera okuması 24.2°C göstermektedir. Hedef sıcaklık 21.5°C\'ye çekilerek konfor artırılabilir.',
+    description: 'Review the modeled nighttime HVAC opportunity against real occupancy and temperature telemetry before action.',
     impact_value: 38,
-    impact_unit: 'kWh',
-    icon: 'Building2'
+    impact_unit: 'kWh model potential',
+    icon: 'Building2',
+    provenance: 'MODEL_ESTIMATE',
   }
 ];
 
-// 6. Aggregate Dashboard KPI Metrics from Real Calculations
+// 6. Aggregate dashboard model metrics. Food impact is intentionally excluded until
+// measured pilot evidence exists.
 const totalBaselineEnergy = realEnergy.reduce((acc, e) => acc + e.baseline_kwh, 0);
 const totalOptimizedEnergy = realEnergy.reduce((acc, e) => acc + e.optimized_kwh, 0);
 const totalEnergySavedKwh = totalBaselineEnergy - totalOptimizedEnergy;
-const costSavedTl = Math.round(totalEnergySavedKwh * 2.85 + (184 + 40) * 85); // 2.85 TL/kWh + 85 TL/kg meal
-const co2AvoidedKg = Math.round(totalEnergySavedKwh * 0.47 + (184 + 40) * 1.8); // 0.47 kg CO2/kWh + 1.8 kg CO2/kg food
+const modeledEnergySavingTl = Math.round(totalEnergySavedKwh * 2.85);
+const modeledEnergyCo2Kg = Math.round(totalEnergySavedKwh * 0.47);
 
 const campusTotalStudents = realBuildings.reduce((acc, b) => acc + (b.current_occupancy || 0), 0);
 const campusTotalCapacity = realBuildings.reduce((acc, b) => acc + b.total_capacity, 0);
@@ -162,17 +205,26 @@ export const realDashboardData: DashboardData = {
   date: now.toISOString().split('T')[0],
   campus_occupancy: campusOccupancyRatio,
   predicted_energy_mwh: Math.round((totalBaselineEnergy / 1000) * 10) / 10,
-  food_demand_meals: 3240 + 820,
-  potential_saving_tl: costSavedTl,
-  co2_avoided_kg: co2AvoidedKg,
+  food_demand_meals: fallbackFoodDemandMeals,
+  potential_saving_tl: modeledEnergySavingTl,
+  co2_avoided_kg: modeledEnergyCo2Kg,
   buildings: realBuildings,
   actions: realActions,
   occupancy_forecasts: realOccupancy,
   energy_forecasts: realEnergy,
-  food_forecasts: realFood
+  food_forecasts: realFood,
+  data_quality: {
+    mode: 'MODEL_SANDBOX',
+    official_live_sources: 0,
+    external_live_sources: 0,
+    model_estimates: ['building occupancy', 'energy', 'food demand'],
+    unavailable_sources: ['cafeteria POS', 'produced portions', 'served portions', 'measured service waste', 'live building telemetry'],
+    note: 'Repository fallback only. Food demand and energy values are model estimates; no achieved food-waste or climate impact is claimed.',
+  },
 };
 
-// 7. Scenario Simulation Engine
+// 7. Scenario Simulation Engine. Changes are counterfactual scenario outputs, not
+// measured impact.
 export const realScenarioResult: ScenarioResult = {
   original: realDashboardData,
   modified: {
@@ -187,6 +239,6 @@ export const realScenarioResult: ScenarioResult = {
     energy_change_percent: 18.2,
     food_change_percent: 22.0,
     co2_change_percent: 24.1,
-    cost_change_tl: Math.round(costSavedTl * 0.3),
+    cost_change_tl: Math.round(modeledEnergySavingTl * 0.3),
   }
 };
