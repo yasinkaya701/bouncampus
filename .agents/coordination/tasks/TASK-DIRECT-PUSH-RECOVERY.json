@@ -4,7 +4,7 @@
   "title": "Recover green master provenance after unauthorized direct push",
   "priority": "P0",
   "lane": "quality-release",
-  "state": "INTEGRATING",
+  "state": "MERGED_VERIFYING",
   "owner_agent": "execution-systems-engineer",
   "branch": "agent/quality-release/direct-push-recovery",
   "depends_on": [],
@@ -34,19 +34,20 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T16:44:00Z",
-    "heartbeat_at": "2026-09-30T16:47:00Z",
+    "heartbeat_at": "2026-09-30T16:50:00Z",
     "ttl_minutes": 360
   },
   "blocker": null,
   "integration": {
     "pull_request": 34,
-    "validated_head_sha": null,
-    "merge_sha": null,
+    "validated_head_sha": "71f84322faa6bbb650bd3a2ad7a108daad7cf90f",
+    "merge_sha": "de3a33305bae245cf2d8cf81b5e0037c20011302",
     "post_merge_verified_at": null
   },
   "notes": [
     "Triggered because direct master pushes after PR #33 caused provenance failures; CI #254 explicitly failed master-merge-audit while fabric/KREATE/repository checks passed.",
-    "PR #34 is the single integration PR. Its head was merged with latest master state through branch merge commit 71f84322faa6bbb650bd3a2ad7a108daad7cf90f after master advanced again during recovery.",
+    "PR #34 exact-head CI #258 passed after the recovery branch merged the latest master state through 71f84322faa6bbb650bd3a2ad7a108daad7cf90f.",
+    "PR #34 merged normally at de3a33305bae245cf2d8cf81b5e0037c20011302; post-merge verification is in progress.",
     "This task is autonomous; the separate branch-protection administration task remains the only human gate."
   ]
 }
