@@ -2,324 +2,172 @@
 
 **Campus food-waste decision intelligence for KREATE for Climate.**
 
-BOUNCAMPUS turns a measured institutional climate problem into a safe operating decision loop. For the hackathon, the product is deliberately focused on **food-waste prevention in university dining operations**.
+## Team — start here
 
-Boğaziçi University publicly reports:
+If you just joined the team, you should be able to clone the repo, understand your lane, run the product, choose a bounded task, and start contributing without reading the entire repository first.
 
-- **50,993 kg** food waste in 2024;
-- **48,251 kg** food waste in 2025;
-- **33,430 kg** of 2025 food waste sent to İSTAÇ for recovery;
-- dining services spanning six campuses, with published dining-hall capacity and service schedules.
+### 5-minute local start
 
-Official baseline: https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310
+Requirements:
 
-> **The 48-ton problem is already known. BOUNCAMPUS acts before the next kilogram becomes waste—and lets measured pilot evidence, not the model, decide whether the intervention worked.**
+- Git
+- Node.js **24.x**
+- Python **3.11+** only when you touch backend/repository tooling
 
-## Hackathon thesis
+```bash
+git clone https://github.com/yasinkaya701/bouncampus.git
+cd bouncampus/frontend
+npm ci
+npm run dev
+```
+
+Open `http://localhost:3000` and check these first:
+
+1. `/demo`
+2. `/food-waste`
+3. `/food-waste/pilot`
+4. `/data`
+
+Then use:
+
+- **[`docs/ONBOARDING.md`](docs/ONBOARDING.md)** — first 30 minutes in the repo
+- **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — branch, issue, validation and PR rules
+- **[`docs/development-workflow.md`](docs/development-workflow.md)** — authoritative parallel merge model
+- **[`AGENTS.md`](AGENTS.md)** — full human/agent execution policy
+
+### Four team roles
+
+| Role | Owns the question | Long-lived integration branch |
+| --- | --- | --- |
+| **IE — Customer Discovery & Market Lead** | Who has the problem, who buys, and what does real PMR show? | `role/ie-customer-discovery` |
+| **EE — Physical Systems & Measurement Lead** | What can we reliably measure, instrument and validate? | `role/ee-physical-systems` |
+| **CS1 — Decision Intelligence Lead** | Can we make a better operating decision and prove it? | `role/cs1-decision-intelligence` |
+| **CS2 — Product Strategy, Evidence Synthesis & Application Lead** | What should we build and what can we credibly claim? | `role/cs2-product-strategy` |
+
+Roles are ownership defaults, not silos. Cross-role work is encouraged when ownership is visible and shared files are coordinated.
+
+### Normal development flow
 
 ```text
-OFFICIAL WASTE BASELINE
+pick one bounded issue
         ↓
-SOURCE HEALTH + CAMPUS CONTEXT
-(schedule + academic calendar + weather + menu)
+choose the owning role branch
         ↓
-UNCERTAINTY-AWARE DEMAND / PRODUCTION BAND
+sync that role branch
         ↓
-DECISION READINESS
+create agent/<lane>/<task>
+        ↓
+implement + validate
+        ↓
+feature PR → role branch
+        ↓
+role integration PR → master
+        ↓
+post-merge verification
+```
+
+Do not start new work from stale local `master`. Do not commit routine feature work directly to `master`. Final delivery exists only after the change reaches verified `master`.
+
+### Fast validation
+
+Frontend work:
+
+```bash
+cd frontend
+npm run typecheck
+npm run lint
+```
+
+Before an integration candidate:
+
+```bash
+cd frontend
+npm run verify
+```
+
+Repository/KREATE checks when relevant:
+
+```bash
+python scripts/agent_fabric_check.py
+python scripts/kreate_check.py
+python -m compileall -q backend/app scripts
+```
+
+### Repository map
+
+```text
+frontend/      active Next.js product and co-located /api/v1 routes
+backend/       FastAPI research/backend service
+KREATE/        role docs, PMR, evidence, application and hackathon execution
+docs/          maintained product, onboarding and technical documentation
+scripts/       validation, coordination and release tooling
+.agents/       autonomous multi-agent coordination and policy
+legacy/        old experiments/mocks; not the default place for new work
+```
+
+---
+
+## Product thesis
+
+BOUNCAMPUS turns a measured institutional food-waste problem into an uncertainty-aware, human-approved operating decision and a falsifiable pilot.
+
+Boğaziçi University publicly reports **48,251 kg** of food waste in 2025. BOUNCAMPUS does not claim live cafeteria telemetry; it combines source-backed context with transparent decision logic, exposes uncertainty, requires operator approval, and measures whether the intervention actually reduces normalized waste.
+
+```text
+OFFICIAL BASELINE + CONTEXT
+        ↓
+SOURCE HEALTH
+        ↓
+DEMAND / PRODUCTION BAND
+        ↓
 PILOT_READY / REVIEW_REQUIRED / WITHHOLD
         ↓
 HUMAN OPERATOR GATE
-approve / edit / hold
         ↓
-MATCHED 14-DAY PILOT
+MATCHED PILOT
         ↓
-WASTE KG / 100 SERVED MEALS + GUARDRAILS
+WASTE KG / 100 SERVED
         ↓
-MEASURED PILOT SCORECARD
-        ↓
-MODEL CALIBRATION
-        ↺
+MEASURED SCORECARD
 ```
 
-BOUNCAMPUS does **not** autonomously dispatch a kitchen command. A human operator accepts, edits or holds every production recommendation.
-
-## Why this is stronger than another sustainability dashboard
-
-The product:
-
-1. acts **before** avoidable food waste is created;
-2. exposes model uncertainty and missing-source context;
-3. can explicitly **withhold** an operational recommendation;
-4. keeps a human operator in control;
-5. defines the field measurement that can prove the product wrong;
-6. already contains the evidence-scoring path for real pilot measurements.
-
-The goal is not “predict demand accurately” in isolation. The goal is to reduce normalized food waste **without degrading service reliability**.
-
-## Decision readiness
-
-Every production band carries:
-
-- predicted meals;
-- lower and upper operating bounds;
-- operator starting point;
-- signal coverage;
-- `PILOT_READY`, `REVIEW_REQUIRED`, or `WITHHOLD`;
-- missing-signal reason codes;
-- `MODEL_ESTIMATE` provenance;
-- `operatorApprovalRequired=true`;
-- `autoDispatchAllowed=false`.
-
-Current transparent pilot weights:
-
-| Signal | Weight |
-|---|---:|
-| Course schedule | 50% |
-| Weather | 20% |
-| Menu context | 20% |
-| Academic calendar | 10% |
-
-These weights are pilot policy, not learned universal coefficients. Real service data is required for calibration.
-
-## Truth boundary / claim firewall
-
-### Official/public
-
-- 2024 and 2025 annual food-waste totals;
-- 2025 monthly food-waste values;
-- 2025 recovery totals;
-- Boğaziçi dining-service scale and published capacities;
-- official/public contextual sources when available.
-
-### Model estimates
-
-- next-service meal demand;
-- uncertainty-aware production planning band;
-- decision readiness based on source availability;
-- prevention/recovery scenarios;
-- occupancy and building-energy estimates elsewhere in the platform.
-
-### Not currently available
-
-BOUNCAMPUS does **not** claim access to:
-
-- cafeteria POS transactions;
-- actual produced or served portions per service before the pilot;
-- plate-level waste measurements;
-- university BMS or smart meters;
-- turnstiles or Wi-Fi occupancy telemetry;
-- shuttle GPS;
-- live IoT sensor networks.
-
-### Forbidden claims before a measured pilot
-
-The UI/API explicitly rejects statements such as:
-
-- “BOUNCAMPUS saved X kg of food”;
-- “BOUNCAMPUS avoided Y kg CO2”;
-- “BOUNCAMPUS saved Z liters of water”;
-- “we observe actual student demand”;
-- “we optimized actual cafeteria production.”
-
-Scenario values remain scenarios. Climate-equivalent conversions require measured waste reduction plus a documented lifecycle factor.
-
-## 90-second Jury Mode
-
-Open:
+The primary pilot metric is:
 
 ```text
-/demo
+waste_kg_per_100_served = (waste_kg / served_portions) * 100
 ```
 
-The jury flow is five beats:
+The pre-registered target is at least **10% lower normalized waste** versus matched control without increasing early sell-outs. This is a target, not an achieved result.
 
-1. **PROBLEM** — prove the official 48,251 kg 2025 baseline.
-2. **DECISION** — show the next-service band, signal coverage and readiness state.
-3. **HUMAN GATE** — show approve/hold and `AUTO_DISPATCH=false`.
-4. **SCENARIO** — stress-test prevention/recovery without presenting modeled outcomes as achieved savings.
-5. **EVIDENCE** — show the pre-registered pilot target, primary KPI and measurement workflow.
-
-One-line pitch:
-
-> **“BOUNCAMPUS turns measured institutional food waste into an uncertainty-aware, human-approved production decision and a controlled pilot that can prove the product wrong.”**
-
-## Product surfaces
+## Core surfaces
 
 | Surface | Purpose |
-|---|---|
-| `/` | Focused KREATE command center and official problem baseline |
-| `/food-waste` | Core decision workspace: baseline, source health, readiness, operator gate, scenario lab and pilot contract |
-| `/food-waste/pilot` | Pilot Evidence Lab for entering real control/intervention service measurements and scoring the pre-registered gates |
-| `/demo` | 90-second jury choreography |
-| `/decisions` | Existing human-review decision ledger and outcome loop |
+| --- | --- |
+| `/` | KREATE command center and official problem baseline |
+| `/food-waste` | Decision workspace, source health, operator gate, scenario and pilot contract |
+| `/food-waste/pilot` | Pilot Evidence Lab |
+| `/demo` | 90-second jury flow |
+| `/decisions` | Human-review decision ledger |
 | `/data` | Source provenance and truth boundary |
-| `/buildings` | Existing campus building intelligence |
-| `/scenarios` | Existing counterfactual model workspace |
-| `/mobility` | Existing source-backed campus/inter-campus shuttle workspace |
-| `/courses` | BUIS/ÖBİKAS schedule explorer |
-| `/lab` | Experimental/future modules kept outside the primary jury story |
+| `/lab` | Experimental/future modules |
 
-Important endpoints:
+Important API routes:
 
 ```text
 GET  /api/v1/food
 GET  /api/v1/food/pilot-template
 GET  /api/v1/food/pilot-score
 POST /api/v1/food/pilot-score
-GET  /api/v1/dashboard
 GET  /api/v1/health
-GET  /api/v1/brief
-POST /api/v1/scenarios/simulate
 ```
 
-`GET /api/v1/food` exposes the official baseline, source-backed demand context, decision band/readiness, human-approval policy, scenario output, pilot contract, claim policy and truth boundary.
+## Truth boundary
 
-`GET /api/v1/food/pilot-template` returns the blank measurement CSV.
+BOUNCAMPUS distinguishes public facts, model estimates, hypotheses, and measured pilot evidence.
 
-`POST /api/v1/food/pilot-score` accepts **measured aggregate service outcomes only** and computes the predefined control/intervention scorecard. It does not fabricate pilot measurements.
+Do not claim access to cafeteria POS, actual produced/served portions before a pilot, university BMS/smart meters, turnstiles, Wi-Fi occupancy telemetry, shuttle GPS, or live IoT networks unless the source is explicitly integrated and verified.
 
-## 14-day falsifiable pilot
-
-The pilot uses matched **CONTROL vs INTERVENTION** services.
-
-Record aggregate operational fields only:
-
-1. date / service ID / arm;
-2. model forecast meals;
-3. produced portions;
-4. served portions;
-5. edible surplus kg;
-6. waste kg;
-7. early sell-out;
-8. operator override;
-9. anomaly notes.
-
-No student identity, payment identity, device tracking or individual consumption data is required.
-
-### Primary KPI
-
-```text
-waste_kg_per_100_served = (waste_kg / served_portions) * 100
-```
-
-Why normalize by served meals?
-
-Because `waste kg / service` alone is confounded by service volume. A quiet day can look artificially successful. The normalized metric makes control/intervention comparison more defensible.
-
-### Pre-registered success gate
-
-A promising pilot requires all of the following:
-
-- at least **5 measured services per arm**;
-- at least **10% lower waste kg / 100 served meals** versus matched control;
-- no increase in early-sellout incidence;
-- no food-safety process bypass;
-- comparable measurement quality across arms;
-- operator overrides reported rather than hidden.
-
-The **10% value is a target, not an achieved result**.
-
-### Measured evidence engine
-
-The Pilot Evidence Lab starts empty. It does not seed synthetic “winning” results.
-
-Once real service measurements are entered, the score engine reports:
-
-- control/intervention sample counts;
-- mean waste kg / 100 served meals;
-- raw waste kg / service;
-- overproduction rate;
-- edible surplus intensity;
-- forecast absolute percentage error;
-- early-sellout rate;
-- operator-override rate;
-- normalized waste reduction versus control;
-- minimum-evidence, reduction-target and early-sellout gates.
-
-Possible numeric classifications:
-
-- `INSUFFICIENT_EVIDENCE`
-- `PROMISING`
-- `FAILED`
-
-`PROMISING` is intentionally not named `PROVEN`: food-safety review, service matching, measurement quality and replication remain necessary.
-
-Detailed protocol: [`docs/food-waste-pilot-protocol.md`](docs/food-waste-pilot-protocol.md)
-
-## Why the rest of the platform still matters
-
-Food waste is the hackathon wedge, not the entire long-term platform.
-
-Existing capabilities remain preserved as expansion modules:
-
-- campus building/energy decisions;
-- counterfactual scenarios;
-- source-backed shuttle mobility;
-- campus map and 3D/photogrammetry context;
-- source provenance and human approval.
-
-They demonstrate that the same `SENSE → QUALIFY → APPROVE → PILOT → LEARN` architecture can later expand to energy, mobility and other campus climate operations **after** one primary climate outcome is validated end to end.
-
-## Scale path
-
-The transferable asset is not a Boğaziçi-specific dashboard. It is the operating loop and evidence contract.
-
-Potential next environments:
-
-- university cafeterias;
-- hospitals;
-- factories;
-- schools;
-- municipal kitchens;
-- large catering operators.
-
-Each deployment can swap in local demand signals while keeping the same provenance, readiness, human-control and measurement framework.
-
-## Architecture
-
-```text
-OFFICIAL / PUBLIC SIGNALS
-├─ food-waste baseline
-├─ menu
-├─ academic calendar
-├─ course schedule snapshot
-└─ weather
-        │
-        ▼
-PROVENANCE + SOURCE HEALTH
-        │
-        ▼
-FOOD DEMAND CONTEXT
-        │
-        ▼
-UNCERTAINTY-AWARE PRODUCTION BAND
-        │
-        ▼
-READINESS / WITHHOLD POLICY
-        │
-        ▼
-HUMAN OPERATOR GATE
-        │
-        ▼
-14-DAY MATCHED PILOT
-        │
-        ▼
-NORMALIZED SCORECARD + GUARDRAILS
-        │
-        ▼
-CALIBRATION / NEXT SERVICE
-```
-
-## Tech stack
-
-| Layer | Technology |
-|---|---|
-| Product gateway | Next.js 14 / TypeScript |
-| Research backend | FastAPI / Python 3.11+ |
-| Frontend | React, Tailwind, Recharts |
-| Maps | Leaflet + optional 3D/photogrammetry |
-| Models | transparent schedule / demand / energy logic |
-| Deployment target | Vercel frontend + optional FastAPI service |
+Do not state achieved food, CO2, water, cost, or service improvements before measured pilot evidence supports the claim.
 
 ## Run locally
 
@@ -331,45 +179,77 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Validation sequence
+Optional frontend environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+The active frontend can use co-located Next.js `/api/v1` routes, so a separate FastAPI process is not required for normal frontend development.
+
+## Full validation
 
 ```bash
 cd frontend
-npm ci
+npm ci --no-audit --no-fund
 npm run typecheck
 npm run lint
 npm run build
 ```
 
-Then verify at minimum:
+From repository root:
 
-- `/`
-- `/food-waste`
-- `/food-waste/pilot`
-- `/demo`
-- `/decisions`
-- `/data`
-- `/api/v1/food`
-- `/api/v1/food/pilot-template`
-- `/api/v1/food/pilot-score`
-- `/api/v1/health`
+```bash
+python scripts/agent_fabric_check.py
+python scripts/kreate_check.py
+python -m compileall -q backend/app scripts
+```
 
-Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.md). Work is performed on short-lived agent branches, validated through the single integration PR, merged to `master`, and post-merge verified before completion.
+## Parallel development model
 
-## KREATE for Climate
+The repository uses four long-lived role integration branches:
 
+| Role | Branch |
+| --- | --- |
+| IE | `role/ie-customer-discovery` |
+| EE | `role/ee-physical-systems` |
+| CS1 | `role/cs1-decision-intelligence` |
+| CS2 | `role/cs2-product-strategy` |
+
+Create short-lived `agent/<lane>/<task>` branches from the role that owns the outcome and open feature PRs back into that role branch.
+
+Multiple PRs may be open concurrently. Up to three feature PRs may target one role branch, and each role may have one role-to-`master` integration PR open. Every `master` integration must contain current `master`; stale integration branches must sync and revalidate.
+
+High-conflict files such as `AGENTS.md`, `.agents/**`, `.github/**`, root configuration, lockfiles, shared contracts and evidence-policy files require explicit coordination and broad validation.
+
+See [`docs/development-workflow.md`](docs/development-workflow.md) for the exact merge model.
+
+## KREATE role system
+
+Role documents live under [`KREATE/ROLES/`](KREATE/ROLES/):
+
+- IE — Customer Discovery & Market Lead
+- EE — Physical Systems & Measurement Lead
+- CS1 — Decision Intelligence Lead
+- CS2 — Product Strategy, Evidence Synthesis & Application Lead
+
+## Key documentation
+
+- [`docs/ONBOARDING.md`](docs/ONBOARDING.md)
+- [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- [`docs/development-workflow.md`](docs/development-workflow.md)
+- [`docs/food-waste-pilot-protocol.md`](docs/food-waste-pilot-protocol.md)
+- [`docs/kreate-winning-product.md`](docs/kreate-winning-product.md)
+- [`docs/jury-demo-script.md`](docs/jury-demo-script.md)
+- [`docs/pitch.md`](docs/pitch.md)
+- [`docs/jury-q-and-a.md`](docs/jury-q-and-a.md)
+- [`docs/architecture.md`](docs/architecture.md)
+- [`docs/assumptions.md`](docs/assumptions.md)
+
+## KREATE timeline
+
+- **Application deadline:** 8 October 2026, 23:59
+- **Top-15 selection announcement:** 9 October 2026
 - **Hackathon:** 15 October 2026, İstanbul
-- **Core climate problem:** avoidable institutional food waste
-- **Primary pilot metric:** waste kg / 100 served meals
-- **Pilot target:** ≥10% normalized reduction vs matched control, without service degradation
-- **Scale path:** universities → hospitals → factories → schools → municipal kitchens → catering operators
 
-## Jury preparation
-
-- Product contract: [`docs/kreate-winning-product.md`](docs/kreate-winning-product.md)
-- 90-second script: [`docs/jury-demo-script.md`](docs/jury-demo-script.md)
-- Full pitch: [`docs/pitch.md`](docs/pitch.md)
-- Pilot protocol: [`docs/food-waste-pilot-protocol.md`](docs/food-waste-pilot-protocol.md)
-- Judge red-team Q&A: [`docs/jury-q-and-a.md`](docs/jury-q-and-a.md)
-- Runtime architecture: [`docs/architecture.md`](docs/architecture.md)
-- Assumptions/methodology: [`docs/assumptions.md`](docs/assumptions.md)
+Until the application deadline, optimize for PMR evidence, problem clarity, beachhead/persona quality, measurement feasibility, decision-intelligence credibility, and coherent claims. Product polish is valuable only when it supports those priorities.

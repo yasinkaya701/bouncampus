@@ -1,235 +1,294 @@
 # BOUNCAMPUS Repository Working Policy
 
-## Mandatory multi-agent architecture
+## Purpose
 
-BOUNCAMPUS is a multi-agent repository. Parallel implementation is encouraged when ownership is explicit and integration is serialized.
+BOUNCAMPUS is a multi-agent, four-role KREATE repository. Parallel development is encouraged. Integration is controlled by role branches, explicit path ownership, CI gates, and verified merges to `master`.
 
-### Roles
+The repository optimizes for two things at the same time:
 
-- **Dispatcher**: decomposes goals into independently executable tasks, resolves dependencies, and exposes ready work.
-- **Workstream Agent**: claims one task/lane and owns it end-to-end: implementation, tests, integration, merge, and post-merge verification.
-- **Verifier / Red Team**: independently checks risky diffs, acceptance criteria, evidence boundaries, or failure modes when useful.
-- **Integration Owner / temporary Merge Coordinator**: the Workstream Agent whose batch currently holds the repository's single integration slot. This is not a handoff role.
-- **Frontend / UX lane**: UI, accessibility, responsive behavior, visual system, client interactions.
-- **Campus Data / Geo lane**: building metadata, coordinates, geometry, map/3D assets, source provenance.
-- **API / Product lane**: Next.js API routes, backend data contracts, product logic, integrations.
-- **Quality / Release lane**: typecheck, lint, build, backend validation, deployment/release evidence.
+1. let IE, EE, CS1, and CS2 move independently without waiting for a repository-wide PR lock;
+2. prevent stale branches, silent feature loss, and conflict-heavy merges from reaching `master`.
 
-An agent may own more than one lane only when the touched file sets do not overlap with another active task.
+## Core roles
 
-## Autonomous control plane
+KREATE roles:
 
-**Default mode is AUTONOMOUS. Human involvement is exception-only inside an accepted work package.**
+- **IE — Customer Discovery & Market Lead**
+- **EE — Physical Systems & Measurement Lead**
+- **CS1 — Decision Intelligence Lead**
+- **CS2 — Product Strategy, Evidence Synthesis & Application Lead**
 
-The machine-readable contract lives in `.agents/fabric.json`; the execution protocol lives in `.agents/FABRIC.md`.
+Engineering lanes such as `frontend-ux`, `api-product`, `campus-geo`, and `quality-release` remain valid task lanes. A lane may be executed under whichever KREATE role owns the outcome.
 
-- Repository/product truth lives on `master`.
-- Parallel task state lives on the long-lived `agent-coordination` branch under `.agents/coordination/tasks/`.
-- Each task is one JSON file based on `.agents/TASK_TEMPLATE.json`.
-- Claims/heartbeats update only that task file. GitHub blob-SHA preconditions serialize competing claims without a human dispatcher.
-- Product implementation stays on short-lived `agent/<lane>/<task>` branches.
-- At most one integration PR may be open; that PR remains the repository-wide integration lock.
-- `.agents/WORKSTREAMS.md` is a compatibility/history view, not the high-frequency coordination database. Do not make all parallel agents contend on that single markdown file for routine claims/heartbeats.
+Hardware work may additionally use focused lanes such as `hw-measurement`, `hw-sensors`, `hw-power`, `hw-firmware`, `hw-pcb`, `hw-mechanical`, `hw-calibration`, and `hw-verification` under the EE role.
 
-The `agent-coordination` branch is a deliberate policy exception: agents may write **coordination metadata only** under `.agents/coordination/**` directly to that branch. They may not put product code, application claims, secrets, binaries, or release artifacts there.
+## Branch topology
 
-## Human-by-exception policy
+`master` is durable product truth.
 
-Agents MUST NOT ask a human for routine engineering judgment that can be resolved by repository inspection, testing, a reversible implementation choice, or a bounded experiment **while executing the currently accepted work package**.
+Each KREATE role has a long-lived integration branch:
 
-Human input is required only for these gate kinds:
+| Role | Long-lived branch |
+| --- | --- |
+| IE | `role/ie-customer-discovery` |
+| EE | `role/ee-physical-systems` |
+| CS1 | `role/cs1-decision-intelligence` |
+| CS2 | `role/cs2-product-strategy` |
 
-1. `EVIDENCE_ATTESTATION` — a person must attest real-world evidence such as an interview, quote, private institutional fact, or final claim sign-off.
-2. `IRREVERSIBLE_ACTION` — destructive/difficult-to-reverse external actions such as deleting production data, credential revocation/rotation, or repository/account administration.
-3. `PHYSICAL_SAFETY` — real hardware energization, actuator movement, mains/high-current work, field deployment, or another physical-risk action.
-4. `EXTERNAL_COMMITMENT` — final submission, purchase/payment, contract/legal acceptance, consequential external message, or committing to a pilot/date on behalf of the team.
-5. `PRODUCT_DIRECTION` — a material pivot to the agreed beachhead, primary problem, or core product direction when evidence supports materially different choices.
+Normal implementation uses short-lived task branches:
 
-Everything else is autonomous by default **inside the accepted work package**, including decomposition, branch creation, code edits, tests, reversible refactors, dependency updates, ordinary documentation, routine feature prioritization, conflict resolution, PR creation, merge execution, rollback/revert, and post-merge verification.
+```text
+role/<role>
+  ├─ agent/<lane>/<task-a>
+  ├─ agent/<lane>/<task-b>
+  └─ agent/<lane>/<task-c>
+```
 
-`WAITING_HUMAN` is valid only when the task has a non-`NONE` human gate, asks one concrete decision, and all work independent of that decision is already complete. Uncertainty alone is not a human gate.
+Default flow:
 
-## Post-work user decision checkpoint — role scoped
+```text
+latest master
+    ↓ sync
+role/<role>
+    ↓ branch
+agent/<lane>/<task>
+    ↓ PR
+role/<role>
+    ↓ integration PR
+master
+```
 
-The post-work user decision checkpoint is **not universal**.
+The long-lived role branch is a staging/integration surface, not a place to bypass review.
 
-For KREATE role work, the policy is:
+`agent-coordination` remains the long-lived metadata-only coordination branch under `.agents/coordination/**`.
 
-- **IE — Customer Discovery & Market Lead: CHECKPOINT ON**
-- **CS2 — Product Strategy, Evidence Synthesis & Application Lead: CHECKPOINT ON**
-- **EE — Physical Systems & Measurement Lead: CHECKPOINT OFF**
-- **CS1 — Decision Intelligence Lead: CHECKPOINT OFF**
+## Parallel PR policy
 
-The detailed role-specific protocol lives in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
+The old repository-wide single-PR rule is removed.
 
-### IE and CS2 — preserve user control over strategic branches
+Parallelism is allowed under these rules:
 
-Autonomy inside a work package does **not** authorize IE or CS2 to finish one meaningful task and then blindly select the next strategic workstream.
+- Multiple open PRs may exist at the same time.
+- A role branch may have up to **3 open feature PRs** targeting it.
+- Each role may have at most **1 open role-to-`master` integration PR** at a time.
+- Different roles may have integration PRs open concurrently.
+- A `master` integration PR is mergeable only when its head contains the current `master` base SHA and all required checks are green.
+- When one PR merges to `master`, any other open `master` PR that became stale must sync the new `master` before it can merge.
+- Repository-wide governance/bootstrap work may use `agent/quality-release/<task>` directly against `master` when it cannot reasonably live under one role branch.
+- Direct pushes to `master` are forbidden by process and audited by CI.
 
-Their required lifecycle is:
+This gives parallel review without permitting stale concurrent merges.
 
-> **Accept work → finish it end-to-end → merge/verify when applicable → explain the result → surface real next options → recommend one → ask the user to choose when a material strategic branch exists.**
-
-After a completed package, IE/CS2 should stop for user direction when the next action would commit substantial effort to one of multiple credible strategic directions, for example:
-
-- a different beachhead, persona, buyer, or PMR segment;
-- a major product-thesis change;
-- a new major feature family that displaces other important work;
-- a substantial application narrative change;
-- a new campus-domain expansion;
-- a major market/pilot path choice;
-- any other branch where choosing one path materially delays or excludes another.
-
-Their decision package must include:
-
-1. **Completed** — what was delivered;
-2. **Evidence / result** — tests, commits, measurements, interview findings, benchmark results, or evidence IDs;
-3. **What changed** — assumptions, risks, product requirements, feature priority, or KREATE claims affected;
-4. **Options** — normally 2–4 materially different next paths without fake alternatives;
-5. for each option: **expected result, effort/cost, main risk, dependencies, and KREATE impact**;
-6. **Recommendation** — which option the agent prefers and why;
-7. **Decision needed** — one concise user choice.
-
-IE/CS2 should not ask vague questions such as “What should I do next?” without first supplying the result and decision context.
-
-### EE and CS1 — continuous technical execution
-
-EE and CS1 must **not** pause after completed technical work merely to ask the user which technical direction to take next.
-
-After a work package reaches `MERGED_VERIFIED`, or after a bounded experiment reaches its accepted Definition of Done, EE/CS1 should:
-
-1. report the concrete result and evidence;
-2. record limitations, failures, and changed assumptions;
-3. inspect current KREATE objectives, dependencies, ready work, and latest IE/CS2 strategic decisions;
-4. choose the next highest-value non-conflicting technical task;
-5. continue autonomously.
-
-EE may autonomously choose among measurement architectures, component/sensor approaches, calibration work, hardware-free alternatives, integration methods, or pilot-instrumentation tasks.
-
-CS1 may autonomously choose among realistic baselines, model/heuristic experiments, signal ablation, uncertainty methods, decision-cost formulations, data-quality work, evaluation, or pilot analytics.
-
-Multiple technically plausible paths are **not** by themselves a reason to ask the user. EE/CS1 should use tests and bounded experiments to choose.
-
-If EE/CS1 uncover evidence that implies a genuine market/product pivot rather than a technical choice, they should document the finding and surface it to IE/CS2. The strategic role then runs the user checkpoint if needed.
-
-Checkpoint OFF does not override `EVIDENCE_ATTESTATION`, `IRREVERSIBLE_ACTION`, `PHYSICAL_SAFETY`, `EXTERNAL_COMMITMENT`, or a genuine `PRODUCT_DIRECTION` human gate.
-
-This role split does not weaken the merge-before-exit contract and must not be used as an excuse to stop with accepted code unmerged or unverified.
-
-## Task claim and lease rules
-
-New autonomous workstreams use task files on `agent-coordination` rather than editing a central shared ledger for every state change.
+## Task ownership and conflict prevention
 
 Before implementation, a Workstream Agent must:
 
-1. read the task and current blob SHA from `agent-coordination`;
-2. require `READY` state or satisfy the stale-reclaim rules in `.agents/FABRIC.md`;
-3. verify all hard dependencies are `MERGED_VERIFIED`;
-4. verify its declared `touched_paths` do not overlap another active task;
-5. atomically update the task to `CLAIMED` with `owner_agent`, branch, claim timestamp, and heartbeat using the current blob SHA;
-6. create/use the declared `agent/<lane>/<task>` branch and move to `ACTIVE`.
+1. read/claim the task using the `agent-coordination` task store when the work is represented there;
+2. verify hard dependencies are `MERGED_VERIFIED`;
+3. declare realistic `touched_paths`;
+4. verify no active task owns overlapping product paths;
+5. create a short-lived `agent/<lane>/<task>` branch from the correct role branch;
+6. keep the task lease alive while the work is active.
 
-A material commit or meaningful validation checkpoint refreshes the heartbeat. An expired lease may be reclaimed autonomously only under the evidence requirements in `.agents/FABRIC.md`; a human is not required merely because an agent disappeared.
+Two active tasks must not own overlapping product paths. Parent/child ownership counts as overlap.
 
-Two active agents must not own overlapping product paths. Parent/child ownership counts as overlap. If a newly discovered necessary path overlaps another active task, re-scope, wait, or explicitly coordinate; do not silently edit the overlapping path.
+If work must cross role boundaries, choose one primary role branch and document the cross-role impact. If the change is genuinely repository-wide, use the quality/release governance path rather than silently editing several role branches.
 
-## HARD EXIT CONTRACT — MERGE BEFORE EXIT
+## Feature PR requirements: task branch -> role branch
 
-**An agent MUST NOT finish, report success, relinquish ownership, or exit while its accepted work exists only on an agent branch or open PR.**
+A feature PR is not final delivery. It stages validated work into a role branch.
 
-For every workstream an agent accepts, the same owning Workstream Agent MUST continue until all of the following are true:
+Before merging a feature PR into a role branch:
 
-1. implementation is complete on its short-lived branch;
-2. targeted validation passes;
-3. the task reaches `READY_FOR_INTEGRATION`;
-4. the agent acquires the single integration slot when no other PR is open;
-5. its branch is updated with the latest `master`;
-6. feature-preservation and agent-fabric checks pass;
-7. the repository's single integration PR is opened or updated by that same agent;
-8. all PR CI checks pass on the exact head SHA;
-9. the same agent resolves every merge conflict and CI failure caused by the batch;
-10. the same agent performs a normal merge into `master`;
-11. the merged `master` commit is verified with the required post-merge checks;
-12. `python scripts/agent_exit_gate.py --branch-head <merged-agent-head>` passes;
-13. the coordination task is updated to `MERGED_VERIFIED` with PR/head/merge/post-merge evidence;
-14. only then may the lease be released and the agent report completion.
+1. the PR head contains the latest target role-branch base SHA;
+2. declared ownership does not overlap an active incompatible task;
+3. targeted tests pass;
+4. repository CI required for the touched surfaces passes on the exact PR head;
+5. deletions/renames are intentional;
+6. conflicts are resolved by reviewing both sides, never by blind whole-file `ours`/`theirs`;
+7. the PR is small enough to understand and revert independently.
 
-`PR opened`, `PR ready`, `tests green on branch`, `handoff written`, or `awaiting merge` are **not completion states**.
+A task merged only into a role branch is **not** `MERGED_VERIFIED` and is not yet present in durable product truth.
 
-If merge is blocked by conflicts, stale base, failing CI, or integration regressions, the agent keeps working on the same workstream and fixes them. It may not stop merely because integration became difficult.
+## Role integration PR requirements: role branch -> master
 
-The only permitted non-merged exit is a **hard external blocker** that the agent cannot resolve with available repository/tool access, such as unavailable credentials/permissions, an unavailable required external service, or an explicit repository-owner decision. In that case the task remains `BLOCKED`, never `DONE`, and must contain exact blocker evidence and the next executable action.
+A role integration PR may contain one or more compatible, already-reviewed workstreams from that role.
 
-## Branch and ownership rules
+It may merge only when all of the following are true:
 
-- `master` is protected by process: normal engineering work MUST NOT be committed directly to `master`.
-- Product work uses short-lived branches named `agent/<lane>/<task>`.
-- `agent-coordination` is the only long-lived agent branch and is metadata-only as defined above.
-- New autonomous work claims ownership in task JSON on `agent-coordination`. `.agents/WORKSTREAMS.md` may continue to record legacy/in-flight work and verified history but is not required for high-frequency lease changes.
-- Two active tasks must not edit the same product path unless ownership is explicitly re-scoped.
-- An agent does not hand completed code to another agent merely to perform the merge. The owning Workstream Agent becomes the temporary Integration Owner when its task reaches the integration slot.
-- Ownership remains active until work is merged to `master`, post-merge verification passes, and the task reaches `MERGED_VERIFIED`.
+1. the role branch has been synchronized with current `master`;
+2. the PR head contains the exact current `master` base commit;
+3. `python scripts/verify_feature_preservation.py --base-ref <master-sha>` passes;
+4. `python scripts/agent_fabric_check.py` passes;
+5. `python scripts/kreate_check.py` passes;
+6. repository Python compilation/data validation passes;
+7. frontend `npm ci`, typecheck, lint, and build pass when the frontend is in CI;
+8. every deletion or rename is accounted for;
+9. cross-role/shared-file changes are explicitly called out in the PR checklist;
+10. CI is green on the exact PR head SHA;
+11. merge uses a normal merge commit;
+12. merged `master` is verified after merge.
 
-## One-PR integration rule
+If another PR lands first, the role PR becomes stale and must re-sync before merge. It does not get grandfathered through on previously green CI.
 
-BOUNCAMPUS must not accumulate pull requests.
+## Shared and high-conflict surfaces
 
-- There may be **at most one open pull request** in the repository.
-- That PR is the current Integration Owner's integration PR targeting `master`.
-- Other agents may continue non-overlapping implementation on their branches while the slot is occupied.
-- They may not mark their work complete or exit with unmerged accepted work.
-- When the integration slot becomes free, the next `READY_FOR_INTEGRATION` task updates from latest `master`, acquires the slot, integrates, and merges.
-- The integration PR must contain the latest `master` before final validation; stale heads are not mergeable.
-- A PR is never a parking lot. Its owner keeps driving it until merged or a genuine hard external blocker is documented.
+Treat these as shared/high-conflict surfaces:
 
-## Feature-preservation rule
+- `AGENTS.md`
+- `.agents/**`
+- `.github/**`
+- root build/deployment configuration
+- dependency lockfiles
+- shared API/data contracts
+- feature registry
+- KREATE claim/evidence policy files
 
-A merge is invalid if an existing feature, route, data source, UI surface, asset, or validation gate disappears unintentionally.
+A PR touching a shared/high-conflict surface must:
 
-Before merge, the owning agent acting as Integration Owner MUST:
+- identify the owning role or governance owner;
+- list other active workstreams that could be affected;
+- preserve both valid sides during conflict resolution;
+- run the broad repository validation gates, not only a narrow unit test.
 
-1. start from the latest `master`;
-2. resolve conflicts manually; never use whole-file `ours`/`theirs` on product files without reviewing both sides;
-3. compare the integration head with `master` and account for every deletion or rename;
-4. update `.github/feature-registry.json` when a new durable feature is introduced;
-5. run `python scripts/verify_feature_preservation.py --base-ref <master-sha>`;
-6. run `python scripts/agent_fabric_check.py`;
-7. run frontend `npm run typecheck`, `npm run lint`, and `npm run build` when frontend remains part of repository CI;
-8. compile backend/scripts Python and validate critical JSON datasets;
-9. merge only after all required CI gates are green on the exact head;
-10. re-run release checks on the merged `master` commit;
-11. run the agent exit gate before declaring completion.
+## Hardware engineering policy
 
-Existing feature-registry entries may not be removed or weakened in a normal feature PR. Intentional removals require an explicit repository-owner decision documented in the PR.
+Hardware work is first-class engineering work, not presentation polish. The detailed execution contract lives in `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`.
 
-## Merge semantics
+The EE role should decompose hardware into explicit workstreams such as measurement requirements, sensors/analog front end, power, compute/MCU, connectivity, firmware, PCB/interconnect, mechanical/enclosure, calibration/test, BOM/sourcing, integration contracts, and pilot deployment.
 
-- **Merge is mandatory and owned by the Workstream Agent that accepted the task.**
-- Completed work is not delivered while it exists only on a branch or PR.
-- Use a normal merge commit so the validated agent head remains an ancestor of `master` and can be verified by the exit gate.
-- After successful merge and post-merge verification, merged work branches are disposable and should be deleted when practical.
-- No agent may report `DONE` for work that is not present on verified `master` and reflected as `MERGED_VERIFIED` in coordination state.
+Hardware agents MUST preserve the distinction between:
 
-## Product truth boundary
+- `ASSUMPTION`
+- `DATASHEET`
+- `CALCULATION`
+- `SIMULATION`
+- `BENCH_TEST`
+- `FIELD_TEST`
+- `PRODUCTION_EVIDENCE`
 
-BOUNCAMPUS must not present model estimates as live university telemetry. Unless a source is explicitly integrated and verified, do not claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, shuttle GPS, or IoT sensor networks.
+A simulation, CAD render, datasheet value, or AI-generated schematic is not bench evidence.
 
-Real-world evidence and KREATE claims remain subject to the stricter evidence system under `KREATE/`; multi-agent autonomy never permits fabricating or self-attesting PMR.
+For custom electronics, agents should create the relevant subset of these artifacts before claiming deployability:
 
-## Release sequence
+- measurement/operational requirements;
+- block and interface diagrams;
+- sensor/error budget;
+- power tree and worst-case power budget;
+- schematic and PCB constraints;
+- firmware state/failure behavior;
+- exact data contract;
+- BOM with exact part identities where known;
+- calibration procedure;
+- verification plan and acceptance criteria;
+- failure-mode/safety notes;
+- test points/debug strategy;
+- DFM/DFT checks when manufacturing is in scope.
 
-1. Dispatcher exposes independent `READY` tasks.
-2. Workstream Agents atomically claim non-overlapping tasks and execute in parallel.
-3. Each agent validates its branch and moves its task to `READY_FOR_INTEGRATION`.
-4. One task at a time acquires the integration slot, updates from latest `master`, and opens the single PR.
-5. Feature-preservation + agent-fabric + typecheck/lint/build + repository-data gates pass.
-6. The same owning agent resolves integration failures and merges to `master`.
-7. The same agent verifies the merged `master`, runs the exit gate, and records merge evidence.
-8. Only then does the task become `MERGED_VERIFIED` and release its lease.
-9. Deploy/verify runtime surfaces when deployment is part of the task scope.
-10. **IE/CS2:** if completed work exposes multiple meaningful strategic next directions, present the user decision checkpoint before claiming a new strategic workstream.
-11. **EE/CS1:** report the result, choose the next highest-value aligned technical task, and continue autonomously unless a genuine human gate applies.
+Hardware work should prefer the simplest system that closes the evidence loop. A commercial device, manual SOP, or software integration may be superior to custom hardware.
 
-## Bootstrap exception
+Physical actions that can create real risk remain subject to the `PHYSICAL_SAFETY` gate. Designing, simulating, calculating, coding firmware, and non-energized review are autonomous; dangerous energization, high-current/high-voltage testing, unsafe battery work, destructive testing, hazardous actuator motion, or consequential field installation require appropriate human approval/supervision.
 
-Policy bootstrap changes that establish or strengthen this execution contract may temporarily use a conservative bootstrap path when the old coordination mechanism itself prevents a valid parallel claim. Bootstrap work must remain non-product, must not overwrite another task's owned product paths, must be explicitly identified in its integration PR, and must still pass exact-head CI, normal merge, and post-merge verification before it is considered delivered.
+## Plugin and specialized-tool policy
+
+Agents are explicitly allowed and encouraged to use available plugins, connectors, and specialized tools when they materially improve execution or verification. The detailed policy lives in `.agents/PLUGIN_POLICY.md`.
+
+Rules:
+
+- An agent MAY proactively inspect available plugins/tooling when a specialized capability would materially improve the current task.
+- An agent SHOULD use a relevant installed/connected plugin instead of inventing a weaker manual workaround when the plugin provides stronger evidence or direct execution.
+- An agent MUST NOT pretend a plugin exists or was used when it has not been discovered/available.
+- An agent MAY ask the user to install, enable, connect, or authorize a plugin when a missing specialized capability would materially improve or unlock the work.
+- A plugin request should name the **capability gap** and why it matters; do not invent a product/plugin name unless it was actually discovered.
+- A plugin request is not automatically a human-gate blocker. If useful work can continue safely without it, continue and record what remains unverified.
+- If the missing plugin/capability is genuinely required to meet acceptance criteria, record the exact blocker rather than fabricating results.
+- Agents must use least privilege and must not ask users to paste passwords, API keys, secrets, or private credentials into repository files/chat when a normal authorization flow exists.
+
+Hardware agents may specifically request capabilities for schematic/PCB CAD, SPICE/circuit simulation, component/datasheet lookup, BOM sourcing/lifecycle data, firmware build/debug, mechanical CAD, signal/power-integrity analysis, manufacturing/DFM checks, or remote bench/instrument access.
+
+Plugin output keeps its real evidence class: simulator output is simulation, BOM pricing is a point-in-time sourcing observation, CAD checks are design verification, and remote physical measurements count as physical evidence only when provenance and conditions are recorded.
+
+## Merge-before-completion contract
+
+`PR opened`, `feature PR merged to role branch`, `review ready`, or `tests green on a feature branch` are not final completion states.
+
+For an accepted task to become `MERGED_VERIFIED`:
+
+1. its implementation must be contained in the role branch that will integrate it;
+2. the role-to-`master` integration PR must pass exact-head CI;
+3. the integration PR must merge to `master` using a normal merge commit;
+4. the resulting `master` commit must pass post-merge verification;
+5. `python scripts/agent_exit_gate.py --branch-head <task-or-integration-head>` must prove the validated work is contained in `master`;
+6. integration evidence must be recorded in coordination state.
+
+Several compatible tasks may share one role-to-`master` integration PR. They may also integrate independently. The old repository-wide integration slot no longer exists.
+
+## Human-by-exception policy
+
+Default mode is autonomous inside accepted work.
+
+Human input is required only for:
+
+1. `EVIDENCE_ATTESTATION`
+2. `IRREVERSIBLE_ACTION`
+3. `PHYSICAL_SAFETY`
+4. `EXTERNAL_COMMITMENT`
+5. `PRODUCT_DIRECTION`
+
+Routine branch creation, PR creation, conflict resolution, reversible refactors, tests, merge execution, plugin discovery, and optional plugin requests are not human gates.
+
+## Role-specific post-work checkpoint
+
+The strategic checkpoint remains role scoped:
+
+- **IE: CHECKPOINT ON**
+- **CS2: CHECKPOINT ON**
+- **EE: CHECKPOINT OFF**
+- **CS1: CHECKPOINT OFF**
+
+Detailed behavior lives in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
+
+IE/CS2 should surface a user decision after completing a package when the next step is a genuine strategic branch such as a different beachhead, buyer, major product thesis, or application narrative.
+
+EE/CS1 should continue to the next highest-value aligned technical task unless one of the explicit human gates applies.
+
+## Feature preservation
+
+A merge is invalid if an existing feature, route, data source, asset, validation gate, or evidence boundary disappears unintentionally.
+
+Before a `master` merge:
+
+- start from latest `master`;
+- account for deletions and renames;
+- update `.github/feature-registry.json` for new durable features when applicable;
+- run feature-preservation checks;
+- run agent-fabric checks;
+- run the full relevant CI suite;
+- verify `master` after merge.
+
+Intentional removal of a registered durable feature requires explicit repository-owner direction and PR documentation.
+
+## Product truth and evidence boundary
+
+BOUNCAMPUS must not present estimates as live university telemetry.
+
+Unless explicitly integrated and verified, do not claim access to university BMS, smart meters, turnstiles, Wi-Fi occupancy, cafeteria POS, shuttle GPS, or IoT sensor networks.
+
+Real-world PMR, interview claims, pilot measurements, and KREATE evidence remain subject to the evidence system under `KREATE/`. Parallel development never authorizes fabricated evidence.
+
+## Practical release sequence
+
+1. Expose/claim independent non-overlapping tasks.
+2. Branch from the owning role branch.
+3. Implement and validate in parallel.
+4. Open feature PRs into the owning role branch.
+5. Merge compatible feature PRs after exact-head validation.
+6. Periodically sync the role branch from latest `master`.
+7. Open one role-to-`master` integration PR for that role.
+8. Run full integration gates.
+9. Merge with a normal merge commit.
+10. Verify merged `master` and record evidence.
+11. Mark included tasks `MERGED_VERIFIED`.
+12. Delete disposable feature branches when practical.
+
+See `.agents/FABRIC.md`, `.agents/PLUGIN_POLICY.md`, `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`, and `docs/development-workflow.md` for the operational protocol.
