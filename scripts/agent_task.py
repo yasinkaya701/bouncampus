@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Operate BOUNCAMPUS agent-fabric parent/child coordination records safely.
+"""Operate the BOUNCAMPUS human-parent / child-agent coordination fabric.
 
 Fabric v2 keeps four persistent human-owned parent workstreams and allows an
 unbounded-by-policy number of independently leased child agents beneath them.
-All local mutations are written atomically and rolled back if repository
-invariants fail.
+Every mutation is written atomically and rolled back when fabric invariants fail.
 """
 
 from __future__ import annotations
@@ -12,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import tempfile
 from copy import deepcopy
@@ -130,15 +130,16 @@ def _write_validated(
     existed = path.exists()
     _atomic_write(path, candidate)
     errors, _, _ = fabric.validate_repository(root)
-    if errors:
-        if existed and previous is not None:
-            _atomic_write(path, previous)
-        else:
-            try:
-                path.unlink()
-            except FileNotFoundError:
-                pass
-        raise TaskOperationError("operation rejected by fabric invariants:\n- " + "\n- ".join(errors))
+    if not errors:
+        return
+    if existed and previous is not None:
+        _atomic_write(path, previous)
+    else:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+    raise TaskOperationError("operation rejected by fabric invariants:\n- " + "\n- ".join(errors))
 
 
 def _write_task_validated(
@@ -175,44 +176,69 @@ def _priority_rank(priority: str) -> int:
 
 
 def _declared_producers(tasks: dict[str, dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    producers: dict[str, list[dict[str, Any]]] = {}
+    result: dict[str, list[dict[str, Any]]] = {}
     for task in tasks.values():
         for artifact in task.get("produces", []):
             if isinstance(artifact, str) and artifact:
-                producers.setdefault(artifact, []).append(task)
-    return producers
+                result.setdefault(artifact, []).append(task)
+    return result
 
 
 def unresolved_declared_consumes(
     task: dict[str, Any],
     tasks: dict[str, dict[str, Any]],
 ) -> list[str]:
-    """Block only artifacts with an in-fabric producer that is not verified.
+    """Return in-fabric produced artifacts not yet available.
 
-    A consumed identifier with no declared producer is treated as an external
-    evidence/artifact reference and remains governed by KREATE evidence rules.
+    Identifiers with no in-fabric producer are external evidence/artifacts and
+    remain governed by KREATE evidence policy rather than being blocked here.
     """
     producers = _declared_producers(tasks)
     unresolved: list[str] = []
     for artifact in task.get("consumes", []):
         if not isinstance(artifact, str) or artifact not in producers:
             continue
-        if not any(producer.get("state") == "MERGED_VERIFIED" for producer in producers[artifact]):
+        if not any(item.get("state") == "MERGED_VERIFIED" for item in producers[artifact]):
             unresolved.append(artifact)
     return sorted(set(unresolved))
 
 
+def _conflicts_with_active(tasks: dict[str, dict[str, Any]], candidate: dict[str, Any]) -> bool:
+    for other_id, other in tasks.items():
+        if other_id == candidate.get("id") or other.get("state") not in fabric.ACTIVE_OWNERSHIP_STATES:
+            continue
+        for left in candidate.get("touched_paths", []):
+            for right in other.get("touched_paths", []):
+                if isinstance(left, str) and isinstance(right, str) and fabric.paths_overlap(left, right):
+                    return True
+    return False
+
+
 def list_ready(root: Path, parent_id: str | None = None) -> list[str]:
     tasks = _validate_repo_or_raise(root)
-    ready: list[str] = []
+    result: list[str] = []
     for task_id in fabric.ready_task_ids(tasks):
         task = tasks[task_id]
         if parent_id is not None and task.get("parent_id") != parent_id:
             continue
         if unresolved_declared_consumes(task, tasks):
             continue
-        ready.append(task_id)
-    return ready
+        result.append(task_id)
+    return result
+
+
+def next_ready(root: Path, *, parent_id: str) -> list[str]:
+    tasks = _validate_repo_or_raise(root)
+    candidates: list[dict[str, Any]] = []
+    for task_id in fabric.ready_task_ids(tasks):
+        task = tasks[task_id]
+        if task.get("schema_version") != 2 or task.get("parent_id") != parent_id:
+            continue
+        if unresolved_declared_consumes(task, tasks) or _conflicts_with_active(tasks, task):
+            continue
+        candidates.append(task)
+    candidates.sort(key=lambda item: (_priority_rank(str(item.get("priority"))), str(item.get("id"))))
+    return [str(item["id"]) for item in candidates]
 
 
 def summary(root: Path) -> dict[str, Any]:
@@ -238,32 +264,6 @@ def summary(root: Path) -> dict[str, Any]:
         "blocked": blocked,
         "children_by_parent": dict(sorted(by_parent.items())),
     }
-
-
-def _conflicts_with_active(tasks: dict[str, dict[str, Any]], candidate: dict[str, Any]) -> bool:
-    candidate_id = candidate.get("id")
-    for other_id, other in tasks.items():
-        if other_id == candidate_id or other.get("state") not in fabric.ACTIVE_OWNERSHIP_STATES:
-            continue
-        for left in candidate.get("touched_paths", []):
-            for right in other.get("touched_paths", []):
-                if isinstance(left, str) and isinstance(right, str) and fabric.paths_overlap(left, right):
-                    return True
-    return False
-
-
-def next_ready(root: Path, *, parent_id: str) -> list[str]:
-    tasks = _validate_repo_or_raise(root)
-    candidates: list[dict[str, Any]] = []
-    for task_id in fabric.ready_task_ids(tasks):
-        task = tasks[task_id]
-        if task.get("schema_version") != 2 or task.get("parent_id") != parent_id:
-            continue
-        if unresolved_declared_consumes(task, tasks) or _conflicts_with_active(tasks, task):
-            continue
-        candidates.append(task)
-    candidates.sort(key=lambda item: (_priority_rank(str(item.get("priority"))), str(item.get("id"))))
-    return [str(item["id"]) for item in candidates]
 
 
 def claim_task(
@@ -348,7 +348,7 @@ def transition_task(
     if target not in TRANSITIONS.get(current, set()):
         raise TaskOperationError(f"invalid transition: {current} -> {target}")
     if previous.get("schema_version") == 2 and target in {"INTEGRATING", "MERGED_VERIFYING", "MERGED_VERIFIED"}:
-        raise TaskOperationError("v2 child integration must use integrate-child / verify-child, never legacy master integration")
+        raise TaskOperationError("v2 child integration must use integrate-child / verify-child")
     if current not in {"BACKLOG", "READY"}:
         _require_owner(previous, owner)
     elif current == "READY" and target != "CLAIMED":
@@ -377,7 +377,7 @@ def transition_task(
         }
     if target == "WAITING_HUMAN":
         if human_kind not in fabric.CRITICAL_HUMAN_GATES or not human_question:
-            raise TaskOperationError("WAITING_HUMAN requires one of the five critical human gates and one concrete question")
+            raise TaskOperationError("WAITING_HUMAN requires a critical human gate and one concrete question")
         candidate["human_gate"] = {
             "kind": human_kind,
             "status": "PENDING",
@@ -419,10 +419,19 @@ def decide_human_gate(
     decided_by: str,
     at: str | None = None,
 ) -> dict[str, Any]:
+    """Record a critical human decision and immediately release the child.
+
+    WAITING_HUMAN represents a *pending* gate only. Once the human has decided,
+    the child returns to ACTIVE. A rejected decision means the agent must adapt
+    its execution path without performing the rejected action; it does not need
+    another permission round just to resume safe work.
+    """
     if status not in {"APPROVED", "REJECTED"}:
         raise TaskOperationError("human decision status must be APPROVED or REJECTED")
     previous = load_task(root, task_id)
     gate = previous.get("human_gate", {})
+    if previous.get("state") != "WAITING_HUMAN":
+        raise TaskOperationError("human decision requires WAITING_HUMAN state")
     if gate.get("kind") not in fabric.CRITICAL_HUMAN_GATES or gate.get("status") != "PENDING":
         raise TaskOperationError("task does not have a pending critical human gate")
     candidate = deepcopy(previous)
@@ -430,8 +439,54 @@ def decide_human_gate(
     candidate["human_gate"].update(
         {"status": status, "decision": decision, "decided_by": decided_by, "decided_at": stamp}
     )
+    candidate["state"] = "ACTIVE"
+    candidate.setdefault("lease", {})["heartbeat_at"] = stamp
+    candidate["blocker"] = None
     _append_note(candidate, f"Human gate {status.lower()} by {decided_by} at {stamp}: {decision}")
     _write_task_validated(root, task_id, previous, candidate)
+    return candidate
+
+
+def _new_child_candidate(
+    root: Path,
+    *,
+    parent_id: str,
+    task_id: str,
+    title: str,
+    lane: str,
+    priority: str,
+    touched_paths: list[str],
+    depends_on: list[str] | None = None,
+    acceptance_criteria: list[str] | None = None,
+    validation_commands: list[str] | None = None,
+    produces: list[str] | None = None,
+    consumes: list[str] | None = None,
+    required_for_parent: bool = True,
+) -> dict[str, Any]:
+    template = json.loads((root / fabric.TEMPLATE_PATH).read_text(encoding="utf-8"))
+    if template.get("schema_version") != 2:
+        raise TaskOperationError("child creation requires schema-v2 task template")
+    candidate = deepcopy(template)
+    candidate.update(
+        {
+            "id": task_id,
+            "title": title,
+            "lane": lane,
+            "priority": priority,
+            "state": "READY",
+            "parent_id": parent_id,
+            "required_for_parent": bool(required_for_parent),
+            "owner_agent": None,
+            "branch": None,
+            "depends_on": list(depends_on or []),
+            "touched_paths": list(touched_paths),
+            "acceptance_criteria": list(acceptance_criteria or []),
+            "validation_commands": list(validation_commands or []),
+            "produces": list(produces or []),
+            "consumes": list(consumes or []),
+            "notes": [f"Spawned under {parent_id} at {iso_now()}."],
+        }
+    )
     return candidate
 
 
@@ -457,32 +512,22 @@ def spawn_child(
         raise TaskOperationError(f"parent not found: {parent_id}")
     if parent.get("state") == "COMPLETE":
         raise TaskOperationError(f"cannot spawn child under COMPLETE parent {parent_id}")
-    path = task_path(root, task_id)
-    if path.exists():
+    if task_path(root, task_id).exists():
         raise TaskOperationError(f"task already exists: {task_id}")
-    template = json.loads((root / fabric.TEMPLATE_PATH).read_text(encoding="utf-8"))
-    if template.get("schema_version") != 2:
-        raise TaskOperationError("spawn-child requires schema-v2 task template")
-    candidate = deepcopy(template)
-    candidate.update(
-        {
-            "id": task_id,
-            "title": title,
-            "lane": lane,
-            "priority": priority,
-            "state": "READY",
-            "parent_id": parent_id,
-            "required_for_parent": bool(required_for_parent),
-            "owner_agent": None,
-            "branch": None,
-            "depends_on": list(depends_on or []),
-            "touched_paths": list(touched_paths),
-            "acceptance_criteria": list(acceptance_criteria or []),
-            "validation_commands": list(validation_commands or []),
-            "produces": list(produces or []),
-            "consumes": list(consumes or []),
-            "notes": [f"Spawned under {parent_id} at {iso_now()}."],
-        }
+    candidate = _new_child_candidate(
+        root,
+        parent_id=parent_id,
+        task_id=task_id,
+        title=title,
+        lane=lane,
+        priority=priority,
+        touched_paths=touched_paths,
+        depends_on=depends_on,
+        acceptance_criteria=acceptance_criteria,
+        validation_commands=validation_commands,
+        produces=produces,
+        consumes=consumes,
+        required_for_parent=required_for_parent,
     )
     _write_task_validated(root, task_id, None, candidate)
     return candidate
@@ -498,10 +543,8 @@ def integrate_child(
     at: str | None = None,
 ) -> dict[str, Any]:
     previous = load_task(root, task_id)
-    if previous.get("schema_version") != 2:
-        raise TaskOperationError("integrate-child requires a schema-v2 child task")
-    if previous.get("state") != "READY_FOR_INTEGRATION":
-        raise TaskOperationError(f"integrate-child requires READY_FOR_INTEGRATION, found {previous.get('state')}")
+    if previous.get("schema_version") != 2 or previous.get("state") != "READY_FOR_INTEGRATION":
+        raise TaskOperationError("integrate-child requires a READY_FOR_INTEGRATION schema-v2 child")
     _require_owner(previous, owner)
     parent = load_parent(root, str(previous.get("parent_id")))
     expected = parent.get("parent_branch")
@@ -534,8 +577,8 @@ def verify_child(
     if previous.get("schema_version") != 2 or previous.get("state") != "INTEGRATING":
         raise TaskOperationError("verify-child requires an INTEGRATING schema-v2 child")
     _require_owner(previous, owner)
-    child_integration = previous.get("child_integration", {})
-    if not child_integration.get("validated_head_sha") or not child_integration.get("target_parent_branch"):
+    integration = previous.get("child_integration", {})
+    if not integration.get("validated_head_sha") or not integration.get("target_parent_branch"):
         raise TaskOperationError("child integration is missing validated head or parent target")
     stamp = at or iso_now()
     candidate = deepcopy(previous)
@@ -550,8 +593,7 @@ def verify_child(
 
 def children_for_parent(tasks: dict[str, dict[str, Any]], parent_id: str) -> list[dict[str, Any]]:
     return [
-        task
-        for task in tasks.values()
+        task for task in tasks.values()
         if task.get("schema_version") == 2 and task.get("parent_id") == parent_id
     ]
 
@@ -559,11 +601,8 @@ def children_for_parent(tasks: dict[str, dict[str, Any]], parent_id: str) -> lis
 def _historically_integrated_child_ids(parent: dict[str, Any]) -> set[str]:
     result: set[str] = set()
     for entry in parent.get("integration_history", []):
-        if not isinstance(entry, dict):
-            continue
-        for child_id in entry.get("child_ids", []):
-            if isinstance(child_id, str):
-                result.add(child_id)
+        if isinstance(entry, dict):
+            result.update(item for item in entry.get("child_ids", []) if isinstance(item, str))
     return result
 
 
@@ -571,8 +610,11 @@ def pending_children_for_parent(
     tasks: dict[str, dict[str, Any]],
     parent: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    integrated = _historically_integrated_child_ids(parent)
-    return [task for task in children_for_parent(tasks, str(parent["id"])) if task.get("id") not in integrated]
+    historical = _historically_integrated_child_ids(parent)
+    return [
+        task for task in children_for_parent(tasks, str(parent["id"]))
+        if task.get("id") not in historical
+    ]
 
 
 def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
@@ -582,21 +624,15 @@ def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
     pending = pending_children_for_parent(tasks, parent)
     required_pending = [task for task in pending if task.get("required_for_parent", True)]
     incomplete = sorted(
-        str(task["id"])
-        for task in required_pending
-        if task.get("state") != "MERGED_VERIFIED"
+        str(task["id"]) for task in required_pending if task.get("state") != "MERGED_VERIFIED"
     )
-    blocked = sorted(str(task["id"]) for task in pending if task.get("state") == "BLOCKED")
-    waiting = sorted(str(task["id"]) for task in pending if task.get("state") == "WAITING_HUMAN")
+    verified = sorted(
+        str(task["id"]) for task in pending if task.get("state") == "MERGED_VERIFIED"
+    )
     states: dict[str, int] = {}
     for task in pending:
         state = str(task.get("state"))
         states[state] = states.get(state, 0) + 1
-    verified_pending = sorted(
-        str(task["id"])
-        for task in pending
-        if task.get("state") == "MERGED_VERIFIED"
-    )
     return {
         "parent_id": parent_id,
         "role": parent.get("role"),
@@ -605,12 +641,12 @@ def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
         "pending_children": len(pending),
         "required_pending_children": len(required_pending),
         "states": dict(sorted(states.items())),
-        "blocked": blocked,
-        "waiting_human": waiting,
+        "blocked": sorted(str(task["id"]) for task in pending if task.get("state") == "BLOCKED"),
+        "waiting_human": sorted(str(task["id"]) for task in pending if task.get("state") == "WAITING_HUMAN"),
         "incomplete_required": incomplete,
-        "verified_pending": verified_pending,
+        "verified_pending": verified,
         "integration_batches": len(parent.get("integration_history", [])),
-        "ready_for_parent_integration": bool(verified_pending) and not incomplete,
+        "ready_for_parent_integration": bool(verified) and not incomplete,
     }
 
 
@@ -620,28 +656,53 @@ def fanout_children(
     parent_id: str,
     specs: Iterable[dict[str, Any]],
 ) -> list[dict[str, Any]]:
+    """Atomically add an arbitrary number of READY child tasks.
+
+    All candidate files are written, the entire fabric is validated once, and
+    every new file is removed if the batch violates an invariant. This permits
+    sibling dependencies within one fan-out without leaving partial state.
+    """
+    _validate_repo_or_raise(root)
+    parent = _parents_or_raise(root).get(parent_id)
+    if parent is None:
+        raise TaskOperationError(f"parent not found: {parent_id}")
+    if parent.get("state") == "COMPLETE":
+        raise TaskOperationError(f"cannot fan out under COMPLETE parent {parent_id}")
+
     specs_list = list(specs)
+    candidates: list[dict[str, Any]] = []
     seen: set[str] = set()
+    config = load_config(root)
+    priorities = set(config.get("priorities", []))
     for spec in specs_list:
         task_id = spec.get("id")
-        if not isinstance(task_id, str) or not task_id:
-            raise TaskOperationError("every fanout child spec requires id")
+        if not isinstance(task_id, str) or not fabric.TASK_ID_RE.fullmatch(task_id):
+            raise TaskOperationError(f"invalid fanout child id: {task_id!r}")
         if task_id in seen or task_path(root, task_id).exists():
             raise TaskOperationError(f"duplicate/existing fanout child id: {task_id}")
         seen.add(task_id)
-        if not isinstance(spec.get("touched_paths"), list) or not spec.get("touched_paths"):
+        lane = spec.get("lane", "quality-release")
+        if not isinstance(lane, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", lane):
+            raise TaskOperationError(f"fanout child {task_id} has invalid lane")
+        priority = spec.get("priority", "P1")
+        if priority not in priorities:
+            raise TaskOperationError(f"fanout child {task_id} has invalid priority {priority!r}")
+        paths = spec.get("touched_paths")
+        if not isinstance(paths, list) or not paths:
             raise TaskOperationError(f"fanout child {task_id} requires touched_paths")
-    results: list[dict[str, Any]] = []
-    for spec in specs_list:
-        results.append(
-            spawn_child(
+        for path in paths:
+            if not isinstance(path, str):
+                raise TaskOperationError(f"fanout child {task_id} touched_paths must be strings")
+            fabric.normalize_owned_path(path)
+        candidates.append(
+            _new_child_candidate(
                 root,
                 parent_id=parent_id,
-                task_id=spec["id"],
-                title=spec.get("title", spec["id"]),
-                lane=spec.get("lane", "quality-release"),
-                priority=spec.get("priority", "P1"),
-                touched_paths=list(spec["touched_paths"]),
+                task_id=task_id,
+                title=str(spec.get("title") or task_id),
+                lane=lane,
+                priority=priority,
+                touched_paths=list(paths),
                 depends_on=list(spec.get("depends_on", [])),
                 acceptance_criteria=list(spec.get("acceptance_criteria", [])),
                 validation_commands=list(spec.get("validation_commands", [])),
@@ -650,7 +711,24 @@ def fanout_children(
                 required_for_parent=bool(spec.get("required_for_parent", True)),
             )
         )
-    return results
+
+    written: list[Path] = []
+    try:
+        for candidate in candidates:
+            path = task_path(root, str(candidate["id"]))
+            _atomic_write(path, candidate)
+            written.append(path)
+        errors, _, _ = fabric.validate_repository(root)
+        if errors:
+            raise TaskOperationError("fanout rejected by fabric invariants:\n- " + "\n- ".join(errors))
+    except Exception:
+        for path in written:
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                pass
+        raise
+    return candidates
 
 
 def mark_parent_ready(root: Path, parent_id: str, *, at: str | None = None) -> dict[str, Any]:
@@ -662,8 +740,8 @@ def mark_parent_ready(root: Path, parent_id: str, *, at: str | None = None) -> d
     previous = load_parent(root, parent_id)
     if previous.get("state") not in {"ACTIVE", "BLOCKED"}:
         raise TaskOperationError(f"parent-ready requires ACTIVE/BLOCKED, found {previous.get('state')}")
-    candidate = deepcopy(previous)
     stamp = at or iso_now()
+    candidate = deepcopy(previous)
     candidate["state"] = "READY_FOR_INTEGRATION"
     candidate.setdefault("integration", {})["ready_for_integration_at"] = stamp
     candidate["integration"]["pr_state"] = "DRAFT"
@@ -674,31 +752,27 @@ def mark_parent_ready(root: Path, parent_id: str, *, at: str | None = None) -> d
 
 def _parent_unblocking_value(parent_id: str, tasks: dict[str, dict[str, Any]]) -> int:
     child_ids = {str(task["id"]) for task in children_for_parent(tasks, parent_id)}
-    if not child_ids:
-        return 0
-    score = 0
-    for task in tasks.values():
-        if task.get("state") in {"MERGED_VERIFIED", "CANCELLED"}:
-            continue
-        if child_ids.intersection(set(task.get("depends_on", []))):
-            score += 1
-    return score
+    return sum(
+        1
+        for task in tasks.values()
+        if task.get("state") not in {"MERGED_VERIFIED", "CANCELLED"}
+        and child_ids.intersection(set(task.get("depends_on", [])))
+    )
 
 
 def integration_queue(root: Path) -> list[dict[str, Any]]:
     tasks = _validate_repo_or_raise(root)
-    parents = _parents_or_raise(root)
     queue: list[dict[str, Any]] = []
-    for parent_id, parent in parents.items():
+    for parent_id, parent in _parents_or_raise(root).items():
         if parent.get("state") != "READY_FOR_INTEGRATION":
             continue
-        ready_at = parent.get("integration", {}).get("ready_for_integration_at") or "9999-12-31T23:59:59Z"
         queue.append(
             {
                 "parent_id": parent_id,
                 "priority": parent.get("priority"),
                 "unblocking_value": _parent_unblocking_value(parent_id, tasks),
-                "ready_for_integration_at": ready_at,
+                "ready_for_integration_at": parent.get("integration", {}).get("ready_for_integration_at")
+                or "9999-12-31T23:59:59Z",
             }
         )
     queue.sort(
@@ -728,12 +802,11 @@ def acquire_parent_integration(
     for other_id, other in parents.items():
         if other_id != parent_id and other.get("state") in {"INTEGRATING", "MERGED_VERIFYING"}:
             raise TaskOperationError(f"master integration slot occupied by {other_id}")
-    status = parent_status(root, parent_id)
-    if not status["ready_for_parent_integration"]:
+    if not parent_status(root, parent_id)["ready_for_parent_integration"]:
         raise TaskOperationError(f"parent {parent_id} has incomplete required children")
     previous = load_parent(root, parent_id)
-    candidate = deepcopy(previous)
     stamp = at or iso_now()
+    candidate = deepcopy(previous)
     candidate["state"] = "INTEGRATING"
     candidate.setdefault("integration", {}).update(
         {
@@ -762,26 +835,23 @@ def release_parent_integration(
             f"release-integration requires INTEGRATING/MERGED_VERIFYING, found {previous.get('state')}"
         )
     integration = deepcopy(previous.get("integration", {}))
-    if not isinstance(integration.get("pull_request"), int):
-        raise TaskOperationError("parent integration is missing pull request evidence")
-    if not integration.get("base_master_sha"):
-        raise TaskOperationError("parent integration is missing base master evidence")
+    if not isinstance(integration.get("pull_request"), int) or not integration.get("base_master_sha"):
+        raise TaskOperationError("parent integration is missing PR/base-master evidence")
     status = parent_status(root, parent_id)
-    included_child_ids = status["verified_pending"]
-    if not included_child_ids:
-        raise TaskOperationError("parent integration has no newly verified child work to record")
-
+    child_ids = status["verified_pending"]
+    if not child_ids:
+        raise TaskOperationError("parent integration has no newly verified child work")
     stamp = at or iso_now()
-    completed_batch = {
+    batch = {
         "pull_request": integration["pull_request"],
-        "base_master_sha": integration.get("base_master_sha"),
+        "base_master_sha": integration["base_master_sha"],
         "validated_head_sha": validated_head_sha,
         "merge_sha": merge_sha,
         "post_merge_verified_at": stamp,
-        "child_ids": included_child_ids,
+        "child_ids": child_ids,
     }
     candidate = deepcopy(previous)
-    candidate.setdefault("integration_history", []).append(completed_batch)
+    candidate.setdefault("integration_history", []).append(batch)
     candidate["state"] = "ACTIVE"
     candidate["integration"] = {
         "pull_request": None,
@@ -792,10 +862,7 @@ def release_parent_integration(
         "ready_for_integration_at": None,
         "base_master_sha": None,
     }
-    _append_note(
-        candidate,
-        f"Parent master batch verified at {stamp} ({merge_sha}); workstream returned to ACTIVE.",
-    )
+    _append_note(candidate, f"Verified master batch {merge_sha} at {stamp}; parent returned to ACTIVE.")
     _write_parent_validated(root, parent_id, previous, candidate)
     return candidate
 
@@ -809,7 +876,7 @@ def request_parent_human_gate(
     at: str | None = None,
 ) -> dict[str, Any]:
     if kind not in fabric.CRITICAL_HUMAN_GATES or not question.strip():
-        raise TaskOperationError("parent human gate must be one of the five critical kinds with one concrete question")
+        raise TaskOperationError("parent human gate must be critical and ask one concrete question")
     previous = load_parent(root, parent_id)
     if previous.get("state") not in {"ACTIVE", "BLOCKED"}:
         raise TaskOperationError(f"parent gate request requires ACTIVE/BLOCKED, found {previous.get('state')}")
@@ -863,7 +930,7 @@ def _print(value: Any) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=ROOT, help="checkout containing coordination state")
+    parser.add_argument("--root", type=Path, default=ROOT)
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("summary")
@@ -957,18 +1024,18 @@ def parse_args() -> argparse.Namespace:
     release.add_argument("--validated-head-sha", required=True)
     release.add_argument("--at")
 
-    parent_gate = sub.add_parser("parent-human-gate")
-    parent_gate.add_argument("parent_id")
-    parent_gate.add_argument("--kind", required=True)
-    parent_gate.add_argument("--question", required=True)
-    parent_gate.add_argument("--at")
+    pgate = sub.add_parser("parent-human-gate")
+    pgate.add_argument("parent_id")
+    pgate.add_argument("--kind", required=True)
+    pgate.add_argument("--question", required=True)
+    pgate.add_argument("--at")
 
-    parent_decision = sub.add_parser("parent-human-decision")
-    parent_decision.add_argument("parent_id")
-    parent_decision.add_argument("--status", choices=["APPROVED", "REJECTED"], required=True)
-    parent_decision.add_argument("--decision", required=True)
-    parent_decision.add_argument("--by", required=True, dest="decided_by")
-    parent_decision.add_argument("--at")
+    pdecision = sub.add_parser("parent-human-decision")
+    pdecision.add_argument("parent_id")
+    pdecision.add_argument("--status", choices=["APPROVED", "REJECTED"], required=True)
+    pdecision.add_argument("--decision", required=True)
+    pdecision.add_argument("--by", required=True, dest="decided_by")
+    pdecision.add_argument("--at")
     return parser.parse_args()
 
 
@@ -990,69 +1057,36 @@ def main() -> int:
         elif args.command == "heartbeat":
             _print(heartbeat_task(args.root, args.task_id, owner=args.owner, at=args.at, note=args.note))
         elif args.command == "transition":
-            _print(
-                transition_task(
-                    args.root,
-                    args.task_id,
-                    owner=args.owner,
-                    target=args.target,
-                    at=args.at,
-                    note=args.note,
-                    pull_request=args.pull_request,
-                    validated_head_sha=args.validated_head_sha,
-                    merge_sha=args.merge_sha,
-                    blocker_reason=args.blocker_reason,
-                    blocker_evidence=args.blocker_evidence,
-                    blocker_next_action=args.blocker_next_action,
-                    human_kind=args.human_kind,
-                    human_question=args.human_question,
-                )
-            )
+            _print(transition_task(
+                args.root, args.task_id, owner=args.owner, target=args.target, at=args.at,
+                note=args.note, pull_request=args.pull_request,
+                validated_head_sha=args.validated_head_sha, merge_sha=args.merge_sha,
+                blocker_reason=args.blocker_reason, blocker_evidence=args.blocker_evidence,
+                blocker_next_action=args.blocker_next_action, human_kind=args.human_kind,
+                human_question=args.human_question,
+            ))
         elif args.command == "human-decision":
-            _print(
-                decide_human_gate(
-                    args.root,
-                    args.task_id,
-                    status=args.status,
-                    decision=args.decision,
-                    decided_by=args.decided_by,
-                    at=args.at,
-                )
-            )
+            _print(decide_human_gate(
+                args.root, args.task_id, status=args.status, decision=args.decision,
+                decided_by=args.decided_by, at=args.at,
+            ))
         elif args.command == "spawn-child":
-            _print(
-                spawn_child(
-                    args.root,
-                    parent_id=args.parent_id,
-                    task_id=args.task_id,
-                    title=args.title,
-                    lane=args.lane,
-                    priority=args.priority,
-                    touched_paths=args.touched_paths,
-                    required_for_parent=not args.optional,
-                )
-            )
+            _print(spawn_child(
+                args.root, parent_id=args.parent_id, task_id=args.task_id, title=args.title,
+                lane=args.lane, priority=args.priority, touched_paths=args.touched_paths,
+                required_for_parent=not args.optional,
+            ))
         elif args.command == "integrate-child":
-            _print(
-                integrate_child(
-                    args.root,
-                    args.task_id,
-                    owner=args.owner,
-                    target_parent_branch=args.target_parent_branch,
-                    validated_head_sha=args.validated_head_sha,
-                    at=args.at,
-                )
-            )
+            _print(integrate_child(
+                args.root, args.task_id, owner=args.owner,
+                target_parent_branch=args.target_parent_branch,
+                validated_head_sha=args.validated_head_sha, at=args.at,
+            ))
         elif args.command == "verify-child":
-            _print(
-                verify_child(
-                    args.root,
-                    args.task_id,
-                    owner=args.owner,
-                    integrated_commit_sha=args.integrated_commit_sha,
-                    at=args.at,
-                )
-            )
+            _print(verify_child(
+                args.root, args.task_id, owner=args.owner,
+                integrated_commit_sha=args.integrated_commit_sha, at=args.at,
+            ))
         elif args.command == "fanout":
             specs = json.loads(args.spec_file.read_text(encoding="utf-8"))
             if not isinstance(specs, list):
@@ -1065,48 +1099,26 @@ def main() -> int:
         elif args.command == "queue":
             _print(integration_queue(args.root))
         elif args.command == "acquire-integration":
-            _print(
-                acquire_parent_integration(
-                    args.root,
-                    args.parent_id,
-                    pull_request=args.pr,
-                    current_master_sha=args.master_sha,
-                    validated_head_sha=args.validated_head_sha,
-                    at=args.at,
-                )
-            )
+            _print(acquire_parent_integration(
+                args.root, args.parent_id, pull_request=args.pr,
+                current_master_sha=args.master_sha,
+                validated_head_sha=args.validated_head_sha, at=args.at,
+            ))
         elif args.command == "release-integration":
-            _print(
-                release_parent_integration(
-                    args.root,
-                    args.parent_id,
-                    merge_sha=args.merge_sha,
-                    validated_head_sha=args.validated_head_sha,
-                    at=args.at,
-                )
-            )
+            _print(release_parent_integration(
+                args.root, args.parent_id, merge_sha=args.merge_sha,
+                validated_head_sha=args.validated_head_sha, at=args.at,
+            ))
         elif args.command == "parent-human-gate":
-            _print(
-                request_parent_human_gate(
-                    args.root,
-                    args.parent_id,
-                    kind=args.kind,
-                    question=args.question,
-                    at=args.at,
-                )
-            )
+            _print(request_parent_human_gate(
+                args.root, args.parent_id, kind=args.kind, question=args.question, at=args.at,
+            ))
         elif args.command == "parent-human-decision":
-            _print(
-                decide_parent_human_gate(
-                    args.root,
-                    args.parent_id,
-                    status=args.status,
-                    decision=args.decision,
-                    decided_by=args.decided_by,
-                    at=args.at,
-                )
-            )
-    except (TaskOperationError, OSError, json.JSONDecodeError) as exc:
+            _print(decide_parent_human_gate(
+                args.root, args.parent_id, status=args.status, decision=args.decision,
+                decided_by=args.decided_by, at=args.at,
+            ))
+    except (TaskOperationError, OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"agent-task: {exc}", file=sys.stderr)
         return 1
     return 0
