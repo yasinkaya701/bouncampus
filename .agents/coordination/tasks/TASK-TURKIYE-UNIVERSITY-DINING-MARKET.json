@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "TASK-TURKIYE-UNIVERSITY-DINING-MARKET",
+  "title": "Benchmark Türkiye public-university dining procurement",
+  "priority": "P0",
+  "lane": "campus-data-geo",
+  "state": "READY_FOR_INTEGRATION",
+  "owner_agent": "research-evidence",
+  "branch": "agent/campus-data-geo/turkiye-university-dining-market",
+  "depends_on": [],
+  "touched_paths": [
+    "KREATE/RESEARCH/README.md",
+    "KREATE/RESEARCH/TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md",
+    "KREATE/RESEARCH/turkiye_university_dining_procurement_benchmark.json"
+  ],
+  "acceptance_criteria": [
+    "Recent public-university food-service procurements are compared using source-traceable IKN, quantity, authority and operating-mode fields",
+    "The sample is explicitly labeled purposive/non-exhaustive and never presented as TAM/SAM/SOM",
+    "Repeated buyer and explicit-quantity patterns are separated from unvalidated commercial willingness or pain claims",
+    "On-site, transported, multi-campus, meal-type, dietary and package-service variation is translated into product architecture implications",
+    "A narrower candidate beachhead and cross-institution PMR plan are derived without inventing demand or buyer validation",
+    "A machine-readable JSON companion supports downstream IE/CS1/CS2 agents"
+  ],
+  "validation_commands": [
+    "python -m json.tool KREATE/RESEARCH/turkiye_university_dining_procurement_benchmark.json",
+    "python scripts/kreate_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-10-01T00:20:00+03:00",
+    "heartbeat_at": "2026-10-01T00:20:00+03:00",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Secondary public-procurement research only; not PMR or market-size validation.",
+    "Sample includes Boğaziçi, Düzce, Abdullah Gül, Türk-Alman, Marmara on-site/transported and İstanbul University notice-level data.",
+    "Does not touch KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md.",
+    "Master promotion remains subject to the CS2 role integration topology and unrelated ancestor CI health."
+  ]
+}
