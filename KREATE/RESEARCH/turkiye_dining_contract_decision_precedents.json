@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "research_id": "TURKIYE-DINING-CONTRACT-DECISION-PRECEDENTS-2026-10-01",
+  "research_date": "2026-10-01",
+  "evidence_class": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "claim_firewall": {
+    "not_bogazici_contract_evidence": true,
+    "not_pmr": true,
+    "not_customer_validation": true,
+    "not_legal_advice": true,
+    "not_universal_contract_pattern": true
+  },
+  "precedents": [
+    {
+      "case_id": "PRECEDENT-U01",
+      "institution": "Uşak University",
+      "kik_decision": "2023/UH.II-1466",
+      "decision_date": "2023-11-29",
+      "tender_ikn": "2023/1031004",
+      "tender_scope": "Mamul Yemek Alımı, Dağıtımı ve Sonrası Hizmetleri Alımı",
+      "listed_quantity_meals": 800000,
+      "daily_quantity_owner": "CONTRACTOR",
+      "daily_quantity_method": "Previous week's corresponding days, with education term, break and summer periods treated in their own regimes",
+      "actual_count_source": ["SMART_CARD", "CONTROL_ORGANIZATION_DAILY_FALLBACK_RECORD_IF_CARD_SYSTEM_FAILS"],
+      "payment_basis": "Monthly progress payment based on summed daily actual student/staff diners",
+      "excess_risk": "Administration not responsible for excess; contractor cannot request payment for leftover produced meals",
+      "shortage_risk": "Equivalent meal must be produced with Control Organization knowledge so service is not interrupted",
+      "reservation_option": true,
+      "calendar_regime_recognized": true,
+      "menu_context_recognized": false,
+      "menu_mix_adjustment": false,
+      "product_implications": [
+        "Contractor operations can be the direct daily quantity user while university remains buyer/control authority.",
+        "Historical-demand baseline is an actual contract-described operating heuristic.",
+        "Actual diners can provide both model ground truth and settlement reconciliation without PII if aggregated.",
+        "Excess and shortage have asymmetric operational/economic consequences."
+      ],
+      "source_url": "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=a2f80a616e9c557c0277ada12419f7fe4b56a43f838d580d271ac80b78fc28d7&KararMetni=463e03f9e3aad6ea48bee9aff80678331453bbe55b4fbbbde6250ac09a80c38d"
+    },
+    {
+      "case_id": "PRECEDENT-K01",
+      "institution": "Kırıkkale University",
+      "kik_decision": "2026/UH.I-2269",
+      "decision_date": "2026-08-26",
+      "tender_ikn": "2026/1174924",
+      "tender_scope": "Malzemeli Yemek Hizmeti",
+      "listed_quantity_meals": 350000,
+      "daily_quantity_owner": "CONTRACTOR",
+      "daily_quantity_method": "Previous meal counts, while accounting for academic calendar, menu and day popularity",
+      "actual_count_source": ["ACTUALLY_EATEN_OR_PURCHASED_MEAL_QUANTITY_AS_DESCRIBED_IN_KIK_REASONING"],
+      "payment_basis": "Progress payment linked to actually eaten/purchased meal quantity",
+      "excess_risk": "Administration not responsible for excess food; leftovers cannot simply be reused in another meal",
+      "shortage_risk": "Insufficient preparation can trigger contractual penalty/service consequences",
+      "reservation_option": false,
+      "calendar_regime_recognized": true,
+      "menu_context_recognized": true,
+      "menu_mix_adjustment": false,
+      "product_implications": [
+        "Academic calendar and menu are contract-recognized demand drivers, not merely academic modeling ideas.",
+        "Decision loss should reflect excess cost and shortage/penalty risk rather than MAE alone.",
+        "Current heuristic baselines must include previous-demand and regime-aware approaches."
+      ],
+      "source_url": "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=0b6db2bdc4dcba60ddf7cb70334f72bf03b482e26ad51295bd12345ea082c52b"
+    },
+    {
+      "case_id": "PRECEDENT-S01",
+      "institution": "Sakarya University",
+      "kik_decision": "2026/UH.I-2163",
+      "decision_date": "2026-08-19",
+      "tender_ikn": "2026/1002808",
+      "tender_scope": "Sakarya Üniversitesi Servise Hazır Yemek Hizmeti Alım İşi",
+      "listed_quantity_meals": 1250000,
+      "listed_days_for_capacity_basis": 354,
+      "daily_quantity_owner": "NOT_ESTABLISHED_BY_THIS_PRECEDENT",
+      "daily_quantity_method": "Not promoted from this decision; the strong precedent is production-mix adjustment",
+      "actual_count_source": [],
+      "payment_basis": "NOT_ESTABLISHED_IN_THIS_RESEARCH",
+      "excess_risk": "NOT_ESTABLISHED_IN_THIS_RESEARCH",
+      "shortage_risk": "NOT_ESTABLISHED_IN_THIS_RESEARCH",
+      "reservation_option": false,
+      "calendar_regime_recognized": false,
+      "menu_context_recognized": true,
+      "menu_mix_adjustment": true,
+      "menu_mix_rule": "Default main-course mix includes 3% vegetarian and remaining selectable mains initially 50/50; contractor and university Control Organization may jointly increase the preferred selected main course using historical-period student/staff preference data",
+      "product_implications": [
+        "Historical preference data can be contractually relevant to production mix even when total quantity is not the only decision.",
+        "Product architecture should separate total quantity, menu mix and campus allocation decisions.",
+        "A useful wedge may exist in mix optimization even if total meal quantity is constrained."
+      ],
+      "source_url": "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=992c5efa9fa05688b41bc2a9bf9e09c0927c462208d40fa9af7f78f7e2807899"
+    },
+    {
+      "case_id": "PRECEDENT-M01",
+      "institution": "Marmara University",
+      "kik_decision": "2026/UH.II-1601",
+      "tender_ikn": "2026/603458",
+      "tender_scope": "Transported meal service",
+      "daily_quantity_owner": "NOT_ESTABLISHED_BY_THIS_PRECEDENT",
+      "daily_quantity_method": "NOT_ESTABLISHED_BY_THIS_PRECEDENT",
+      "actual_count_source": [],
+      "payment_basis": "NOT_ESTABLISHED_IN_THIS RESEARCH",
+      "excess_risk": "NOT_ESTABLISHED_IN_THIS_RESEARCH",
+      "shortage_risk": "NOT_ESTABLISHED_IN_THIS_RESEARCH",
+      "reservation_option": false,
+      "calendar_regime_recognized": false,
+      "menu_context_recognized": true,
+      "menu_mix_adjustment": false,
+      "contract_line_items": {
+        "standard_transported_meals": 220000,
+        "vegetarian_meals": 19000,
+        "gluten_free_meals": 500,
+        "vegan_meals": 500
+      },
+      "product_implications": [
+        "Dietary classes can be formal contract line items and should survive into the canonical data model.",
+        "Do not flatten contractually distinct service classes before decision modeling."
+      ],
+      "source_url": "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=e53bf685cc2908fe76abbf541eec9f9bd19b36dabe0cb1efb72281d2bc429276"
+    }
+  ],
+  "cross_precedent_patterns": [
+    {
+      "id": "CP-01",
+      "claim": "Daily production forecasting can be a contractor responsibility under university food-service contracts.",
+      "supported_by": ["PRECEDENT-U01", "PRECEDENT-K01"],
+      "product_effect": "Treat contractor operations as a candidate daily user distinct from university buyer/control roles."
+    },
+    {
+      "id": "CP-02",
+      "claim": "Excess and shortage can create asymmetric contract/operational risks.",
+      "supported_by": ["PRECEDENT-U01", "PRECEDENT-K01"],
+      "product_effect": "Optimize decision loss/guardrails, not forecast MAE alone."
+    },
+    {
+      "id": "CP-03",
+      "claim": "Actual diner/consumption quantity can be used for progress-payment settlement.",
+      "supported_by": ["PRECEDENT-U01", "PRECEDENT-K01"],
+      "product_effect": "Where locally verified, aggregate actual-diner counts can reconcile model performance with contract settlement."
+    },
+    {
+      "id": "CP-04",
+      "claim": "Academic calendar and menu context can be contract-recognized demand drivers.",
+      "supported_by": ["PRECEDENT-U01", "PRECEDENT-K01"],
+      "product_effect": "Regime-aware and menu-aware historical baselines are mandatory benchmarks before complex models."
+    },
+    {
+      "id": "CP-05",
+      "claim": "Reservation can be a permitted institutional mechanism for meal counts.",
+      "supported_by": ["PRECEDENT-U01"],
+      "product_effect": "Keep reservation/pre-commit signals as a future option, not a forced current feature."
+    },
+    {
+      "id": "CP-06",
+      "claim": "Historical preference data can alter production mix among menu alternatives.",
+      "supported_by": ["PRECEDENT-S01"],
+      "product_effect": "Separate total-demand, menu-mix and campus-allocation decisions."
+    }
+  ],
+  "candidate_role_map": {
+    "university_sks_food_services": "contract owner, control authority, policy/menu/service governance",
+    "control_organization": "service validation and possible joint operational decision authority",
+    "contractor_operations_kitchen": "candidate direct daily quantity forecasting/production user",
+    "data_owner": "card, turnstile, POS, reservation or transaction aggregate export",
+    "procurement_finance": "progress-payment and accepted-quantity semantics",
+    "student_staff_diner": "demand source and service beneficiary, not automatically buyer"
+  },
+  "candidate_commercial_hypothesis": {
+    "label": "HYPOTHESIS",
+    "statement": "In some outsourced university dining contracts, operational value may be shared between university buyer/control functions and contractor production operations, making the problem closer to B2B2B decision support than a university-only sustainability dashboard.",
+    "must_validate": ["who_pays", "who_saves", "who_uses", "who_approves_software", "who_bears_excess", "who_bears_shortage"]
+  },
+  "cs1_requirements": [
+    "Predict a demand distribution or decision range when asymmetry matters; do not rely only on point MAE.",
+    "Implement previous-same-weekday and regime-aware historical heuristics because these classes of rules appear in contract precedents.",
+    "Where verified, evaluate excess, shortage, emergency top-up, service failure and settlement-aware outcomes.",
+    "Do not express TL savings without local verified contract unit economics.",
+    "Separate total demand, menu mix and campus allocation heads only when corresponding operational decisions/data exist."
+  ],
+  "highest_value_bogazici_questions": [
+    "Who forecasts quantity under the current TEMAŞ contract?",
+    "What historical/current signal is used?",
+    "When is quantity frozen?",
+    "How is actual service counted for progress payment?",
+    "Who absorbs excess-food cost?",
+    "Who absorbs shortage/service-failure risk?",
+    "Can total quantity, campus allocation, menu mix or batch timing be changed independently?"
+  ],
+  "forbidden_bogazici_inferences": [
+    "Boğaziçi pays only for card-swiped meals.",
+    "TEMAŞ bears Boğaziçi excess-food cost.",
+    "TEMAŞ is contractually responsible for daily quantity forecasting at Boğaziçi.",
+    "Boğaziçi can change meal quantities daily.",
+    "Boğaziçi current contract uses reservation or smart-card settlement.",
+    "Contract precedents prove Boğaziçi savings or customer demand."
+  ]
+}
