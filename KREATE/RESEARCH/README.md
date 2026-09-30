@@ -11,6 +11,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 - Model or scenario implications derived from these sources remain `HYPOTHESIS`, `POLICY_HEURISTIC`, or `MODEL ESTIMATE` until separately validated.
 - Procurement samples in this directory are **not** TAM/SAM/SOM unless a separate systematic market-sizing method explicitly establishes that scope.
 - Contract clauses from another university are **sector precedents, not Boğaziçi contract facts**.
+- Global climate/food-waste statistics are context, **not local conversion factors or measured Boğaziçi impact**.
 
 ## Available packs
 
@@ -21,6 +22,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 | [Boğaziçi Food Procurement & Contract Research](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md) | Current 2026–2027 unit-price dining procurement, quantities, contractor, capacity requirement, cancelled predecessor, contract-semantics unknowns and PMR/data questions. | [`bogazici_food_procurement_2026_2027.json`](./bogazici_food_procurement_2026_2027.json) |
 | [Türkiye Public-University Dining Procurement Benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) | Cross-university 2026 procurement sample testing whether the buyer/quantity/contract workflow repeats beyond Boğaziçi; covers SKS buyer pattern, on-site vs transported service, meal/channel segmentation and candidate beachhead refinement. | [`turkiye_university_dining_procurement_benchmark.json`](./turkiye_university_dining_procurement_benchmark.json) |
 | [Türkiye University Dining Contract Decision Precedents](./TURKIYE_DINING_CONTRACT_DECISION_PRECEDENTS.md) | KİK-backed precedents showing historical-demand quantity heuristics, contractor forecast responsibility, smart-card/actual-consumption settlement, excess/shortage risk and historical-preference menu-mix adjustment. | [`turkiye_dining_contract_decision_precedents.json`](./turkiye_dining_contract_decision_precedents.json) |
+| [Türkiye Zero-Waste & Campus Food-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) | Official Türkiye Zero Waste and UNEP context translated into pilot KPI hierarchy, measurement boundary and anti-greenwashing rules for food-waste/climate claims. | [`turkiye_zero_waste_campus_measurement_context.json`](./turkiye_zero_waste_campus_measurement_context.json) |
 | [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) | Cross-source data-quality control: capacity, beneficiary, serving, packaged-meal, food-waste/İSTAÇ and service-regime semantics that agents must reconcile before joining metrics or training models. | See the `source_conflicts` section of [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json). |
 
 ## Recommended reading order
@@ -30,7 +32,8 @@ This directory contains secondary/public-source research prepared for KREATE age
 3. Read the Procurement & Contract pack before making Boğaziçi-specific cost, buyer, contractor-incentive or quantity-control claims.
 4. Read the Türkiye procurement benchmark before beachhead, market-repeatability or cross-institution product-architecture work.
 5. Read the Contract Decision Precedents before designing PMR around quantity ownership, hakediş, excess/shortage incentives, current heuristics or menu-mix decisions.
-6. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
+6. Read the Zero-Waste Measurement Context before defining pilot waste KPIs, climate/resource conversions or application impact language.
+7. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
 
 ## How agents should consume a pack
 
@@ -43,3 +46,4 @@ This directory contains secondary/public-source research prepared for KREATE age
 7. Never translate procurement contract value into food-waste savings unless the payable/accepted quantity semantics are verified.
 8. Never extrapolate a purposive procurement sample into a national market size without an explicit market-sizing methodology and denominator.
 9. Never copy another university's contract clause into a Boğaziçi claim; use precedents only to sharpen the exact question that Boğaziçi PMR/contract verification must answer.
+10. Never convert global food-waste GHG/resource statistics into local saved CO2e/water without measured physical change, a documented conversion method and explicit `MODEL ESTIMATE` labeling.

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "research_id": "TURKIYE-ZERO-WASTE-CAMPUS-MEASUREMENT-CONTEXT-2026-10-01",
+  "research_date": "2026-10-01",
+  "evidence_class": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "claim_firewall": {
+    "not_legal_advice": true,
+    "not_compliance_certification": true,
+    "not_measured_bogazici_impact": true,
+    "global_stats_not_local_conversion_factors": true
+  },
+  "turkiye_framework": [
+    {
+      "id": "ZW-01",
+      "claim": "Türkiye's Zero Waste framework includes prevention/reduction before source separation, storage, collection, transport and processing, and defines biodegradable waste to include food/kitchen waste from food-service-type settings.",
+      "product_effect": "A verified production-avoidance intervention belongs conceptually upstream of downstream diversion/processing; do not conflate prevention with composting or disposal routing.",
+      "source_url": "https://erzincan.csb.gov.tr/sifir-atik-yonetmeligi-resmi-gazetede-yayinlandi-haber-240271"
+    },
+    {
+      "id": "ZW-02",
+      "claim": "Official university Zero Waste guidance emphasizes team formation, planning, implementation, monitoring, record keeping and revision, including records of waste quantities and gains.",
+      "product_effect": "Pilot evidence should be traceable and measurement-based rather than a dashboard-only demonstration.",
+      "source_url": "https://sifiratik.gov.tr/SistemKurulumu/universiteler-icin"
+    },
+    {
+      "id": "ZW-03",
+      "claim": "The Ministry's own cafeteria Zero Waste implementation describes separate collection and kilogram weighing/recording of incoming waste streams.",
+      "product_effect": "Prefer physically measured, category-aware waste outcomes when feasible.",
+      "source_url": "https://destek.csb.gov.tr/bakanligimizda-sifir-atik-uygulamalari-99118"
+    },
+    {
+      "id": "ZW-04",
+      "claim": "The national Zero Waste Information System is used for inventory, monitoring, reporting and certification workflows and includes public/educational institutions among its user groups.",
+      "product_effect": "Use monitoring/reporting language carefully without claiming this product replaces or fulfills the official reporting system.",
+      "source_url": "https://cevreselgostergeler.csb.gov.tr/sifir-atik-yonetim-sistemi-108178"
+    }
+  ],
+  "global_context": [
+    {
+      "id": "CLIMATE-01",
+      "claim": "UNEP's current food-waste framing attributes approximately 28% of global consumer-level food waste to food service, with households at 60% and retail at 12%.",
+      "scope": "GLOBAL_CONTEXT_ONLY",
+      "source_url": "https://www.unep.org/news-and-stories/press-release/food-waste-focus-world-marks-international-day-zero-waste"
+    },
+    {
+      "id": "CLIMATE-02",
+      "claim": "UNEP states that food loss and waste together account for roughly 8-10% of global greenhouse-gas emissions.",
+      "scope": "GLOBAL_CONTEXT_ONLY",
+      "source_url": "https://www.unep.org/topics/food-systems/food-loss-and-waste/delivering-sdg-123"
+    },
+    {
+      "id": "CLIMATE-03",
+      "claim": "SDG 12.3 provides a measurement-and-reduction policy frame and UNEP emphasizes measurement to establish baseline and track progress.",
+      "scope": "GLOBAL_POLICY_CONTEXT_ONLY",
+      "source_url": "https://www.unep.org/resources/publication/food-waste-index-report-2024"
+    }
+  ],
+  "pilot_kpi_hierarchy": {
+    "tier_1_primary_decision_metrics": [
+      "produced_portions",
+      "served_portions",
+      "unserved_edible_surplus",
+      "shortage_or_sellout_events",
+      "emergency_top_up",
+      "operator_override"
+    ],
+    "tier_2_waste_metrics": [
+      "unserved_edible_surplus_kg",
+      "preparation_waste_kg",
+      "plate_waste_kg",
+      "kg_waste_per_100_served_meals"
+    ],
+    "tier_3_economic_metrics_after_contract_verification": [
+      "variable_food_cost_exposure",
+      "contract_accepted_quantity",
+      "emergency_shortage_cost",
+      "labor_or_logistics_delta"
+    ],
+    "tier_4_model_estimates_after_measured_physical_reduction": [
+      "estimated_CO2e_avoided",
+      "estimated_water_embodied_avoided",
+      "estimated_resource_effect"
+    ]
+  },
+  "minimum_measurement_contract": {
+    "preproduction": [
+      "forecast_timestamp",
+      "quantity_freeze_timestamp",
+      "planned_quantity",
+      "recommended_quantity",
+      "operator_final_quantity",
+      "reason_codes"
+    ],
+    "service": [
+      "produced_quantity",
+      "served_or_validated_actual_demand",
+      "shortage_event",
+      "emergency_top_up",
+      "unserved_edible_surplus"
+    ],
+    "waste_audit": [
+      "unserved_edible_surplus_kg",
+      "preparation_waste_kg",
+      "plate_waste_kg",
+      "measurement_method",
+      "measurement_timestamp",
+      "scale_or_source",
+      "reviewer"
+    ]
+  },
+  "anti_greenwashing_rules": [
+    "A public food-waste total is a scale fact, not evidence that forecast error caused it.",
+    "Waste diversion is not the same as waste prevention.",
+    "Food saved requires a consistent before/after measurement boundary.",
+    "CO2e saved requires measured physical change plus a documented conversion method; otherwise label MODEL_ESTIMATE.",
+    "Water saved must not be inferred from generic water-footprint averages without appropriate composition and method.",
+    "A global 8-10% GHG statistic cannot be converted into a local percentage impact.",
+    "Contract value, procurement value and avoidable food-waste cost are separate quantities.",
+    "Prediction accuracy is not environmental impact unless operators act and measured waste changes without unacceptable service degradation."
+  ],
+  "pmr_questions_zero_waste_owner": [
+    "Which food-waste categories are currently weighed separately?",
+    "What is the exact measurement boundary of the published food-waste total?",
+    "Is measurement keyed to generation date or collection date?",
+    "Can waste be separated by campus, meal and pre/post-consumer category?",
+    "Which internal Zero Waste record is considered authoritative?",
+    "Who reviews public monthly food-waste numbers?",
+    "Which metric would count as meaningful reduction without harming service?",
+    "Does the sustainability/Zero Waste function influence production quantity or only downstream handling?",
+    "What evidence is required before a climate-impact claim is approved?",
+    "Does the university already use a documented carbon/water conversion method for food waste?"
+  ]
+}
