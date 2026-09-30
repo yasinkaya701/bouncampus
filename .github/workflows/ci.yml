@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - 'work/**'
       - 'role/**'
 
 permissions:
@@ -26,60 +27,90 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
-      - name: Validate PR topology and per-role concurrency
+      - name: Validate parent/child PR topology and integration slot
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          IS_DRAFT: ${{ github.event.pull_request.draft }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           set -euo pipefail
 
-          role_branches="$(python - <<'PY'
+          read -r max_parent_prs max_ready_prs <<EOF
+          $(python - <<'PY'
           import json
           cfg = json.load(open('.agents/fabric.json'))
-          print('\n'.join(cfg['role_branches'].values()))
+          integration = cfg['integration']
+          print(integration['max_parent_pull_requests'], integration['max_integration_ready_pull_requests'])
           PY
-          )"
-          feature_limit="$(python - <<'PY'
-          import json
-          cfg = json.load(open('.agents/fabric.json'))
-          print(cfg['integration']['max_open_feature_pull_requests_per_role'])
-          PY
-          )"
+          )
+          EOF
 
-          is_role_branch() {
-            printf '%s\n' "$role_branches" | grep -Fxq "$1"
+          is_parent_branch() {
+            [[ "$1" =~ ^work/(ie|ee|cs1|cs2)/[a-z0-9][a-z0-9-]*$ ]]
+          }
+
+          is_legacy_role_branch() {
+            [[ "$1" =~ ^role/(ie|ee|cs1|cs2)- ]]
           }
 
           if [ "$BASE_REF" = "master" ]; then
-            if is_role_branch "$HEAD_REF"; then
-              :
+            if is_parent_branch "$HEAD_REF"; then
+              if ! printf '%s' "$PR_BODY" | grep -Eq 'Parent workstream:[[:space:]]*HUMAN-(IE|EE|CS1|CS2)'; then
+                echo "Parent-to-master PR body must declare: Parent workstream: HUMAN-<ROLE>."
+                exit 1
+              fi
             elif [[ "$HEAD_REF" == agent/quality-release/* ]]; then
               echo "Governance/bootstrap PR directly to master."
+            elif is_legacy_role_branch "$HEAD_REF"; then
+              echo "Legacy role branch accepted during Fabric v2 migration."
             else
-              echo "PRs to master must come from a configured role branch or agent/quality-release/*."
+              echo "PRs to master must come from work/<role>/<slug>, legacy role/<role>-*, or agent/quality-release/*."
               exit 1
             fi
-          elif is_role_branch "$BASE_REF"; then
+
+            open_json="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base master --limit 100 --json number,isDraft,headRefName)"
+            open_count="$(printf '%s' "$open_json" | jq 'length')"
+            ready_count="$(printf '%s' "$open_json" | jq '[.[] | select(.isDraft == false)] | length')"
+            if [ "$open_count" -gt "$max_parent_prs" ]; then
+              echo "Too many open parent/master PRs: $open_count > $max_parent_prs."
+              exit 1
+            fi
+            if [ "$ready_count" -gt "$max_ready_prs" ]; then
+              echo "Master integration slot violation: $ready_count non-draft PRs > $max_ready_prs."
+              exit 1
+            fi
+          elif is_parent_branch "$BASE_REF"; then
             if [[ "$HEAD_REF" != agent/* ]]; then
-              echo "Feature PRs into role branches must use agent/<lane>/<task> heads."
+              echo "Child PRs into a parent workstream must use agent/<lane>/<task> heads."
               exit 1
             fi
-            open_count="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base "$BASE_REF" --json number --jq 'length')"
-            if [ "$open_count" -gt "$feature_limit" ]; then
-              echo "Role branch $BASE_REF exceeds feature PR limit: $open_count > $feature_limit."
+            if ! printf '%s' "$PR_BODY" | grep -Eq 'Agent task ID:[[:space:]]*TASK-[A-Z0-9-]+'; then
+              echo "Child PR body must declare: Agent task ID: TASK-...."
+              exit 1
+            fi
+          elif is_legacy_role_branch "$BASE_REF"; then
+            if [[ "$HEAD_REF" != agent/* ]]; then
+              echo "Legacy feature PRs into role branches must use agent/<lane>/<task> heads."
               exit 1
             fi
           else
-            echo "Unsupported PR base: $BASE_REF. Use a configured role branch or master."
+            echo "Unsupported PR base: $BASE_REF. Use a parent work branch or master."
             exit 1
           fi
 
-      - name: Require PR head to contain current target base
+      - name: Require latest target base for merge-ready PRs
+        env:
+          IS_DRAFT: ${{ github.event.pull_request.draft }}
         run: |
+          if [ "$IS_DRAFT" = "true" ]; then
+            echo "Draft PR: CI is advisory. Latest target base will be required when the PR acquires an integration slot."
+            exit 0
+          fi
           git merge-base --is-ancestor "${{ github.event.pull_request.base.sha }}" HEAD || {
-            echo "PR head is stale. Integrate the latest target branch before merge."
+            echo "Merge-ready PR head is stale. Integrate the latest target branch and rerun exact-head CI."
             exit 1
           }
 
