@@ -71,9 +71,8 @@ jobs:
               exit 1
             fi
 
-            open_json="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base master --limit 100 --json number,isDraft,headRefName)"
-            open_count="$(printf '%s' "$open_json" | jq 'length')"
-            ready_count="$(printf '%s' "$open_json" | jq '[.[] | select(.isDraft == false)] | length')"
+            open_count="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base master --limit 100 --json number --jq 'length')"
+            ready_count="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base master --limit 100 --json isDraft --jq '[.[] | select(.isDraft == false)] | length')"
             if [ "$open_count" -gt "$max_parent_prs" ]; then
               echo "Too many open parent/master PRs: $open_count > $max_parent_prs."
               exit 1
