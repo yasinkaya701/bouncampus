@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BOUNCAMPUS frontend
 
-## Getting Started
+The production web application is the Next.js app in this directory. Vercel routes the public deployment to `frontend/`; by default the UI uses the co-located `/api/v1/*` Next.js routes.
 
-First, run the development server:
+## Local development
+
+Requirements:
+
+- Node.js `24.x`
+- npm
 
 ```bash
+npm ci
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Leave `NEXT_PUBLIC_API_URL` empty to use the co-located Next.js API. Set it only when intentionally testing against a separately deployed FastAPI research service.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Verification
 
-## Learn More
+Before integration, run:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run verify
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This runs TypeScript checks, lint, and the production build. GitHub CI runs the same frontend gates on the exact PR head.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Primary product surfaces
 
-## Deploy on Vercel
+- `/` — KREATE command center
+- `/food-waste` — core food-waste decision workspace
+- `/food-waste/pilot` — measured pilot evidence workflow
+- `/demo` and `/demo/jury` — jury presentation flow
+- `/decisions` — human-review decision ledger
+- `/data` — source provenance and truth boundary
+- `/buildings` — campus building intelligence
+- `/mobility` — source-backed shuttle workspace
+- `/scenarios` — counterfactual scenario workspace
+- `/courses` — course/schedule explorer
+- `/lab` — explicitly non-jury experimental roadmap surface
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Historical mock/synthetic code belongs under the repository-level `legacy/` directory and must not be imported into production code.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Truth boundary
+
+Do not present model estimates, synthetic datasets, or unavailable integrations as measured/live university telemetry. The product must distinguish official/public sources, model estimates, unavailable sources, and measured pilot evidence.
