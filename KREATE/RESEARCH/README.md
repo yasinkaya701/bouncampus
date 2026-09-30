@@ -16,6 +16,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 - Policy/ranking pressure is market context, **not willingness-to-pay evidence or a guaranteed score/compliance outcome**.
 - Vendor claims and case-study percentages are competitive context, **not neutral evidence or expected BOUNCAMPUS impact**.
 - National university counts are ecosystem context, **not addressable-customer counts or TAM without segmentation evidence**.
+- Reservation practices at other universities are sector precedents, **not evidence that Boğaziçi should use the same mechanism in normal-term service**.
 
 ## Available packs
 
@@ -26,6 +27,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 | [Boğaziçi Food Procurement & Contract Research](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md) | Current 2026–2027 unit-price dining procurement, quantities, contractor, capacity requirement, cancelled predecessor, contract-semantics unknowns and PMR/data questions. | [`bogazici_food_procurement_2026_2027.json`](./bogazici_food_procurement_2026_2027.json) |
 | [Türkiye Public-University Dining Procurement Benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) | Cross-university 2026 procurement sample testing whether the buyer/quantity/contract workflow repeats beyond Boğaziçi; covers SKS buyer pattern, on-site vs transported service, meal/channel segmentation and candidate beachhead refinement. | [`turkiye_university_dining_procurement_benchmark.json`](./turkiye_university_dining_procurement_benchmark.json) |
 | [Türkiye University Dining Contract Decision Precedents](./TURKIYE_DINING_CONTRACT_DECISION_PRECEDENTS.md) | KİK-backed precedents showing historical-demand quantity heuristics, contractor forecast responsibility, smart-card/actual-consumption settlement, excess/shortage risk and historical-preference menu-mix adjustment. | [`turkiye_dining_contract_decision_precedents.json`](./turkiye_dining_contract_decision_precedents.json) |
+| [Türkiye Dining Reservation Signals](./TURKIYE_DINING_RESERVATION_SIGNALS.md) | Multi-university examples of reservation/intent systems used to plan meals and reduce waste/shortages; compares passive forecast, reservation and hybrid residual-uncertainty approaches, including Boğaziçi's 2026 special-service reservation precedent. | — |
 | [Türkiye Zero-Waste & Campus Food-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) | Official Türkiye Zero Waste and UNEP context translated into pilot KPI hierarchy, measurement boundary and anti-greenwashing rules for food-waste/climate claims. | [`turkiye_zero_waste_campus_measurement_context.json`](./turkiye_zero_waste_campus_measurement_context.json) |
 | [Boğaziçi PMR Target Map](./BOGAZICI_PMR_TARGET_MAP.md) | Public role-routing map for Food Services, current contractor, BİD data owner, sustainability/Zero Waste measurement owner, SKS escalation and operational-data support; includes question ownership and recommended interview sequence. | [`bogazici_pmr_target_map.json`](./bogazici_pmr_target_map.json) |
 | [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) | Cross-source data-quality control: capacity, beneficiary, serving, packaged-meal, food-waste/İSTAÇ and service-regime semantics that agents must reconcile before joining metrics or training models. | See the `source_conflicts` section of [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json). |
@@ -50,16 +52,17 @@ This directory contains secondary/public-source research prepared for KREATE age
 5. Read the [Procurement & Contract](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md) pack before making Boğaziçi-specific cost, buyer, contractor-incentive or quantity-control claims.
 6. Read the [Türkiye procurement benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) before beachhead, market-repeatability or cross-institution product-architecture work.
 7. Read the [Contract Decision Precedents](./TURKIYE_DINING_CONTRACT_DECISION_PRECEDENTS.md) before designing PMR around quantity ownership, hakediş, excess/shortage incentives, current heuristics or menu-mix decisions.
-8. Read the [Zero-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) before defining pilot waste KPIs, climate/resource conversions or application impact language.
-9. Use the [PMR Target Map](./BOGAZICI_PMR_TARGET_MAP.md) to route each unresolved question to the smallest relevant owner set; do not shotgun generic outreach.
-10. Use [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) for model/measurement/interview method choices, never as a Boğaziçi impact claim.
+8. Read [Türkiye Dining Reservation Signals](./TURKIYE_DINING_RESERVATION_SIGNALS.md) before treating ML forecasting as the default intervention; compare reservation/intent, passive forecast and hybrid strategies.
+9. Read the [Zero-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) before defining pilot waste KPIs, climate/resource conversions or application impact language.
+10. Use the [PMR Target Map](./BOGAZICI_PMR_TARGET_MAP.md) to route each unresolved question to the smallest relevant owner set; do not shotgun generic outreach.
+11. Use [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) for model/measurement/interview method choices, never as a Boğaziçi impact claim.
 
 ### Platform / expansion / market-context work
 
-11. Read [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) for safe why-now context and national benchmark signals.
-12. Read [Competitor & Substitute Landscape](./COMPETITOR_SUBSTITUTE_LANDSCAPE.md) before claiming novelty, designing broad platform features or writing competitor analysis.
-13. Read [Türkiye Market Segmentation & Beachhead](./MARKET_SEGMENTATION_AND_BEACHHEAD.md) before TAM/SAM/SOM work, external PMR sampling or beachhead claims.
-14. Read [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) before defining durable cross-domain schemas, water/energy expansion or evidence export surfaces.
+12. Read [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) for safe why-now context and national benchmark signals.
+13. Read [Competitor & Substitute Landscape](./COMPETITOR_SUBSTITUTE_LANDSCAPE.md) before claiming novelty, designing broad platform features or writing competitor analysis.
+14. Read [Türkiye Market Segmentation & Beachhead](./MARKET_SEGMENTATION_AND_BEACHHEAD.md) before TAM/SAM/SOM work, external PMR sampling or beachhead claims.
+15. Read [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) before defining durable cross-domain schemas, water/energy expansion or evidence export surfaces.
 
 ## How agents should consume a pack
 
@@ -79,6 +82,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 14. Preserve event-time, reporting-period and measurement-stage semantics; if two values cannot be safely reconciled, represent the conflict rather than silently cleaning it.
 15. Verify competitor capabilities directly before claiming a gap; vendor marketing claims and case-study savings are not neutral performance evidence.
 16. Do not turn a national institution count into an addressable market count before decision/workflow segmentation and buying-path evidence exist.
+17. Do not defend ML as the intervention if reservation/intent or a simple operational rule removes the uncertainty more cheaply and reliably.
 
 ## Current cross-pack synthesis
 
@@ -87,23 +91,23 @@ PUBLIC FACT:
 Boğaziçi already has sustainability measurement/governance and reports 48,251 kg food waste for 2025.
 
 MARKET FACT:
-Türkiye already has a higher-education sustainability platform category and specialist food-waste/BMS alternatives.
+Türkiye already has sustainability platforms, food-waste specialists, BMS/BEMS, in-house tools and reservation-based demand signals.
 
 RESEARCH INFERENCE:
-A first-time monitoring/dashboard/reporting pitch is weak and provenance alone is not a moat.
+A first-time monitoring/dashboard/reporting pitch is weak; provenance alone is not a moat; ML forecasting is not automatically the best control mechanism.
 
 HYPOTHESIS:
-Demand mismatch materially contributes to avoidable dining waste and the production decision is reachable.
+A material residual dining-demand/production decision remains unsolved after current tools/signals and can be improved before the freeze point.
 
 PMR JOB:
-Find the real decision owner, timing, constraints, data, consequences, current workaround and incumbent tools.
+Find the real decision owner, timing, constraints, current data/signals, reservation practices, consequences, current workaround and incumbent tools.
 
 TECH JOB:
-Start with a simple baseline, preserve uncertainty/human approval, and verify outcomes against service-level guardrails.
+Compare simple baseline + reservation/intent + contextual forecast strategies; preserve uncertainty/human approval; verify outcomes against service-level guardrails.
 
 BEACHHEAD GATE:
 Repeated pain + reachable control point + measurable outcome + current-tool gap + incentive alignment + pilot feasibility + repeatability.
 
 PLATFORM DIRECTION IF VALIDATED:
-Observe -> Reconcile -> Predict -> Diagnose -> Recommend -> Human Act -> Verify.
+Observe -> Reconcile -> Predict/Infer Intent -> Diagnose -> Recommend -> Human Act -> Verify.
 ```
