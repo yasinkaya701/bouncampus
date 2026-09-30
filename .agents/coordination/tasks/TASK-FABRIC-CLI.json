@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "TASK-FABRIC-CLI",
+  "title": "Add mechanical agent task claim and transition CLI",
+  "priority": "P0",
+  "lane": "quality-release",
+  "state": "ACTIVE",
+  "owner_agent": "execution-systems-engineer",
+  "branch": "agent/quality-release/fabric-task-cli",
+  "depends_on": [],
+  "touched_paths": [
+    "scripts/agent_task.py",
+    "scripts/test_agent_task.py",
+    ".github/workflows/ci.yml"
+  ],
+  "acceptance_criteria": [
+    "Agents can list/inspect ready tasks without editing JSON manually",
+    "Agents can claim READY tasks only when dependencies, human gates, and path ownership allow it",
+    "Agents can heartbeat and transition their owned task with lifecycle invariants enforced",
+    "Task operations are covered by standard-library unit tests",
+    "Repository CI runs the task-operation unit tests"
+  ],
+  "validation_commands": [
+    "python scripts/test_agent_task.py",
+    "python scripts/test_agent_fabric_check.py",
+    "python scripts/agent_fabric_check.py",
+    "python -m compileall -q scripts"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-09-30T16:53:00Z",
+    "heartbeat_at": "2026-09-30T16:53:00Z",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "This task intentionally does not touch .agents/FABRIC.md, which remains owned by the blocked direct-push recovery task.",
+    "The CLI operates on a checked-out agent-coordination task store and relies on git/GitHub commit conflict semantics for remote atomicity."
+  ]
+}
