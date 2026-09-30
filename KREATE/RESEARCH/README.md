@@ -13,6 +13,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 - Contract clauses from another university are **sector precedents, not Boğaziçi contract facts**.
 - Global climate/food-waste statistics are context, **not local conversion factors or measured Boğaziçi impact**.
 - Public professional contact information is for role routing only; it is **not interview evidence, endorsement, availability or permission for repeated outreach**.
+- Policy/ranking pressure is market context, **not willingness-to-pay evidence or a guaranteed score/compliance outcome**.
 
 ## Available packs
 
@@ -26,17 +27,33 @@ This directory contains secondary/public-source research prepared for KREATE age
 | [Türkiye Zero-Waste & Campus Food-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) | Official Türkiye Zero Waste and UNEP context translated into pilot KPI hierarchy, measurement boundary and anti-greenwashing rules for food-waste/climate claims. | [`turkiye_zero_waste_campus_measurement_context.json`](./turkiye_zero_waste_campus_measurement_context.json) |
 | [Boğaziçi PMR Target Map](./BOGAZICI_PMR_TARGET_MAP.md) | Public role-routing map for Food Services, current contractor, BİD data owner, sustainability/Zero Waste measurement owner, SKS escalation and operational-data support; includes question ownership and recommended interview sequence. | [`bogazici_pmr_target_map.json`](./bogazici_pmr_target_map.json) |
 | [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) | Cross-source data-quality control: capacity, beneficiary, serving, packaged-meal, food-waste/İSTAÇ and service-regime semantics that agents must reconcile before joining metrics or training models. | See the `source_conflicts` section of [`bogazici_food_operations_deep_dive.json`](./bogazici_food_operations_deep_dive.json). |
+| [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) | YÖK, public-building energy policy, Climate Law, UI GreenMetric 2026 Governance & Digitalization, Türkiye benchmark campuses and safe why-now language. | — |
+| [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) | Cross-domain event/provenance model, food-pilot data contract, decision records, water/energy governance implications and verification levels. | — |
+| [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) | Peer-reviewed synthesis connecting food-waste causality, forecasting, smart-campus decision processes, measurement and model design. | — |
+| [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) | Role-specific execution handoff for IE, EE, CS1, CS2, frontend and backend agents, including kill/modify conditions. | — |
 
 ## Recommended reading order
 
-1. Start with the Sustainability 2025 pack for the broad campus problem landscape and claim firewall.
-2. Read the Food Operations Deep Dive before PMR, data requests, architecture or modeling around dining operations.
-3. Read the Procurement & Contract pack before making Boğaziçi-specific cost, buyer, contractor-incentive or quantity-control claims.
-4. Read the Türkiye procurement benchmark before beachhead, market-repeatability or cross-institution product-architecture work.
-5. Read the Contract Decision Precedents before designing PMR around quantity ownership, hakediş, excess/shortage incentives, current heuristics or menu-mix decisions.
-6. Read the Zero-Waste Measurement Context before defining pilot waste KPIs, climate/resource conversions or application impact language.
-7. Use the PMR Target Map to route each unresolved question to the smallest relevant owner set; do not shotgun generic outreach.
-8. Check the Source Reconciliation Matrix before importing any numeric field into an application claim, dataset, KPI or model.
+### Any new agent
+
+1. Read [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) for the current research-to-execution handoff and falsification conditions.
+2. Read the [Sustainability 2025](./BOGAZICI_SUSTAINABILITY_2025.md) pack for the broad campus problem landscape and claim firewall.
+3. Check the [Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) before importing any numeric field into a claim, dataset, KPI or model.
+
+### Dining / PMR / model work
+
+4. Read the [Food Operations Deep Dive](./BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md) before PMR, data requests, architecture or modeling around dining operations.
+5. Read the [Procurement & Contract](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md) pack before making Boğaziçi-specific cost, buyer, contractor-incentive or quantity-control claims.
+6. Read the [Türkiye procurement benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md) before beachhead, market-repeatability or cross-institution product-architecture work.
+7. Read the [Contract Decision Precedents](./TURKIYE_DINING_CONTRACT_DECISION_PRECEDENTS.md) before designing PMR around quantity ownership, hakediş, excess/shortage incentives, current heuristics or menu-mix decisions.
+8. Read the [Zero-Waste Measurement Context](./TURKIYE_ZERO_WASTE_CAMPUS_MEASUREMENT_CONTEXT.md) before defining pilot waste KPIs, climate/resource conversions or application impact language.
+9. Use the [PMR Target Map](./BOGAZICI_PMR_TARGET_MAP.md) to route each unresolved question to the smallest relevant owner set; do not shotgun generic outreach.
+10. Use [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md) for model/measurement/interview method choices, never as a Boğaziçi impact claim.
+
+### Platform / expansion / market-context work
+
+11. Read [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md) for safe why-now context and national benchmark signals.
+12. Read [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) before defining durable cross-domain schemas, water/energy expansion or evidence export surfaces.
 
 ## How agents should consume a pack
 
@@ -51,3 +68,28 @@ This directory contains secondary/public-source research prepared for KREATE age
 9. Never copy another university's contract clause into a Boğaziçi claim; use precedents only to sharpen the exact question that Boğaziçi PMR/contract verification must answer.
 10. Never convert global food-waste GHG/resource statistics into local saved CO2e/water without measured physical change, a documented conversion method and explicit `MODEL ESTIMATE` labeling.
 11. A contact, scheduled call or unanswered outreach is not PMR evidence; only completed conversation artifacts can enter the interview evidence pipeline.
+12. Treat policy and sustainability rankings as **context pressure**, not proof that a university will buy BOUNCAMPUS or that implementation guarantees ranking points.
+13. Treat external academic intervention effects as **design references**, not expected or measured Boğaziçi effects.
+14. Preserve event-time, reporting-period and measurement-stage semantics; if two values cannot be safely reconciled, represent the conflict rather than silently cleaning it.
+
+## Current cross-pack synthesis
+
+```text
+PUBLIC FACT:
+Boğaziçi already has sustainability measurement/governance and reports 48,251 kg food waste for 2025.
+
+RESEARCH INFERENCE:
+A first-time monitoring/dashboard pitch is weak for a mature campus.
+
+HYPOTHESIS:
+Demand mismatch materially contributes to avoidable dining waste and the production decision is reachable.
+
+PMR JOB:
+Find the real decision owner, timing, constraints, data, consequences and current workaround.
+
+TECH JOB:
+Start with a simple baseline, preserve uncertainty/human approval, and verify outcomes against service-level guardrails.
+
+PLATFORM DIRECTION IF VALIDATED:
+Observe -> Reconcile -> Predict -> Diagnose -> Recommend -> Human Act -> Verify.
+```
