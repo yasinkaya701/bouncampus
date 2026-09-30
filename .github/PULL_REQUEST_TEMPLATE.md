@@ -77,6 +77,8 @@ A feature PR merged only into a role branch is staging, not final completion.
 
 Use this section for application, PMR, evidence, experiment, or claim-bearing changes.
 
+<!-- Automation compatibility: AI-generated material must contain no fabricated evidence or results. -->
+
 - [ ] Material claims are classified correctly.
 - [ ] Every material claim has an evidence ID or remains explicitly `HYPOTHESIS`/`UNKNOWN`.
 - [ ] AI did not fabricate interviews, quotes, personas, pilot results, accuracy, climate impact, hardware performance, live data, or savings.
