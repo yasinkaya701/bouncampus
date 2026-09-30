@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "research_id": "TURKIYE-UNIVERSITY-DINING-PROCUREMENT-BENCHMARK-2026-10-01",
+  "research_date": "2026-10-01",
+  "evidence_class": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "scope": {
+    "sample_type": "PURPOSIVE_CONVENIENCE_SAMPLE",
+    "not_tam": true,
+    "not_exhaustive": true,
+    "purpose": "Test repeatability and operational variation of outsourced public-university dining procurement patterns in Türkiye."
+  },
+  "sample": [
+    {
+      "institution": "Boğaziçi University",
+      "ikn": "2025/1727143",
+      "authority_type": "SKS",
+      "period": "2026-01-01/2027-12-31",
+      "quantity_signals": {
+        "student_meals": 2500000,
+        "breakfast_including_sahur": 380000,
+        "staff_meals": 250000,
+        "listed_total_units": 3130000
+      },
+      "operating_form": ["CENTRAL_PRODUCTION", "MULTI_CAMPUS_DISTRIBUTION"],
+      "result_status": "CONTRACTED",
+      "source": "KREATE/RESEARCH/BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md"
+    },
+    {
+      "institution": "Düzce University",
+      "ikn": "2026/684643",
+      "authority_type": "SKS",
+      "period": "2026-07-01/2027-06-30",
+      "quantity_signals": {"meals": 400000, "event_packages": 10000},
+      "operating_form": ["CAMPUS_KITCHEN", "CAMPUS_DINING_HALLS", "EVENT_PACKAGE_CHANNEL"],
+      "contract_value_try": 57822400,
+      "contractor": "Maya Grubu Catering",
+      "result_status": "CONTRACTED",
+      "source_url": "https://ekapveri.com/ihale/ekap-2026-684643/"
+    },
+    {
+      "institution": "Abdullah Gül University",
+      "ikn": "2026/253113",
+      "authority_type": "SKS",
+      "period": "2026-05-04/2027-04-30",
+      "quantity_signals": {"transported_meals": 210000},
+      "operating_form": ["TRANSPORTED_SERVICE"],
+      "contract_value_try": 27972000,
+      "contractor": "Sevim Yemek ve Gıda Hizmetleri A.Ş.",
+      "result_status": "CONTRACTED",
+      "source_url": "https://ekapveri.com/ihale/ekap-2026-253113/"
+    },
+    {
+      "institution": "Türk-Alman University",
+      "ikn": "2026/296251",
+      "authority_type": "ADMINISTRATIVE_AND_FINANCIAL_AFFAIRS",
+      "period": "2026-05-01/2026-12-31",
+      "quantity_signals": {"breakfast": 15000, "lunch_and_dinner": 195000, "listed_total_units": 210000},
+      "operating_form": ["CAMPUS_DINING_HALLS", "MEAL_TYPE_SEGMENTATION"],
+      "contract_value_try": 34704344,
+      "contractor": "Okbay Unlu Mamülleri Gıda San. ve Tic. Ltd. Şti.",
+      "result_status": "CONTRACTED",
+      "source_url": "https://ekapveri.com/ihale/ekap-2026-296251/"
+    },
+    {
+      "institution": "Marmara University",
+      "case": "ON_SITE",
+      "ikn": "2026/593793",
+      "authority_type": "SKS",
+      "period": "2026-07-01/2027-06-30",
+      "quantity_signals": {
+        "standard_meals": 700000,
+        "vegetarian_meals": 36400,
+        "gluten_free_meals": 1000,
+        "vegan_meals": 1000,
+        "packages": 1000,
+        "sahur_packages": 600
+      },
+      "operating_form": ["ON_SITE_PRODUCTION", "MULTI_SITE", "DIETARY_VARIANTS", "PACKAGE_CHANNEL"],
+      "contract_value_try": 177352151.28,
+      "contractor": "ZCatering",
+      "result_status": "CONTRACTED",
+      "source_urls": ["https://ekapveri.com/ihale/ekap-2026-593793/", "https://www.ihaledetay.com/2026-593793"]
+    },
+    {
+      "institution": "Marmara University",
+      "case": "TRANSPORTED",
+      "ikn": "2026/603458",
+      "authority_type": "SKS",
+      "period": "2026-07-01/2026-12-31",
+      "quantity_signals": {
+        "standard_meals": 220000,
+        "vegetarian_meals": 19000,
+        "gluten_free_meals": 500,
+        "vegan_meals": 500
+      },
+      "operating_form": ["TRANSPORTED_SERVICE", "MULTI_SITE", "DIETARY_VARIANTS"],
+      "contract_value_try": 64980000,
+      "contractor": "Kapari Hazır Yemek Ltd. Şti.",
+      "result_status": "CONTRACTED",
+      "source_urls": ["https://www.ihaledetay.com/2026-603458", "https://ekapveri.com/ihale/ekap-2026-603458/"]
+    },
+    {
+      "institution": "İstanbul University",
+      "ikn": "2026/1430432",
+      "authority_type": "SKS",
+      "tender_date": "2026-09-16",
+      "quantity_signals": {"meal_person_units_approx": 882000, "student_breakfast_units": 30000},
+      "operating_form": ["MULTI_SITE"],
+      "result_status": "TENDER_NOTICE_ONLY_IN_THIS_RESEARCH",
+      "source_url": "https://ekapveri.com/ihale/ekap-2026-1430432/"
+    }
+  ],
+  "patterns": [
+    {
+      "id": "MKT-01",
+      "claim": "Food-service procurement repeatedly sits in SKS or another identifiable university administrative authority.",
+      "use": "Narrow buyer-discovery targets beyond generic university management."
+    },
+    {
+      "id": "MKT-02",
+      "claim": "Explicit meal/service quantities recur across sampled procurements.",
+      "use": "Treat quantity as an existing operational/procurement object, while validating whether daily quantities are adjustable."
+    },
+    {
+      "id": "MKT-03",
+      "claim": "Operating modes vary across on-site production, transported food, multi-site distribution, meal types, dietary variants and package channels.",
+      "use": "Require a configurable canonical schema rather than a single cafeteria-specific model."
+    },
+    {
+      "id": "MKT-04",
+      "claim": "Procurement/contract rules can materially constrain the value of a forecast recommendation.",
+      "use": "Combine forecast with contract, shortage and service constraints before recommending quantity."
+    },
+    {
+      "id": "MKT-05",
+      "claim": "Institution-specific operational data systems are likely heterogeneous even when procurement patterns repeat.",
+      "use": "Separate canonical internal schema from institution-specific adapters."
+    }
+  ],
+  "candidate_beachhead": {
+    "label": "HYPOTHESIS",
+    "definition": "Turkish public universities with outsourced material-included dining services where explicit meal quantities are managed across one or more campuses/channels and an administrative food-service owner can influence contractor quantities.",
+    "unvalidated_dimensions": [
+      "forecast_error_frequency_and_cost",
+      "current_forecasting_method",
+      "quantity_adjustment_discretion",
+      "buyer_willingness",
+      "data_access",
+      "software_procurement_path",
+      "operator_actionability"
+    ]
+  },
+  "pmr_plan": {
+    "university_operating_modes": 3,
+    "contractor_operators": 2,
+    "data_owner_interviews": 1,
+    "canonical_questions": [
+      "Who owns quantity?",
+      "When is quantity frozen?",
+      "What is today's forecast method?",
+      "What data are visible before freeze?",
+      "Can quantity be revised?",
+      "What is shortage cost or service failure?",
+      "What is excess cost?",
+      "Which quantity is payable/accepted?",
+      "What is measured after service?"
+    ]
+  },
+  "product_schema_recommendation": {
+    "forecast_context": ["institution", "campus", "meal_type", "service_channel", "menu_class", "service_regime", "history"],
+    "decision_constraints": ["freeze_time", "min_max_quantity", "contract_rules", "shortage_guardrail", "production_batch_rules", "source_health"],
+    "recommendation": ["quantity", "uncertainty", "reason_codes", "abstain_or_review"]
+  },
+  "forbidden_inferences": [
+    "This sample is TAM/SAM/SOM.",
+    "All Turkish universities outsource dining.",
+    "All contracts have identical unit-price/payment semantics.",
+    "Contract value equals addressable software value or food-waste cost.",
+    "All sampled universities have meaningful overproduction.",
+    "One model transfers without local calibration.",
+    "Public procurement data proves software willingness to pay."
+  ]
+}
