@@ -19,7 +19,7 @@ Allowed lifecycle states:
 
 ## Rules
 
-- Every active workstream must declare a lane, branch, owner role, scope, and touched paths before implementation begins.
+- Every active workstream must declare a lane, branch, owner role, state, scope, and touched paths before implementation begins.
 - File ownership is exclusive while a workstream is active.
 - The agent that accepts a workstream owns implementation, validation, integration, conflict resolution, merge, and post-merge verification.
 - The Merge Coordinator is a repository-wide lock acquired temporarily by the ready workstream owner; it is not a separate agent handoff.
@@ -32,9 +32,9 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| quality-release | `agent/quality-release/kreate-team-os` | Execution systems engineer | BLOCKED | Bootstrap the minimal KREATE application/PMR collaboration and evidence system without changing product behavior. | `.agents/WORKSTREAMS.md`; `KREATE/**`; `.github/ISSUE_TEMPLATE/kreate-task.yml`; `.github/PULL_REQUEST_TEMPLATE.md`; `.github/workflows/ci.yml`; `scripts/kreate_check.py` |
+| frontend-ux + api-product + quality-release | `agent/frontend-ux/archive-stale-flow-mock` | Workstream Agent / temporary Merge Coordinator | INTEGRATING | Remove stale mock/synthetic/superseded surfaces from active runtime and documentation trees while preserving provenance under `legacy/`: archive the orphan hard-coded `/flow` route, unused synthetic backend data-generation/training utilities, and the pre-food-waste platform walkthrough; replace stale create-next-app documentation without changing active production behavior. | `.agents/WORKSTREAMS.md`, `frontend/README.md`, `frontend/src/app/flow/page.tsx`, `backend/app/data/generator.py`, `backend/generate_and_train.py`, `docs/walkthrough.md`, `legacy/README.md`, `legacy/frontend/src/app/flow/page.tsx`, `legacy/backend/synthetic-training/generator.py`, `legacy/backend/synthetic-training/generate_and_train.py`, `legacy/docs/platform-walkthrough-pre-food-waste.md` |
 
-**Blocker evidence (2026-09-30):** PR #27 CI run #220 is queued on required labels `self-hosted`, `macOS`, `ARM64`, `bouncampus` with no runner assigned. Repository policy requires green CI before merge. **Next executable action:** make the matching self-hosted runner available, let the exact PR head run all gates (including `python scripts/kreate_check.py`), resolve any failures, then return this workstream to `INTEGRATING`, merge with a normal merge commit, and verify `master`.
+The `quality-release / kreate-team-os` workstream was merged through PR #27 and verified on `master` at merge commit `557cb53eea229a999dec265ac076067b82922f94` by CI run #241 before ownership was released. It added the KREATE evidence-gated team operating system, 16 PMR interview slots, claim/evidence controls, issue/PR workflow requirements, and `scripts/kreate_check.py` without changing product behavior.
 
 The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
 
