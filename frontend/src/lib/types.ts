@@ -128,7 +128,7 @@ export interface ActionItem {
   impact_value: number;
   impact_unit: string;
   icon: string;
-  provenance?: 'MODEL_ESTIMATE' | 'OFFICIAL_LIVE' | 'OFFICIAL_SNAPSHOT';
+  provenance?: 'MODEL_ESTIMATE' | 'POLICY_HEURISTIC' | 'OFFICIAL_LIVE' | 'OFFICIAL_SNAPSHOT';
 }
 
 export interface LiveWeatherInfo {
