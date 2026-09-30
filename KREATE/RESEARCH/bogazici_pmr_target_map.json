@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "research_id": "BOGAZICI-PMR-TARGET-MAP-2026-10-01",
+  "research_date": "2026-10-01",
+  "evidence_class": "PUBLIC_PROFESSIONAL_ROLE_MAPPING",
+  "claim_firewall": {
+    "no_interviews_completed": true,
+    "not_customer_validation": true,
+    "public_contact_not_permission_for_repeated_outreach": true,
+    "no_personal_diner_data_request": true
+  },
+  "targets": [
+    {
+      "target_id": "TARGET-BU-01",
+      "priority": "P0",
+      "unit": "Yemek Hizmetleri Şube Müdürlüğü",
+      "public_role_owner": "Aygül Demir Yolasığmazoğlu",
+      "public_title": "Yemek Hizmetleri Şube Müdürü",
+      "public_contact": {
+        "email": "yemekhane@bogazici.edu.tr",
+        "phone": ["+90 212 359 4460", "+90 212 359 6729", "+90 212 359 6730"]
+      },
+      "why": "Highest-value owner for dining governance, current contractor workflow, menu/service administration and contract-related process discovery.",
+      "resolve": ["quantity_owner", "freeze_time", "adjustment_rights", "hakediş_measure", "excess_risk", "shortage_risk", "contractor_local_owner"],
+      "source_urls": ["https://yemekhane.bogazici.edu.tr/people", "https://yemekhane.bogazici.edu.tr/iletisim"]
+    },
+    {
+      "target_id": "TARGET-BU-02",
+      "priority": "P0",
+      "unit": "TEMAŞ Gıda / Boğaziçi project operations",
+      "public_role_owner": "LOCAL_PROJECT_OWNER_UNKNOWN",
+      "public_title": "Ask Food Services for current Boğaziçi project/production operator",
+      "public_contact": {
+        "email": "info@temasgida.com",
+        "phone": ["+90 212 886 41 41"]
+      },
+      "why": "Sector precedents show contractor operations may directly forecast daily quantity and bear asymmetric excess/shortage risk.",
+      "resolve": ["current_forecast_heuristic", "production_freeze", "batch_adjustability", "campus_allocation", "operator_records", "benefit_capture"],
+      "source_urls": ["https://www.temasgida.com/", "https://www.temasgida.com/iletisim"]
+    },
+    {
+      "target_id": "TARGET-BU-03",
+      "priority": "P0",
+      "unit": "Bilgi İşlem Daire Başkanlığı",
+      "public_role_owner": "INSTITUTIONAL_DATA_OWNER_TO_BE_ROUTED",
+      "public_title": "BUCard / BUCampus data-system owner",
+      "public_contact": {
+        "email": "bilgiislem@bogazici.edu.tr",
+        "phone": ["+90 212 359 4700"]
+      },
+      "why": "Official pages place BUCard and BUCampus under BİD; dining sources establish QR/turnstile and menu-vote functionality but not historical aggregate access.",
+      "resolve": ["aggregate_entry_retention", "campus_meal_export", "duplicate_refund_semantics", "menu_vote_history", "privacy_approval", "structured_calendar_or_event_feed"],
+      "source_urls": ["https://bilgiislem.bogazici.edu.tr/"]
+    },
+    {
+      "target_id": "TARGET-BU-04",
+      "priority": "P1",
+      "unit": "Sürdürülebilir Yeşil Kampüs Uygulamaları Komisyonu / sustainability measurement",
+      "public_role_owner": "Prof. Dr. Mustafa Öztürk",
+      "public_title": "Commission Chair",
+      "public_contact": null,
+      "why": "Current commission remit explicitly includes waste/emission reduction and ecological-footprint strategy; appropriate for measurement boundary and impact review, not automatically quantity control.",
+      "resolve": ["food_waste_boundary", "category_separation", "generation_vs_collection_date", "authoritative_internal_record", "impact_claim_review", "existing_conversion_method"],
+      "source_urls": ["https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246", "https://sdcpc.bogazici.edu.tr/tr/team.asp"]
+    },
+    {
+      "target_id": "TARGET-BU-05",
+      "priority": "P1",
+      "unit": "Sağlık, Kültür ve Spor Daire Başkanlığı",
+      "public_role_owner": "Eshabil Yıldız",
+      "public_title": "Sağlık Kültür ve Spor Daire Başkanı",
+      "public_contact": {
+        "email": "sks@bogazici.edu.tr",
+        "phone": ["+90 212 359 4515"]
+      },
+      "why": "Administrative umbrella/escalation path for Food Services; use after workflow discovery for permissions, pilot approval or contract/data escalation.",
+      "resolve": ["pilot_permission", "contract_escalation", "aggregate_data_approval", "measurement_protocol_approval"],
+      "source_urls": ["https://sks.bogazici.edu.tr/tr/pages/kadromuz/2212"]
+    },
+    {
+      "target_id": "TARGET-BU-06",
+      "priority": "P2",
+      "unit": "Yemek Hizmetleri operational staff",
+      "public_role_owner": ["Hakan Deniz", "İsmet Gündoğan", "Mustafa Melep"],
+      "public_title": ["Büro Personeli", "Büro Personeli", "Bilgisayar İşletmeni"],
+      "public_contact": null,
+      "why": "Potential data-dictionary/spreadsheet/reporting workflow knowledge after manager routes the correct owner; not assumed buyer/persona from title alone.",
+      "resolve": ["actual_spreadsheets", "monthly_reports", "data_dictionary", "support_workflow", "record_location"],
+      "source_urls": ["https://yemekhane.bogazici.edu.tr/people"]
+    }
+  ],
+  "existing_feedback_signals": [
+    "BUCampus menu selection/voting",
+    "2025 satisfaction survey with 2386 participants",
+    "daily pre-service student tasting/evaluation program",
+    "web request/complaint channel",
+    "2026-2027 target for daily meal ratings in BUCampus"
+  ],
+  "product_rule": "Do not build another generic feedback app as the core wedge before testing whether existing preference/attendance/feedback signals reach the production decision before quantity freeze.",
+  "recommended_sequence": ["TARGET-BU-01", "TARGET-BU-02", "TARGET-BU-03", "TARGET-BU-04", "TARGET-BU-05"],
+  "highest_value_question": "Under the current Boğaziçi–TEMAŞ workflow, who chooses each meal's production/allocation quantity, at what exact time does that choice become costly to change, what aggregate signals exist before that moment, and who bears the cost of excess versus shortage?",
+  "interview_artifact_fields": [
+    "interviewee_role",
+    "organization_or_unit",
+    "role_in_decision",
+    "last_real_incident",
+    "current_process",
+    "input_signals",
+    "decision_owner",
+    "freeze_time",
+    "adjustment_rights",
+    "excess_consequence",
+    "shortage_consequence",
+    "settlement_measure",
+    "data_system",
+    "privacy_or_access_constraint",
+    "hypothesis_change",
+    "follow_up_owner"
+  ]
+}
