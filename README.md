@@ -2,6 +2,99 @@
 
 **Campus food-waste decision intelligence for KREATE for Climate.**
 
+## Team — start here
+
+New teammate? You do **not** need to read the whole repository before contributing.
+
+### 5-minute start
+
+Requirements: Git + Node.js **24.x**.
+
+```bash
+git clone https://github.com/yasinkaya701/bouncampus.git
+cd bouncampus/frontend
+npm ci
+npm run dev
+```
+
+Open `http://localhost:3000`, then visit `/demo` and `/food-waste` first.
+
+For a complete first-session path, use **[`docs/ONBOARDING.md`](docs/ONBOARDING.md)**. For branch, validation, commit, evidence, and PR rules, use **[`CONTRIBUTING.md`](CONTRIBUTING.md)**.
+
+### Human team roles
+
+| Role | Primary ownership | Good starting area |
+|---|---|---|
+| **IE — Customer Discovery & Market Lead** | PMR, beachhead, buyer/persona, interview evidence | `KREATE/`, PMR/evidence issues |
+| **EE — Physical Systems & Measurement Lead** | measurement design, instrumentation, pilot feasibility | measurement/pilot tasks under `KREATE/` |
+| **CS1 — Decision Intelligence Lead** | modeling, uncertainty, evaluation, decision logic | `backend/`, `frontend/src`, analytical scripts |
+| **CS2 — Product Strategy, Evidence Synthesis & Application Lead** | product synthesis, application narrative, evidence integration | `KREATE/`, product/application docs |
+
+### Normal teammate workflow
+
+```text
+pick a bounded issue
+        ↓
+update master
+        ↓
+create human/<role>/<task>
+        ↓
+implement a small change
+        ↓
+validate locally
+        ↓
+self-review the diff + evidence
+        ↓
+use the single integration PR slot
+        ↓
+CI / review / merge
+```
+
+Do not commit routine work directly to `master`. Do not open a second parking-lot PR while another integration PR is active. You may continue non-conflicting work on your own branch until the integration slot is free.
+
+### Fast validation
+
+Frontend:
+
+```bash
+cd frontend
+npm run typecheck
+npm run lint
+```
+
+Merge candidate:
+
+```bash
+cd frontend
+npm run verify
+```
+
+Repository/KREATE checks when relevant:
+
+```bash
+python scripts/kreate_check.py
+python scripts/agent_fabric_check.py
+python -m compileall -q backend/app scripts
+```
+
+### Where should I edit?
+
+```text
+frontend/      active Next.js product + co-located /api/v1 routes
+backend/       FastAPI research/backend service
+KREATE/        roles, PMR, evidence, application and hackathon execution
+docs/          maintained product/technical documentation
+scripts/       repository validation and coordination tooling
+.agents/       autonomous multi-agent coordination
+legacy/        old experiments/mocks — not the default place for new work
+```
+
+The full autonomous execution and merge contract lives in [`AGENTS.md`](AGENTS.md). Humans can start with the onboarding/contribution guides above and use `AGENTS.md` when working with agents or integration mechanics.
+
+---
+
+## Product overview
+
 BOUNCAMPUS turns a measured institutional climate problem into a safe operating decision loop. For the hackathon, the product is deliberately focused on **food-waste prevention in university dining operations**.
 
 Boğaziçi University publicly reports:
@@ -354,7 +447,7 @@ Then verify at minimum:
 - `/api/v1/food/pilot-score`
 - `/api/v1/health`
 
-Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.md). Work is performed on short-lived agent branches, validated through the single integration PR, merged to `master`, and post-merge verified before completion.
+Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.md). Human work uses short-lived `human/<role>/<task>` branches; autonomous work uses the agent branch/lease system. Integration is serialized through the single PR slot, merged to `master`, and verified after merge.
 
 ## KREATE for Climate
 
@@ -366,6 +459,8 @@ Repository engineering and merge discipline are defined in [`AGENTS.md`](AGENTS.
 
 ## Jury preparation
 
+- Team onboarding: [`docs/ONBOARDING.md`](docs/ONBOARDING.md)
+- Contribution workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - Product contract: [`docs/kreate-winning-product.md`](docs/kreate-winning-product.md)
 - 90-second script: [`docs/jury-demo-script.md`](docs/jury-demo-script.md)
 - Full pitch: [`docs/pitch.md`](docs/pitch.md)
