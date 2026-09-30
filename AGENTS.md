@@ -20,6 +20,8 @@ KREATE roles:
 
 Engineering lanes such as `frontend-ux`, `api-product`, `campus-geo`, and `quality-release` remain valid task lanes. A lane may be executed under whichever KREATE role owns the outcome.
 
+Hardware work may additionally use focused lanes such as `hw-measurement`, `hw-sensors`, `hw-power`, `hw-firmware`, `hw-pcb`, `hw-mechanical`, `hw-calibration`, and `hw-verification` under the EE role.
+
 ## Branch topology
 
 `master` is durable product truth.
@@ -149,6 +151,63 @@ A PR touching a shared/high-conflict surface must:
 - preserve both valid sides during conflict resolution;
 - run the broad repository validation gates, not only a narrow unit test.
 
+## Hardware engineering policy
+
+Hardware work is first-class engineering work, not presentation polish. The detailed execution contract lives in `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`.
+
+The EE role should decompose hardware into explicit workstreams such as measurement requirements, sensors/analog front end, power, compute/MCU, connectivity, firmware, PCB/interconnect, mechanical/enclosure, calibration/test, BOM/sourcing, integration contracts, and pilot deployment.
+
+Hardware agents MUST preserve the distinction between:
+
+- `ASSUMPTION`
+- `DATASHEET`
+- `CALCULATION`
+- `SIMULATION`
+- `BENCH_TEST`
+- `FIELD_TEST`
+- `PRODUCTION_EVIDENCE`
+
+A simulation, CAD render, datasheet value, or AI-generated schematic is not bench evidence.
+
+For custom electronics, agents should create the relevant subset of these artifacts before claiming deployability:
+
+- measurement/operational requirements;
+- block and interface diagrams;
+- sensor/error budget;
+- power tree and worst-case power budget;
+- schematic and PCB constraints;
+- firmware state/failure behavior;
+- exact data contract;
+- BOM with exact part identities where known;
+- calibration procedure;
+- verification plan and acceptance criteria;
+- failure-mode/safety notes;
+- test points/debug strategy;
+- DFM/DFT checks when manufacturing is in scope.
+
+Hardware work should prefer the simplest system that closes the evidence loop. A commercial device, manual SOP, or software integration may be superior to custom hardware.
+
+Physical actions that can create real risk remain subject to the `PHYSICAL_SAFETY` gate. Designing, simulating, calculating, coding firmware, and non-energized review are autonomous; dangerous energization, high-current/high-voltage testing, unsafe battery work, destructive testing, hazardous actuator motion, or consequential field installation require appropriate human approval/supervision.
+
+## Plugin and specialized-tool policy
+
+Agents are explicitly allowed and encouraged to use available plugins, connectors, and specialized tools when they materially improve execution or verification. The detailed policy lives in `.agents/PLUGIN_POLICY.md`.
+
+Rules:
+
+- An agent MAY proactively inspect available plugins/tooling when a specialized capability would materially improve the current task.
+- An agent SHOULD use a relevant installed/connected plugin instead of inventing a weaker manual workaround when the plugin provides stronger evidence or direct execution.
+- An agent MUST NOT pretend a plugin exists or was used when it has not been discovered/available.
+- An agent MAY ask the user to install, enable, connect, or authorize a plugin when a missing specialized capability would materially improve or unlock the work.
+- A plugin request should name the **capability gap** and why it matters; do not invent a product/plugin name unless it was actually discovered.
+- A plugin request is not automatically a human-gate blocker. If useful work can continue safely without it, continue and record what remains unverified.
+- If the missing plugin/capability is genuinely required to meet acceptance criteria, record the exact blocker rather than fabricating results.
+- Agents must use least privilege and must not ask users to paste passwords, API keys, secrets, or private credentials into repository files/chat when a normal authorization flow exists.
+
+Hardware agents may specifically request capabilities for schematic/PCB CAD, SPICE/circuit simulation, component/datasheet lookup, BOM sourcing/lifecycle data, firmware build/debug, mechanical CAD, signal/power-integrity analysis, manufacturing/DFM checks, or remote bench/instrument access.
+
+Plugin output keeps its real evidence class: simulator output is simulation, BOM pricing is a point-in-time sourcing observation, CAD checks are design verification, and remote physical measurements count as physical evidence only when provenance and conditions are recorded.
+
 ## Merge-before-completion contract
 
 `PR opened`, `feature PR merged to role branch`, `review ready`, or `tests green on a feature branch` are not final completion states.
@@ -176,7 +235,7 @@ Human input is required only for:
 4. `EXTERNAL_COMMITMENT`
 5. `PRODUCT_DIRECTION`
 
-Routine branch creation, PR creation, conflict resolution, reversible refactors, tests, and merge execution are not human gates.
+Routine branch creation, PR creation, conflict resolution, reversible refactors, tests, merge execution, plugin discovery, and optional plugin requests are not human gates.
 
 ## Role-specific post-work checkpoint
 
@@ -232,4 +291,4 @@ Real-world PMR, interview claims, pilot measurements, and KREATE evidence remain
 11. Mark included tasks `MERGED_VERIFIED`.
 12. Delete disposable feature branches when practical.
 
-See `.agents/FABRIC.md` and `docs/development-workflow.md` for the operational protocol.
+See `.agents/FABRIC.md`, `.agents/PLUGIN_POLICY.md`, `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`, and `docs/development-workflow.md` for the operational protocol.
