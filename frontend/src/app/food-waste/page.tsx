@@ -38,6 +38,7 @@ import {
 import { useLocale } from '@/lib/i18n';
 
 type ProductionBand = {
+  policyVersion: string;
   predictedMeals: number;
   lowerBound: number;
   recommendedTarget: number;
@@ -47,16 +48,32 @@ type ProductionBand = {
   operatorApprovalRequired: true;
   autoDispatchAllowed: false;
   provenance: 'MODEL_ESTIMATE';
-  signals: Array<{ id: string; label: string; available: boolean; weightPct: number }>;
+  decisionProvenance: 'POLICY_HEURISTIC';
+  bandSemantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL';
+  calibrationStatus: 'NOT_CALIBRATED';
+  signals: Array<{
+    id: string;
+    label: string;
+    available: boolean;
+    weightPct: number;
+    weightBasis: 'POLICY_HEURISTIC';
+  }>;
   reasonCodes: string[];
+  limitations: string[];
 };
 
 type FoodApi = {
   demandContext: {
     available: boolean;
+    actionable: boolean;
     productionBand: ProductionBand | null;
   };
   decisionPolicy: {
+    version: string;
+    provenance: 'POLICY_HEURISTIC';
+    forecastProvenance: 'MODEL_ESTIMATE';
+    bandSemantics: 'PLANNING_RANGE_NOT_CALIBRATED_INTERVAL';
+    calibrationStatus: 'NOT_CALIBRATED';
     humanApprovalRequired: boolean;
     automaticKitchenDispatch: boolean;
   };
@@ -95,7 +112,7 @@ export default function FoodWastePage() {
   );
 
   const band = food?.demandContext.productionBand ?? null;
-  const canApprovePilot = band?.decisionReadiness === 'PILOT_READY';
+  const canApprovePilot = Boolean(food?.demandContext.actionable) && band?.decisionReadiness === 'PILOT_READY';
 
   return (
     <div className="space-y-8 sm:space-y-10">
@@ -106,12 +123,12 @@ export default function FoodWastePage() {
               <Utensils size={12} /> {t('KREATE odak problemi · yemek israfı', 'KREATE focus problem · food waste')}
             </div>
             <h1 className="mt-4 max-w-4xl text-[40px] font-black leading-[.98] tracking-[-0.06em] sm:text-[56px]">
-              {t('48.251 kg gerçek atığı, bir sonraki öğünde önlenecek karara çevir.', 'Turn 48,251 kg of measured waste into a decision that prevents the next kilogram.')}
+              {t('48.251 kg gerçek atığı, bir sonraki servis için test edilebilir bir karara çevir.', 'Turn 48,251 kg of measured waste into a testable next-service decision.')}
             </h1>
             <p className="mt-5 max-w-3xl text-[12px] leading-6 text-white/62 sm:text-[13px]">
               {t(
-                'BOUNCAMPUS resmi atık geçmişini ders programı, akademik takvim, hava ve menü bağlamıyla birleştirir; veri eksikse öneriyi genişletir veya tamamen bekletir, operatör onayı olmadan hiçbir üretim komutu göndermez ve sonucu kontrollü pilotta ölçer.',
-                'BOUNCAMPUS combines the official waste baseline with schedules, academic calendar, weather and menu context; it widens or withholds advice when evidence is missing, never dispatches production without an operator, and measures the result in a controlled pilot.',
+                'BOUNCAMPUS resmi atık geçmişini ders programı, akademik takvim, hava ve menü bağlamıyla birleştirir; gerekli bağlam eksikse öneriyi tamamen bekletir, operatör onayı olmadan hiçbir üretim komutu göndermez ve sonucu kontrollü pilotta ölçer.',
+                'BOUNCAMPUS combines the official waste baseline with schedules, academic calendar, weather and menu context; it withholds the recommendation when required context is missing, never dispatches production without an operator, and measures the result in a controlled pilot.',
               )}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -164,34 +181,39 @@ export default function FoodWastePage() {
         <aside className="bc-panel rounded-[24px] p-5 sm:p-6">
           <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] text-slate-400"><Gauge size={12} /> {t('Bir sonraki servis · karar kalitesi', 'Next service · decision quality')}</div>
           <h2 className="mt-3 text-[25px] font-black tracking-[-0.045em] text-slate-950">
-            {band ? t('Sistem sadece bant değil, o bandın ne kadar kullanılabilir olduğunu da söyler.', 'The system exposes not just a band, but how usable that band is.') : t('Talep bağlamı yoksa sistem üretim sayısı uydurmuyor.', 'If demand context is unavailable, the system does not invent a production number.')}
+            {band ? t('Tahmin ile politika kararını ayrı ayrı göster.', 'Expose the forecast and policy decision separately.') : t('Talep bağlamı yoksa sistem üretim sayısı uydurmuyor.', 'If demand context is unavailable, the system does not invent a production number.')}
           </h2>
 
           {band ? (
             <div className="mt-5 space-y-4">
-              <div className="grid grid-cols-2 gap-2">
-                <MiniMetric label={t('Önerilen başlangıç', 'Operator starting point')} value={band.recommendedTarget.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} />
-                <MiniMetric label={t('Karar bandı', 'Decision band')} value={`${band.lowerBound.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}–${band.upperBound.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}`} />
+              <div className="grid grid-cols-3 gap-2">
+                <MiniMetric label={t('Nokta tahmini', 'Point forecast')} value={band.predictedMeals.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} />
+                <MiniMetric label={t('Operatör başlangıcı', 'Operator starting point')} value={band.recommendedTarget.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')} />
+                <MiniMetric label={t('Planlama bandı', 'Planning range')} value={`${band.lowerBound.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}–${band.upperBound.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US')}`} />
               </div>
 
               <div className="rounded-2xl border border-slate-900/10 bg-[#f7f9f6] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <ReadinessBadge readiness={band.decisionReadiness} />
-                  <span className="font-mono text-[10px] font-black text-slate-600">{band.signalCoveragePct}% {t('sinyal kapsamı', 'signal coverage')}</span>
+                  <span className="font-mono text-[10px] font-black text-slate-600">{band.signalCoveragePct}% {t('politika kapsamı', 'policy coverage')}</span>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   {band.signals.map(signal => (
                     <div key={signal.id} className="flex items-center gap-2 rounded-xl border border-slate-900/[0.07] bg-white px-3 py-2 text-[8px] font-black text-slate-600">
                       {signal.available ? <CheckCircle2 size={11} className="text-emerald-600" /> : <AlertTriangle size={11} className="text-amber-600" />}
                       <span>{signal.label}</span>
-                      <span className="ml-auto font-mono text-slate-400">{signal.weightPct}%</span>
+                      <span className="ml-auto font-mono text-slate-400">{signal.weightPct}% POLICY</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-[9px] leading-5 text-amber-900">
-                <strong>MODEL_ESTIMATE.</strong> {t('Bant pilot öncesi doğrulanmış gerçek üretim talebi değildir. Eksik sinyal belirsizliği artırır; WITHHOLD durumunda öneri uygulanmaz.', 'The band is not validated production demand before the pilot. Missing signals widen uncertainty; a WITHHOLD decision must not be applied.')}
+                <strong>{band.provenance} → {band.decisionProvenance} · {band.calibrationStatus}.</strong>{' '}
+                {t(
+                  'Nokta tahmini model çıktısıdır; planlama bandı, sinyal ağırlıkları ve readiness eşikleri politika heuristiğidir. Bu bant kalibre edilmiş bir confidence interval değildir.',
+                  'The point forecast is a model output; the planning range, signal weights, and readiness thresholds are policy heuristics. This band is not a calibrated confidence interval.',
+                )}
               </div>
             </div>
           ) : (
@@ -270,7 +292,7 @@ export default function FoodWastePage() {
       </section>
 
       <section className="grid gap-3 lg:grid-cols-3">
-        <TruthCard title={t('ŞİMDİ SÖYLEYEBİLİRİZ', 'WE CAN CLAIM NOW')} items={[t('48.251 kg resmi 2025 baz çizgisi', '48,251 kg official 2025 baseline'), t('Kaynak sağlığı / provenance', 'Source health / provenance'), t('Model tahmini ve senaryo olduğunu açıkça', 'Model estimates and scenarios, explicitly labeled')]} tone="good" />
+        <TruthCard title={t('ŞİMDİ SÖYLEYEBİLİRİZ', 'WE CAN CLAIM NOW')} items={[t('48.251 kg resmi 2025 baz çizgisi', '48,251 kg official 2025 baseline'), t('Kaynak sağlığı / provenance', 'Source health / provenance'), t('Model tahmini ile POLICY_HEURISTIC planlama bandını ayrı etiketliyoruz', 'Model estimate and POLICY_HEURISTIC planning range are labeled separately')]} tone="good" />
         <TruthCard title={t('PİLOTTA TEST EDECEĞİZ', 'WE WILL TEST IN PILOT')} items={[t('Üretim bandı atığı azaltıyor mu?', 'Does the production band reduce waste?'), t('Erken tükenme artıyor mu?', 'Does early sell-out increase?'), t('Operatör ne sıklıkla override ediyor?', 'How often does the operator override?')]} tone="neutral" />
         <TruthCard title={t('ÖLÇMEDEN SÖYLEMEYİZ', 'WE WILL NOT CLAIM BEFORE MEASUREMENT')} items={[t('“X kg tasarruf ettik”', '“We saved X kg”'), t('“Y kg CO₂ azalttık”', '“We avoided Y kg CO₂”'), t('“Gerçek öğrenci talebini görüyoruz”', '“We observe actual student demand”')]} tone="warn" />
       </section>
