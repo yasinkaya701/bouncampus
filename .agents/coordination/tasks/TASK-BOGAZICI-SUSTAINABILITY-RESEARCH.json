@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "TASK-BOGAZICI-SUSTAINABILITY-RESEARCH",
+  "title": "Build agent-ready Boğaziçi sustainability research pack",
+  "priority": "P0",
+  "lane": "campus-data-geo",
+  "state": "ACTIVE",
+  "owner_agent": "research-evidence",
+  "branch": "agent/campus-data-geo/bogazici-sustainability-research",
+  "depends_on": [],
+  "touched_paths": [
+    "KREATE/RESEARCH/README.md",
+    "KREATE/RESEARCH/BOGAZICI_SUSTAINABILITY_2025.md",
+    "KREATE/RESEARCH/bogazici_sustainability_2025.json"
+  ],
+  "acceptance_criteria": [
+    "Official Boğaziçi 2025 sustainability sources are converted into narrow source-backed facts with provenance and caveats",
+    "Public-source research is explicitly separated from PMR/interview evidence and measured pilot evidence",
+    "Food-waste data quality anomalies and unsupported causal inferences are called out rather than silently normalized",
+    "Peer-reviewed university food-service forecasting literature is summarized as benchmark evidence, not as proof of Boğaziçi workflow",
+    "IE, EE, CS1 and CS2 each receive concrete handoff questions/actions grounded in the research",
+    "A machine-readable JSON companion exposes facts, hypotheses, caveats, source URLs and role handoffs for other agents"
+  ],
+  "validation_commands": [
+    "python -m json.tool KREATE/RESEARCH/bogazici_sustainability_2025.json",
+    "python scripts/kreate_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": "2026-09-30T20:55:00Z",
+    "heartbeat_at": "2026-09-30T20:55:00Z",
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "Do not edit KREATE/EVIDENCE.md or KREATE/ASSUMPTIONS.md while TASK-CS1-DECISION-CORE owns those paths.",
+    "This package is secondary/public-source research only; it must never be counted as PMR or customer validation.",
+    "Source values are transcribed with semantic caveats where the university tables appear internally inconsistent."
+  ]
+}
