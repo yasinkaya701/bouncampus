@@ -118,6 +118,9 @@ class ActionItem(BaseModel):
     description: str
     impact_value: float
     impact_unit: str
+    provenance: Optional[
+        Literal["MODEL_ESTIMATE", "POLICY_HEURISTIC", "OFFICIAL_LIVE", "OFFICIAL_SNAPSHOT"]
+    ] = None
 
 
 class ScenarioRequest(BaseModel):
@@ -142,8 +145,13 @@ class ScenarioResult(BaseModel):
 class ImpactMetrics(BaseModel):
     kwh_saved: float
     co2_avoided_kg: float
-    food_waste_avoided_kg: float
+    food_waste_avoided_kg: Optional[float] = None
     cost_saved_tl: float
+    energy_provenance: Literal["MODEL_ESTIMATE"] = "MODEL_ESTIMATE"
+    food_waste_impact_status: Literal["UNMEASURED"] = "UNMEASURED"
+    note: str = (
+        "Energy values are model estimates. Food-waste impact remains unmeasured until a valid pilot exists."
+    )
 
 
 class LiveWeatherInfo(BaseModel):
