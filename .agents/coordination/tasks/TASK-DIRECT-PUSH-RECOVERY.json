@@ -4,7 +4,7 @@
   "title": "Recover green master provenance after unauthorized direct push",
   "priority": "P0",
   "lane": "quality-release",
-  "state": "MERGED_VERIFYING",
+  "state": "BLOCKED",
   "owner_agent": "execution-systems-engineer",
   "branch": "agent/quality-release/direct-push-recovery",
   "depends_on": [],
@@ -34,10 +34,14 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T16:44:00Z",
-    "heartbeat_at": "2026-09-30T16:50:00Z",
+    "heartbeat_at": "2026-09-30T16:52:00Z",
     "ttl_minutes": 360
   },
-  "blocker": null,
+  "blocker": {
+    "reason": "Post-merge verification cannot complete while unrelated processes continue pushing directly to unprotected master and cancelling/replacing the merge CI run.",
+    "evidence": "PR #34 exact-head CI #258 passed and merge de3a33305bae245cf2d8cf81b5e0037c20011302 landed, but post-merge CI #259 was cancelled after master advanced to direct-pushed descendants including 98b096f7e18d0e3721d340110112b962dcd73127. GitHub reports master protection disabled.",
+    "next_action": "Enable the master branch protection/ruleset recorded in TASK-ADMIN-BRANCH-PROTECTION, or otherwise stop direct master writers; then rerun a normal PR recovery and require post-merge master-merge-audit success."
+  },
   "integration": {
     "pull_request": 34,
     "validated_head_sha": "71f84322faa6bbb650bd3a2ad7a108daad7cf90f",
@@ -45,9 +49,8 @@
     "post_merge_verified_at": null
   },
   "notes": [
-    "Triggered because direct master pushes after PR #33 caused provenance failures; CI #254 explicitly failed master-merge-audit while fabric/KREATE/repository checks passed.",
-    "PR #34 exact-head CI #258 passed after the recovery branch merged the latest master state through 71f84322faa6bbb650bd3a2ad7a108daad7cf90f.",
-    "PR #34 merged normally at de3a33305bae245cf2d8cf81b5e0037c20011302; post-merge verification is in progress.",
-    "This task is autonomous; the separate branch-protection administration task remains the only human gate."
+    "PR #34 exact-head CI #258 passed all required jobs, including fabric tests/validator, feature preservation, KREATE/repository-data checks, frontend regression, and latest-master discipline.",
+    "Post-merge CI #259 was cancelled by newer master activity before verification could complete; current master remains a descendant of the recovery merge and retains the fabric changes.",
+    "This task is BLOCKED, not DONE. Product and other non-overlapping autonomous tasks may continue; branch protection is tracked separately as the only critical human/admin gate."
   ]
 }
