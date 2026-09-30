@@ -485,6 +485,82 @@ def check_github_templates(errors: list[str]) -> None:
                 errors.append(f"{pr_path}: missing KREATE review gate phrase {phrase!r}")
 
 
+def check_food_decision_integrity(errors: list[str]) -> None:
+    """Protect the CS1 truth boundary in active food-decision product surfaces."""
+
+    required_paths = [
+        "backend/app/decision/food_policy.py",
+        "backend/app/decision/baselines.py",
+        "backend/app/routers/food.py",
+        "backend/app/optimizers/food_optimizer.py",
+        "backend/app/models/food_demand.py",
+        "backend/app/schemas.py",
+        "frontend/src/lib/food-waste.ts",
+        "frontend/src/app/api/v1/food/route.ts",
+        "scripts/cs1_baseline_benchmark.py",
+    ]
+    for path in required_paths:
+        if not (ROOT / path).is_file():
+            errors.append(f"food decision integrity: missing required CS1 artifact {path}")
+    if any(not (ROOT / path).is_file() for path in required_paths):
+        return
+
+    backend_policy = read("backend/app/decision/food_policy.py")
+    frontend_policy = read("frontend/src/lib/food-waste.ts")
+    backend_route = read("backend/app/routers/food.py")
+    optimizer = read("backend/app/optimizers/food_optimizer.py")
+    schemas = read("backend/app/schemas.py")
+    food_schema = schemas.split("class FoodDemandForecast", 1)[-1].split("class ActionItem", 1)[0]
+    next_route = read("frontend/src/app/api/v1/food/route.ts")
+    benchmark = read("scripts/cs1_baseline_benchmark.py")
+
+    forbidden_food_terms = ("potential_waste_saved_kg", "waste_reduction", "cost_saved_tl")
+    for path, content in (
+        ("backend/app/routers/food.py", backend_route),
+        ("backend/app/optimizers/food_optimizer.py", optimizer),
+        ("backend/app/schemas.py::FoodDemandForecast", food_schema),
+    ):
+        for term in forbidden_food_terms:
+            if term in content:
+                errors.append(f"food decision integrity: unsupported pre-pilot field {term!r} found in {path}")
+
+    backend_markers = (
+        "POLICY_HEURISTIC",
+        "MODEL_ESTIMATE",
+        "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL",
+        "NOT_CALIBRATED",
+        "operator_approval_required",
+        "automatic_kitchen_dispatch",
+        "WITHHOLD",
+        "PILOT_READY",
+    )
+    for marker in backend_markers:
+        if marker not in backend_policy:
+            errors.append(f"food decision integrity: backend policy missing {marker!r}")
+
+    frontend_markers = (
+        "POLICY_HEURISTIC",
+        "MODEL_ESTIMATE",
+        "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL",
+        "NOT_CALIBRATED",
+        "operatorApprovalRequired",
+        "autoDispatchAllowed",
+        "abstained",
+    )
+    for marker in frontend_markers:
+        if marker not in frontend_policy:
+            errors.append(f"food decision integrity: frontend policy missing {marker!r}")
+
+    for marker in ("humanApprovalRequired", "automaticKitchenDispatch", "forbiddenUntilMeasured"):
+        if marker not in next_route:
+            errors.append(f"food decision integrity: Next food API missing truth-boundary marker {marker!r}")
+
+    if "OFFLINE_BENCHMARK_ONLY" not in benchmark or "TECH_TEST" not in benchmark:
+        errors.append("food decision integrity: baseline benchmark must remain scoped to TECH_TEST/OFFLINE_BENCHMARK_ONLY")
+    if "food-waste" not in next_route.lower() and "food waste" not in next_route.lower():
+        errors.append("food decision integrity: food API lost explicit food-waste claim boundary context")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -509,6 +585,7 @@ def main() -> int:
     check_template_headings(errors)
     check_local_markdown_links(errors)
     check_github_templates(errors)
+    check_food_decision_integrity(errors)
 
     mode = "SUBMISSION" if args.submission else "CI"
     if warnings:
@@ -531,6 +608,7 @@ def main() -> int:
     print("- mandatory template/application headings are present and non-empty")
     print("- local KREATE markdown links resolve")
     print("- GitHub task/PR anti-slop review gates are present")
+    print("- food decision policy, abstention, provenance, baseline scope, and claim firewall are intact")
     if args.submission:
         print("- hard minimum PMR count and final submission gates are satisfied")
     return 0
