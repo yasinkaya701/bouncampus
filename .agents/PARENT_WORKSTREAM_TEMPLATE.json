@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "id": "HUMAN-TODO",
+  "role": "IE",
+  "human_owner": "human:TODO",
+  "objective": "TODO",
+  "priority": "P1",
+  "state": "ACTIVE",
+  "parent_branch": "work/ie/todo",
+  "child_ids": [],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "integration": {
+    "pull_request": null,
+    "pr_state": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null,
+    "ready_for_integration_at": null
+  },
+  "notes": [
+    "EXAMPLE/TODO template only. Exactly one active parent workstream is allowed per KREATE human role."
+  ]
+}
