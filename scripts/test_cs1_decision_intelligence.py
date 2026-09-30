@@ -137,16 +137,30 @@ def test_metrics_reject_misaligned_inputs() -> None:
 
 
 def test_backend_food_claim_firewall() -> None:
-    router = (ROOT / "backend/app/routers/food.py").read_text(encoding="utf-8")
+    food_route = (ROOT / "backend/app/routers/food.py").read_text(encoding="utf-8")
+    dashboard_route = (ROOT / "backend/app/routers/dashboard.py").read_text(encoding="utf-8")
+    actions_route = (ROOT / "backend/app/routers/actions.py").read_text(encoding="utf-8")
     optimizer = (ROOT / "backend/app/optimizers/food_optimizer.py").read_text(encoding="utf-8")
     schemas = (ROOT / "backend/app/schemas.py").read_text(encoding="utf-8")
     food_schema = schemas.split("class FoodDemandForecast", 1)[1].split("class ActionItem", 1)[0]
 
     forbidden = ("potential_waste_saved_kg", "waste_reduction", "cost_saved_tl")
     for term in forbidden:
-        assert term not in router, f"unsupported pre-pilot claim leaked into food route: {term}"
+        assert term not in food_route, f"unsupported pre-pilot claim leaked into food route: {term}"
         assert term not in optimizer, f"unsupported pre-pilot claim leaked into food optimizer: {term}"
         assert term not in food_schema, f"unsupported pre-pilot claim leaked into food schema: {term}"
+
+    for term in ("food_waste_saved_kg", "food_waste_avoided_kg=40.0", "base_meals * 1.15"):
+        assert term not in dashboard_route, f"legacy food-impact claim leaked into dashboard: {term}"
+    for term in ("Pre-portion 1,420", "impact_value=48.0", 'impact_unit="kg"'):
+        assert term not in actions_route, f"legacy food-impact claim leaked into actions route: {term}"
+
+    assert "food_waste_avoided_kg=None" in dashboard_route
+    assert 'food_waste_impact_status="UNMEASURED"' in dashboard_route
+    assert "automatic kitchen dispatch" in dashboard_route.lower()
+    assert "automatic kitchen dispatch" in actions_route.lower()
+    assert "provenance=" in dashboard_route
+    assert "provenance=" in actions_route
 
 
 def test_frontend_contract_is_explicit() -> None:
@@ -162,7 +176,13 @@ def test_frontend_contract_is_explicit() -> None:
         "abstained",
     ):
         assert marker in library, f"frontend decision contract missing {marker}"
-    for marker in ("forbiddenUntilMeasured", "humanApprovalRequired", "automaticKitchenDispatch"):
+    for marker in (
+        "forbiddenUntilMeasured",
+        "humanApprovalRequired",
+        "automaticKitchenDispatch",
+        "decisionAssessment",
+        "READY_FOR_MEASURED_DATA",
+    ):
         assert marker in route, f"food API truth boundary missing {marker}"
 
 
@@ -171,6 +191,8 @@ def test_kreate_checker_enforces_food_decision_integrity() -> None:
     assert "check_food_decision_integrity" in checker
     assert "POLICY_HEURISTIC" in checker
     assert "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL" in checker
+    assert "backend/app/routers/dashboard.py" in checker
+    assert "backend/app/routers/actions.py" in checker
 
 
 def main() -> int:
