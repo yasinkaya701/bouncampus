@@ -144,6 +144,23 @@ Implementation can be parallel; integration is serialized.
 - After merge, move to `MERGED_VERIFYING`, verify the resulting `master`, then move to `MERGED_VERIFIED`.
 - A task may not release its lease before `MERGED_VERIFIED`.
 
+## Direct-master-push incident recovery
+
+Branch protection is the preferred preventive control. Until GitHub administration enforces it, CI remains a detection control and a direct push can mutate `master` before `master-merge-audit` rejects the provenance.
+
+When a direct push is detected:
+
+1. do **not** silently mark the failed master CI as acceptable;
+2. inspect the direct commit and preserve/revert it based on repository evidence rather than authorship;
+3. create an autonomous P0 recovery task in `agent-coordination` with the exact offending SHA and CI run;
+4. branch from the current `master`, make the smallest useful recovery/policy artifact change, and send the entire current master state through the normal single integration PR;
+5. require exact-head feature preservation, agent-fabric checks, KREATE/repository-data checks, and frontend regression gates;
+6. merge with a normal merge commit and require post-merge `master-merge-audit` success;
+7. record PR/head/merge/post-merge evidence and move the recovery task to `MERGED_VERIFIED`;
+8. keep or create a separate `IRREVERSIBLE_ACTION` human/admin task for enabling branch protection/rulesets if repository administration is not exposed to the agent.
+
+The recovery PR does not retroactively make the original direct push compliant; it restores a validated merge boundary around the current repository state and keeps the violation auditable.
+
 ## Agent-to-agent communication
 
 Prefer repository-visible state over chat messages. Agents communicate through task JSON state and notes on `agent-coordination`, dependency IDs, branch commits, issue/PR discussion when relevant, and explicit blocker evidence.
