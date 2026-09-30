@@ -32,9 +32,8 @@ Allowed lifecycle states:
 
 | Lane | Branch | Owner role | State | Scope | Touched paths |
 | --- | --- | --- | --- | --- | --- |
-| quality-release | `agent/quality-release/kreate-team-os` | Execution systems engineer | BLOCKED | Bootstrap the minimal KREATE application/PMR collaboration and evidence system without changing product behavior. | `.agents/WORKSTREAMS.md`; `KREATE/**`; `.github/ISSUE_TEMPLATE/kreate-task.yml`; `.github/PULL_REQUEST_TEMPLATE.md`; `.github/workflows/ci.yml`; `scripts/kreate_check.py` |
 
-**Blocker evidence (2026-09-30):** PR #27 CI run #220 is queued on required labels `self-hosted`, `macOS`, `ARM64`, `bouncampus` with no runner assigned. Repository policy requires green CI before merge. **Next executable action:** make the matching self-hosted runner available, let the exact PR head run all gates (including `python scripts/kreate_check.py`), resolve any failures, then return this workstream to `INTEGRATING`, merge with a normal merge commit, and verify `master`.
+The `quality-release / kreate-team-os` workstream was merged through PR #27 at merge commit `557cb53eea229a999dec265ac076067b82922f94` and verified on `master` by CI run #241. Verification included feature preservation, frontend typecheck/lint/build, repository Python compile, `python scripts/kreate_check.py`, critical JSON validation, merged-PR provenance, and confirmation that the integrated agent head is contained in `master`. Ownership is released; the stale pre-runner blocker state has been removed.
 
 The `frontend-ux + campus-geo + quality-release / ui-3d-reliability` workstream was merged through PR #24 and verified on `master` at merge commit `571791e0da14edb09882f8f2ddd0da9fa3742572` by CI run #216 before ownership was released. It removed the duplicate mock-heavy homepage stage, rebuilt the landing experience around source-labeled dashboard data, made the first-party Three.js campus surface resilient when live geometry is unavailable, and added provider-timeout fallback for external photogrammetry.
 
