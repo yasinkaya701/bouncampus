@@ -1,29 +1,43 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "research_date": "2026-10-01",
   "status": "UNREQUESTED",
-  "purpose": "Route unresolved Boğaziçi dining P0 unknowns to the smallest authoritative artifact, aggregate dataset or owner confirmation.",
+  "purpose": "Route unresolved Boğaziçi dining P0 unknowns to the smallest authoritative artifact, existing aggregate report, bounded owner-generated dataset or owner confirmation.",
+  "new_public_evidence": {
+    "source": "Boğaziçi Üniversitesi BİD Faaliyet Raporu 2025",
+    "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+    "facts": [
+      "A BUCard dining real-time report page existed in 2025 and packaged-meal counts were added.",
+      "Daily passage reports were updated to include packaged-meal information.",
+      "A breakfast field was added to the personnel meal report.",
+      "BUCard mobile use was deployed at dining halls and packaged-meal distribution points.",
+      "A mobile packaged-meal sales application was deployed across packaged-meal sales points."
+    ],
+    "effect_on_acquisition": "Prefer existing report schema/data dictionary and source-owner aggregate exports before requesting raw BUCard events."
+  },
   "rules": [
     "Do not mass-contact multiple roles with the same generic request.",
     "Ask for the smallest artifact or field definition that resolves one product gate.",
+    "Reuse existing institutional aggregate reports before proposing a new telemetry/data pipeline.",
     "Prefer source-owner aggregation over person-level BUCard or reservation exports.",
+    "Request interval-level counts only if a named same-day action remains reachable.",
     "A refusal, non-retention or ownership redirect is a valid research result.",
-    "Do not infer contractor settlement from user meal charges, published diner prices or procurement totals.",
+    "Do not infer contractor settlement from user meal charges, passage reports, published diner prices or procurement totals.",
     "Do not promote current contract-payment claims without current authoritative contract/specification evidence or current-owner confirmation tied to that artifact.",
     "Formal information-acquisition channels are a narrow public-document fallback, not a bypass around legitimate access restrictions."
   ],
   "public_routes": {
     "FOOD_SERVICES": {
       "role": "Yemek Hizmetleri Şube Müdürlüğü",
-      "use_for": ["quantity_owner", "freeze_time", "reservation_workflow", "contract_owner_routing", "service_mode"]
+      "use_for": ["quantity_owner", "freeze_time", "reservation_workflow", "contract_owner_routing", "service_mode", "who_uses_live_dining_report"]
     },
     "TEMAS_LOCAL": {
       "role": "TEMAŞ Boğaziçi local project/kitchen operations",
-      "use_for": ["production_plan", "buffer_logic", "batching", "campus_allocation", "produced_delivered_surplus_records"]
+      "use_for": ["production_plan", "buffer_logic", "batching", "campus_allocation", "produced_delivered_surplus_records", "same_day_adjustability"]
     },
     "CONTROL_ORG": {
       "role": "Yemekhane, Yemek Pişirme ve Yemek Dağıtım Kontrol Teşkilatı",
-      "use_for": ["accepted_operational_truth", "service_deviation", "shortage_record", "approval_boundary", "contract_control"]
+      "use_for": ["accepted_operational_truth", "service_deviation", "shortage_record", "approval_boundary", "contract_control", "report_to_accepted_truth_reconciliation"]
     },
     "TAHAKKUK": {
       "role": "Tahakkuk Şube Müdürlüğü",
@@ -38,7 +52,31 @@
     },
     "BID_BUCARD": {
       "role": "Bilgi İşlem / BUCard / BUCampus source owner",
-      "use_for": ["reservation_event_schema", "aggregate_turnstile_qr_counts", "retention", "source_owner_aggregation"]
+      "publicly_known_surfaces": [
+        "BUCard Yemekhane anlık rapor",
+        "günlük geçiş raporları",
+        "personel yemek raporu",
+        "paket yemek satış mobil uygulaması"
+      ],
+      "use_for": [
+        "existing_dining_report_schema",
+        "report_counting_semantics",
+        "report_dimensions",
+        "aggregate_export",
+        "reservation_event_schema",
+        "aggregate_turnstile_qr_counts",
+        "refresh_latency",
+        "retention",
+        "source_owner_aggregation"
+      ],
+      "default_request_order": [
+        "report schema/data dictionary",
+        "blank/redacted report template if releasable",
+        "bounded aggregate export",
+        "export/API capability",
+        "additional owner-controlled aggregation only if needed",
+        "raw events only if aggregates cannot answer the decision and institutional approval supports it"
+      ]
     },
     "FOOD_GOVERNANCE": {
       "role": "Safe & Sustainable Food monthly reporting owner",
@@ -55,7 +93,7 @@
     {
       "acquisition_id": "EA-01",
       "priority": "P0",
-      "title": "Current production quantity owner and freeze time",
+      "title": "Current production quantity owner, freeze time and same-day adjustability",
       "status": "UNREQUESTED",
       "resolves_unknown_ids": ["U01", "U02"],
       "primary_routes": ["FOOD_SERVICES", "TEMAS_LOCAL"],
@@ -67,17 +105,24 @@
           "decision_owner_role",
           "first_communication_timestamp",
           "final_revision_or_freeze_timestamp",
-          "adjustable_dimensions",
+          "service_start_timestamp",
+          "adjustable_dimensions_before_service",
+          "adjustable_dimensions_during_service",
+          "reserve_or_second_batch_mechanism",
           "source_system_or_document"
         ]
       },
+      "interview_extension": [
+        "Who currently looks at the BUCard dining real-time report?",
+        "Can quantity, reserve, second batch, package/hall channel or campus allocation change after live counts begin arriving?"
+      ],
       "sensitive_data_excluded": ["student_identity", "user_level_transactions"],
       "acceptable_evidence": [
         "Owner-confirmed workflow tied to a current named artifact",
         "Redacted planning/request record plus field definitions"
       ],
-      "downstream_gate": "Reachable decision/control-point gate",
-      "stop_condition": "If quantity, allocation, service mode and batch cannot be changed before usable signals arrive, stop quantity-forecast work and test another control surface."
+      "downstream_gate": "Reachable pre-service or intra-service decision/control-point gate",
+      "stop_condition": "If quantity, allocation, service mode, reserve release and batch cannot be changed before or during usable signals, stop forecast/live-control work and test another control surface."
     },
     {
       "acquisition_id": "EA-02",
@@ -111,29 +156,58 @@
     {
       "acquisition_id": "EA-03",
       "priority": "P0",
-      "title": "Historical reservation-to-realized-service aggregate sample",
+      "title": "Existing BUCard dining-report schema/export and reservation-to-realized-service reconciliation",
       "status": "UNREQUESTED",
       "resolves_unknown_ids": ["U03"],
-      "primary_routes": ["FOOD_SERVICES", "BID_BUCARD"],
+      "primary_routes": ["BID_BUCARD", "FOOD_SERVICES"],
       "verification_route": "CONTROL_ORG",
-      "candidate_periods": ["2024_intersemester", "2026_Kilyos_holiday"],
-      "minimum_request": {
-        "artifact_or_example": "Source-owner aggregate service rows for a bounded historical reservation period",
-        "fields": [
-          "service_date",
-          "campus",
-          "meal_period",
-          "reservation_created_count",
-          "reservation_cancelled_before_cutoff",
-          "active_reservations_at_cutoff",
-          "aggregate_validated_served_or_entry_count",
-          "service_regime"
+      "candidate_periods": ["2024_intersemester", "2026_Kilyos_holiday", "other_owner_approved_bounded_period"],
+      "first_minimum_request": {
+        "artifact_or_example": "Current BUCard dining real-time/daily-passage report schema, data dictionary or blank/redacted template",
+        "questions": [
+          "What physical/business event does each count represent?",
+          "Which dimensions exist: date, campus/location, meal period, service channel, actor class?",
+          "Is the real-time report historically retained or current-state only?",
+          "What is refresh latency?",
+          "Can a bounded aggregate export be generated?",
+          "How are package sales, hall passages, QR events, corrections, refunds and offline transactions represented?",
+          "Which institutional roles currently consume the reports?"
         ]
       },
-      "sensitive_data_excluded": ["student_id", "name", "email", "individual_card_history", "individual_reservation_history"],
-      "acceptable_evidence": ["Aggregate source-owner export with event definitions", "Aggregate manually reconciled table validated by owner"],
-      "downstream_gate": "Reservation residual-uncertainty / Pilot 0 gate",
-      "stop_condition": "If reservation already meets accepted operational tolerance and no other reachable decision remains, do not build residual ML for its own sake."
+      "second_request_if_semantics_support_pilot": {
+        "artifact_or_example": "Source-owner aggregate service rows for a bounded reservation/service period",
+        "fields": [
+          "service_date",
+          "campus_or_location_if_available",
+          "meal_period_if_available",
+          "service_channel_if_available",
+          "reservation_created_count_if_available",
+          "reservation_cancelled_before_cutoff_if_available",
+          "active_reservations_at_cutoff_if_available",
+          "aggregate_daily_or_interval_passage_count",
+          "package_meal_count_if_available",
+          "service_regime",
+          "report_generated_at",
+          "counting_semantics"
+        ]
+      },
+      "sensitive_data_excluded": [
+        "student_id",
+        "name",
+        "email",
+        "card_id",
+        "qr_token",
+        "individual_card_history",
+        "individual_reservation_history",
+        "device_id"
+      ],
+      "acceptable_evidence": [
+        "Existing aggregate report schema/data dictionary",
+        "Owner-generated aggregate export with event definitions",
+        "Aggregate manually reconciled table validated by owner"
+      ],
+      "downstream_gate": "Aggregate data feasibility + reservation residual-uncertainty + possible same-day pacing gate",
+      "stop_condition": "If existing aggregate reports are sufficient, do not request raw events. If reservation/report counts already meet accepted operational tolerance and no reachable action remains, do not build residual ML or real-time control for its own sake."
     },
     {
       "acquisition_id": "EA-04",
@@ -201,7 +275,23 @@
       "stop_condition": "Stop derivative web search once owner confirms the current authoritative document is non-public or requires formal request."
     }
   ],
-  "recommended_sequence": ["EA-01", "EA-02", "EA-03", "EA-04", "EA-05", "EA-06"],
+  "same_day_control_hypothesis": {
+    "status": "HYPOTHESIS",
+    "required_evidence": [
+      "live report latency and counting semantics",
+      "operator who consumes report",
+      "reachable second-batch/reserve/reallocation action",
+      "production/distribution state at matching timestamps"
+    ],
+    "kill_if": [
+      "all relevant production/dispatch is irreversible before live counts arrive",
+      "no operator can act on the report",
+      "report latency is too high",
+      "aggregate counts cannot be reconciled to remaining demand"
+    ]
+  },
+  "recommended_sequence": ["EA-01", "EA-03", "EA-02", "EA-04", "EA-05", "EA-06"],
+  "sequence_note": "EA-03 is moved earlier because existing BUCard aggregate reports may cheaply determine whether both pre-service reservation reconciliation and intra-service pacing are feasible before economic modeling.",
   "evidence_promotion": {
     "PUBLIC_SOURCE": "Inspected current/public artifact supports the narrow claim.",
     "INTERVIEW": "Completed interview artifact supports only the role-appropriate narrow claim.",
