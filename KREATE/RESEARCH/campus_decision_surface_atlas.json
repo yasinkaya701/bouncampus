@@ -1,0 +1,159 @@
+{
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH_ONLY",
+  "claim_firewall": [
+    "not_pmr",
+    "not_customer_validation",
+    "not_measured_product_impact",
+    "unknown_workflow_facts_must_route_to_pmr"
+  ],
+  "architecture": [
+    "observe",
+    "reconcile",
+    "decision_context",
+    "baseline_or_model",
+    "recommend",
+    "human_act",
+    "outcome",
+    "verify"
+  ],
+  "domains": [
+    {
+      "id": "dining_production",
+      "priority": "P0",
+      "owner_visibility": "HIGH",
+      "public_signal_visibility": "MEDIUM",
+      "climate_resource_relevance": "HIGH",
+      "candidate_decision": "quantity(date, meal_type, campus, service_channel)",
+      "required_pmr": [
+        "quantity_decision_owner",
+        "production_freeze_time",
+        "ordered_produced_delivered_accepted_served_semantics",
+        "preconsumer_surplus_share",
+        "underproduction_consequence",
+        "historical_data_access"
+      ],
+      "kill_conditions": [
+        "no_actionable_quantity_discretion_before_service",
+        "overproduction_immaterial_in_measured_waste"
+      ],
+      "packs": [
+        "BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md",
+        "BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md",
+        "BOGAZICI_PMR_PREINTERVIEW_EVIDENCE_PACK.md"
+      ]
+    },
+    {
+      "id": "classroom_allocation",
+      "priority": "P1_CANDIDATE",
+      "owner_visibility": "HIGH",
+      "public_signal_visibility": "MEDIUM_HIGH",
+      "climate_resource_relevance": "INDIRECT_OPERATIONAL",
+      "public_owner": "Kayit Isleri Sube Mudurlugu",
+      "public_inventory": {
+        "general_use_classrooms": 161,
+        "capacity_bands": {
+          "0_25": 7,
+          "26_50": 96,
+          "51_75": 26,
+          "76_100": 16,
+          "101_150": 8,
+          "151_200": 8
+        },
+        "source": "https://sayilarla.bogazici.edu.tr/document"
+      },
+      "candidate_decision": "assign(section, time_slot) -> room",
+      "required_pmr": [
+        "existing_scheduling_tool",
+        "manual_workload",
+        "hard_soft_constraint_hierarchy",
+        "late_change_frequency",
+        "assignment_enrollment_data_access"
+      ],
+      "kill_conditions": [
+        "allocation_already_low_friction_or_near_automated",
+        "dominant_constraints_not_representable_or_accessible"
+      ],
+      "pack": "BOGAZICI_CLASSROOM_ALLOCATION_AND_OCCUPANCY.md"
+    },
+    {
+      "id": "shuttle_scheduling",
+      "priority": "P1_CANDIDATE",
+      "owner_visibility": "MEDIUM",
+      "public_signal_visibility": "MEDIUM",
+      "climate_resource_relevance": "MEDIUM_HIGH",
+      "public_route_families": 7,
+      "candidate_decision": "frequency(route, time_window)",
+      "required_pmr": [
+        "operator_and_approver",
+        "departure_level_ridership",
+        "actual_travel_time",
+        "fleet_driver_constraints",
+        "schedule_adjustment_process",
+        "service_contract_constraints"
+      ],
+      "kill_conditions": [
+        "no_material_peak_imbalance",
+        "no_authority_or_data_to_change_schedule"
+      ],
+      "pack": "BOGAZICI_SHUTTLE_OPERATIONS_AND_DEMAND.md"
+    },
+    {
+      "id": "water_management",
+      "priority": "P2",
+      "owner_visibility": "HIGH",
+      "public_signal_visibility": "MEDIUM",
+      "decision_cadence_visibility": "HIGH",
+      "climate_resource_relevance": "HIGH",
+      "public_cadence": "quarterly data submission and ordinary commission meetings",
+      "candidate_decisions_to_test": [
+        "leak_investigation_priority",
+        "retrofit_priority",
+        "rainwater_greywater_operating_intervention",
+        "unit_anomaly_escalation"
+      ],
+      "source": "https://kurumsalveri.bogazici.edu.tr/tr/pages/1541-water-discharge-guidelines-and-standards/1972",
+      "kill_condition": "existing_process_already_routes_anomalies_and_actions_effectively"
+    },
+    {
+      "id": "energy_buildings",
+      "priority": "P2",
+      "owner_visibility": "MEDIUM_HIGH",
+      "public_signal_visibility": "MEDIUM",
+      "climate_resource_relevance": "VERY_HIGH",
+      "public_governance": "ISO_50001_Energy_Management_System",
+      "candidate_loop": "anomaly -> diagnosis -> accountable_action -> verified_savings",
+      "required_pmr": [
+        "data_granularity",
+        "existing_alarms",
+        "alarm_to_action_workflow",
+        "unresolved_manual_decision",
+        "occupancy_context_use",
+        "baseline_and_savings_verification"
+      ],
+      "sources": [
+        "https://kurumsalveri.bogazici.edu.tr/tr/pages/724-plan-to-reduce-energy-consumption/1367",
+        "https://kurumsalveri.bogazici.edu.tr/tr/pages/1332-climate-action-plan-shared/1428"
+      ],
+      "kill_condition": "existing_bms_ems_already_closes_action_loop_or_access_unavailable"
+    }
+  ],
+  "shared_semantic_separations": [
+    ["scheduled", "observed"],
+    ["estimated", "measured"],
+    ["capacity", "demand"],
+    ["demand", "served_or_fulfilled"],
+    ["recommendation", "approved_action"],
+    ["approved_action", "executed_action"],
+    ["event_timestamp", "reporting_period"],
+    ["public_source", "interview_evidence"],
+    ["model_estimate", "measured_impact"]
+  ],
+  "next_sequence": [
+    "P0_dining_owner_contractor_BID_waste_semantics",
+    "P1a_one_registrar_classroom_workflow_interview",
+    "P1b_one_shuttle_operations_workflow_interview",
+    "P2a_identify_one_water_decision_after_quarterly_reporting",
+    "P2b_identify_one_energy_action_gap_under_ISO50001"
+  ]
+}
