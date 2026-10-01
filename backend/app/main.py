@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import actions, dashboard, energy, food, occupancy, scenarios
+from app.routers import actions, dashboard, energy, food, occupancy, operations, scenarios
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -21,6 +21,7 @@ app.add_middleware(
 app.include_router(occupancy.router)
 app.include_router(energy.router)
 app.include_router(food.router)
+app.include_router(operations.router)
 app.include_router(actions.router)
 app.include_router(scenarios.router)
 app.include_router(dashboard.router)
@@ -34,6 +35,7 @@ def root():
         "environment": settings.ENVIRONMENT,
         "docs": "/docs",
         "health": "/health",
+        "decision_capabilities": "/api/v1/decision/capabilities",
         "truth_boundary": "decision-support models; no live university BMS/POS/turnstile telemetry claimed",
     }
 
