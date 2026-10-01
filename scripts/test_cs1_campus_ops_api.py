@@ -37,6 +37,20 @@ def test_shuttle_endpoint_fails_closed_on_bad_payload() -> None:
     assert result["decision_readiness"] == "WITHHOLD"
 
 
+def test_space_endpoint_exposes_advisory_zone_selection() -> None:
+    router = load_router()
+    result = router.optimize_spaces({
+        "occupancy_scenarios": [{"demand": 40, "weight": 1.0}],
+        "zones": [{"zone_id": "Z1", "capacity": 50, "activation_weight": 1.0}],
+        "idle_capacity_weight": 1.0,
+        "shortage_weight": 3.0,
+        "min_point_service_ratio": 0.9,
+    })
+    assert result["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["selected_zone_ids"] == ["Z1"]
+    assert result["energy_savings_claim_allowed"] is False
+
+
 def test_class_endpoint_exposes_assignments() -> None:
     router = load_router()
     result = router.optimize_classes({
@@ -52,6 +66,7 @@ def test_capabilities_declares_truth_boundary() -> None:
     result = router.capabilities()
     assert "food" in result["modules"]
     assert "shuttle" in result["modules"]
+    assert "space_activation" in result["modules"]
     assert "class_scheduling" in result["modules"]
     assert result["automatic_actuation"] is False
 
@@ -66,6 +81,7 @@ def main() -> int:
     tests = [
         test_food_endpoint_returns_advisory_contract,
         test_shuttle_endpoint_fails_closed_on_bad_payload,
+        test_space_endpoint_exposes_advisory_zone_selection,
         test_class_endpoint_exposes_assignments,
         test_capabilities_declares_truth_boundary,
         test_fastapi_main_registers_campus_ops_router,
