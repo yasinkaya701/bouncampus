@@ -20,6 +20,7 @@ import { useLocale, type Locale } from '@/lib/i18n';
 const primaryNav = [
   { href: '/', tr: 'Kontrol merkezi', en: 'Command center', icon: LayoutDashboard },
   { href: '/campus-ops', tr: 'Operasyon', en: 'Operations', icon: Compass },
+  { href: '/campus-ops/shuttle-frequency', tr: 'Mekik planı', en: 'Shuttle plan', icon: BusFront },
   { href: '/food-waste', tr: 'Yemek atığı', en: 'Food waste', icon: Utensils },
   { href: '/decisions', tr: 'Kararlar', en: 'Decisions', icon: CheckSquare2 },
   { href: '/data', tr: 'Kanıt', en: 'Evidence', icon: Database },
@@ -27,6 +28,12 @@ const primaryNav = [
   { href: '/mobility', tr: 'Mekik', en: 'Shuttle', icon: BusFront },
   { href: '/scenarios', tr: 'Senaryolar', en: 'Scenarios', icon: Compass },
 ];
+
+function isNavActive(pathname: string, href: string) {
+  if (href === '/') return pathname === '/';
+  if (href === '/campus-ops') return pathname === '/campus-ops';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 function LocaleButton({ value, current, onClick }: { value: Locale; current: Locale; onClick: () => void }) {
   return (
@@ -66,7 +73,7 @@ export default function Header() {
 
           <nav className="hidden items-center rounded-[14px] border border-slate-950/[0.07] bg-white/76 p-1 shadow-[0_10px_28px_rgba(7,17,31,.035)] xl:flex">
             {primaryNav.map(link => {
-              const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              const active = isNavActive(pathname, link.href);
               const Icon = link.icon;
               return (
                 <Link
@@ -101,7 +108,7 @@ export default function Header() {
 
       <div className="mx-auto flex w-full max-w-[1520px] gap-1.5 overflow-x-auto px-4 pb-2.5 xl:hidden sm:px-6 lg:px-8">
         {primaryNav.map(link => {
-          const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+          const active = isNavActive(pathname, link.href);
           const Icon = link.icon;
           return (
             <Link
