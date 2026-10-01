@@ -4,12 +4,9 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
+from app.decision.campus_bundle import build_campus_ops_bundle
 from app.decision.campus_contract import validate_no_person_level_data
-from app.decision.campus_ops import (
-    build_campus_ops_bundle,
-    optimize_shuttle_plan,
-    optimize_space_plan,
-)
+from app.decision.campus_ops import optimize_shuttle_plan, optimize_space_plan
 from app.decision.campus_orchestrator import build_integrated_campus_plan
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
