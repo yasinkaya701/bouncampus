@@ -56,6 +56,20 @@ def test_unusable_scenarios_fail_closed() -> None:
     assert "INVALID_OR_UNUSABLE_DEMAND_SCENARIOS" in result["reason_codes"]
 
 
+def test_zero_loss_weights_fail_closed_instead_of_inventing_zero_production() -> None:
+    policy = load_food_policy()
+    result = policy.plan_food_production(
+        demand_scenarios=[{"demand": 100, "weight": 1.0}],
+        max_capacity=120,
+        waste_weight=0.0,
+        shortage_weight=0.0,
+        method_eligibility="PILOT_ELIGIBLE",
+    )
+    assert result["decision_readiness"] == "WITHHOLD"
+    assert result["recommended_production"] is None
+    assert "NON_IDENTIFYING_FOOD_OBJECTIVE" in result["reason_codes"]
+
+
 def test_sandbox_method_cannot_become_actionable_target() -> None:
     policy = load_food_policy()
     result = policy.plan_food_production(
