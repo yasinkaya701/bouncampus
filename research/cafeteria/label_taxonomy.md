@@ -9,8 +9,9 @@ Every label carries `label_provenance` and `label_confidence`.
 1. `OFFICIAL_DISH_PAGE` — official Boğaziçi dish page gives category, kcal, portion and/or ingredients.
 2. `OFFICIAL_MENU_ROLE` — official daily page explicitly places a dish under Çorba / Ana Yemek / Vejetaryen-Vegan / Yardımcı / Seçmeli.
 3. `OFFICIAL_CATEGORY_INDEX` — official food-photo/category index lists the dish under a category.
-4. `NAME_RULE_HEURISTIC` — transparent rule from the dish name only.
-5. `UNKNOWN` — do not force a label.
+4. `OFFICIAL_INGREDIENT_DERIVATION` — a deterministic label derived from a complete official ingredient list; still not a certification.
+5. `NAME_RULE_HEURISTIC` — transparent rule from the dish name only.
+6. `UNKNOWN` — do not force a label.
 
 A heuristic label must never overwrite an official label.
 
@@ -50,13 +51,15 @@ Allowed values:
 
 Use only evidence-supported values:
 
-- `VEGAN_EXPLICIT`
-- `VEGETARIAN_EXPLICIT`
+- `VEGAN_EXPLICIT` — the official menu/category explicitly says vegan.
+- `VEGETARIAN_EXPLICIT` — the official menu/category explicitly says vegetarian/vegan but not specifically vegan.
+- `VEGETARIAN_DERIVED_INGREDIENTS` — official ingredient list contains dairy/egg but no listed meat/fish ingredient.
+- `PLANT_BASED_DERIVED_INGREDIENTS` — official ingredient list has no listed animal-source ingredient.
 - `ANIMAL_BASED`
-- `PLANT_BASED_HEURISTIC`
+- `PLANT_BASED_HEURISTIC` — inferred from the dish name only.
 - `UNKNOWN`
 
-`PLANT_BASED_HEURISTIC` is not equivalent to certified vegan. Cross-contact and hidden ingredients remain unknown.
+`PLANT_BASED_DERIVED_INGREDIENTS` and `PLANT_BASED_HEURISTIC` are not equivalent to certified vegan. Cross-contact, supplier sub-ingredients and recipe changes remain unknown.
 
 ### `preparation_class`
 
@@ -74,7 +77,9 @@ Multi-label string separated by `|`:
 
 ### ingredient-derived flags
 
-Each is tri-state: `PRESENT`, `NOT_LISTED_OFFICIAL`, `UNKNOWN`.
+Registry includes `has_official_ingredient_list`.
+
+Each ingredient-family flag is tri-state: `PRESENT`, `NOT_LISTED_OFFICIAL`, `UNKNOWN`.
 
 - `contains_dairy`
 - `contains_egg`
@@ -84,7 +89,9 @@ Each is tri-state: `PRESENT`, `NOT_LISTED_OFFICIAL`, `UNKNOWN`.
 - `contains_poultry`
 - `contains_fish`
 
-`NOT_LISTED_OFFICIAL` is allowed only when an official ingredient list exists and the ingredient family is absent from that list. It is not an allergy-safety guarantee.
+`NOT_LISTED_OFFICIAL` is legal only when `has_official_ingredient_list=1` and that ingredient family is absent from the official list. If the row comes only from a category index, all ingredient-family absence fields stay `UNKNOWN`.
+
+`NOT_LISTED_OFFICIAL` is not an allergy-safety guarantee: supplier sub-ingredients, substitutions and cross-contact can be missing.
 
 ## Sustainability proxy labels
 
