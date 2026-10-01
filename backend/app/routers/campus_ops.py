@@ -7,11 +7,11 @@ from fastapi import APIRouter
 from app.decision.campus_ops import (
     allocate_shared_capacity,
     build_campus_ops_bundle,
-    optimize_class_schedule,
     optimize_food_production,
     optimize_shuttle_plan,
     optimize_space_plan,
 )
+from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
 
 router = APIRouter(prefix="/api/v1/ops", tags=["campus-operations"])
 
@@ -75,7 +75,7 @@ def optimize_spaces(payload: dict[str, Any]) -> dict[str, Any]:
 
 @router.post("/classes")
 def optimize_classes(payload: dict[str, Any]) -> dict[str, Any]:
-    return optimize_class_schedule(
+    return optimize_conflict_aware_class_schedule(
         classes=_payload_value(payload, "classes", []),
         rooms=_payload_value(payload, "rooms", []),
         building_mismatch_weight=_payload_value(payload, "building_mismatch_weight", 0.0),
