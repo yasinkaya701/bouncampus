@@ -87,9 +87,7 @@ def _unassigned_sessions(classroom_plan: Mapping[str, Any] | None) -> list[str]:
     return output
 
 
-def _building_attendance_targets(
-    classroom_plan: Mapping[str, Any] | None,
-) -> dict[str, int]:
+def _building_attendance_targets(classroom_plan: Mapping[str, Any] | None) -> dict[str, int]:
     if classroom_plan is None or _readiness(classroom_plan) == "WITHHOLD":
         return {}
     loads = classroom_plan.get("building_loads", {})
@@ -121,58 +119,38 @@ def _food_recommended_production(food_decision: Mapping[str, Any] | None) -> int
     return int(numeric)
 
 
-def build_campus_portfolio(
-    *,
-    campus_state: Mapping[str, Any],
-    shuttle_plan: Mapping[str, Any] | None = None,
-    classroom_plan: Mapping[str, Any] | None = None,
-    food_decision: Mapping[str, Any] | None = None,
-    energy_decision: Mapping[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Join domain decisions into one operator-reviewed campus operations view.
+def _energy_zone_modes(energy_decision: Mapping[str, Any] | None) -> dict[str, str]:
+    if energy_decision is None or _readiness(energy_decision) == "WITHHOLD":
+        return {}
+    rows = energy_decision.get("zones", [])
+    if not isinstance(rows, list):
+        return {}
+    output: dict[str, str] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        zone_id = str(row.get("zone_id", "")).strip()
+        mode = str(row.get("recommended_mode", "")).strip().upper()
+        if zone_id and mode:
+            output[zone_id] = mode
+    return output
 
-    The portfolio does not invent a single global optimization score. It surfaces
-    shared demand context and explicit conflicts so domain owners can review tradeoffs
-    without turning modeled estimates into claimed savings or automatic actions.
-    """
 
+def build_campus_portfolio(*, campus_state: Mapping[str, Any], shuttle_plan: Mapping[str, Any] | None = None, classroom_plan: Mapping[str, Any] | None = None, food_decision: Mapping[str, Any] | None = None, energy_decision: Mapping[str, Any] | None = None) -> dict[str, Any]:
     CONTRACT.validate_no_person_level_data(campus_state, path="campus_state")
-    for name, payload in (
-        ("shuttle_plan", shuttle_plan),
-        ("classroom_plan", classroom_plan),
-        ("food_decision", food_decision),
-        ("energy_decision", energy_decision),
-    ):
+    for name, payload in (("shuttle_plan", shuttle_plan), ("classroom_plan", classroom_plan), ("food_decision", food_decision), ("energy_decision", energy_decision)):
         if payload is not None:
             CONTRACT.validate_no_person_level_data(payload, path=name)
 
     core_readiness = _readiness(campus_state)
     if core_readiness is None:
         raise ValueError("campus_state must include a supported decision_readiness")
-
     if core_readiness == "WITHHOLD":
-        return {
-            "contract_version": CONTRACT_VERSION,
-            "decision_provenance": "POLICY_HEURISTIC",
-            "decision_readiness": "WITHHOLD",
-            "abstained": True,
-            "operator_approval_required": True,
-            "automatic_execution_allowed": False,
-            "cross_domain_signals": {},
-            "domain_status": {"campus_state": "WITHHOLD"},
-            "reason_codes": ["CORE_CAMPUS_STATE_WITHHELD"],
-            "limitations": list(LIMITATIONS),
-        }
+        return {"contract_version": CONTRACT_VERSION, "decision_provenance": "POLICY_HEURISTIC", "decision_readiness": "WITHHOLD", "abstained": True, "operator_approval_required": True, "automatic_execution_allowed": False, "cross_domain_signals": {}, "domain_status": {"campus_state": "WITHHOLD"}, "reason_codes": ["CORE_CAMPUS_STATE_WITHHELD"], "limitations": list(LIMITATIONS)}
 
     reason_codes = ["PRE_PILOT_OPERATOR_REVIEW_REQUIRED"]
     domain_status: dict[str, str] = {"campus_state": core_readiness}
-
-    for label, payload in (
-        ("shuttle", shuttle_plan),
-        ("classroom", classroom_plan),
-        ("food", food_decision),
-        ("energy", energy_decision),
-    ):
+    for label, payload in (("shuttle", shuttle_plan), ("classroom", classroom_plan), ("food", food_decision), ("energy", energy_decision)):
         status = _readiness(payload)
         if status is None:
             if payload is not None:
@@ -187,19 +165,9 @@ def build_campus_portfolio(
     building_targets = _building_attendance_targets(classroom_plan)
     campus_context = _campus_demand_context(campus_state)
     food_target = _food_recommended_production(food_decision)
-
+    energy_modes = _energy_zone_modes(energy_decision)
     if shuttle_shortfalls or unassigned:
         reason_codes.append("CROSS_DOMAIN_CONFLICTS_REQUIRE_OPERATOR_REVIEW")
-
-    cross_domain_signals = {
-        "campus_demand_context": campus_context,
-        "food_demand_context": dict(campus_context),
-        "food_recommended_production": food_target,
-        "energy_occupancy_context": dict(campus_context),
-        "shuttle_capacity_shortfall_routes": shuttle_shortfalls,
-        "unassigned_sessions": unassigned,
-        "building_attendance_targets": building_targets,
-    }
 
     return {
         "contract_version": CONTRACT_VERSION,
@@ -208,7 +176,16 @@ def build_campus_portfolio(
         "abstained": False,
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
-        "cross_domain_signals": cross_domain_signals,
+        "cross_domain_signals": {
+            "campus_demand_context": campus_context,
+            "food_demand_context": dict(campus_context),
+            "food_recommended_production": food_target,
+            "energy_occupancy_context": dict(campus_context),
+            "energy_zone_modes": energy_modes,
+            "shuttle_capacity_shortfall_routes": shuttle_shortfalls,
+            "unassigned_sessions": unassigned,
+            "building_attendance_targets": building_targets,
+        },
         "domain_status": domain_status,
         "reason_codes": list(dict.fromkeys(reason_codes)),
         "limitations": list(LIMITATIONS),
