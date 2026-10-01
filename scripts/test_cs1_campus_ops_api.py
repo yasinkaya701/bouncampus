@@ -5,6 +5,8 @@ import importlib
 import sys
 from pathlib import Path
 
+from fastapi import HTTPException
+
 ROOT = Path(__file__).resolve().parents[1]
 BACKEND = ROOT / "backend"
 if str(BACKEND) not in sys.path:
@@ -16,6 +18,34 @@ def load_router():
     if not path.exists():
         raise AssertionError("campus-ops API router missing")
     return importlib.import_module("app.routers.campus_ops")
+
+
+def sources():
+    return {
+        "schedule": {
+            "available": True,
+            "provenance": "PUBLIC_SOURCE",
+            "published_at": "2026-10-01T08:00:00+03:00",
+        },
+        "occupancy_model": {
+            "available": True,
+            "provenance": "MODEL_ESTIMATE",
+            "published_at": "2026-10-01T09:00:00+03:00",
+        },
+    }
+
+
+def zones():
+    return [
+        {
+            "zone_id": "south-academic",
+            "campus": "south",
+            "capacity": 1000,
+            "occupancy_estimate": 620,
+            "scheduled_load": 580,
+            "event_load": 40,
+        }
+    ]
 
 
 def test_food_endpoint_returns_advisory_contract() -> None:
@@ -65,20 +95,8 @@ def test_class_endpoint_enforces_conflict_keys() -> None:
     router = load_router()
     result = router.optimize_classes({
         "classes": [
-            {
-                "class_id": "C1",
-                "planning_attendance": 10,
-                "allowed_slots": ["T1"],
-                "required_features": [],
-                "conflict_keys": ["instructor:I1"],
-            },
-            {
-                "class_id": "C2",
-                "planning_attendance": 10,
-                "allowed_slots": ["T1"],
-                "required_features": [],
-                "conflict_keys": ["instructor:I1"],
-            },
+            {"class_id": "C1", "planning_attendance": 10, "allowed_slots": ["T1"], "required_features": [], "conflict_keys": ["instructor:I1"]},
+            {"class_id": "C2", "planning_attendance": 10, "allowed_slots": ["T1"], "required_features": [], "conflict_keys": ["instructor:I1"]},
         ],
         "rooms": [
             {"room_id": "R1", "capacity": 20, "features": [], "building": "A"},
@@ -89,14 +107,78 @@ def test_class_endpoint_enforces_conflict_keys() -> None:
     assert "NO_CONFLICT_FREE_CLASS_SCHEDULE" in result["reason_codes"]
 
 
-def test_capabilities_declares_truth_boundary() -> None:
+def test_decision_time_state_endpoint_rejects_future_information() -> None:
+    router = load_router()
+    payload = {
+        "decision_time": "2026-10-01T10:00:00+03:00",
+        "zones": zones(),
+        "sources": sources(),
+    }
+    payload["sources"]["occupancy_model"]["published_at"] = "2026-10-01T11:00:00+03:00"
+    result = router.state(payload)
+    assert result["decision_readiness"] == "WITHHOLD"
+    assert "SOURCE_NOT_AVAILABLE_AT_DECISION_TIME_OCCUPANCY_MODEL" in result["reason_codes"]
+
+
+def test_integrated_plan_runs_registered_modules_behind_one_state_gate() -> None:
+    router = load_router()
+    result = router.plan({
+        "decision_time": "2026-10-01T10:00:00+03:00",
+        "zones": zones(),
+        "sources": sources(),
+        "modules": {
+            "food": {
+                "demand_scenarios": [{"demand": 90, "weight": 0.5}, {"demand": 100, "weight": 0.5}],
+                "max_capacity": 120,
+                "waste_weight": 1.0,
+                "shortage_weight": 2.0,
+                "method_eligibility": "PILOT_ELIGIBLE",
+            },
+            "resources": {
+                "total_capacity": 10,
+                "requests": [
+                    {"request_id": "study", "minimum": 2, "desired": 7, "priority_weight": 3},
+                    {"request_id": "charging", "minimum": 1, "desired": 5, "priority_weight": 1},
+                ],
+            },
+        },
+    })
+    assert result["state"]["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["modules"]["food"]["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["modules"]["resources"]["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["bundle"]["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["automatic_execution_allowed"] is False
+    assert result["operator_approval_required"] is True
+
+
+def test_person_level_payload_is_rejected_at_api_boundary() -> None:
+    router = load_router()
+    try:
+        router.optimize_food({
+            "student_id": "forbidden",
+            "demand_scenarios": [{"demand": 10, "weight": 1.0}],
+            "max_capacity": 20,
+            "waste_weight": 1,
+            "shortage_weight": 1,
+            "method_eligibility": "PILOT_ELIGIBLE",
+        })
+    except HTTPException as exc:
+        assert exc.status_code == 422
+    else:
+        raise AssertionError("person-level payload must fail at API boundary")
+
+
+def test_capabilities_declares_truth_and_privacy_boundary() -> None:
     router = load_router()
     result = router.capabilities()
     assert "food" in result["modules"]
     assert "shuttle" in result["modules"]
     assert "space_activation" in result["modules"]
     assert "class_scheduling" in result["modules"]
+    assert "campus_state" in result["modules"]
+    assert "integrated_plan" in result["modules"]
     assert result["automatic_actuation"] is False
+    assert "person-level" in result["privacy_boundary"].lower()
 
 
 def test_fastapi_main_registers_campus_ops_router() -> None:
@@ -106,18 +188,10 @@ def test_fastapi_main_registers_campus_ops_router() -> None:
 
 
 def main() -> int:
-    tests = [
-        test_food_endpoint_returns_advisory_contract,
-        test_shuttle_endpoint_fails_closed_on_bad_payload,
-        test_space_endpoint_exposes_advisory_zone_selection,
-        test_class_endpoint_exposes_assignments,
-        test_class_endpoint_enforces_conflict_keys,
-        test_capabilities_declares_truth_boundary,
-        test_fastapi_main_registers_campus_ops_router,
-    ]
-    for test in tests:
-        test()
-        print(f"PASS {test.__name__}")
+    tests = [name for name in globals() if name.startswith("test_")]
+    for name in tests:
+        globals()[name]()
+        print(f"PASS {name}")
     return 0
 
 
