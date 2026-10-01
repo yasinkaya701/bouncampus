@@ -24,7 +24,13 @@ def _conflict_keys(value: Any) -> set[str] | None:
     return {str(item).strip() for item in value if str(item).strip()}
 
 
-def _withhold(reason: str, *, conflict_key_count: int = 0, plans_evaluated: int = 0) -> dict[str, Any]:
+def _withhold(
+    reason: str,
+    *,
+    conflict_key_count: int = 0,
+    plans_evaluated: int = 0,
+    search_complete: bool = True,
+) -> dict[str, Any]:
     return {
         **_base("CLASS_ROOM_SLOT_RECOMMENDATION"),
         "decision_readiness": "WITHHOLD",
@@ -32,6 +38,7 @@ def _withhold(reason: str, *, conflict_key_count: int = 0, plans_evaluated: int 
         "conflict_constraints_enforced": conflict_key_count > 0,
         "conflict_key_count": conflict_key_count,
         "conflict_slot_plans_evaluated": plans_evaluated,
+        "conflict_search_complete": search_complete,
         "reason_codes": [reason],
     }
 
@@ -128,6 +135,7 @@ def optimize_conflict_aware_class_schedule(
             "conflict_constraints_enforced": False,
             "conflict_key_count": 0,
             "conflict_slot_plans_evaluated": 0,
+            "conflict_search_complete": True,
         }
 
     parsed.sort(key=lambda row: (len(row["slots"]), -len(row["keys"]), row["class_id"], row["index"]))
@@ -211,16 +219,20 @@ def optimize_conflict_aware_class_schedule(
             reason,
             conflict_key_count=len(all_keys),
             plans_evaluated=plans_evaluated,
+            search_complete=not search_limit_hit,
         )
 
     result = best[2]
     reason_codes = list(result.get("reason_codes") or [])
     if "CLASS_CONFLICT_KEYS_ENFORCED" not in reason_codes:
         reason_codes.append("CLASS_CONFLICT_KEYS_ENFORCED")
+    if search_limit_hit and "CLASS_CONFLICT_SEARCH_LIMIT_EXCEEDED" not in reason_codes:
+        reason_codes.append("CLASS_CONFLICT_SEARCH_LIMIT_EXCEEDED")
     return {
         **result,
         "conflict_constraints_enforced": True,
         "conflict_key_count": len(all_keys),
         "conflict_slot_plans_evaluated": plans_evaluated,
+        "conflict_search_complete": not search_limit_hit,
         "reason_codes": reason_codes,
     }
