@@ -29,6 +29,12 @@ const network = {
 }
 
 {
+  const directPreferred = recommendShuttleItinerary(network, 'a', 'd', { transferPenaltyKm: 0 });
+  assert.equal(directPreferred.recommendation?.routeIds.join(','), 'r3');
+  assert.equal(directPreferred.recommendation?.transfers, 0);
+}
+
+{
   const oneWayOnlyNetwork = { ...network, routes: [network.routes[0]] };
   const reversed = recommendShuttleItinerary(oneWayOnlyNetwork, 'c', 'a');
   assert.equal(reversed.readiness, 'WITHHOLD');
@@ -65,6 +71,7 @@ const freshMeta = {
   assert.equal(batch.decisions[0].recommendation?.roomId, 'R2');
   assert.equal(batch.decisions[1].readiness, 'WITHHOLD');
   assert.ok(batch.decisions[1].reasonCodes.includes('NO_FEASIBLE_ROOM'));
+  assert.deepEqual(batch.unassignedRequestIds, ['B']);
 }
 
 {
