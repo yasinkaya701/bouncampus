@@ -24,9 +24,11 @@ def _load_contract():
 
 CONTRACT = _load_contract()
 CONTRACT_VERSION = CONTRACT.CONTRACT_VERSION
+CAPACITY_SEMANTICS = "VERIFIED_AGGREGATE_RESOURCE_INVENTORY"
 
 LIMITATIONS = (
     "REGISTERED_PRIORITY_WEIGHTS_NOT_OBSERVED_ECONOMICS",
+    "NO_UNVERIFIED_SHARED_CAPACITY_CLAIM",
     "AGGREGATE_RESOURCE_ALLOCATION_ONLY",
     "NO_PERSON_LEVEL_ALLOCATION",
     "NO_AUTOMATIC_RESOURCE_ACTUATION",
@@ -46,7 +48,7 @@ def _finite_nonnegative(value: Any) -> float | None:
     return numeric
 
 
-def _withhold(reason: str) -> dict[str, Any]:
+def _withhold(reason: str, *, capacity_provenance: str) -> dict[str, Any]:
     return {
         "contract_version": CONTRACT_VERSION,
         "decision_provenance": "POLICY_HEURISTIC",
@@ -54,6 +56,8 @@ def _withhold(reason: str) -> dict[str, Any]:
         "abstained": True,
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
+        "capacity_provenance": capacity_provenance,
+        "capacity_semantics": CAPACITY_SEMANTICS,
         "allocations": [],
         "unallocated_capacity": None,
         "reason_codes": [reason],
@@ -65,23 +69,41 @@ def allocate_shared_capacity(
     *,
     total_capacity: Any,
     requests: Sequence[Mapping[str, Any]],
+    capacity_provenance: str = "UNAVAILABLE",
 ) -> dict[str, Any]:
-    """Allocate integer shared capacity using minimums then registered priorities."""
+    """Allocate verified aggregate resource capacity using minimums then priorities."""
 
     CONTRACT.validate_no_person_level_data(requests, path="requests")
+    normalized_capacity_provenance = CONTRACT.normalize_provenance(
+        capacity_provenance, field="capacity_provenance"
+    )
     capacity_number = _finite_nonnegative(total_capacity)
     if capacity_number is None or not capacity_number.is_integer():
-        return _withhold("INVALID_SHARED_CAPACITY")
+        return _withhold(
+            "INVALID_SHARED_CAPACITY",
+            capacity_provenance=normalized_capacity_provenance,
+        )
+    if normalized_capacity_provenance not in CONTRACT.VERIFIED_CAPACITY_PROVENANCE:
+        return _withhold(
+            "UNVERIFIED_SHARED_CAPACITY",
+            capacity_provenance=normalized_capacity_provenance,
+        )
     capacity = int(capacity_number)
 
     if not isinstance(requests, Sequence) or isinstance(requests, (str, bytes, bytearray)) or not requests:
-        return _withhold("NO_SHARED_CAPACITY_REQUESTS")
+        return _withhold(
+            "NO_SHARED_CAPACITY_REQUESTS",
+            capacity_provenance=normalized_capacity_provenance,
+        )
 
     normalized: list[dict[str, Any]] = []
     seen: set[str] = set()
     for raw in requests:
         if not isinstance(raw, Mapping):
-            return _withhold("INVALID_SHARED_CAPACITY_REQUEST")
+            return _withhold(
+                "INVALID_SHARED_CAPACITY_REQUEST",
+                capacity_provenance=normalized_capacity_provenance,
+            )
         request_id = str(raw.get("request_id", "")).strip()
         minimum = _finite_nonnegative(raw.get("minimum"))
         desired = _finite_nonnegative(raw.get("desired"))
@@ -96,7 +118,10 @@ def allocate_shared_capacity(
             or not desired.is_integer()
             or desired < minimum
         ):
-            return _withhold("INVALID_SHARED_CAPACITY_REQUEST")
+            return _withhold(
+                "INVALID_SHARED_CAPACITY_REQUEST",
+                capacity_provenance=normalized_capacity_provenance,
+            )
         seen.add(request_id)
         normalized.append(
             {
@@ -109,7 +134,10 @@ def allocate_shared_capacity(
 
     minimum_total = sum(row["minimum"] for row in normalized)
     if minimum_total > capacity:
-        return _withhold("REQUEST_MINIMUMS_EXCEED_SHARED_CAPACITY")
+        return _withhold(
+            "REQUEST_MINIMUMS_EXCEED_SHARED_CAPACITY",
+            capacity_provenance=normalized_capacity_provenance,
+        )
 
     allocation = {row["request_id"]: row["minimum"] for row in normalized}
     remaining = capacity - minimum_total
@@ -145,6 +173,8 @@ def allocate_shared_capacity(
         "abstained": False,
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
+        "capacity_provenance": normalized_capacity_provenance,
+        "capacity_semantics": CAPACITY_SEMANTICS,
         "allocations": rows,
         "unallocated_capacity": remaining,
         "reason_codes": ["PRE_PILOT_OPERATOR_REVIEW_REQUIRED"],
