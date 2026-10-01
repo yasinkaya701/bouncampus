@@ -74,6 +74,15 @@ def test_record_fails_closed_when_decision_misses_freeze_or_uses_future_informat
     assert "INFORMATION_CUTOFF_AFTER_DECISION_CREATED" in leakage["reason_codes"]
 
 
+def test_record_fails_closed_when_created_exactly_at_freeze() -> None:
+    contract = load_contract()
+    at_freeze = contract.validate_decision_record(
+        valid_record(created_at="2026-10-01T09:30:00+03:00")
+    )
+    assert at_freeze["record_status"] == "RECONCILIATION_REQUIRED"
+    assert "DECISION_CREATED_AT_FREEZE" in at_freeze["reason_codes"]
+
+
 def test_override_requires_reason_and_actionable_modes_require_operator_action() -> None:
     contract = load_contract()
     missing_reason = contract.validate_decision_record(
@@ -140,6 +149,7 @@ if __name__ == "__main__":
     tests = [
         test_valid_advisory_record_is_audit_ready_but_not_pilot_evidence,
         test_record_fails_closed_when_decision_misses_freeze_or_uses_future_information,
+        test_record_fails_closed_when_created_exactly_at_freeze,
         test_override_requires_reason_and_actionable_modes_require_operator_action,
         test_operator_override_must_be_explicit_boolean,
         test_verified_outcome_requires_reconciled_service_truth,
