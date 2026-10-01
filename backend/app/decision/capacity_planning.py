@@ -151,6 +151,24 @@ def _expected_loss(
     )
 
 
+def _candidate_is_better(
+    candidate: tuple[float, float, tuple[str, ...]],
+    incumbent: tuple[float, float, tuple[str, ...]] | None,
+) -> bool:
+    if incumbent is None:
+        return True
+    objective, capacity, ids = candidate
+    best_objective, best_capacity, best_ids = incumbent
+    if objective < best_objective - EPSILON:
+        return True
+    return math.isclose(
+        objective,
+        best_objective,
+        rel_tol=0.0,
+        abs_tol=EPSILON,
+    ) and (capacity, ids) < (best_capacity, best_ids)
+
+
 def _sparse_capacity_dp(
     options: Sequence[tuple[str, int, float]],
 ) -> tuple[dict[int, tuple[float, tuple[str, ...]]], bool]:
@@ -241,7 +259,7 @@ def _optimize_capacity_subset(
             shortage_weight=shortage_weight,
         )
         ranked = (objective, capacity, ids)
-        if best is None or ranked < best:
+        if _candidate_is_better(ranked, best):
             best = ranked
 
     if best is None:
