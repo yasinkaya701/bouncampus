@@ -1,11 +1,4 @@
-"""Conflict-aware hardening for the CS1 class room/slot optimizer.
-
-The base class-assignment solver owns room capacity, room feature, room/slot
-collision, and building mismatch logic. This module adds a separate hard constraint
-for classes that must not overlap in time (for example, a shared instructor or
-student cohort) without duplicating the room solver.
-"""
-
+"""Conflict-aware hardening for the CS1 class room/slot optimizer."""
 from __future__ import annotations
 
 import math
@@ -24,13 +17,7 @@ def _conflict_keys(value: Any) -> set[str] | None:
     return {str(item).strip() for item in value if str(item).strip()}
 
 
-def _withhold(
-    reason: str,
-    *,
-    conflict_key_count: int = 0,
-    plans_evaluated: int = 0,
-    search_complete: bool = True,
-) -> dict[str, Any]:
+def _withhold(reason: str, *, conflict_key_count: int = 0, plans_evaluated: int = 0, search_complete: bool = True) -> dict[str, Any]:
     return {
         **_base("CLASS_ROOM_SLOT_RECOMMENDATION"),
         "decision_readiness": "WITHHOLD",
@@ -45,17 +32,7 @@ def _withhold(
 
 def _assignment_signature(result: Mapping[str, Any]) -> tuple[tuple[str, str, str], ...]:
     rows = result.get("assignments") or []
-    return tuple(
-        sorted(
-            (
-                str(row.get("class_id") or ""),
-                str(row.get("slot") or ""),
-                str(row.get("room_id") or ""),
-            )
-            for row in rows
-            if isinstance(row, Mapping)
-        )
-    )
+    return tuple(sorted((str(row.get("class_id") or ""), str(row.get("slot") or ""), str(row.get("room_id") or "")) for row in rows if isinstance(row, Mapping)))
 
 
 def optimize_conflict_aware_class_schedule(
@@ -63,73 +40,41 @@ def optimize_conflict_aware_class_schedule(
     classes: Sequence[Mapping[str, Any]],
     rooms: Sequence[Mapping[str, Any]],
     building_mismatch_weight: Any = 0.0,
+    solar_exposure_weight: Any = 0.0,
 ) -> dict[str, Any]:
-    """Optimize room/slot assignments while enforcing caller-declared conflicts.
-
-    Each class may declare ``conflict_keys`` such as ``instructor:I1`` or
-    ``cohort:CMPE-1``. Classes sharing any key may not occupy the same slot.
-    Keys are opaque caller-provided identifiers; this layer does not infer them.
-
-    To preserve one source of truth for room feasibility, this function searches
-    only the conflict-constrained slot choices and delegates every candidate to
-    ``class_assignment.optimize_class_schedule`` for room assignment and objective
-    scoring.
-    """
-
-    if not isinstance(classes, Sequence) or isinstance(classes, (str, bytes)):
+    def base_optimize(target_classes: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         return optimize_class_schedule(
-            classes=classes,
+            classes=target_classes,
             rooms=rooms,
             building_mismatch_weight=building_mismatch_weight,
+            solar_exposure_weight=solar_exposure_weight,
         )
+
+    if not isinstance(classes, Sequence) or isinstance(classes, (str, bytes)):
+        return base_optimize(classes)
 
     parsed: list[dict[str, Any]] = []
     all_keys: set[str] = set()
     for index, item in enumerate(classes):
         if not isinstance(item, Mapping):
-            return optimize_class_schedule(
-                classes=classes,
-                rooms=rooms,
-                building_mismatch_weight=building_mismatch_weight,
-            )
-
+            return base_optimize(classes)
         keys = _conflict_keys(item.get("conflict_keys"))
         if keys is None:
             return _withhold("INVALID_CLASS_CONFLICT_KEYS")
         all_keys.update(keys)
         if not keys:
             continue
-
         class_id = str(item.get("class_id") or "").strip()
         slots = item.get("allowed_slots", [])
         if not class_id or not isinstance(slots, Sequence) or isinstance(slots, (str, bytes)):
-            return optimize_class_schedule(
-                classes=classes,
-                rooms=rooms,
-                building_mismatch_weight=building_mismatch_weight,
-            )
+            return base_optimize(classes)
         allowed_slots = sorted({str(slot).strip() for slot in slots if str(slot).strip()})
         if not allowed_slots:
-            return optimize_class_schedule(
-                classes=classes,
-                rooms=rooms,
-                building_mismatch_weight=building_mismatch_weight,
-            )
-        parsed.append(
-            {
-                "index": index,
-                "class_id": class_id,
-                "keys": keys,
-                "slots": allowed_slots,
-            }
-        )
+            return base_optimize(classes)
+        parsed.append({"index": index, "class_id": class_id, "keys": keys, "slots": allowed_slots})
 
     if not parsed:
-        result = optimize_class_schedule(
-            classes=classes,
-            rooms=rooms,
-            building_mismatch_weight=building_mismatch_weight,
-        )
+        result = base_optimize(classes)
         return {
             **result,
             "conflict_constraints_enforced": False,
@@ -153,22 +98,15 @@ def optimize_conflict_aware_class_schedule(
             search_limit_hit = True
             return
         plans_evaluated += 1
-
         locked_classes: list[dict[str, Any]] = []
         for index, item in enumerate(classes):
             row = dict(item)
             if index in selected_slots:
                 row["allowed_slots"] = [selected_slots[index]]
             locked_classes.append(row)
-
-        candidate = optimize_class_schedule(
-            classes=locked_classes,
-            rooms=rooms,
-            building_mismatch_weight=building_mismatch_weight,
-        )
+        candidate = base_optimize(locked_classes)
         if candidate.get("decision_readiness") == "WITHHOLD":
             return
-
         raw_loss = candidate.get("total_registered_loss")
         try:
             loss = float(raw_loss)
@@ -188,7 +126,6 @@ def optimize_conflict_aware_class_schedule(
         if position == len(parsed):
             evaluate_slot_plan()
             return
-
         row = parsed[position]
         keys: set[str] = row["keys"]
         index = int(row["index"])
@@ -207,7 +144,6 @@ def optimize_conflict_aware_class_schedule(
                 return
 
     search(0)
-
     if best is None:
         if search_limit_hit:
             reason = "CLASS_CONFLICT_SEARCH_LIMIT_EXCEEDED"
@@ -215,12 +151,7 @@ def optimize_conflict_aware_class_schedule(
             reason = "NO_CONFLICT_FREE_CLASS_SCHEDULE"
         else:
             reason = "NO_CONFLICT_AND_ROOM_FEASIBLE_CLASS_SCHEDULE"
-        return _withhold(
-            reason,
-            conflict_key_count=len(all_keys),
-            plans_evaluated=plans_evaluated,
-            search_complete=not search_limit_hit,
-        )
+        return _withhold(reason, conflict_key_count=len(all_keys), plans_evaluated=plans_evaluated, search_complete=not search_limit_hit)
 
     result = best[2]
     reason_codes = list(result.get("reason_codes") or [])
