@@ -17,7 +17,10 @@ STAGE_ELIGIBILITY = {
 def _metric_value(value):
     if value is None:
         return None
-    numeric = float(value)
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
     if not math.isfinite(numeric) or numeric < 0:
         return None
     return numeric
@@ -71,6 +74,7 @@ def select_method(
 
     Thresholds are caller-supplied registered policy inputs. This function does not
     invent promotion thresholds, economic weights, or pilot-readiness claims.
+    Malformed measured metrics fail closed as unavailable evidence.
     """
 
     if stage not in STAGE_ELIGIBILITY:
