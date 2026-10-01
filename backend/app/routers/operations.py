@@ -10,6 +10,10 @@ from app.decision.campus_operations import (
     plan_food_service,
     plan_shuttle_service,
 )
+from app.decision.meal_feedback import (
+    build_recommendation_outcome,
+    evaluate_recommendation_outcomes,
+)
 from app.decision.meal_recommendation import (
     build_recommendation_impression,
     rank_menu_items,
@@ -32,6 +36,8 @@ def get_decision_capabilities() -> dict[str, Any]:
             "meal_recommendation": {
                 "endpoint": "POST /api/v1/decision/meals/recommend",
                 "impression_endpoint": "POST /api/v1/decision/meals/impression",
+                "outcome_endpoint": "POST /api/v1/decision/meals/outcome",
+                "evaluation_endpoint": "POST /api/v1/decision/meals/evaluate",
                 "decision": "auditable student-facing menu ranking baseline",
                 "hard_boundary": "no generated-data collaborative model promoted as validated",
             },
@@ -80,6 +86,36 @@ def post_meal_impression(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
             ranking,
             request_id=str(payload.get("request_id") or ""),
             context=payload.get("context") if isinstance(payload.get("context"), dict) else {},
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/meals/outcome")
+def post_meal_outcome(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    impression = payload.get("impression")
+    if not isinstance(impression, dict):
+        raise HTTPException(status_code=422, detail="impression object is required")
+    try:
+        return build_recommendation_outcome(
+            impression,
+            selected_item_id=str(payload.get("selected_item_id") or ""),
+            rating=payload.get("rating"),
+            action=str(payload.get("action") or "SELECTED"),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/meals/evaluate")
+def post_meal_evaluation(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    events = payload.get("events")
+    if not isinstance(events, list):
+        raise HTTPException(status_code=422, detail="events list is required")
+    try:
+        return evaluate_recommendation_outcomes(
+            events,
+            top_k=payload.get("top_k", 3),
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
