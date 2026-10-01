@@ -35,16 +35,19 @@ Then use:
 - **[`docs/development-workflow.md`](docs/development-workflow.md)** — authoritative parallel merge model
 - **[`AGENTS.md`](AGENTS.md)** — full human/agent execution policy
 
-### Four team roles
+### Five execution roles, four human team members
 
 | Role | Owns the question | Long-lived integration branch |
 | --- | --- | --- |
 | **IE — Customer Discovery & Market Lead** | Who has the problem, who buys, and what does real PMR show? | `role/ie-customer-discovery` |
-| **EE — Physical Systems & Measurement Lead** | What can we reliably measure, instrument and validate? | `role/ee-physical-systems` |
+| **EE — Physical Systems & Measurement Lead** | What should we measure, how accurately, and can we trust it? | `role/ee-physical-systems` |
+| **EHB — Embedded Hardware, Communications & Integration Lead** | Can we implement the electronics/firmware/comms path reliably and connect it to software? | `role/ehb-embedded-integration` |
 | **CS1 — Decision Intelligence Lead** | Can we make a better operating decision and prove it? | `role/cs1-decision-intelligence` |
 | **CS2 — Product Strategy, Evidence Synthesis & Application Lead** | What should we build and what can we credibly claim? | `role/cs2-product-strategy` |
 
-Roles are ownership defaults, not silos. Cross-role work is encouraged when ownership is visible and shared files are coordinated.
+Roles are ownership defaults, not silos. There are still four human team members; execution-role count does not change the PMR target of 16 interviews.
+
+EE owns measurement truth (measurement architecture, calibration, uncertainty, field validity). EHB owns embedded implementation (electronics, PCB, firmware, communications, bring-up, HW↔SW integration). Cross-boundary changes use an explicit EE↔EHB interface contract and dual review.
 
 ### Normal development flow
 
@@ -88,6 +91,7 @@ npm run verify
 Repository/KREATE checks when relevant:
 
 ```bash
+python scripts/test_agent_fabric_check.py
 python scripts/agent_fabric_check.py
 python scripts/kreate_check.py
 python -m compileall -q backend/app scripts
@@ -200,6 +204,7 @@ npm run build
 From repository root:
 
 ```bash
+python scripts/test_agent_fabric_check.py
 python scripts/agent_fabric_check.py
 python scripts/kreate_check.py
 python -m compileall -q backend/app scripts
@@ -207,20 +212,23 @@ python -m compileall -q backend/app scripts
 
 ## Parallel development model
 
-The repository uses four long-lived role integration branches:
+The repository uses five long-lived execution-role integration branches:
 
 | Role | Branch |
 | --- | --- |
 | IE | `role/ie-customer-discovery` |
 | EE | `role/ee-physical-systems` |
+| EHB | `role/ehb-embedded-integration` |
 | CS1 | `role/cs1-decision-intelligence` |
 | CS2 | `role/cs2-product-strategy` |
 
 Create short-lived `agent/<lane>/<task>` branches from the role that owns the outcome and open feature PRs back into that role branch.
 
+Typical EHB task lanes are `ehb-hardware`, `ehb-firmware`, `ehb-comms`, `ehb-integration`, and `ehb-verification`.
+
 Multiple PRs may be open concurrently. Up to three feature PRs may target one role branch, and each role may have one role-to-`master` integration PR open. Every `master` integration must contain current `master`; stale integration branches must sync and revalidate.
 
-High-conflict files such as `AGENTS.md`, `.agents/**`, `.github/**`, root configuration, lockfiles, shared contracts and evidence-policy files require explicit coordination and broad validation.
+High-conflict files such as `AGENTS.md`, `.agents/**`, `.github/**`, root configuration, lockfiles, shared contracts, EE↔EHB interface contracts, and evidence-policy files require explicit coordination and broad validation.
 
 See [`docs/development-workflow.md`](docs/development-workflow.md) for the exact merge model.
 
@@ -230,14 +238,18 @@ Role documents live under [`KREATE/ROLES/`](KREATE/ROLES/):
 
 - IE — Customer Discovery & Market Lead
 - EE — Physical Systems & Measurement Lead
+- EHB — Embedded Hardware, Communications & Integration Lead
 - CS1 — Decision Intelligence Lead
 - CS2 — Product Strategy, Evidence Synthesis & Application Lead
+
+Hardware coordination artifacts live under [`KREATE/HARDWARE/`](KREATE/HARDWARE/), including the EE↔EHB interface-contract template.
 
 ## Key documentation
 
 - [`docs/ONBOARDING.md`](docs/ONBOARDING.md)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - [`docs/development-workflow.md`](docs/development-workflow.md)
+- [`KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md`](KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md)
 - [`docs/food-waste-pilot-protocol.md`](docs/food-waste-pilot-protocol.md)
 - [`docs/kreate-winning-product.md`](docs/kreate-winning-product.md)
 - [`docs/jury-demo-script.md`](docs/jury-demo-script.md)
@@ -252,4 +264,4 @@ Role documents live under [`KREATE/ROLES/`](KREATE/ROLES/):
 - **Top-15 selection announcement:** 9 October 2026
 - **Hackathon:** 15 October 2026, İstanbul
 
-Until the application deadline, optimize for PMR evidence, problem clarity, beachhead/persona quality, measurement feasibility, decision-intelligence credibility, and coherent claims. Product polish is valuable only when it supports those priorities.
+Until the application deadline, optimize for PMR evidence, problem clarity, beachhead/persona quality, measurement feasibility, embedded/integration credibility, decision-intelligence credibility, and coherent claims. Product polish is valuable only when it supports those priorities.
