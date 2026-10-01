@@ -9,7 +9,6 @@ from typing import Any
 def _load_contract():
     try:
         from app.decision import campus_contract as contract  # type: ignore
-
         return contract
     except ModuleNotFoundError:
         path = Path(__file__).with_name("campus_contract.py")
@@ -23,7 +22,6 @@ def _load_contract():
 
 CONTRACT = _load_contract()
 CONTRACT_VERSION = CONTRACT.CONTRACT_VERSION
-
 LIMITATIONS = (
     "CROSS_DOMAIN_OUTPUT_IS_DECISION_SUPPORT_ONLY",
     "NO_AUTOMATIC_UNIVERSITY_OPERATION_EXECUTION",
@@ -54,43 +52,38 @@ def _campus_demand_context(campus_state: Mapping[str, Any]) -> dict[str, int]:
     return output
 
 
-def _shuttle_shortfalls(shuttle_plan: Mapping[str, Any] | None) -> list[str]:
-    if shuttle_plan is None or _readiness(shuttle_plan) == "WITHHOLD":
+def _shuttle_shortfalls(payload: Mapping[str, Any] | None) -> list[str]:
+    if payload is None or _readiness(payload) == "WITHHOLD":
         return []
-    routes = shuttle_plan.get("routes", [])
-    if not isinstance(routes, list):
-        return []
-    output: list[str] = []
-    for route in routes:
-        if not isinstance(route, Mapping):
-            continue
-        if route.get("capacity_feasible") is False:
-            route_id = str(route.get("route_id", "")).strip()
-            if route_id:
-                output.append(route_id)
-    return output
-
-
-def _unassigned_sessions(classroom_plan: Mapping[str, Any] | None) -> list[str]:
-    if classroom_plan is None or _readiness(classroom_plan) == "WITHHOLD":
-        return []
-    rows = classroom_plan.get("unassigned", [])
+    rows = payload.get("routes", [])
     if not isinstance(rows, list):
         return []
-    output: list[str] = []
-    for row in rows:
-        if not isinstance(row, Mapping):
-            continue
-        session_id = str(row.get("session_id", "")).strip()
-        if session_id:
-            output.append(session_id)
-    return output
+    return [
+        str(row.get("route_id", "")).strip()
+        for row in rows
+        if isinstance(row, Mapping)
+        and row.get("capacity_feasible") is False
+        and str(row.get("route_id", "")).strip()
+    ]
 
 
-def _building_attendance_targets(classroom_plan: Mapping[str, Any] | None) -> dict[str, int]:
-    if classroom_plan is None or _readiness(classroom_plan) == "WITHHOLD":
+def _unassigned_sessions(payload: Mapping[str, Any] | None) -> list[str]:
+    if payload is None or _readiness(payload) == "WITHHOLD":
+        return []
+    rows = payload.get("unassigned", [])
+    if not isinstance(rows, list):
+        return []
+    return [
+        str(row.get("session_id", "")).strip()
+        for row in rows
+        if isinstance(row, Mapping) and str(row.get("session_id", "")).strip()
+    ]
+
+
+def _building_attendance_targets(payload: Mapping[str, Any] | None) -> dict[str, int]:
+    if payload is None or _readiness(payload) == "WITHHOLD":
         return {}
-    loads = classroom_plan.get("building_loads", {})
+    loads = payload.get("building_loads", {})
     if not isinstance(loads, Mapping):
         return {}
     output: dict[str, int] = {}
@@ -104,25 +97,23 @@ def _building_attendance_targets(classroom_plan: Mapping[str, Any] | None) -> di
     return output
 
 
-def _food_recommended_production(food_decision: Mapping[str, Any] | None) -> int | None:
-    if food_decision is None or _readiness(food_decision) == "WITHHOLD":
+def _food_target(payload: Mapping[str, Any] | None) -> int | None:
+    if payload is None or _readiness(payload) == "WITHHOLD":
         return None
-    value = food_decision.get("recommended_production")
+    value = payload.get("recommended_production")
     if isinstance(value, bool):
         return None
     try:
         numeric = float(value)
     except (TypeError, ValueError):
         return None
-    if numeric < 0 or not numeric.is_integer():
-        return None
-    return int(numeric)
+    return int(numeric) if numeric >= 0 and numeric.is_integer() else None
 
 
-def _energy_zone_modes(energy_decision: Mapping[str, Any] | None) -> dict[str, str]:
-    if energy_decision is None or _readiness(energy_decision) == "WITHHOLD":
+def _energy_modes(payload: Mapping[str, Any] | None) -> dict[str, str]:
+    if payload is None or _readiness(payload) == "WITHHOLD":
         return {}
-    rows = energy_decision.get("zones", [])
+    rows = payload.get("zones", [])
     if not isinstance(rows, list):
         return {}
     output: dict[str, str] = {}
@@ -136,9 +127,46 @@ def _energy_zone_modes(energy_decision: Mapping[str, Any] | None) -> dict[str, s
     return output
 
 
-def build_campus_portfolio(*, campus_state: Mapping[str, Any], shuttle_plan: Mapping[str, Any] | None = None, classroom_plan: Mapping[str, Any] | None = None, food_decision: Mapping[str, Any] | None = None, energy_decision: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def _shared_allocations(payload: Mapping[str, Any] | None) -> dict[str, int]:
+    if payload is None or _readiness(payload) == "WITHHOLD":
+        return {}
+    rows = payload.get("allocations", [])
+    if not isinstance(rows, list):
+        return {}
+    output: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        request_id = str(row.get("request_id", "")).strip()
+        value = row.get("allocated")
+        if not request_id or isinstance(value, bool):
+            continue
+        try:
+            numeric = float(value)
+        except (TypeError, ValueError):
+            continue
+        if numeric >= 0 and numeric.is_integer():
+            output[request_id] = int(numeric)
+    return output
+
+
+def build_campus_portfolio(
+    *,
+    campus_state: Mapping[str, Any],
+    shuttle_plan: Mapping[str, Any] | None = None,
+    classroom_plan: Mapping[str, Any] | None = None,
+    food_decision: Mapping[str, Any] | None = None,
+    energy_decision: Mapping[str, Any] | None = None,
+    shared_capacity_decision: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     CONTRACT.validate_no_person_level_data(campus_state, path="campus_state")
-    for name, payload in (("shuttle_plan", shuttle_plan), ("classroom_plan", classroom_plan), ("food_decision", food_decision), ("energy_decision", energy_decision)):
+    for name, payload in (
+        ("shuttle_plan", shuttle_plan),
+        ("classroom_plan", classroom_plan),
+        ("food_decision", food_decision),
+        ("energy_decision", energy_decision),
+        ("shared_capacity_decision", shared_capacity_decision),
+    ):
         if payload is not None:
             CONTRACT.validate_no_person_level_data(payload, path=name)
 
@@ -146,11 +174,28 @@ def build_campus_portfolio(*, campus_state: Mapping[str, Any], shuttle_plan: Map
     if core_readiness is None:
         raise ValueError("campus_state must include a supported decision_readiness")
     if core_readiness == "WITHHOLD":
-        return {"contract_version": CONTRACT_VERSION, "decision_provenance": "POLICY_HEURISTIC", "decision_readiness": "WITHHOLD", "abstained": True, "operator_approval_required": True, "automatic_execution_allowed": False, "cross_domain_signals": {}, "domain_status": {"campus_state": "WITHHOLD"}, "reason_codes": ["CORE_CAMPUS_STATE_WITHHELD"], "limitations": list(LIMITATIONS)}
+        return {
+            "contract_version": CONTRACT_VERSION,
+            "decision_provenance": "POLICY_HEURISTIC",
+            "decision_readiness": "WITHHOLD",
+            "abstained": True,
+            "operator_approval_required": True,
+            "automatic_execution_allowed": False,
+            "cross_domain_signals": {},
+            "domain_status": {"campus_state": "WITHHOLD"},
+            "reason_codes": ["CORE_CAMPUS_STATE_WITHHELD"],
+            "limitations": list(LIMITATIONS),
+        }
 
     reason_codes = ["PRE_PILOT_OPERATOR_REVIEW_REQUIRED"]
     domain_status: dict[str, str] = {"campus_state": core_readiness}
-    for label, payload in (("shuttle", shuttle_plan), ("classroom", classroom_plan), ("food", food_decision), ("energy", energy_decision)):
+    for label, payload in (
+        ("shuttle", shuttle_plan),
+        ("classroom", classroom_plan),
+        ("food", food_decision),
+        ("energy", energy_decision),
+        ("shared_capacity", shared_capacity_decision),
+    ):
         status = _readiness(payload)
         if status is None:
             if payload is not None:
@@ -162,13 +207,10 @@ def build_campus_portfolio(*, campus_state: Mapping[str, Any], shuttle_plan: Map
 
     shuttle_shortfalls = _shuttle_shortfalls(shuttle_plan)
     unassigned = _unassigned_sessions(classroom_plan)
-    building_targets = _building_attendance_targets(classroom_plan)
-    campus_context = _campus_demand_context(campus_state)
-    food_target = _food_recommended_production(food_decision)
-    energy_modes = _energy_zone_modes(energy_decision)
     if shuttle_shortfalls or unassigned:
         reason_codes.append("CROSS_DOMAIN_CONFLICTS_REQUIRE_OPERATOR_REVIEW")
 
+    campus_context = _campus_demand_context(campus_state)
     return {
         "contract_version": CONTRACT_VERSION,
         "decision_provenance": "POLICY_HEURISTIC",
@@ -179,12 +221,13 @@ def build_campus_portfolio(*, campus_state: Mapping[str, Any], shuttle_plan: Map
         "cross_domain_signals": {
             "campus_demand_context": campus_context,
             "food_demand_context": dict(campus_context),
-            "food_recommended_production": food_target,
+            "food_recommended_production": _food_target(food_decision),
             "energy_occupancy_context": dict(campus_context),
-            "energy_zone_modes": energy_modes,
+            "energy_zone_modes": _energy_modes(energy_decision),
+            "shared_capacity_allocations": _shared_allocations(shared_capacity_decision),
             "shuttle_capacity_shortfall_routes": shuttle_shortfalls,
             "unassigned_sessions": unassigned,
-            "building_attendance_targets": building_targets,
+            "building_attendance_targets": _building_attendance_targets(classroom_plan),
         },
         "domain_status": domain_status,
         "reason_codes": list(dict.fromkeys(reason_codes)),
