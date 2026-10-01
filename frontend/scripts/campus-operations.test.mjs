@@ -70,6 +70,7 @@ const freshMeta = {
     { scheduleIndex: index, snapshotMeta: freshMeta, nowIso: '2026-10-01T12:00:00Z' },
   );
   assert.equal(batch.decisions[0].recommendation?.roomId, 'R2');
+  assert.equal(batch.decisions[0].recommendation?.capacitySource, 'NOT_REQUIRED');
   assert.equal(batch.decisions[1].readiness, 'WITHHOLD');
   assert.ok(batch.decisions[1].reasonCodes.includes('NO_FEASIBLE_ROOM'));
   assert.deepEqual(batch.unassignedRequestIds, ['B']);
@@ -81,6 +82,7 @@ const freshMeta = {
     { scheduleIndex: index, snapshotMeta: freshMeta, nowIso: '2026-10-01T12:00:00Z' },
   );
   assert.equal(capacityUnknown.decisions[0].readiness, 'REVIEW_REQUIRED');
+  assert.equal(capacityUnknown.decisions[0].recommendation?.capacitySource, 'UNAVAILABLE');
   assert.ok(capacityUnknown.decisions[0].reasonCodes.includes('ROOM_CAPACITY_UNVERIFIED'));
 }
 
@@ -95,6 +97,7 @@ const freshMeta = {
     },
   );
   assert.equal(capacityVerified.decisions[0].recommendation?.roomId, 'R2');
+  assert.equal(capacityVerified.decisions[0].recommendation?.capacitySource, 'USER_SUPPLIED');
   assert.equal(capacityVerified.decisions[0].readiness, 'READY');
 }
 
