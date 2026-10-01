@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './polish.css';
-import Header from '@/components/shared/Header';
-import Footer from '@/components/shared/Footer';
+import AppShell from '@/components/shared/AppShell';
 import { LocaleProvider } from '@/lib/i18n';
 import { getSiteUrl } from '@/lib/site-url';
 import 'leaflet/dist/leaflet.css';
@@ -35,21 +34,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#07131f',
+  themeColor: '#f4f1ea',
   colorScheme: 'light',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="tr">
-      <body className="min-h-screen text-slate-950">
+      <body className="min-h-screen text-[#111712]">
         <LocaleProvider>
           <a href="#main-content" className="bc-skip-link">Skip to main content</a>
-          <Header />
-          <main id="main-content" className="mx-auto w-full max-w-[1600px] flex-1 px-3 pb-10 pt-4 sm:px-5 sm:pt-6 lg:px-7 lg:pt-7">
-            {children}
-          </main>
-          <Footer />
+          <AppShell>{children}</AppShell>
         </LocaleProvider>
       </body>
     </html>
