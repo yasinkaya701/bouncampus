@@ -65,7 +65,7 @@ assert.match(foodRoute, /recommendedTarget:\s*sourceAssessment\.predictedMeals/)
 assert.match(foodRoute, /ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER/);
 
 const page = readFileSync(resolve(frontendRoot, 'src/app/food-waste/page.tsx'), 'utf8');
-assert.match(page, /Operatör başlangıcı/);
+assert.match(page, /recommendedTarget/);
 assert.match(page, /decisionReadiness/);
 
 console.log('food menu-demand product wiring tests passed');
