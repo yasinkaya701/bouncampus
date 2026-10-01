@@ -1,6 +1,6 @@
 # Contributing to BOUNCAMPUS
 
-BOUNCAMPUS is a fast-moving KREATE for Climate repository. The collaboration model is designed so four humans and supporting agents can work in parallel without turning `master` into a conflict queue or allowing unsupported claims into the product.
+BOUNCAMPUS is a fast-moving KREATE for Climate repository. The collaboration model is designed so four humans and supporting agents can work through **five execution roles** without turning `master` into a conflict queue or allowing unsupported claims into the product.
 
 If this is your first session, start with [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 
@@ -13,17 +13,23 @@ If this is your first session, start with [`docs/ONBOARDING.md`](docs/ONBOARDING
 5. **Validate before merge.** The exact gates depend on what you changed.
 6. **Do not invent evidence.** Interviews, quotes, pilot outcomes, model metrics, institutional facts, savings, hardware performance and climate impact require real evidence or an explicit hypothesis/estimate label.
 7. **Final delivery means verified `master`.** A feature merged only into a role branch is still in integration.
+8. **EE↔EHB boundary changes require explicit interface coordination and dual review.**
 
 ## Pick the owning role
 
 | Role | Integration branch | Primary ownership |
 | --- | --- | --- |
 | IE | `role/ie-customer-discovery` | PMR, beachhead, persona/buyer, interview evidence |
-| EE | `role/ee-physical-systems` | measurement, instrumentation, physical feasibility, pilot collection |
+| EE | `role/ee-physical-systems` | measurement architecture, calibration, uncertainty, field/pilot measurement validity |
+| EHB | `role/ehb-embedded-integration` | embedded electronics, PCB, firmware, communications, bring-up, HW↔SW integration |
 | CS1 | `role/cs1-decision-intelligence` | decision logic, modeling, uncertainty, evaluation, analytics |
 | CS2 | `role/cs2-product-strategy` | product synthesis, evidence integration, application narrative |
 
-These are ownership defaults, not silos. If a task crosses roles, choose the role that owns the **outcome**, then call out the cross-role dependency in the issue/PR.
+These are ownership defaults, not silos. Five execution roles do not imply five humans; the human team remains four people and the PMR target remains 16 interviews.
+
+If a task crosses roles, choose the role that owns the **outcome**, then call out the cross-role dependency in the issue/PR.
+
+For EE↔EHB work, use [`KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md`](KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md) when the task changes shared electrical/data/timing/power/fault assumptions.
 
 ## Before you start
 
@@ -41,32 +47,25 @@ git branch -r
 
 Also check GitHub Issues and Pull Requests. Prefer an existing KREATE task with clear acceptance criteria.
 
-A good first task has:
-
-- one visible result;
-- clear acceptance criteria;
-- a bounded file set;
-- no dependency on unavailable private data;
-- no need to fabricate PMR/pilot evidence;
-- a validation method you can run yourself.
-
-Avoid starting with goals such as “improve the whole app,” “redo the architecture,” or “make the pitch better.” Split broad goals into testable work packages.
+A good first task has one visible result, clear acceptance criteria, bounded paths, no dependency on unavailable private data, no need to fabricate evidence, and a validation method you can run yourself.
 
 ## Create your feature branch
 
-Example for CS1:
+Example for EHB:
 
 ```bash
-git switch role/cs1-decision-intelligence
-git pull --ff-only origin role/cs1-decision-intelligence
-git switch -c agent/decision-intelligence/demand-baseline
+git switch role/ehb-embedded-integration
+git pull --ff-only origin role/ehb-embedded-integration
+git switch -c agent/ehb-firmware/offline-replay
 ```
 
 Other examples:
 
 ```text
 agent/customer-discovery/interview-guide
-agent/physical-systems/pilot-measurement-sheet
+agent/hw-measurement/pilot-measurement-sheet
+agent/ehb-hardware/controller-board
+agent/ehb-comms/scale-gateway
 agent/decision-intelligence/forecast-calibration
 agent/product-strategy/evidence-matrix
 agent/frontend-ux/pilot-state-empty-screen
@@ -75,8 +74,6 @@ agent/frontend-ux/pilot-state-empty-screen
 Use short lowercase slugs. The authoritative branch topology lives in [`docs/development-workflow.md`](docs/development-workflow.md).
 
 ## Development loop
-
-Use this loop:
 
 ```text
 issue / question
@@ -96,11 +93,9 @@ role branch → master integration
 post-merge verification
 ```
 
-Do not expand scope simply because nearby code could also be cleaned up. Open a separate task when work has a separate reason to exist.
+Do not expand scope simply because nearby code could also be cleaned up.
 
 ## Local setup
-
-Primary product:
 
 ```bash
 cd frontend
@@ -108,37 +103,22 @@ npm ci
 npm run dev
 ```
 
-Requirements: Node.js **24.x**.
-
-Optional environment file:
-
-```bash
-cp .env.example .env.local
-```
+Requirements: Node.js **24.x**. For FastAPI/repository tooling, use Python **3.11+**.
 
 The active frontend includes co-located Next.js `/api/v1` routes, so a separate FastAPI service is not required for normal frontend work.
-
-For FastAPI/repository tooling, use Python **3.11+**.
 
 ## Validation
 
 ### Frontend change
 
-At minimum:
-
 ```bash
 cd frontend
 npm run typecheck
 npm run lint
-```
-
-Before integration:
-
-```bash
 npm run build
 ```
 
-Or run the bundled gate:
+Or:
 
 ```bash
 npm run verify
@@ -152,45 +132,49 @@ From repository root:
 python -m compileall -q backend/app scripts
 ```
 
-Run the relevant targeted tests/scripts for the area you changed.
+Run targeted tests/scripts for the area you changed.
 
 ### KREATE / evidence / repository policy change
 
 ```bash
-python scripts/kreate_check.py
+python scripts/test_agent_fabric_check.py
 python scripts/agent_fabric_check.py
+python scripts/kreate_check.py
 ```
 
 For a `master` integration candidate, follow the full gates defined by CI and [`AGENTS.md`](AGENTS.md).
+
+## EE ↔ EHB handoff rule
+
+EE defines what must be true about the measurement. EHB implements the embedded path that makes the contract real.
+
+Use a shared interface contract when changing any of:
+
+- voltage/current;
+- connector/pinout;
+- ADC/reference/excitation;
+- sampling/timing;
+- calibration storage/semantics;
+- protocol/payload schema;
+- units/scaling;
+- quality/error flags;
+- power budget;
+- startup/shutdown;
+- offline/retry/replay behavior;
+- fault semantics;
+- verification method.
+
+EE reviews measurement correctness; EHB reviews implementation correctness; CS1 reviews downstream data semantics when affected.
 
 ## Evidence and anti-slop policy
 
 AI can help research, synthesize, code, test and draft. It cannot create real-world evidence.
 
-Treat material statements as one of:
+Treat material statements as public/source-backed fact, measured evidence, model estimate, policy heuristic, interpretation, hypothesis, or unknown.
 
-- public/source-backed fact;
-- measured evidence;
-- model estimate;
-- policy heuristic;
-- interpretation;
-- hypothesis;
-- unknown.
+Do not fabricate interviews, pilot measurements, model accuracy, food/water/CO2/cost savings, live university telemetry, hardware performance, or buyer intent.
 
-Never silently upgrade a hypothesis to a fact.
-
-Do not fabricate:
-
-- interviews or interview quotes;
-- persona validation;
-- pilot measurements;
-- model accuracy;
-- food/water/CO2/cost savings;
-- live university telemetry;
-- hardware performance;
-- user demand or buyer intent.
-
-If evidence is not available, say so and keep the claim bounded.
+Hardware evidence must preserve the repository labels: `ASSUMPTION`, `DATASHEET`, `CALCULATION`, `SIMULATION`, `BENCH_TEST`, `FIELD_TEST`, `PRODUCTION_EVIDENCE`.
 
 ## Shared / high-conflict files
 
@@ -203,6 +187,7 @@ AGENTS.md
 package-lock files
 root configuration
 shared API/data contracts
+EE↔EHB interface contracts
 KREATE evidence-policy files
 ```
 
@@ -220,21 +205,16 @@ Examples:
 agent/decision-intelligence/demand-baseline
   → role/cs1-decision-intelligence
 
-agent/physical-systems/measurement-protocol
+agent/hw-measurement/measurement-protocol
   → role/ee-physical-systems
+
+agent/ehb-firmware/offline-replay
+  → role/ehb-embedded-integration
 ```
 
 The repository permits up to three open feature PRs per role branch.
 
-A useful PR explains:
-
-- **What** changed;
-- **Why** this task matters;
-- **Scope** / touched paths;
-- **Validation** run and results;
-- **Evidence / truth-boundary impact** when applicable;
-- screenshots for meaningful UI changes;
-- known limitations.
+A useful PR explains what changed, why it matters, touched paths, validation results, truth/evidence impact, cross-role contract impact, screenshots where useful, and known limitations.
 
 ### Role integration PR
 
@@ -248,45 +228,39 @@ Prefer compact, descriptive commits:
 
 ```text
 feat(food): expose decision readiness reasons
+feat(ehb): add offline telemetry replay
 fix(pilot): reject zero served portions
-docs(onboarding): add CS1 first-task path
-research(pmr): add interview synthesis template
-test(food): cover WITHHOLD source-health state
+docs(onboarding): add EHB first-task path
+test(agents): pin EHB role contract
 ```
-
-Do not use vague messages such as `update`, `changes`, or `fix stuff`.
 
 ## Before asking for merge
 
 Check all of these:
 
-- the diff contains only intended work;
-- the target branch is correct;
+- intended bounded diff;
+- correct target branch;
 - no unrelated feature disappeared;
 - relevant tests/checks pass;
 - evidence claims are correctly classified;
 - limitations are visible;
 - shared-file conflicts are reconciled;
-- the PR is small enough for another teammate to review.
+- EE↔EHB dual review is complete when required;
+- the PR is small enough to review.
 
 ## Human decision gates
 
-Routine engineering is not a reason to block on another person. Human input is required for genuinely consequential gates such as:
+Routine engineering is not a reason to block on another person. Human input is required for real-world evidence attestation, irreversible/destructive actions, physical-safety actions, purchases/submissions/external commitments, and genuine product-direction pivots.
 
-- real-world evidence attestation;
-- irreversible/destructive external actions;
-- physical-safety actions;
-- purchases, submissions or external commitments;
-- genuine product-direction pivots.
-
-See [`AGENTS.md`](AGENTS.md) for the exact contract.
+EE, EHB and CS1 are technical checkpoint-OFF roles; ordinary architecture choices are autonomous. See [`AGENTS.md`](AGENTS.md) for the exact contract.
 
 ## When in doubt
 
 Use this priority order:
 
 1. preserve evidence integrity;
-2. avoid breaking verified product behavior;
-3. keep work mergeable and bounded;
-4. prefer reversible implementation choices;
-5. escalate only decisions that genuinely need a human.
+2. preserve measurement/interface truth;
+3. avoid breaking verified product behavior;
+4. keep work mergeable and bounded;
+5. prefer reversible implementation choices;
+6. escalate only decisions that genuinely need a human.
