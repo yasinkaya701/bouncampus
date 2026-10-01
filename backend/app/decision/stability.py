@@ -147,7 +147,7 @@ def assess_method_disagreement(
         }
 
     if not comparable_disagreements:
-        status = "NOT_ASSESSABLE"
+        status = "WITHHOLD"
         maximum = None
         reason_codes = ["NO_COMPARABLE_ELIGIBLE_ESTIMATE"]
     else:
