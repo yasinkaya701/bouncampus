@@ -14,6 +14,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+VERIFIED_REACHABILITY = {
+    "decision_surface": "PRODUCTION_QUANTITY",
+    "operator_authority_confirmed": True,
+    "minutes_before_freeze": 90,
+}
+
 
 def load_module(name: str, relative_path: str):
     path = ROOT / relative_path
@@ -32,6 +38,7 @@ def test_policy_metadata_and_full_context() -> None:
         {"schedule": True, "weather": True, "menu": True, "calendar": True},
         model_id="measured-food-method-v1",
         method_eligibility="PILOT_ELIGIBLE",
+        decision_reachability=VERIFIED_REACHABILITY,
     )
     assert decision["policy_version"] == policy.POLICY_VERSION
     assert decision["method_eligibility"] == "PILOT_ELIGIBLE"
@@ -40,6 +47,7 @@ def test_policy_metadata_and_full_context() -> None:
     assert decision["band_semantics"] == "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL"
     assert decision["calibration_status"] == "NOT_CALIBRATED"
     assert decision["signal_coverage_pct"] == 100
+    assert decision["decision_reachability_status"] == "REACHABLE"
     assert decision["decision_readiness"] == "PILOT_READY"
     assert decision["abstained"] is False
     assert decision["recommended_production"] == 1000
@@ -48,6 +56,7 @@ def test_policy_metadata_and_full_context() -> None:
     assert decision["operator_approval_required"] is True
     assert decision["automatic_kitchen_dispatch"] is False
     assert "HEURISTIC_BAND_NOT_CALIBRATED" in decision["reason_codes"]
+    assert "DECISION_REACHABLE_BEFORE_FREEZE" in decision["reason_codes"]
     assert "PILOT_OUTCOMES_NOT_YET_MEASURED" in decision["limitations"]
 
 
@@ -98,6 +107,7 @@ def test_signal_weights_are_explicit_policy_not_confidence() -> None:
     assert policy.REVIEW_MIN_COVERAGE_PCT == 50
     assert "SANDBOX_ONLY" in policy.METHOD_ELIGIBILITY_STATES
     assert "PILOT_ELIGIBLE" in policy.METHOD_ELIGIBILITY_STATES
+    assert policy.REACHABILITY_POLICY_VERSION == "decision-reachability-v1.0"
 
 
 def test_naive_baselines_do_not_use_future_values() -> None:
