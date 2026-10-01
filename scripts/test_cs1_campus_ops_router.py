@@ -165,7 +165,7 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
     assert result["portfolio"]["operator_approval_required"] is True
     assert result["portfolio"]["domain_status"]["food"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["energy"] == "REVIEW_REQUIRED"
-    assert result["portfolio"]["domain_status"]["space_activation"] == "REVIEW_REQUIRED"
+    assert result["portfolio"]["domain_status"]["space"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["shared_capacity"] == "REVIEW_REQUIRED"
 
 
@@ -203,7 +203,7 @@ def test_optional_domains_can_be_omitted_without_fabricated_outputs() -> None:
     assert result["shared_capacity"] is None
     assert "food" not in result["portfolio"]["domain_status"]
     assert "energy" not in result["portfolio"]["domain_status"]
-    assert "space_activation" not in result["portfolio"]["domain_status"]
+    assert "space" not in result["portfolio"]["domain_status"]
     assert "shared_capacity" not in result["portfolio"]["domain_status"]
 
 
