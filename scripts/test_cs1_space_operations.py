@@ -16,8 +16,8 @@ from app.decision.campus_operations import (  # noqa: E402
     READINESS_PILOT,
     READINESS_REVIEW,
     READINESS_WITHHOLD,
-    plan_space_service,
 )
+from app.decision.space_operations import plan_space_service  # noqa: E402
 
 
 class SpaceOperationsTests(unittest.TestCase):
