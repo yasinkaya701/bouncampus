@@ -2,81 +2,129 @@
 
 ## Scope
 
-This playbook governs hardware-specific work owned primarily by **EE — Physical Systems & Measurement Lead**. It supplements `AGENTS.md`, `.agents/FABRIC.md`, `.agents/PLUGIN_POLICY.md`, and the EE role document.
+This playbook governs hardware-specific work across two independent roles:
 
-The hardware agent is responsible for turning a measurement need into a testable physical-system architecture without presenting simulations, CAD, or unbuilt designs as field evidence.
+- **EE — Physical Systems & Measurement Lead:** owns measurement truth, calibration, uncertainty and field validity.
+- **EHB — Embedded Hardware, Communications & Integration Lead:** owns embedded electronics, PCB, firmware, communications, bring-up and HW↔SW integration.
 
-## Hardware workstreams
+It supplements `AGENTS.md`, `.agents/FABRIC.md`, `.agents/PLUGIN_POLICY.md`, and both role documents.
 
-Hardware work should be decomposed into explicit, independently reviewable workstreams when possible:
+Five execution roles do not imply five humans. The same human may staff more than one role with autonomous agents, but ownership boundaries and review rights remain explicit.
 
-1. **Measurement Requirement** — what physical variable must be measured, at what accuracy, rate, environment, and operational point.
-2. **Sensor / Analog Front End** — sensor technology, excitation, amplification, filtering, ADC/interface, protection, calibration strategy.
-3. **Power** — source, conversion, peak/current budget, brownout behavior, protection, thermal margin, battery/runtime if applicable.
-4. **Compute / MCU** — controller selection, peripheral budget, timing, memory, watchdog, boot/recovery behavior.
-5. **Connectivity** — Wi-Fi/BLE/Ethernet/etc., provisioning, offline buffering, retry/idempotency, security boundary.
-6. **Firmware** — drivers, calibration, event state machine, storage, fault handling, observability, update path.
-7. **PCB / Interconnect** — schematic, layout constraints, connectors, grounding, analog/digital separation, test points, manufacturability.
-8. **Mechanical / Enclosure** — installation, ingress/cleaning constraints, strain relief, mounting, operator interaction, serviceability.
-9. **Calibration / Test** — reference method, acceptance criteria, repeatability, drift, failure injection, traceability.
-10. **Integration Contract** — event schema, timestamps, quality states, device identity, backend/API behavior.
-11. **BOM / Sourcing** — part identity, alternates, lifecycle/availability, unit assumptions, cost provenance.
-12. **Pilot Deployment** — installation SOP, safety, staff burden, field failure recovery, evidence collection.
+## Ownership model
+
+### EE-owned work
+
+1. **Measurement Requirement** — measurand, operational point, range, accuracy, rate, environment and decision relevance.
+2. **Measurement Method / Sensor Selection** — whether the physical method can produce valid evidence.
+3. **Calibration / Uncertainty** — reference method, error budget, repeatability, drift, hysteresis and acceptance criteria.
+4. **Physical Workflow** — placement, operator burden, service identification and measurement SOP.
+5. **Field Measurement Verification** — whether the real measurement remains valid in representative operation.
+
+### EHB-owned work
+
+1. **Compute / MCU** — controller, peripherals, timing, memory, watchdog, boot/recovery.
+2. **Power / Interface Electronics** — source, conversion, peak/current budget, protection, brownout, controller-side analog/digital interface implementation.
+3. **Connectivity** — Wi-Fi/BLE/Ethernet/USB/RS232/CAN/etc., provisioning, offline buffering, retry/idempotency and security boundary.
+4. **Firmware** — drivers, state machine, storage, fault handling, observability and update path.
+5. **PCB / Interconnect** — schematic, layout constraints, connectors, grounding, test points, DFM/DFT.
+6. **Bring-up / Debug** — board checks, test jigs, firmware/hardware debug and recovery-path testing.
+7. **HW↔SW Integration** — device protocol, payload implementation, backend/device compatibility and integration verification.
+
+### Shared work
+
+- **EE↔EHB Interface Contract**
+- **System-Level Verification**
 
 Parallel agents may execute non-overlapping workstreams. Shared interfaces must be written down before independent implementation diverges.
 
-## Hardware branch conventions
+## Mandatory EE ↔ EHB interface contract
 
-Hardware work under the EE role should normally branch from:
+The relevant subset must define:
+
+- sensor/interface electrical requirements;
+- voltage/current limits;
+- connector/pinout;
+- ADC/interface expectations;
+- sampling/timing;
+- calibration data ownership and persistence;
+- protocol;
+- packet/event schema;
+- units/scaling;
+- quality/status/error flags;
+- power budget;
+- startup/shutdown behavior;
+- offline behavior;
+- fault states;
+- recovery/retry behavior;
+- test points;
+- validation method.
+
+Cross-boundary changes require EE+EHB dual review. No silent voltage, pinout, sampling, schema, protocol, calibration-persistence, power-budget or fault-semantic change is permitted.
+
+## Branch conventions
+
+### EE measurement work
+
+Base branch:
 
 `role/ee-physical-systems`
 
-Suggested task lanes:
+Suggested lanes:
 
 - `agent/hw-measurement/<task>`
 - `agent/hw-sensors/<task>`
-- `agent/hw-power/<task>`
-- `agent/hw-firmware/<task>`
-- `agent/hw-pcb/<task>`
-- `agent/hw-mechanical/<task>`
 - `agent/hw-calibration/<task>`
-- `agent/hw-verification/<task>`
+- `agent/hw-field-verification/<task>`
 
-Use the existing `agent/<lane>/<task>` pattern. Do not create overlapping hardware branches that both own the same schematic, board, firmware module, interface contract, or BOM artifact.
+### EHB embedded/integration work
+
+Base branch:
+
+`role/ehb-embedded-integration`
+
+Suggested lanes:
+
+- `agent/ehb-hardware/<task>`
+- `agent/ehb-firmware/<task>`
+- `agent/ehb-comms/<task>`
+- `agent/ehb-integration/<task>`
+- `agent/ehb-verification/<task>`
+
+Use the existing `agent/<lane>/<task>` pattern. Do not create overlapping branches that both own the same schematic, board, firmware module, interface contract, measurement SOP or BOM artifact.
 
 ## Required design artifacts
 
-A serious hardware proposal should produce the subset of these artifacts relevant to its maturity:
+A serious hardware proposal should produce only the subset relevant to its maturity/risk:
 
-- requirement table with operational rationale;
-- block diagram;
-- interface/control-flow diagram;
-- schematic or schematic-level design notes;
-- power tree and power/current budget;
-- sensor error/uncertainty budget;
+- measurement requirement table;
+- block/interface diagram;
+- schematic or schematic-level notes;
+- power tree/current budget;
+- measurement error/uncertainty budget;
 - firmware state machine;
 - communication/data contract;
 - BOM with exact part numbers where known;
-- alternates for single-source or risky parts;
-- test-point / debug strategy;
+- alternates for risky parts;
+- test-point/debug strategy;
 - calibration procedure;
-- test plan and acceptance criteria;
+- verification plan and acceptance criteria;
 - failure-mode table;
 - assembly/installation notes;
-- DFM/DFT checklist if PCB/manufacturing work exists;
-- evidence table separating simulated, bench, field, and assumed values.
+- DFM/DFT checklist when manufacturing is in scope;
+- evidence table separating assumed, simulated, bench and field values.
 
-Do not create artifacts only for visual completeness. Each artifact must support a decision, implementation, verification, sourcing, or integration need.
+Do not create artifacts for visual completeness. Each artifact must support a decision, implementation, verification, sourcing or integration need.
 
-## Schematic and PCB requirements
+## Schematic and PCB requirements — EHB
 
-When a custom PCB is justified, agents should verify as applicable:
+When a custom PCB is justified, EHB should verify as applicable:
 
 - input ranges and absolute maximum ratings;
 - regulator headroom and transient/peak current;
 - decoupling placement intent;
-- reverse-polarity / overcurrent / ESD protection where relevant;
-- ADC/reference/excitation assumptions;
+- reverse-polarity/overcurrent/ESD protection;
+- ADC/reference/excitation assumptions agreed with EE;
 - grounding and return-current paths;
 - analog vs switching/noisy-domain separation;
 - connector current/voltage ratings;
@@ -86,54 +134,68 @@ When a custom PCB is justified, agents should verify as applicable:
 - unused pin treatment;
 - pull-up/pull-down requirements;
 - external component tolerances;
-- thermal dissipation assumptions;
-- creepage/clearance where voltage requires it;
-- BOM availability and package manufacturability;
+- thermal assumptions;
+- creepage/clearance where relevant;
+- BOM availability/package manufacturability;
 - ERC/DRC or equivalent checks when CAD tooling is available.
 
 A rendered PCB image is not a verification artifact by itself.
 
-## Power design gate
+## Power design gate — EHB
 
 Any powered design should have an explicit power budget before it is described as deployable.
 
-At minimum record:
+Record as relevant:
 
 - input source/range;
 - nominal and worst-case rail currents;
 - startup/peak loads;
-- conversion efficiency assumptions;
+- conversion-efficiency assumptions;
 - regulator thermal assumptions;
 - brownout behavior;
 - protection strategy;
 - expected runtime if battery powered;
 - behavior after power loss/restoration.
 
-If these are unknown, label them as assumptions and create tests or calculations to resolve them.
+Unknowns remain `ASSUMPTION` until calculation/test resolves them.
 
-## Firmware quality gate
+## Firmware quality gate — EHB
 
-Firmware should be treated as production logic even for prototypes when it controls evidence collection.
+Firmware controlling evidence collection should have:
 
-Minimum expectations where applicable:
-
-- deterministic measurement/state flow;
+- deterministic state flow;
 - explicit invalid/error states;
-- watchdog or recovery strategy for unattended operation;
-- debouncing/filtering where relevant;
-- calibration values stored/versioned safely;
+- watchdog/recovery strategy where relevant;
+- calibration values stored/versioned safely according to the EE↔EHB contract;
 - offline queue/buffering when network loss is possible;
 - idempotent upload/event identity when retries are possible;
-- monotonic/event timestamps where ordering matters;
-- diagnostics suitable for bench and field debugging;
+- timestamp/order behavior;
+- diagnostics for bench/field debugging;
 - no silent coercion of invalid sensor data into plausible values;
 - reproducible build instructions.
 
-## Measurement and calibration gate
+## Communications quality gate — EHB
+
+For connected devices define as applicable:
+
+- provisioning;
+- connection-loss behavior;
+- queue persistence/depth;
+- retry/backoff;
+- duplicate/idempotency behavior;
+- clock/timestamp source;
+- ordering guarantees;
+- payload/schema versioning;
+- quality/error/status representation;
+- restart/power-loss recovery.
+
+A device reaching an API endpoint is not integrated if payload semantics are ambiguous downstream.
+
+## Measurement and calibration gate — EE
 
 No sensor is "accurate" because its datasheet says so.
 
-For measurement-critical hardware, define:
+For measurement-critical hardware, EE defines:
 
 - measurand and unit;
 - operational range;
@@ -147,7 +209,22 @@ For measurement-critical hardware, define:
 - invalid-reading rules;
 - acceptance criterion tied to the operational decision.
 
-Report raw measurements and test conditions. Do not report only a final percentage without provenance.
+Raw measurements and test conditions should be retained. Do not report only a final percentage without provenance.
+
+## EHB ↔ CS1 data contract
+
+EHB and CS1 must align on:
+
+- event/data schema;
+- timestamps and ordering;
+- missing/invalid readings;
+- quality flags;
+- device metadata;
+- duplicate handling;
+- offline replay;
+- API expectations that affect firmware behavior.
+
+EHB owns reliable transport/device semantics; CS1 owns decision/model semantics.
 
 ## Evidence maturity labels
 
@@ -158,8 +235,8 @@ Use these labels in hardware reports and PRs:
 - `CALCULATION` — engineering calculation with stated inputs.
 - `SIMULATION` — circuit/mechanical/software simulation only.
 - `BENCH_TEST` — physically measured prototype/board/device under recorded conditions.
-- `FIELD_TEST` — measured in the intended or representative operating environment.
-- `PRODUCTION_EVIDENCE` — verified on manufactured/release hardware with defined test process.
+- `FIELD_TEST` — measured in intended or representative operation.
+- `PRODUCTION_EVIDENCE` — verified on manufactured/release hardware with a defined process.
 
 Never promote a claim to a higher label without corresponding evidence.
 
@@ -167,89 +244,44 @@ Never promote a claim to a higher label without corresponding evidence.
 
 The repository's `PHYSICAL_SAFETY` and `IRREVERSIBLE_ACTION` human gates remain mandatory.
 
-Agents may autonomously:
+Agents may autonomously design circuits, write firmware, run simulations, review PCB files, create BOMs, prepare test procedures, calculate power/thermal limits, and design non-energized fixtures.
 
-- design circuits;
-- write firmware;
-- run simulations;
-- review PCB files;
-- create BOMs;
-- prepare test procedures;
-- calculate power/thermal limits;
-- design non-energized fixtures.
+Human approval/supervision is required before actions that can create real physical risk, including mains/high-voltage energization, unsafe battery handling/charging, high-current fault testing, hazardous actuator motion, destructive testing, or field installation affecting real operations.
 
-Human approval/supervision is required before actions that can create real physical risk, including as applicable:
+## BOM and sourcing discipline — primarily EHB
 
-- mains/high-voltage energization;
-- unsafe battery handling or charging experiments;
-- high-current fault testing;
-- actuator motion that can injure people or damage equipment;
-- destructive testing;
-- field installation affecting real operations;
-- hazardous thermal/chemical/mechanical processes.
+BOM entries should prefer exact manufacturer part numbers. For material parts record where useful manufacturer, MPN, function, package, critical rating, estimated unit cost/quantity basis, source/date, availability/lifecycle risk, and substitution constraints.
 
-Do not weaken a safety gate because a deadline is close.
+Do not claim a prototype or production cost without stating important excluded items.
 
-## BOM and sourcing discipline
+## Plugin/tool policy
 
-BOM entries should prefer exact manufacturer part numbers rather than generic descriptions.
+Use `.agents/PLUGIN_POLICY.md`.
 
-For material parts, record where useful:
+Relevant specialized capabilities include schematic/PCB CAD, SPICE, component/datasheet lookup, BOM sourcing/lifecycle checks, firmware build/debug, mechanical CAD, signal/power-integrity review, remote instruments/bench access, manufacturing/DFM and technical literature.
 
-- manufacturer;
-- manufacturer part number;
-- function;
-- package;
-- critical rating;
-- estimated unit cost and quantity basis;
-- source/date for price observation;
-- availability/lifecycle risk;
-- approved alternate or substitution constraints.
-
-Do not claim a prototype or production cost without stating excluded items such as PCB fabrication, assembly, enclosure, connectors, shipping, tax, tooling, calibration labor, or test equipment when they are not included.
-
-## Plugin/tool policy for hardware agents
-
-Hardware agents should use `.agents/PLUGIN_POLICY.md`.
-
-They are encouraged to use available specialized plugins or tools for:
-
-- schematic and PCB CAD;
-- SPICE/circuit simulation;
-- component/datasheet lookup;
-- BOM sourcing/lifecycle checks;
-- firmware build/debug;
-- mechanical CAD;
-- signal/power-integrity review;
-- remote instruments/bench access;
-- manufacturing/DFM checks;
-- technical literature.
-
-If a useful specialized capability is not available, the agent may explicitly ask the user to install/connect/authorize an appropriate plugin. The request should name the missing capability rather than inventing a plugin name unless that plugin has actually been discovered.
-
-When a plugin is optional, continue with the best available fallback and record what remains unverified. When the plugin is necessary to satisfy acceptance criteria, document the exact blocker.
+Optional capability absence does not justify fabricated results. Continue with the strongest safe fallback and record what remains unverified.
 
 ## Hardware PR merge checklist
 
-In addition to normal repository CI, a hardware PR should answer the relevant items below:
-
-- [ ] Measurement requirement is stated.
-- [ ] Architecture choice is compared against simpler alternatives.
-- [ ] Exact interfaces/contracts are documented.
-- [ ] Power assumptions are explicit.
+- [ ] Primary owner is correctly identified as EE or EHB.
+- [ ] Measurement requirement is stated where the hardware affects measurement.
+- [ ] Architecture is compared with simpler alternatives.
+- [ ] EE↔EHB interface contract is explicit when both domains are affected.
+- [ ] Cross-boundary changes received dual review.
+- [ ] Power assumptions are explicit where powered electronics are involved.
 - [ ] Safety risks are identified.
 - [ ] BOM parts/ratings are not invented.
-- [ ] Datasheet-derived claims have source provenance.
+- [ ] Datasheet-derived claims have provenance.
 - [ ] Simulation is not presented as bench evidence.
 - [ ] Bench evidence includes setup/test conditions when present.
-- [ ] Firmware failure/recovery behavior is defined.
-- [ ] Calibration and invalid-reading handling are defined when measurement-critical.
-- [ ] Cross-role API/data impacts are documented.
+- [ ] Firmware failure/recovery behavior is defined when relevant.
+- [ ] Calibration/invalid-reading handling is defined by EE when measurement-critical.
+- [ ] EHB↔CS1 API/data impacts are documented when relevant.
 - [ ] Known unverified assumptions are listed.
-- [ ] A missing useful plugin/tool capability is requested from the user when it would materially improve verification.
 
 ## Exit criterion
 
-A hardware workstream is complete only when its intended artifact and evidence are merged through the EE role path to verified `master`, or when a genuine hard blocker is recorded.
+A hardware workstream is complete only when its intended artifact/evidence is merged through the correct EE or EHB role path to verified `master`, or when a genuine hard blocker is recorded.
 
 "Designed", "simulated", "PCB rendered", "firmware compiles", and "BOM drafted" are intermediate states unless they satisfy the explicitly scoped acceptance criteria.
