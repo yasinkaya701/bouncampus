@@ -1,151 +1,198 @@
+"""Aggregate, fail-closed campus state for CS1 decision intelligence."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from datetime import datetime
+import importlib.util
 import math
+from pathlib import Path
 from typing import Any
 
-from app.decision.campus_contract import (
-    CONTRACT_VERSION,
-    PROVENANCE_STATES,
-    decision_envelope,
-    validate_no_person_level_data,
+CONTRACT_VERSION = "campus-ops-v1.0"
+REQUIRED_SOURCES = ("schedule", "occupancy_model")
+PERSON_LEVEL_FIELDS = frozenset(
+    {
+        "student_id",
+        "person_id",
+        "email",
+        "device_id",
+        "wifi_client_id",
+        "payment_id",
+        "card_id",
+    }
 )
 
-REQUIRED_SOURCES = ("schedule", "occupancy_model")
+
+def _load_source_health():
+    path = Path(__file__).with_name("source_health.py")
+    spec = importlib.util.spec_from_file_location("_campus_ops_source_health", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"could not load source-health module at {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
-def _timestamp(value: Any) -> datetime | None:
-    text = str(value or "").strip()
-    if not text:
-        return None
-    if text.endswith("Z"):
-        text = text[:-1] + "+00:00"
+def _required_text(value: Any, *, field: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{field} must be a non-empty string")
+    return value.strip()
+
+
+def _number(
+    value: Any,
+    *,
+    field: str,
+    minimum: float = 0.0,
+    strictly_positive: bool = False,
+) -> float:
+    if isinstance(value, bool):
+        raise ValueError(f"{field} must be a finite number")
     try:
-        parsed = datetime.fromisoformat(text)
-    except ValueError:
-        return None
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
-        return None
-    return parsed
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{field} must be a finite number") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{field} must be a finite number")
+    if strictly_positive:
+        if number <= 0:
+            raise ValueError(f"{field} must be greater than zero")
+    elif number < minimum:
+        raise ValueError(f"{field} must be at least {minimum:g}")
+    return number
 
 
-def _nonnegative(value: Any) -> float | None:
-    if value is None or isinstance(value, bool):
-        return None
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(numeric) or numeric < 0:
-        return None
-    return numeric
+def _normalized_zone(zone: Mapping[str, Any]) -> dict[str, Any]:
+    if not isinstance(zone, Mapping):
+        raise ValueError("each zone must be a mapping")
+    disallowed = PERSON_LEVEL_FIELDS.intersection(zone.keys())
+    if disallowed:
+        fields = ", ".join(sorted(disallowed))
+        raise ValueError(f"person-level identifiers are not allowed in campus state: {fields}")
+
+    zone_id = _required_text(zone.get("zone_id"), field="zone_id")
+    campus = _required_text(zone.get("campus"), field=f"{zone_id}.campus")
+    capacity = _number(
+        zone.get("capacity"),
+        field=f"{zone_id}.capacity",
+        strictly_positive=True,
+    )
+    occupancy = _number(
+        zone.get("occupancy_estimate"),
+        field=f"{zone_id}.occupancy_estimate",
+    )
+    scheduled = _number(
+        zone.get("scheduled_load"),
+        field=f"{zone_id}.scheduled_load",
+    )
+    event = _number(
+        zone.get("event_load", 0),
+        field=f"{zone_id}.event_load",
+    )
+
+    return {
+        "zone_id": zone_id,
+        "campus": campus,
+        "capacity": capacity,
+        "occupancy_estimate": occupancy,
+        "scheduled_load": scheduled,
+        "event_load": event,
+        "utilization_pct": round((occupancy / capacity) * 100.0, 2),
+    }
+
+
+def _compact_number(value: float) -> int | float:
+    return int(value) if float(value).is_integer() else value
 
 
 def build_campus_state(
     zones: Sequence[Mapping[str, Any]],
     sources: Mapping[str, Mapping[str, Any]],
-    *,
     decision_time: str,
 ) -> dict[str, Any]:
-    """Build one aggregate campus snapshot using only decision-time-available evidence."""
+    """Build an aggregate state using only information available at decision time."""
 
-    validate_no_person_level_data(zones, path="zones")
-    validate_no_person_level_data(sources, path="sources")
-    cutoff = _timestamp(decision_time)
-    if cutoff is None:
-        raise ValueError("decision_time must be a timezone-aware ISO timestamp")
-
-    source_status: dict[str, dict[str, Any]] = {}
-    reasons: list[str] = []
-    for source_id, raw in sources.items():
-        if not isinstance(raw, Mapping):
-            reasons.append(f"INVALID_SOURCE_{str(source_id).upper()}")
-            continue
-        available = raw.get("available") is True
-        provenance = str(raw.get("provenance") or "").strip().upper()
-        published = _timestamp(raw.get("published_at"))
-        accepted = (
-            available
-            and provenance in PROVENANCE_STATES
-            and published is not None
-            and published <= cutoff
-        )
-        if available and published is not None and published > cutoff:
-            reasons.append(f"SOURCE_NOT_AVAILABLE_AT_DECISION_TIME_{str(source_id).upper()}")
-        elif available and provenance not in PROVENANCE_STATES:
-            reasons.append(f"UNSUPPORTED_SOURCE_PROVENANCE_{str(source_id).upper()}")
-        elif available and published is None:
-            reasons.append(f"INVALID_SOURCE_TIMESTAMP_{str(source_id).upper()}")
-        source_status[str(source_id)] = {
-            "available": available,
-            "provenance": provenance or None,
-            "published_at": raw.get("published_at"),
-            "accepted_at_decision_time": accepted,
-        }
-
-    for required in REQUIRED_SOURCES:
-        if not source_status.get(required, {}).get("accepted_at_decision_time", False):
-            code = f"REQUIRED_SOURCE_UNAVAILABLE_{required.upper()}"
-            if not any(required.upper() in existing for existing in reasons):
-                reasons.append(code)
+    if isinstance(zones, (str, bytes)) or not isinstance(zones, Sequence) or not zones:
+        raise ValueError("zones must be a non-empty sequence of mappings")
+    if not isinstance(sources, Mapping):
+        raise ValueError("sources must be a mapping")
 
     normalized_zones: list[dict[str, Any]] = []
-    seen: set[str] = set()
-    for raw in zones:
-        if not isinstance(raw, Mapping):
-            raise ValueError("zones must contain mappings")
-        zone_id = str(raw.get("zone_id") or "").strip()
-        campus = str(raw.get("campus") or "").strip().lower()
-        capacity = _nonnegative(raw.get("capacity"))
-        occupancy = _nonnegative(raw.get("occupancy_estimate"))
-        scheduled = _nonnegative(raw.get("scheduled_load", 0))
-        event = _nonnegative(raw.get("event_load", 0))
-        if (
-            not zone_id
-            or zone_id in seen
-            or not campus
-            or capacity is None
-            or capacity <= 0
-            or occupancy is None
-            or scheduled is None
-            or event is None
-        ):
-            raise ValueError("invalid aggregate zone input")
-        seen.add(zone_id)
-        bounded_occupancy = min(occupancy, capacity)
-        if occupancy > capacity:
-            reasons.append(f"OCCUPANCY_ESTIMATE_EXCEEDS_CAPACITY_{zone_id.upper()}")
-        normalized_zones.append(
+    seen_zone_ids: set[str] = set()
+    for raw_zone in zones:
+        zone = _normalized_zone(raw_zone)
+        if zone["zone_id"] in seen_zone_ids:
+            raise ValueError(f"duplicate zone_id: {zone['zone_id']}")
+        seen_zone_ids.add(zone["zone_id"])
+        normalized_zones.append(zone)
+
+    source_health_module = _load_source_health()
+    normalized_sources = source_health_module.normalize_sources(
+        sources,
+        decision_time,
+        domain="campus",
+    )
+    by_id = {item["source_id"]: item for item in normalized_sources}
+
+    reason_codes: list[str] = []
+    withheld = False
+    for required in REQUIRED_SOURCES:
+        health = by_id.get(required)
+        if health is None or health["status"] == "UNAVAILABLE":
+            reason_codes.append(f"MISSING_REQUIRED_SOURCE_{required.upper()}")
+            withheld = True
+            continue
+        if health["status"] == "NOT_AVAILABLE_AT_DECISION_TIME":
+            reason_codes.extend(health["reason_codes"])
+            withheld = True
+            continue
+        if health["status"] in {"STALE", "PARTIAL"} or not health["eligible_at_decision_time"]:
+            reason_codes.extend(
+                health["reason_codes"]
+                or [f"REQUIRED_SOURCE_NOT_VERIFIED_{required.upper()}"]
+            )
+            withheld = True
+
+    campus_totals: dict[str, dict[str, int | float]] = {}
+    for zone in normalized_zones:
+        campus = zone["campus"]
+        totals = campus_totals.setdefault(
+            campus,
             {
-                "zone_id": zone_id,
-                "campus": campus,
-                "capacity": int(round(capacity)),
-                "occupancy_estimate": int(round(bounded_occupancy)),
-                "scheduled_load": int(round(scheduled)),
-                "event_load": int(round(event)),
-                "utilization_pct": round((bounded_occupancy / capacity) * 100.0, 2),
-            }
+                "capacity": 0.0,
+                "occupancy_estimate": 0.0,
+                "scheduled_load": 0.0,
+                "event_load": 0.0,
+            },
         )
+        for field in ("capacity", "occupancy_estimate", "scheduled_load", "event_load"):
+            totals[field] += zone[field]
 
-    if not normalized_zones:
-        reasons.append("NO_CAMPUS_ZONES")
+    for totals in campus_totals.values():
+        totals["utilization_pct"] = round(
+            totals["occupancy_estimate"] / totals["capacity"] * 100.0,
+            2,
+        )
+        for field in ("capacity", "occupancy_estimate", "scheduled_load", "event_load"):
+            totals[field] = _compact_number(float(totals[field]))
 
-    required_ok = all(
-        source_status.get(source, {}).get("accepted_at_decision_time", False)
-        for source in REQUIRED_SOURCES
-    )
-    readiness = "REVIEW_REQUIRED" if required_ok and normalized_zones else "WITHHOLD"
-    envelope = decision_envelope(
-        readiness=readiness,
-        reason_codes=reasons or ["PRE_PILOT_OPERATOR_REVIEW_REQUIRED"],
-        scope="AGGREGATE_CAMPUS_STATE",
-    )
+    readiness = "WITHHOLD" if withheld else "REVIEW_REQUIRED"
+    if not reason_codes:
+        reason_codes = ["OPERATOR_REVIEW_REQUIRED"]
+
     return {
-        **envelope,
+        "contract_version": CONTRACT_VERSION,
         "decision_time": decision_time,
-        "zones": normalized_zones,
-        "source_status": source_status,
-        "truth_boundary": "AGGREGATE_DECISION_TIME_AVAILABLE_INPUTS_ONLY",
-        "impact_claim_allowed": False,
+        "decision_readiness": readiness,
+        "abstained": withheld,
+        "campus_totals": campus_totals,
+        "zone_states": normalized_zones,
+        "source_health": normalized_sources,
+        "reason_codes": reason_codes,
+        "limitations": [
+            "NO_LIVE_TELEMETRY_CLAIM",
+            "OCCUPANCY_IS_AGGREGATE_MODEL_ESTIMATE",
+        ],
+        "operator_approval_required": True,
+        "automatic_execution_allowed": False,
     }
