@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/cs1/class-search-limit-hardening
+  pull_request:
+    branches:
+      - agent/cs1/campus-ops-suite
 
 permissions:
   contents: read
