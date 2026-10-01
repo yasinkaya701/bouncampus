@@ -5,10 +5,12 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from app.decision.building_energy_policy import plan_building_energy
 from app.decision.campus_contract import CONTRACT_VERSION
 from app.decision.campus_portfolio import build_campus_portfolio
 from app.decision.campus_state import build_campus_state
 from app.decision.classroom_policy import allocate_classrooms
+from app.decision.food_ops_policy import plan_food_production
 from app.decision.shuttle_policy import plan_shuttle_capacity
 
 router = APIRouter(prefix="/api/v1/campus-ops", tags=["campus-ops"])
@@ -32,6 +34,35 @@ class ClassroomAllocationRequest(BaseModel):
     upstream_readiness: str = "REVIEW_REQUIRED"
 
 
+class FoodPlanRequest(BaseModel):
+    demand_scenarios: list[dict[str, Any]]
+    max_capacity: float
+    waste_weight: float
+    shortage_weight: float
+    method_eligibility: str
+    upstream_readiness: str = "REVIEW_REQUIRED"
+
+
+class EnergyPlanRequest(BaseModel):
+    zones: list[dict[str, Any]]
+    low_utilization_threshold: float
+    medium_utilization_threshold: float
+    upstream_readiness: str = "REVIEW_REQUIRED"
+
+
+class FoodPlanConfig(BaseModel):
+    demand_scenarios: list[dict[str, Any]]
+    max_capacity: float
+    waste_weight: float
+    shortage_weight: float
+    method_eligibility: str
+
+
+class EnergyPlanConfig(BaseModel):
+    low_utilization_threshold: float
+    medium_utilization_threshold: float
+
+
 class CampusPortfolioRequest(BaseModel):
     campus_state: dict[str, Any]
     shuttle_plan: dict[str, Any] | None = None
@@ -48,6 +79,8 @@ class CampusOpsPlanRequest(BaseModel):
     reserve_ratio: float = 0.10
     sessions: list[dict[str, Any]] = Field(default_factory=list)
     rooms: list[dict[str, Any]] = Field(default_factory=list)
+    food: FoodPlanConfig | None = None
+    energy: EnergyPlanConfig | None = None
 
 
 def _unprocessable(exc: ValueError) -> HTTPException:
@@ -58,7 +91,14 @@ def _unprocessable(exc: ValueError) -> HTTPException:
 def get_campus_ops_contract() -> dict[str, Any]:
     return {
         "contract_version": CONTRACT_VERSION,
-        "domains": ["campus_state", "shuttle", "classroom", "portfolio"],
+        "domains": [
+            "campus_state",
+            "shuttle",
+            "classroom",
+            "food",
+            "energy",
+            "portfolio",
+        ],
         "decision_readiness_states": ["PILOT_READY", "REVIEW_REQUIRED", "WITHHOLD"],
         "provenance_states": [
             "PUBLIC_SOURCE",
@@ -119,6 +159,34 @@ def build_classroom_plan(payload: ClassroomAllocationRequest) -> dict[str, Any]:
         raise _unprocessable(exc) from exc
 
 
+@router.post("/food/plan")
+def build_food_plan(payload: FoodPlanRequest) -> dict[str, Any]:
+    try:
+        return plan_food_production(
+            demand_scenarios=payload.demand_scenarios,
+            max_capacity=payload.max_capacity,
+            waste_weight=payload.waste_weight,
+            shortage_weight=payload.shortage_weight,
+            method_eligibility=payload.method_eligibility,
+            upstream_readiness=payload.upstream_readiness,
+        )
+    except ValueError as exc:
+        raise _unprocessable(exc) from exc
+
+
+@router.post("/energy/plan")
+def build_energy_plan(payload: EnergyPlanRequest) -> dict[str, Any]:
+    try:
+        return plan_building_energy(
+            zones=payload.zones,
+            low_utilization_threshold=payload.low_utilization_threshold,
+            medium_utilization_threshold=payload.medium_utilization_threshold,
+            upstream_readiness=payload.upstream_readiness,
+        )
+    except ValueError as exc:
+        raise _unprocessable(exc) from exc
+
+
 @router.post("/portfolio")
 def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
     try:
@@ -143,25 +211,51 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
             payload.sources,
             decision_time=payload.decision_time,
         )
+        readiness = state["decision_readiness"]
         shuttle = plan_shuttle_capacity(
             payload.shuttle_routes,
             reserve_ratio=payload.reserve_ratio,
-            upstream_readiness=state["decision_readiness"],
+            upstream_readiness=readiness,
         )
         classroom = allocate_classrooms(
             payload.sessions,
             payload.rooms,
-            upstream_readiness=state["decision_readiness"],
+            upstream_readiness=readiness,
         )
+
+        food = None
+        if payload.food is not None:
+            food = plan_food_production(
+                demand_scenarios=payload.food.demand_scenarios,
+                max_capacity=payload.food.max_capacity,
+                waste_weight=payload.food.waste_weight,
+                shortage_weight=payload.food.shortage_weight,
+                method_eligibility=payload.food.method_eligibility,
+                upstream_readiness=readiness,
+            )
+
+        energy = None
+        if payload.energy is not None:
+            energy = plan_building_energy(
+                zones=state["zones"],
+                low_utilization_threshold=payload.energy.low_utilization_threshold,
+                medium_utilization_threshold=payload.energy.medium_utilization_threshold,
+                upstream_readiness=readiness,
+            )
+
         portfolio = build_campus_portfolio(
             campus_state=state,
             shuttle_plan=shuttle,
             classroom_plan=classroom,
+            food_decision=food,
+            energy_decision=energy,
         )
         return {
             "state": state,
             "shuttle": shuttle,
             "classroom": classroom,
+            "food": food,
+            "energy": energy,
             "portfolio": portfolio,
         }
     except ValueError as exc:
