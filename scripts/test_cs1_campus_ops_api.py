@@ -61,6 +61,34 @@ def test_class_endpoint_exposes_assignments() -> None:
     assert result["assignments"][0]["room_id"] == "R1"
 
 
+def test_class_endpoint_enforces_conflict_keys() -> None:
+    router = load_router()
+    result = router.optimize_classes({
+        "classes": [
+            {
+                "class_id": "C1",
+                "planning_attendance": 10,
+                "allowed_slots": ["T1"],
+                "required_features": [],
+                "conflict_keys": ["instructor:I1"],
+            },
+            {
+                "class_id": "C2",
+                "planning_attendance": 10,
+                "allowed_slots": ["T1"],
+                "required_features": [],
+                "conflict_keys": ["instructor:I1"],
+            },
+        ],
+        "rooms": [
+            {"room_id": "R1", "capacity": 20, "features": [], "building": "A"},
+            {"room_id": "R2", "capacity": 20, "features": [], "building": "A"},
+        ],
+    })
+    assert result["decision_readiness"] == "WITHHOLD"
+    assert "NO_CONFLICT_FREE_CLASS_SCHEDULE" in result["reason_codes"]
+
+
 def test_capabilities_declares_truth_boundary() -> None:
     router = load_router()
     result = router.capabilities()
@@ -83,6 +111,7 @@ def main() -> int:
         test_shuttle_endpoint_fails_closed_on_bad_payload,
         test_space_endpoint_exposes_advisory_zone_selection,
         test_class_endpoint_exposes_assignments,
+        test_class_endpoint_enforces_conflict_keys,
         test_capabilities_declares_truth_boundary,
         test_fastapi_main_registers_campus_ops_router,
     ]
