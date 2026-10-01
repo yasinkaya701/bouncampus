@@ -7,12 +7,12 @@ from app.decision.campus_contract import validate_no_person_level_data
 from app.decision.campus_ops import (
     allocate_shared_capacity,
     build_campus_ops_bundle,
-    optimize_class_schedule,
-    optimize_food_production,
     optimize_shuttle_plan,
     optimize_space_plan,
 )
 from app.decision.campus_state import build_campus_state
+from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
+from app.decision.food_production import optimize_food_production
 
 ALLOWED_MODULES = frozenset({"food", "shuttle", "spaces", "classes", "resources"})
 
@@ -47,7 +47,7 @@ def build_integrated_campus_plan(payload: Mapping[str, Any]) -> dict[str, Any]:
                 max_capacity=config.get("max_capacity"),
                 waste_weight=config.get("waste_weight"),
                 shortage_weight=config.get("shortage_weight"),
-                method_eligibility=str(config.get("method_eligibility") or "EVALUATED_OFFLINE"),
+                method_eligibility=str(config.get("method_eligibility") or "SANDBOX_ONLY"),
             )
         if "shuttle" in requested:
             config = _mapping(requested["shuttle"], name="modules.shuttle")
@@ -69,7 +69,7 @@ def build_integrated_campus_plan(payload: Mapping[str, Any]) -> dict[str, Any]:
             )
         if "classes" in requested:
             config = _mapping(requested["classes"], name="modules.classes")
-            results["classes"] = optimize_class_schedule(
+            results["classes"] = optimize_conflict_aware_class_schedule(
                 classes=config.get("classes", []),
                 rooms=config.get("rooms", []),
                 building_mismatch_weight=config.get("building_mismatch_weight", 0.0),
