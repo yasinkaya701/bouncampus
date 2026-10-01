@@ -4,9 +4,13 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+BACKEND = ROOT / "backend"
+if str(BACKEND) not in sys.path:
+    sys.path.insert(0, str(BACKEND))
 
 
 def load_state():
@@ -23,39 +27,18 @@ def load_state():
 
 def valid_sources():
     return {
-        "schedule": {
-            "available": True,
-            "provenance": "PUBLIC_SOURCE",
-            "published_at": "2026-10-01T08:00:00+03:00",
-        },
-        "occupancy_model": {
-            "available": True,
-            "provenance": "MODEL_ESTIMATE",
-            "published_at": "2026-10-01T09:00:00+03:00",
-        },
+        "schedule": {"available": True, "provenance": "PUBLIC_SOURCE", "published_at": "2026-10-01T08:00:00+03:00"},
+        "occupancy_model": {"available": True, "provenance": "MODEL_ESTIMATE", "published_at": "2026-10-01T09:00:00+03:00"},
     }
 
 
 def valid_zones():
-    return [
-        {
-            "zone_id": "south-academic",
-            "campus": "south",
-            "capacity": 1000,
-            "occupancy_estimate": 620,
-            "scheduled_load": 580,
-            "event_load": 40,
-        }
-    ]
+    return [{"zone_id": "south-academic", "campus": "south", "capacity": 1000, "occupancy_estimate": 620, "scheduled_load": 580, "event_load": 40}]
 
 
 def test_complete_decision_time_state_requires_operator_review() -> None:
     state = load_state()
-    result = state.build_campus_state(
-        valid_zones(),
-        valid_sources(),
-        decision_time="2026-10-01T10:00:00+03:00",
-    )
+    result = state.build_campus_state(valid_zones(), valid_sources(), decision_time="2026-10-01T10:00:00+03:00")
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert result["operator_approval_required"] is True
     assert result["automatic_execution_allowed"] is False
@@ -67,11 +50,7 @@ def test_future_or_missing_required_source_fails_closed() -> None:
     state = load_state()
     sources = valid_sources()
     sources["occupancy_model"]["published_at"] = "2026-10-01T11:00:00+03:00"
-    result = state.build_campus_state(
-        valid_zones(),
-        sources,
-        decision_time="2026-10-01T10:00:00+03:00",
-    )
+    result = state.build_campus_state(valid_zones(), sources, decision_time="2026-10-01T10:00:00+03:00")
     assert result["decision_readiness"] == "WITHHOLD"
     assert result["abstained"] is True
     assert "SOURCE_NOT_AVAILABLE_AT_DECISION_TIME_OCCUPANCY_MODEL" in result["reason_codes"]
@@ -82,11 +61,7 @@ def test_person_level_identifiers_are_rejected() -> None:
     zones = valid_zones()
     zones[0]["student_id"] = "forbidden"
     try:
-        state.build_campus_state(
-            zones,
-            valid_sources(),
-            decision_time="2026-10-01T10:00:00+03:00",
-        )
+        state.build_campus_state(zones, valid_sources(), decision_time="2026-10-01T10:00:00+03:00")
     except ValueError as exc:
         assert "person-level data" in str(exc)
     else:
