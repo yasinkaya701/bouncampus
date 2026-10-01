@@ -1,0 +1,53 @@
+field,family,grain,availability_rule,dtype,missing_policy,leakage_risk,provenance_class,priority,notes
+service_id,key,service,known_pre_decision,string,forbid_missing,NONE,INTERNAL_ID,P0,"Stable identifier across recommendation and outcome"
+service_date,time,service,known_pre_decision,date,forbid_missing,NONE,OFFICIAL,P0,
+campus_id,context,service,known_pre_decision,categorical,forbid_missing,NONE,OFFICIAL,P0,
+service_type,context,service,known_pre_decision,categorical,forbid_missing,NONE,OFFICIAL,P0,"breakfast/lunch/dinner; package service represented separately"
+information_cutoff_at,time,decision,known_pre_decision,timestamp,forbid_missing,NONE,DECISION_AUDIT,P0,"All feature timestamps must be <= cutoff"
+decision_freeze_at,time,decision,known_pre_decision,timestamp,forbid_missing,NONE,DECISION_AUDIT,P0,"Recommendation is useful only before operational freeze"
+weekday,time,service,derived_from_date,int8,forbid_missing,NONE,DERIVED,P0,
+week_of_year,time,service,derived_from_date,int16,forbid_missing,NONE,DERIVED,P1,
+days_from_semester_start,calendar,service,calendar_known_pre_decision,int16,nullable,LOW,OFFICIAL_DERIVED,P1,
+is_class_day,calendar,service,calendar_known_pre_decision,bool,nullable,LOW,OFFICIAL_DERIVED,P0,
+semester_phase,calendar,service,calendar_known_pre_decision,categorical,nullable,LOW,OFFICIAL_DERIVED,P0,"instruction/finals/break/registration etc"
+is_holiday_no_classes,calendar,service,calendar_known_pre_decision,bool,nullable,LOW,OFFICIAL_DERIVED,P0,
+is_ramadan_regime,operations,service,dated_regime_known_pre_decision,bool,nullable,LOW,OFFICIAL_DERIVED,P1,"Prefer cafeteria announcement/service regime over assumption"
+service_regime_id,operations,service,dated_regime_known_pre_decision,categorical,nullable,LOW,OFFICIAL_DERIVED,P0,"captures closures/package service/hour changes"
+price_regime_id,operations,service,dated_regime_known_pre_decision,categorical,nullable,LOW,OFFICIAL_DERIVED,P2,"meal subsidy/price can shift demand; not food production cost"
+menu_snapshot_id,menu,service,snapshot_at_or_before_cutoff,string,nullable,MEDIUM,OFFICIAL_SNAPSHOT,P0,
+menu_main_dish,menu,service,snapshot_at_or_before_cutoff,categorical,nullable,MEDIUM,OFFICIAL_SNAPSHOT,P0,
+menu_vegan_alt,menu,service,snapshot_at_or_before_cutoff,categorical,nullable,MEDIUM,OFFICIAL_SNAPSHOT,P1,
+menu_soup,menu,service,snapshot_at_or_before_cutoff,categorical,nullable,MEDIUM,OFFICIAL_SNAPSHOT,P1,
+menu_starch_family,menu,service,snapshot_at_or_before_cutoff,multi_hot,nullable,MEDIUM,DERIVED_FROM_OFFICIAL,P1,
+menu_protein_family,menu,service,snapshot_at_or_before_cutoff,categorical,nullable,MEDIUM,DERIVED_FROM_OFFICIAL,P0,"beef/poultry/fish/legume/none/mixed/unknown"
+menu_dessert_family,menu,service,snapshot_at_or_before_cutoff,categorical,nullable,MEDIUM,DERIVED_FROM_OFFICIAL,P2,
+menu_calories_coverage,menu,service,snapshot_at_or_before_cutoff,float01,nullable,MEDIUM,OFFICIAL_DERIVED,P2,"coverage flag matters because dish nutrition pages can be incomplete"
+menu_total_listed_kcal,menu,service,snapshot_at_or_before_cutoff,float,nullable,MEDIUM,OFFICIAL_DERIVED,P2,"Only sum when semantic serving units are compatible"
+menu_novelty_days,menu,service,history_before_cutoff,float,nullable,LOW,DERIVED,P1,"days since same normalized main/menu last appeared"
+main_dish_trailing_take_rate,preference,service,history_before_cutoff,float,nullable,LOW,MEASURED_IF_AVAILABLE,P1,"Do not substitute an LLM popularity score"
+poll_vote_share,preference,service,poll_closed_before_cutoff,float01,nullable,HIGH,MEASURED_IF_EXPORTED,P1,"Only eligible when poll result existed before cutoff"
+tasting_score_trailing,preference,service,history_before_cutoff,float,nullable,LOW,MEASURED_IF_EXPORTED,P2,"Use prior services only"
+active_reservations_at_cutoff,reservation,service,snapshot_at_or_before_cutoff,float,nullable,HIGH,MEASURED,P0,"intent signal not served demand"
+trailing_reservation_show_rate,reservation,service,history_before_cutoff,float01,nullable,LOW,MEASURED_DERIVED,P0,"Learn from reconciled past rows only"
+trailing_unreserved_mean,reservation,service,history_before_cutoff,float,nullable,LOW,MEASURED_DERIVED,P0,"Past walk-in component"
+demand_lag_1_service,demand_history,service,observed_before_cutoff,float,nullable,LOW,MEASURED_DERIVED,P1,"previous comparable service rather than arbitrary previous row"
+demand_lag_7d,demand_history,service,observed_before_cutoff,float,nullable,LOW,MEASURED_DERIVED,P0,
+demand_rolling_median_4wk,demand_history,service,history_before_cutoff,float,nullable,LOW,MEASURED_DERIVED,P0,
+demand_rolling_wape_context,demand_history,service,history_before_cutoff,float,nullable,LOW,MEASURED_DERIVED,P2,"model/source-health context only"
+forecast_temp_c,weather,service,forecast_issue_at_or_before_cutoff,float,nullable,LOW_IF_VALID_ISSUE_TIME,EXTERNAL_FORECAST,P1,
+forecast_precip_mm,weather,service,forecast_issue_at_or_before_cutoff,float,nullable,LOW_IF_VALID_ISSUE_TIME,EXTERNAL_FORECAST,P1,
+forecast_rain_probability,weather,service,forecast_issue_at_or_before_cutoff,float01,nullable,LOW_IF_VALID_ISSUE_TIME,EXTERNAL_FORECAST,P1,
+forecast_apparent_temp_c,weather,service,forecast_issue_at_or_before_cutoff,float,nullable,LOW_IF_VALID_ISSUE_TIME,EXTERNAL_FORECAST,P2,
+forecast_weather_code,weather,service,forecast_issue_at_or_before_cutoff,categorical,nullable,LOW_IF_VALID_ISSUE_TIME,EXTERNAL_FORECAST,P2,
+menu_ghg_proxy_coverage,environment,service,known_from_menu_snapshot,float01,nullable,LOW,EXTERNAL_LCA_PROXY,P2,"scenario feature; not measured campus impact"
+menu_ghg_proxy_kgco2e,environment,service,known_from_menu_snapshot,float,nullable,LOW,EXTERNAL_LCA_PROXY,P2,"keep recipe mapping uncertainty"
+source_coverage,data_quality,decision,computed_pre_decision,float01,forbid_missing,NONE,DERIVED,P0,
+source_freshness_status,data_quality,decision,computed_pre_decision,categorical,forbid_missing,NONE,DERIVED,P0,
+served_count,target,service,POST_SERVICE_ONLY,float,forbid_missing_for_training,TARGET,MEASURED,P0,"primary forecast target; never a pre-service feature"
+prepared_count,outcome,service,POST_DECISION_OR_BATCH,float,nullable,TARGET_SIDE,MEASURED,P0,"evaluate recommendation/production execution"
+waste_kg,outcome,service,POST_SERVICE_ONLY,float,nullable,TARGET,MEASURED,P0,"measurement protocol required"
+waste_portions,outcome,service,POST_SERVICE_ONLY,float,nullable,TARGET,MEASURED,P1,"use if kg unavailable; keep units explicit"
+stockout_flag,outcome,service,POST_SERVICE_ONLY,bool,nullable,TARGET,MEASURED,P1,
+stockout_time,outcome,service,POST_SERVICE_ONLY,timestamp,nullable,TARGET,MEASURED,P1,
+operator_override,outcome,decision,AT_DECISION_TIME,bool,nullable,NONE,DECISION_AUDIT,P2,
+operator_override_reason,outcome,decision,AT_DECISION_TIME,categorical_or_text,nullable,NONE,DECISION_AUDIT,P2,
