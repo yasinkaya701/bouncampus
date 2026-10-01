@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "TASK-EHB-EXAMPLE",
+  "title": "Example EHB embedded integration task",
+  "priority": "P1",
+  "lane": "ehb-firmware",
+  "state": "BACKLOG",
+  "owner_agent": null,
+  "branch": null,
+  "depends_on": [],
+  "touched_paths": [],
+  "acceptance_criteria": [
+    "Example only: when instantiated, target role/ehb-embedded-integration and declare real touched paths.",
+    "If the work changes the EE/EHB boundary, create or update an EE-EHB interface contract and obtain dual review.",
+    "If downstream data semantics change, include CS1 consumer review."
+  ],
+  "validation_commands": [
+    "python scripts/test_agent_fabric_check.py",
+    "python scripts/agent_fabric_check.py"
+  ],
+  "human_gate": {
+    "kind": "NONE",
+    "status": "NOT_REQUIRED",
+    "question": null,
+    "decision": null,
+    "decided_by": null,
+    "decided_at": null
+  },
+  "lease": {
+    "claimed_at": null,
+    "heartbeat_at": null,
+    "ttl_minutes": 360
+  },
+  "blocker": null,
+  "integration": {
+    "pull_request": null,
+    "validated_head_sha": null,
+    "merge_sha": null,
+    "post_merge_verified_at": null
+  },
+  "notes": [
+    "EXAMPLE ONLY. This file is intentionally outside .agents/coordination/tasks and is not an active task.",
+    "EHB is an independent execution role, not an EE sub-role.",
+    "Typical instantiated branch: agent/ehb-firmware/<task> -> role/ehb-embedded-integration."
+  ]
+}
