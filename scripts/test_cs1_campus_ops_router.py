@@ -88,6 +88,13 @@ def request_payload():
             "low_utilization_threshold": 0.25,
             "medium_utilization_threshold": 0.60,
         },
+        "shared_capacity": {
+            "total_capacity": 10,
+            "requests": [
+                {"request_id": "study", "minimum": 2, "desired": 7, "priority_weight": 3},
+                {"request_id": "charging", "minimum": 1, "desired": 5, "priority_weight": 1},
+            ],
+        },
     }
 
 
@@ -101,6 +108,7 @@ def test_router_registers_domain_and_combined_endpoints() -> None:
     assert "/api/v1/campus-ops/classrooms/allocate" in paths
     assert "/api/v1/campus-ops/food/plan" in paths
     assert "/api/v1/campus-ops/energy/plan" in paths
+    assert "/api/v1/campus-ops/shared-capacity/allocate" in paths
     assert "/api/v1/campus-ops/portfolio" in paths
     assert "/api/v1/campus-ops/plan" in paths
 
@@ -116,6 +124,7 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
         "classroom",
         "food",
         "energy",
+        "shared_capacity",
         "portfolio",
     }
     assert result["state"]["decision_time"] == "2026-10-01T10:00:00Z"
@@ -123,24 +132,30 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
     assert result["classroom"]["assignments"][0]["room_id"] == "M101"
     assert result["food"]["recommended_production"] == 100
     assert result["energy"]["zones"][0]["recommended_mode"] == "NORMAL_SERVICE_REVIEW"
+    allocations = {row["request_id"]: row["allocated"] for row in result["shared_capacity"]["allocations"]}
+    assert allocations == {"study": 7, "charging": 3}
     assert result["portfolio"]["automatic_execution_allowed"] is False
     assert result["portfolio"]["operator_approval_required"] is True
     assert result["portfolio"]["domain_status"]["food"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["energy"] == "REVIEW_REQUIRED"
+    assert result["portfolio"]["domain_status"]["shared_capacity"] == "REVIEW_REQUIRED"
 
 
-def test_optional_food_and_energy_domains_can_be_omitted_without_fabricated_outputs() -> None:
+def test_optional_domains_can_be_omitted_without_fabricated_outputs() -> None:
     from app.routers import campus_ops
 
     raw = request_payload()
     raw.pop("food")
     raw.pop("energy")
+    raw.pop("shared_capacity")
     payload = campus_ops.CampusOpsPlanRequest(**raw)
     result = campus_ops.plan_campus_operations(payload)
     assert result["food"] is None
     assert result["energy"] is None
+    assert result["shared_capacity"] is None
     assert "food" not in result["portfolio"]["domain_status"]
     assert "energy" not in result["portfolio"]["domain_status"]
+    assert "shared_capacity" not in result["portfolio"]["domain_status"]
 
 
 def test_contract_and_main_preserve_truth_boundary() -> None:
@@ -157,6 +172,7 @@ def test_contract_and_main_preserve_truth_boundary() -> None:
         "classroom",
         "food",
         "energy",
+        "shared_capacity",
         "portfolio",
     }
 
