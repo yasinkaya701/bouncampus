@@ -6,6 +6,7 @@ import {
 import {
   MATCHED_FOOD_WASTE_PILOT_PROTOCOL,
   analyzeMatchedPilotDesign,
+  normalizeMatchedPilotMeasurement,
   validateMatchedPilotMeasurement,
   type MatchedPilotServiceMeasurement,
 } from '@/lib/food-pilot-matching';
@@ -17,6 +18,7 @@ export async function GET() {
     decisionPolicyVersion: FOOD_DECISION_POLICY.version,
     requestShape: {
       measurements: MATCHED_FOOD_WASTE_PILOT_PROTOCOL.measurementFields,
+      acceptedNaming: ['snake_case', 'camelCase'],
     },
     evidencePromotion: {
       inputEvidenceClass: 'MEASURED_PILOT_DATA',
@@ -59,7 +61,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const validationErrors = measurements.flatMap((candidate, index) => {
+  const normalizedMeasurements = measurements.map(candidate => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return candidate;
+    return normalizeMatchedPilotMeasurement(candidate as Record<string, unknown>);
+  });
+
+  const validationErrors = normalizedMeasurements.flatMap((candidate, index) => {
     if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
       return [{ index, message: 'measurement must be an object' }];
     }
@@ -78,7 +85,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const typed = measurements as MatchedPilotServiceMeasurement[];
+  const typed = normalizedMeasurements as MatchedPilotServiceMeasurement[];
   const matching = analyzeMatchedPilotDesign(typed);
   if (!matching.structurePassed) {
     return NextResponse.json(
