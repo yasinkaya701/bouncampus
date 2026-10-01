@@ -1,6 +1,18 @@
-import unittest
+#!/usr/bin/env python3
+"""Focused regression tests for the CS1 campus operations decision layer."""
 
-from backend.app.decision.campus_operations import (
+from __future__ import annotations
+
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+BACKEND = ROOT / "backend"
+if str(BACKEND) not in sys.path:
+    sys.path.insert(0, str(BACKEND))
+
+from app.decision.campus_operations import (  # noqa: E402
     READINESS_PILOT,
     READINESS_REVIEW,
     READINESS_WITHHOLD,
