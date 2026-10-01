@@ -29,7 +29,8 @@ const network = {
 }
 
 {
-  const reversed = recommendShuttleItinerary(network, 'c', 'a');
+  const oneWayOnlyNetwork = { ...network, routes: [network.routes[0]] };
+  const reversed = recommendShuttleItinerary(oneWayOnlyNetwork, 'c', 'a');
   assert.equal(reversed.readiness, 'WITHHOLD');
   assert.equal(reversed.recommendation, null);
   assert.ok(reversed.reasonCodes.includes('NO_FEASIBLE_SHUTTLE_PATH'));
