@@ -96,6 +96,29 @@ def assess_method_disagreement(
             ),
         }
 
+    zero_reference_conflict = selected_estimate == 0 and any(
+        method_id != selected_method_id
+        and method_eligibility.get(method_id, "SANDBOX_ONLY") in allowed_states
+        and (estimate := _finite_nonnegative(raw_estimate)) is not None
+        and estimate != 0
+        for method_id, raw_estimate in method_estimates.items()
+    )
+    if zero_reference_conflict:
+        return {
+            "assessment_status": "WITHHOLD",
+            "selected_method_id": selected_method_id,
+            "selected_estimate": selected_estimate,
+            "max_relative_disagreement_pct": None,
+            "max_allowed_relative_disagreement_pct": gate,
+            "method_assessments": {},
+            "reason_codes": ["ZERO_SELECTED_ESTIMATE_NO_RELATIVE_DISAGREEMENT"],
+            "stage": stage,
+            "result_scope": "METHOD_DISAGREEMENT_GATE_ONLY",
+            "claim_boundary": (
+                "Relative disagreement is undefined against a zero selected estimate; stability is withheld rather than normalized by an arbitrary floor."
+            ),
+        }
+
     denominator = max(abs(selected_estimate), floor)
     assessments: dict[str, dict[str, object]] = {}
     comparable_disagreements: list[float] = []
@@ -213,6 +236,33 @@ def assess_policy_sensitivity(
             "policy_weight_semantics": "REGISTERED_SCENARIO_INPUTS_NOT_LEARNED_ECONOMICS",
             "claim_boundary": (
                 "Policy sensitivity is a stability diagnostic, not evidence of economic value or achieved impact."
+            ),
+        }
+
+    scenario_ids = required or tuple(
+        scenario_id
+        for scenario_id in scenario_targets
+        if scenario_id != reference_policy_id
+    )
+    zero_reference_conflict = reference_target == 0 and any(
+        (target := _finite_nonnegative(scenario_targets.get(scenario_id))) is not None
+        and target != 0
+        for scenario_id in scenario_ids
+    )
+    if zero_reference_conflict:
+        return {
+            "assessment_status": "WITHHOLD",
+            "reference_policy_id": reference_policy_id,
+            "reference_target": reference_target,
+            "max_relative_target_change_pct": None,
+            "max_allowed_relative_target_change_pct": gate,
+            "scenario_assessments": {},
+            "missing_required_scenario_ids": [],
+            "reason_codes": ["ZERO_REFERENCE_TARGET_NO_RELATIVE_SENSITIVITY"],
+            "result_scope": "POLICY_SENSITIVITY_GATE_ONLY",
+            "policy_weight_semantics": "REGISTERED_SCENARIO_INPUTS_NOT_LEARNED_ECONOMICS",
+            "claim_boundary": (
+                "Relative sensitivity is undefined against a zero reference target; assessment is withheld rather than normalized by an arbitrary floor."
             ),
         }
 
