@@ -264,7 +264,7 @@ def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
             classroom_plan=payload.classroom_plan,
             food_decision=payload.food_decision,
             energy_decision=payload.energy_decision,
-            space_activation_decision=payload.space_activation_decision,
+            space_decision=payload.space_activation_decision,
             shared_capacity_decision=payload.shared_capacity_decision,
         )
     except ValueError as exc:
@@ -340,7 +340,7 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
             classroom_plan=classroom,
             food_decision=food,
             energy_decision=energy,
-            space_activation_decision=space_activation,
+            space_decision=space_activation,
             shared_capacity_decision=shared_capacity,
         )
         return {
