@@ -1,0 +1,82 @@
+{
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH_ONLY",
+  "domain": "classroom_allocation",
+  "public_owner": {
+    "role": "Kayit Isleri Sube Mudurlugu",
+    "scope": "general-use classroom scheduling",
+    "source": "https://oidb.bogazici.edu.tr/tr/pages/derslikler-hakkinda/4422"
+  },
+  "separate_workflow": {
+    "role": "Kurumsal Iletisim Ofisi",
+    "scope": "hall reservations outside course scheduling",
+    "source": "https://oidb.bogazici.edu.tr/tr/pages/derslikler-hakkinda/4422"
+  },
+  "inventory_2025": {
+    "general_use_classrooms": 161,
+    "capacity_bands": {
+      "0_25": 7,
+      "26_50": 96,
+      "51_75": 26,
+      "76_100": 16,
+      "101_150": 8,
+      "151_200": 8
+    },
+    "source": "https://sayilarla.bogazici.edu.tr/document"
+  },
+  "candidate_decision": "assign(section, time_slot) -> room",
+  "candidate_objectives": [
+    "minimize_capacity_slack",
+    "avoid_capacity_violation",
+    "minimize_room_type_mismatch",
+    "minimize_room_changes",
+    "minimize_cross_building_or_cross_campus_transition_cost",
+    "preserve_accessibility_and_equipment_constraints"
+  ],
+  "semantic_separations": [
+    "course_quota != registered_students",
+    "registered_students != attendance",
+    "scheduled_room != observed_occupancy",
+    "wifi_client_count != measured_occupancy"
+  ],
+  "pmr_questions": [
+    "existing_scheduling_tool",
+    "manual_workload",
+    "hard_vs_soft_constraints",
+    "late_change_frequency_and_causes",
+    "freeze_time",
+    "assignment_and_enrollment_data_access",
+    "highest_cost_exception"
+  ],
+  "baseline_sequence": [
+    "current_assignment_replay",
+    "feasibility_validator",
+    "greedy_best_fit",
+    "integer_programming",
+    "multiobjective_recommendation",
+    "adaptive_rescheduling_only_if_validated"
+  ],
+  "kill_conditions": [
+    "current_allocation_is_already_low_friction_or_near_automated",
+    "dominant_constraints_cannot_be_encoded_or_accessed",
+    "room_assignment_is_not_a_material_operational_burden",
+    "required_data_access_is_unavailable"
+  ],
+  "academic_references": [
+    {
+      "title": "Multiobjective Optimization Approaches for Room Allocation in University Course Timetabling",
+      "year": 2026,
+      "url": "https://consensus.app/papers/multiobjective-optimization-approaches-for-room-antunes-batista-atta/c030fabfafb357a797367c6733a37aa3/?utm_source=chatgpt"
+    },
+    {
+      "title": "Human Mobility Reimagined: Digital Twin Intelligence for Adaptive Campus Course Timetabling",
+      "year": 2025,
+      "url": "https://consensus.app/papers/human-mobility-reimagined-digital-twin-intelligence-for-wu-ye/56c56c329b7d5c02abd2c90f44bd5167/?utm_source=chatgpt"
+    },
+    {
+      "title": "Modeling Classroom Occupancy Using Data of WiFi Infrastructure in a University Campus",
+      "year": 2021,
+      "url": "https://consensus.app/papers/modeling-classroom-occupancy-using-data-of-wifi-mohottige-gharakheili/22967457baa556c49b5f2fe53fa9ca6e/?utm_source=chatgpt"
+    }
+  ]
+}
