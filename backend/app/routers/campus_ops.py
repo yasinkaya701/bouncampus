@@ -41,6 +41,7 @@ class ClassroomAllocationRequest(BaseModel):
 class FoodPlanRequest(BaseModel):
     demand_scenarios: list[dict[str, Any]]
     max_capacity: float
+    capacity_provenance: str = "UNAVAILABLE"
     waste_weight: float
     shortage_weight: float
     method_eligibility: str
@@ -73,6 +74,7 @@ class SharedCapacityRequest(BaseModel):
 class FoodPlanConfig(BaseModel):
     demand_scenarios: list[dict[str, Any]]
     max_capacity: float
+    capacity_provenance: str = "UNAVAILABLE"
     waste_weight: float
     shortage_weight: float
     method_eligibility: str
@@ -205,6 +207,7 @@ def build_food_plan(payload: FoodPlanRequest) -> dict[str, Any]:
         return plan_food_production(
             demand_scenarios=payload.demand_scenarios,
             max_capacity=payload.max_capacity,
+            capacity_provenance=payload.capacity_provenance,
             waste_weight=payload.waste_weight,
             shortage_weight=payload.shortage_weight,
             method_eligibility=payload.method_eligibility,
@@ -299,6 +302,7 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
             food = plan_food_production(
                 demand_scenarios=payload.food.demand_scenarios,
                 max_capacity=payload.food.max_capacity,
+                capacity_provenance=payload.food.capacity_provenance,
                 waste_weight=payload.food.waste_weight,
                 shortage_weight=payload.food.shortage_weight,
                 method_eligibility=payload.food.method_eligibility,
