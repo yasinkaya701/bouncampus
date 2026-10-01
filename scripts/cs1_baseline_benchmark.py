@@ -355,6 +355,7 @@ def build_report(
             [parse_optional_number(row.get(reservation_column)) for row in rows],
             [parse_optional_number(row.get(reserved_served_column)) for row in rows],
             [parse_optional_number(row.get(unreserved_column)) for row in rows],
+            actual_demand=actual,
         )
         forecasts["raw_reservation"] = list(
             reservation_reconciliation["raw_reservation"]
