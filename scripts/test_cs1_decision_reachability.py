@@ -85,6 +85,18 @@ def test_named_but_unverified_surface_cannot_unlock_pilot_ready() -> None:
     assert "DECISION_SURFACE_UNVERIFIED" in result["reason_codes"]
 
 
+def test_non_string_surface_is_not_silently_coerced() -> None:
+    result = optimize(
+        decision_reachability=verified_reachability(
+            decision_surface=123,
+        )
+    )
+    assert result["decision_surface"] is None
+    assert result["decision_reachability_status"] == "UNVERIFIED"
+    assert result["decision_readiness"] == "REVIEW_REQUIRED"
+    assert "DECISION_SURFACE_UNSPECIFIED" in result["reason_codes"]
+
+
 def test_denied_authority_withholds_actionable_recommendation() -> None:
     result = optimize(
         decision_reachability=verified_reachability(
@@ -134,6 +146,18 @@ def test_unknown_freeze_time_blocks_pilot_ready_without_inventing_timing() -> No
     assert "DECISION_FREEZE_TIME_UNKNOWN" in result["reason_codes"]
 
 
+def test_string_freeze_time_is_not_silently_coerced() -> None:
+    result = optimize(
+        decision_reachability=verified_reachability(
+            minutes_before_freeze="90",
+        )
+    )
+    assert result["minutes_before_freeze"] is None
+    assert result["decision_reachability_status"] == "UNVERIFIED"
+    assert result["decision_readiness"] == "REVIEW_REQUIRED"
+    assert "DECISION_FREEZE_TIME_UNKNOWN" in result["reason_codes"]
+
+
 def test_known_infeasible_change_before_freeze_withholds() -> None:
     result = optimize(
         decision_reachability=verified_reachability(
@@ -163,10 +187,12 @@ def main() -> int:
         test_unverified_reachability_blocks_pilot_ready_but_keeps_review_path,
         test_verified_reachability_can_preserve_pilot_ready,
         test_named_but_unverified_surface_cannot_unlock_pilot_ready,
+        test_non_string_surface_is_not_silently_coerced,
         test_denied_authority_withholds_actionable_recommendation,
         test_unknown_authority_blocks_pilot_ready_without_claiming_denial,
         test_closed_decision_window_withholds_actionable_recommendation,
         test_unknown_freeze_time_blocks_pilot_ready_without_inventing_timing,
+        test_string_freeze_time_is_not_silently_coerced,
         test_known_infeasible_change_before_freeze_withholds,
         test_unknown_change_feasibility_blocks_pilot_ready,
     ]
