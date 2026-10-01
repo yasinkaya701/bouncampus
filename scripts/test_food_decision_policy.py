@@ -14,6 +14,13 @@ if str(BACKEND) not in sys.path:
 from app.optimizers.food_optimizer import FoodOptimizer  # noqa: E402
 
 
+VERIFIED_REACHABILITY = {
+    "decision_surface": "PRODUCTION_QUANTITY",
+    "operator_authority_confirmed": True,
+    "minutes_before_freeze": 90,
+}
+
+
 def assert_claim_firewall(result: dict) -> None:
     forbidden = {"waste_reduction", "potential_waste_saved_kg", "cost_saved_tl"}
     leaked = forbidden.intersection(result)
@@ -35,6 +42,7 @@ def pilot_eligible_optimize(*, demand: int, signals: dict[str, bool]):
         [],
         signal_availability=signals,
         method_eligibility="PILOT_ELIGIBLE",
+        decision_reachability=VERIFIED_REACHABILITY,
     )
 
 
@@ -73,6 +81,7 @@ def test_marks_pilot_eligible_core_context_ready_but_keeps_human_gate() -> None:
     )
     assert_claim_firewall(result)
     assert result["method_eligibility"] == "PILOT_ELIGIBLE"
+    assert result["decision_reachability_status"] == "REACHABLE"
     assert result["decision_readiness"] == "PILOT_READY"
     assert result["signal_coverage_pct"] == 70
     assert result["recommended"] == 1000
