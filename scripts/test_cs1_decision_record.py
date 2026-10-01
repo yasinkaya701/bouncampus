@@ -142,6 +142,46 @@ def test_outcome_is_separate_and_requires_accepted_record_for_verified_state():
     assert verified["actual_surplus"] == 7
 
 
+def test_operator_override_must_be_boolean():
+    module = load_module()
+    kwargs = base_kwargs()
+    kwargs["stage"] = "ADVISORY"
+    record = module.create_decision_record(**kwargs)
+    try:
+        module.record_operator_action(
+            record,
+            {"type": "PRODUCTION_QUANTITY", "value": 525},
+            operator_override="false",
+            operator_override_reason="typed incorrectly",
+        )
+    except ValueError as exc:
+        assert "boolean" in str(exc).lower()
+    else:
+        raise AssertionError("non-boolean override flag must be rejected")
+
+
+def test_non_finite_numbers_fail_closed():
+    module = load_module()
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        kwargs = base_kwargs()
+        kwargs["raw_reservation_count"] = bad
+        try:
+            module.create_decision_record(**kwargs)
+        except ValueError as exc:
+            assert "finite" in str(exc).lower()
+        else:
+            raise AssertionError(f"non-finite count {bad!r} must be rejected")
+
+    kwargs = base_kwargs()
+    kwargs["planning_band"] = [495, float("inf")]
+    try:
+        module.create_decision_record(**kwargs)
+    except ValueError as exc:
+        assert "finite" in str(exc).lower()
+    else:
+        raise AssertionError("non-finite planning band must be rejected")
+
+
 def test_invalid_identifiers_timestamps_counts_and_planning_band_fail_closed():
     module = load_module()
     bad_cases = [
@@ -169,6 +209,8 @@ def main() -> int:
         test_advisory_override_requires_reason_and_non_override_must_match_recommendation,
         test_shadow_mode_rejects_operator_action,
         test_outcome_is_separate_and_requires_accepted_record_for_verified_state,
+        test_operator_override_must_be_boolean,
+        test_non_finite_numbers_fail_closed,
         test_invalid_identifiers_timestamps_counts_and_planning_band_fail_closed,
     ]
     for test in tests:
