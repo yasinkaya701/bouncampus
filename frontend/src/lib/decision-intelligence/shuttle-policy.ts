@@ -196,7 +196,7 @@ export function recommendShuttleItinerary(
     : 3;
   const maxTransfers = options.maxTransfers ?? 1;
   const candidates = directCandidates(network, originStopId, destinationStopId);
-  if (maxTransfers === 1) {
+  if (candidates.length === 0 && maxTransfers === 1) {
     candidates.push(...transferCandidates(network, originStopId, destinationStopId, transferPenaltyKm));
   }
 
