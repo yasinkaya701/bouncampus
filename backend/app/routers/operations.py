@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 
 from app.decision.campus_operations import (
     DECISION_POLICY_VERSION,
@@ -9,6 +9,10 @@ from app.decision.campus_operations import (
     build_operations_snapshot,
     plan_food_service,
     plan_shuttle_service,
+)
+from app.decision.meal_recommendation import (
+    build_recommendation_impression,
+    rank_menu_items,
 )
 from app.decision.space_operations import plan_space_service
 
@@ -24,6 +28,12 @@ def get_decision_capabilities() -> dict[str, Any]:
                 "endpoint": "POST /api/v1/decision/food/plan",
                 "decision": "operator-reviewed production quantity",
                 "hard_boundary": "no automatic kitchen dispatch",
+            },
+            "meal_recommendation": {
+                "endpoint": "POST /api/v1/decision/meals/recommend",
+                "impression_endpoint": "POST /api/v1/decision/meals/impression",
+                "decision": "auditable student-facing menu ranking baseline",
+                "hard_boundary": "no generated-data collaborative model promoted as validated",
             },
             "shuttle": {
                 "endpoint": "POST /api/v1/decision/shuttle/plan",
@@ -53,6 +63,26 @@ def get_decision_capabilities() -> dict[str, Any]:
 @router.post("/food/plan")
 def post_food_plan(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return plan_food_service(payload)
+
+
+@router.post("/meals/recommend")
+def post_meal_recommendation(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return rank_menu_items(payload)
+
+
+@router.post("/meals/impression")
+def post_meal_impression(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    ranking = payload.get("ranking")
+    if not isinstance(ranking, dict):
+        raise HTTPException(status_code=422, detail="ranking object is required")
+    try:
+        return build_recommendation_impression(
+            ranking,
+            request_id=str(payload.get("request_id") or ""),
+            context=payload.get("context") if isinstance(payload.get("context"), dict) else {},
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.post("/shuttle/plan")
