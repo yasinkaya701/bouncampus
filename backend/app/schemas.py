@@ -88,6 +88,10 @@ class FoodDemandForecast(BaseModel):
     meal_type: str
     predicted_demand: int
     planning_lower: int
+    planning_candidate_production: int
+    planning_candidate_semantics: Literal[
+        "ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER"
+    ]
     recommended_production: Optional[int]
     planning_upper: int
     menu_items: List[MenuPopularity]
