@@ -13,6 +13,10 @@ import {
   type DemandSignalId,
 } from '@/lib/food-waste';
 import { applyMethodEligibility } from '@/lib/food-decision-eligibility';
+import {
+  applyDecisionReachability,
+  REACHABILITY_POLICY_VERSION,
+} from '@/lib/food-decision-reachability';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -49,9 +53,14 @@ export async function GET(request: Request) {
   const preventionRatePct = Number(requestUrl.searchParams.get('prevention_rate_pct') ?? 15);
   const recoveryRatePct = Number(requestUrl.searchParams.get('recovery_rate_pct') ?? 85);
   const sourceAssessment = buildProductionBand(predictedMeals, signalAvailability);
-  const decisionAssessment = applyMethodEligibility(sourceAssessment, {
+  const methodAssessment = applyMethodEligibility(sourceAssessment, {
     methodEligibility: 'SANDBOX_ONLY',
   });
+
+  // Current repository evidence does not verify the live normal-term control surface,
+  // decision authority, freeze time, or ability to change that decision before freeze.
+  // Keep these unknowns explicit instead of inventing reachability evidence.
+  const decisionAssessment = applyDecisionReachability(methodAssessment);
   const productionBand = decisionAssessment.abstained ? null : decisionAssessment;
 
   return NextResponse.json({
@@ -71,10 +80,12 @@ export async function GET(request: Request) {
       decisionAssessment,
       provenance: FOOD_DECISION_POLICY.forecastProvenance,
       methodEligibility: decisionAssessment.methodEligibility,
-      note: 'Schedule/weather/menu/calendar-derived planning context; not cafeteria POS, production, or served-meal telemetry. The current dashboard estimator is SANDBOX_ONLY, so it cannot emit an actionable production target.',
+      reachabilityStatus: decisionAssessment.decisionReachabilityStatus,
+      note: 'Schedule/weather/menu/calendar-derived planning context; not cafeteria POS, production, served-meal telemetry, or verified decision-reachability evidence. The current dashboard estimator is SANDBOX_ONLY and the live control surface is unverified, so no actionable production target is emitted.',
     },
     decisionPolicy: {
       version: FOOD_DECISION_POLICY.version,
+      reachabilityPolicyVersion: REACHABILITY_POLICY_VERSION,
       provenance: FOOD_DECISION_POLICY.provenance,
       forecastProvenance: FOOD_DECISION_POLICY.forecastProvenance,
       bandSemantics: FOOD_DECISION_POLICY.bandSemantics,
@@ -86,8 +97,8 @@ export async function GET(request: Request) {
       humanApprovalRequired: FOOD_DECISION_POLICY.operatorApprovalRequired,
       automaticKitchenDispatch: FOOD_DECISION_POLICY.autoDispatchAllowed,
       limitations: FOOD_DECISION_POLICY.limitations,
-      withholdRule: 'WITHHOLD when there is no positive demand estimate, a required source is unavailable, or the selected method is SANDBOX_ONLY/RETIRED.',
-      pilotRule: 'PILOT_READY additionally requires a method explicitly promoted to PILOT_ELIGIBLE or PILOT_EVALUATED; source coverage alone can never promote a sandbox model.',
+      withholdRule: 'WITHHOLD when there is no positive demand estimate, a required source is unavailable, the selected method is SANDBOX_ONLY/RETIRED, or a known operational constraint makes the decision unreachable.',
+      pilotRule: 'PILOT_READY requires a PILOT_ELIGIBLE/PILOT_EVALUATED method plus a verified control surface, confirmed operator authority, an open decision window, and confirmed ability to change the decision before freeze. Unknown reachability remains REVIEW_REQUIRED.',
     },
     baselineEvaluation: {
       status: 'READY_FOR_MEASURED_DATA',
@@ -120,7 +131,7 @@ export async function GET(request: Request) {
         'source health and provenance',
         'sandbox model-estimated next-service demand for diagnostic use',
         'POLICY_HEURISTIC planning range for diagnostic use',
-        'decision readiness, method eligibility, and abstention state',
+        'decision readiness, method eligibility, reachability status, and abstention state',
         'offline baseline/model evaluation explicitly labeled TECH_TEST',
         'scenario outputs explicitly labeled as scenarios',
         'pre-registered pilot targets and formulas',
@@ -133,6 +144,7 @@ export async function GET(request: Request) {
         'actual student demand observed',
         'calibrated confidence interval unless calibration is measured and documented',
         'PILOT_READY from a SANDBOX_ONLY or merely EVALUATED_OFFLINE method',
+        'PILOT_READY without a verified control surface, decision authority, open decision window, and pre-freeze change feasibility',
       ],
     },
     truthBoundary: {
@@ -156,6 +168,9 @@ export async function GET(request: Request) {
         'actual served portions by service',
         'plate-waste measurements by menu item',
         'calibrated forecast interval coverage',
+        'verified live normal-term decision surface',
+        'verified current decision authority',
+        'verified current freeze time and pre-freeze change feasibility',
       ],
     },
   });
