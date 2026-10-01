@@ -1,0 +1,11 @@
+start_date,end_date,event_name,event_type,feature_tag,source_url,truth_class
+2026-09-14,2026-09-14,"Birimler tarafından kota girişleri ve danışman atama işlemlerinin tamamlanması için son gün",ADMIN,PRE_TERM_ADMIN,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-14,2026-09-14,"Misafir öğrencilerin ve değişim öğrencilerinin Üniversiteyi Tanıma Programı başlangıcı",INSTRUCTION,ORIENTATION_PERIOD,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-18,2026-09-18,"Lisans programlarına yeni başlayan öğrenciler için muafiyet sınavları",INSTRUCTION,EXEMPTION_EXAM_DAY,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-21,2026-09-21,"Derslerin başlaması (YADYOK hariç)",INSTRUCTION,TERM_CLASSES_BEGIN,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-21,2026-09-23,"Üniversiteyi Tanıma Günleri",INSTRUCTION,ORIENTATION_PERIOD,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-21,2026-09-21,"YADYOK Düzey Belirleme Sınavı (DBS)",YADYOK,PLACEMENT_EXAM_DAY,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-23,2026-09-23,"YADYOK derslerinin başlaması",YADYOK,SFL_CLASSES_BEGIN,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
+2026-09-28,2026-09-28,"Ders ekleme/bırakma dönemi için akademik kayıt sisteminin açılışı",REGISTRATION,ADD_DROP_OPEN,https://akademiktakvim.bogazici.edu.tr/en/events/registration-system-opens-for-adddrop-10-am/13036,OFFICIAL_PUBLIC
+2026-09-28,2026-09-30,"Ders ekleme/bırakma dönemi",REGISTRATION,ADD_DROP_PERIOD,https://akademiktakvim.bogazici.edu.tr/tr/events/ders-eklemebirakma-donemi/9111,OFFICIAL_PUBLIC
+2026-09-30,2026-09-30,"Ders ekleme/bırakma dönemi öğrenci erişiminin kapanışı",REGISTRATION,ADD_DROP_CLOSE,https://akademiktakvim.bogazici.edu.tr/tr/,OFFICIAL_PUBLIC
