@@ -1,0 +1,63 @@
+name: CS1 Campus Ops Canonical Verify
+
+on:
+  push:
+    branches:
+      - agent/cs1/campus-ops-suite
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cs1-campus-ops-canonical-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-targeted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check fastapi
+      - run: python scripts/test_cs1_campus_ops_suite.py
+      - run: python scripts/test_cs1_campus_ops_api.py
+      - run: python scripts/test_cs1_campus_state.py
+      - run: python scripts/test_cs1_class_conflict_hardening.py
+      - run: python scripts/test_cs1_food_menu_adjustment.py
+      - run: python scripts/test_cs1_food_production_scaling.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test:campus-operations
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+
+  repository-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m compileall -q backend/app scripts
+      - run: python scripts/agent_fabric_check.py
+      - run: python scripts/kreate_check.py
