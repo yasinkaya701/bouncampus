@@ -138,7 +138,12 @@ def validate_decision_record(record: Mapping[str, Any]) -> dict[str, Any]:
     ):
         reasons.append("OPERATOR_ACTION_REQUIRED")
 
-    operator_override = bool(record.get("operator_override", False))
+    operator_override_raw = record.get("operator_override", False)
+    if not isinstance(operator_override_raw, bool):
+        reasons.append("OPERATOR_OVERRIDE_MUST_BE_BOOLEAN")
+        operator_override = False
+    else:
+        operator_override = operator_override_raw
     override_reason = _nonempty_text(record.get("operator_override_reason"))
     if operator_override and override_reason is None:
         reasons.append("OVERRIDE_REASON_REQUIRED")
@@ -153,6 +158,10 @@ def validate_decision_record(record: Mapping[str, Any]) -> dict[str, Any]:
     elif verification_state == "VERIFIED":
         if _non_negative_number(record.get("actual_served")) is None:
             reasons.append("VERIFIED_OUTCOME_REQUIRES_ACTUAL_SERVED")
+        if _non_negative_number(record.get("actual_surplus")) is None:
+            reasons.append("VERIFIED_OUTCOME_REQUIRES_ACTUAL_SURPLUS")
+        if not isinstance(record.get("shortage_event"), bool):
+            reasons.append("VERIFIED_OUTCOME_REQUIRES_SHORTAGE_EVENT")
         if _nonempty_text(record.get("accepted_service_record")) is None:
             reasons.append("VERIFIED_OUTCOME_REQUIRES_ACCEPTED_SERVICE_RECORD")
 
