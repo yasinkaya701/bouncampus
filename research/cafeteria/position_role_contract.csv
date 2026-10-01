@@ -1,0 +1,9 @@
+service_family,position,official_menu_role,fine_role_policy,label_provenance,note
+STANDARD,1,SOUP_SECTION,SOUP,OFFICIAL_MENU_ROLE,"Monthly menu first slot corresponds to Çorba"
+STANDARD,2,MAIN_SECTION,MAIN_ANIMAL,OFFICIAL_MENU_ROLE,"Monthly menu second slot corresponds to Ana Yemek"
+STANDARD,3,VEGETARIAN_VEGAN_SECTION,MAIN_PLANT,OFFICIAL_MENU_ROLE,"Monthly menu third slot corresponds to Vejetaryen/Vegan; do not infer certified vegan"
+STANDARD,4,SIDE_SECTION,KEEP_FINE_HEURISTIC,OFFICIAL_MENU_ROLE,"First Yardımcı Yemek; fine subtype may be starch or vegetable"
+STANDARD,5,SIDE_SECTION,KEEP_FINE_HEURISTIC,OFFICIAL_MENU_ROLE,"Second Yardımcı Yemek; fine subtype may be starch or vegetable"
+STANDARD,6,SELECTABLE_SECTION,KEEP_FINE_HEURISTIC,OFFICIAL_MENU_ROLE,"First Seçmeli; may be drink/salad/dessert/fruit"
+STANDARD,7,SELECTABLE_SECTION,KEEP_FINE_HEURISTIC,OFFICIAL_MENU_ROLE,"Second Seçmeli; may be drink/salad/dessert/fruit"
+STANDARD,8,SELECTABLE_SECTION,KEEP_FINE_HEURISTIC,OFFICIAL_MENU_ROLE,"Third Seçmeli; may be drink/salad/dessert/fruit"
