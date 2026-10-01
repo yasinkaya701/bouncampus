@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import ast
 import importlib.util
 from pathlib import Path
 
@@ -80,11 +81,47 @@ def test_unknown_official_menu_uses_bounded_source_heuristic() -> None:
     assert "SOURCE_MULTIPLIER_FALLBACK" in result["reason_codes"]
 
 
+def test_food_api_exposes_non_actionable_planning_candidate() -> None:
+    schema_path = ROOT / "backend/app/schemas.py"
+    route_path = ROOT / "backend/app/routers/food.py"
+
+    schema_tree = ast.parse(schema_path.read_text(encoding="utf-8"))
+    forecast_class = next(
+        node
+        for node in schema_tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "FoodDemandForecast"
+    )
+    fields = {
+        node.target.id
+        for node in forecast_class.body
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)
+    }
+    assert "planning_candidate_production" in fields
+    assert "planning_candidate_semantics" in fields
+
+    route_tree = ast.parse(route_path.read_text(encoding="utf-8"))
+    forecast_calls = [
+        node
+        for node in ast.walk(route_tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "FoodDemandForecast"
+    ]
+    assert forecast_calls, "FoodDemandForecast constructor missing from food route"
+    keywords = {kw.arg: kw.value for kw in forecast_calls[0].keywords if kw.arg}
+    candidate = keywords.get("planning_candidate_production")
+    semantics = keywords.get("planning_candidate_semantics")
+    assert isinstance(candidate, ast.Name) and candidate.id == "menu_adjusted_forecast"
+    assert isinstance(semantics, ast.Constant)
+    assert semantics.value == "ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER"
+
+
 def main() -> int:
     tests = [
         test_popular_menu_increases_and_low_popularity_menu_reduces_demand,
         test_unverified_menu_source_is_neutral,
         test_unknown_official_menu_uses_bounded_source_heuristic,
+        test_food_api_exposes_non_actionable_planning_candidate,
     ]
     for test in tests:
         test()
