@@ -127,6 +127,28 @@ def _energy_modes(payload: Mapping[str, Any] | None) -> dict[str, str]:
     return output
 
 
+def _space_zone_ids(payload: Mapping[str, Any] | None) -> list[str]:
+    if payload is None or _readiness(payload) == "WITHHOLD":
+        return []
+    rows = payload.get("selected_zone_ids", [])
+    if not isinstance(rows, list):
+        return []
+    return [str(zone_id).strip() for zone_id in rows if str(zone_id).strip()]
+
+
+def _space_selected_capacity(payload: Mapping[str, Any] | None) -> int | None:
+    if payload is None or _readiness(payload) == "WITHHOLD":
+        return None
+    value = payload.get("selected_capacity")
+    if isinstance(value, bool):
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return int(numeric) if numeric >= 0 and numeric.is_integer() else None
+
+
 def _shared_allocations(payload: Mapping[str, Any] | None) -> dict[str, int]:
     if payload is None or _readiness(payload) == "WITHHOLD":
         return {}
@@ -157,6 +179,7 @@ def build_campus_portfolio(
     classroom_plan: Mapping[str, Any] | None = None,
     food_decision: Mapping[str, Any] | None = None,
     energy_decision: Mapping[str, Any] | None = None,
+    space_decision: Mapping[str, Any] | None = None,
     shared_capacity_decision: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     CONTRACT.validate_no_person_level_data(campus_state, path="campus_state")
@@ -165,6 +188,7 @@ def build_campus_portfolio(
         ("classroom_plan", classroom_plan),
         ("food_decision", food_decision),
         ("energy_decision", energy_decision),
+        ("space_decision", space_decision),
         ("shared_capacity_decision", shared_capacity_decision),
     ):
         if payload is not None:
@@ -194,6 +218,7 @@ def build_campus_portfolio(
         ("classroom", classroom_plan),
         ("food", food_decision),
         ("energy", energy_decision),
+        ("space", space_decision),
         ("shared_capacity", shared_capacity_decision),
     ):
         status = _readiness(payload)
@@ -224,6 +249,8 @@ def build_campus_portfolio(
             "food_recommended_production": _food_target(food_decision),
             "energy_occupancy_context": dict(campus_context),
             "energy_zone_modes": _energy_modes(energy_decision),
+            "space_selected_zone_ids": _space_zone_ids(space_decision),
+            "space_selected_capacity": _space_selected_capacity(space_decision),
             "shared_capacity_allocations": _shared_allocations(shared_capacity_decision),
             "shuttle_capacity_shortfall_routes": shuttle_shortfalls,
             "unassigned_sessions": unassigned,
