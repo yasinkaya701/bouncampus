@@ -16,8 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 VERIFIED_REACHABILITY = {
     "decision_surface": "PRODUCTION_QUANTITY",
+    "decision_surface_verified": True,
     "operator_authority_confirmed": True,
     "minutes_before_freeze": 90,
+    "change_feasible_before_freeze": True,
 }
 
 
@@ -48,6 +50,8 @@ def test_policy_metadata_and_full_context() -> None:
     assert decision["calibration_status"] == "NOT_CALIBRATED"
     assert decision["signal_coverage_pct"] == 100
     assert decision["decision_reachability_status"] == "REACHABLE"
+    assert decision["decision_surface_verified"] is True
+    assert decision["change_feasible_before_freeze"] is True
     assert decision["decision_readiness"] == "PILOT_READY"
     assert decision["abstained"] is False
     assert decision["recommended_production"] == 1000
@@ -107,7 +111,7 @@ def test_signal_weights_are_explicit_policy_not_confidence() -> None:
     assert policy.REVIEW_MIN_COVERAGE_PCT == 50
     assert "SANDBOX_ONLY" in policy.METHOD_ELIGIBILITY_STATES
     assert "PILOT_ELIGIBLE" in policy.METHOD_ELIGIBILITY_STATES
-    assert policy.REACHABILITY_POLICY_VERSION == "decision-reachability-v1.0"
+    assert policy.REACHABILITY_POLICY_VERSION == "decision-reachability-v1.1"
 
 
 def test_naive_baselines_do_not_use_future_values() -> None:
@@ -170,7 +174,7 @@ def test_backend_food_claim_firewall() -> None:
     schemas = (ROOT / "backend/app/schemas.py").read_text(encoding="utf-8")
     food_schema = schemas.split("class FoodDemandForecast", 1)[1].split("class ActionItem", 1)[0]
 
-    forbidden = ("potential_waste_saved_kg", "waste_reduction", "cost_saved_tl")
+    forbidden = {"potential_waste_saved_kg", "waste_reduction", "cost_saved_tl"}
     for term in forbidden:
         assert term not in food_route, f"unsupported pre-pilot claim leaked into food route: {term}"
         assert term not in optimizer, f"unsupported pre-pilot claim leaked into food optimizer: {term}"
