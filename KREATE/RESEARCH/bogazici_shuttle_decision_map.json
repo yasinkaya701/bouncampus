@@ -1,0 +1,69 @@
+{
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH_ONLY",
+  "domain": "shuttle_scheduling",
+  "public_route_families": 7,
+  "sources": {
+    "routes": "https://bogazici.edu.tr/tr/pages/ulasim-park/138",
+    "timetable_surface": "https://mekik.bogazici.edu.tr/",
+    "bucampus_transport": "https://bilgiislem.bogazici.edu.tr/tr/pages/ulasim/8597",
+    "aggregate_sustainability_signal": "https://kurumsalveri.bogazici.edu.tr/tr/pages/1141-sustainable-practices-targets/1406"
+  },
+  "public_aggregate_signal": {
+    "campus_shuttle_services": 7,
+    "listed_service_capacity": 1429,
+    "users": 1332,
+    "reported_occupancy_rate_percent": 93,
+    "target_2026_users": 1350,
+    "semantic_warning": "Do not interpret these aggregate values as departure-level load without owner confirmation."
+  },
+  "candidate_decision": "frequency(route, time_window)",
+  "later_candidate_decision": "select_departure_times(route, service_day)",
+  "candidate_inputs": [
+    "route",
+    "day_type",
+    "academic_calendar_state",
+    "class_transition_intensity",
+    "historical_ridership_by_departure",
+    "vehicle_capacity",
+    "observed_travel_time",
+    "events",
+    "weather_only_if_incremental_value_is_proven"
+  ],
+  "pmr_questions": [
+    "operator_and_approver",
+    "canonical_timetable_owner",
+    "departure_level_boarding_counts",
+    "actual_departure_arrival_retention",
+    "vehicle_capacity_and_assignment",
+    "left_behind_or_queue_measurement",
+    "schedule_change_trigger",
+    "contract_or_driver_constraints"
+  ],
+  "baseline_sequence": [
+    "current_timetable",
+    "historical_mean_load_by_route_weekday_departure",
+    "class_transition_weighted_prior",
+    "threshold_rule_for_one_run_change",
+    "constraint_aware_schedule_optimization",
+    "predictive_or_demand_responsive_only_if_needed"
+  ],
+  "kill_conditions": [
+    "no_material_peak_imbalance",
+    "no_authority_to_change_schedule",
+    "no_useful_departure_level_measurement",
+    "existing_operation_near_service_quality_ceiling"
+  ],
+  "academic_references": [
+    {
+      "title": "Cluster Based Methodology for Scheduling a University Shuttle System",
+      "year": 2020,
+      "url": "https://consensus.app/papers/cluster-based-methodology-for-scheduling-a-university-mahmoudzadeh-wang/b7343ef3a4815186bb9cae7a144c014b/?utm_source=chatgpt"
+    },
+    {
+      "title": "A smart school routing and scheduling problem for the new normalcy",
+      "year": 2022,
+      "url": "https://consensus.app/papers/a-smart-school-routing-and-scheduling-problem-for-the-new-díaz-ramírez-leal-garza/767ff4c146d753159a8b834e3e730a20/?utm_source=chatgpt"
+    }
+  ]
+}
