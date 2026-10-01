@@ -77,12 +77,22 @@ def test_capabilities_declares_truth_boundary() -> None:
     assert result["automatic_actuation"] is False
 
 
+def test_fastapi_main_registers_campus_ops_router() -> None:
+    main_path = ROOT / "backend/app/main.py"
+    source = main_path.read_text(encoding="utf-8")
+    assert "campus_ops" in source, "campus_ops router is not imported by app.main"
+    assert "app.include_router(campus_ops.router)" in source, (
+        "campus_ops router is not registered by app.main"
+    )
+
+
 def main() -> int:
     tests = [
         test_food_endpoint_returns_advisory_contract,
         test_shuttle_endpoint_fails_closed_on_bad_payload,
         test_class_endpoint_exposes_assignments,
         test_capabilities_declares_truth_boundary,
+        test_fastapi_main_registers_campus_ops_router,
     ]
     for test in tests:
         test()
