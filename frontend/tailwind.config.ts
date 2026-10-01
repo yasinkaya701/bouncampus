@@ -18,6 +18,11 @@ const config: Config = {
         danger: '#ef4444',
         warning: '#f97316',
       },
+      opacity: {
+        15: '0.15',
+        45: '0.45',
+        65: '0.65',
+      },
     },
   },
   plugins: [],
