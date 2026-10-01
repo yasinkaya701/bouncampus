@@ -43,4 +43,15 @@ assert.equal(rematched.worsenedWastePairCount, 0);
 assert.equal(rematched.unchangedWastePairCount, 1);
 assert.deepEqual(rematched.pairs.map(pair => pair.wasteDeltaKgPer100Served), [4, 0]);
 
+// Aggregates must use raw pair metrics, not values rounded for presentation.
+// Each control is 0.004 kg/100 served and each intervention is 0.002 kg/100 served.
+// Display rounding may show 0.00, but the relative effect is still a real 50% reduction.
+const precisionSensitive = summarizeMatchedPilotEffects([
+  { pairId: 'P1', arm: 'CONTROL' as const, servedPortions: 100, wasteKg: 0.004, earlySellout: false },
+  { pairId: 'P1', arm: 'INTERVENTION' as const, servedPortions: 100, wasteKg: 0.002, earlySellout: false },
+  { pairId: 'P2', arm: 'CONTROL' as const, servedPortions: 100, wasteKg: 0.004, earlySellout: false },
+  { pairId: 'P2', arm: 'INTERVENTION' as const, servedPortions: 100, wasteKg: 0.002, earlySellout: false },
+]);
+assert.equal(precisionSensitive.normalizedWasteReductionPct, 50);
+
 console.log('PASS matched-pair effect semantics');
