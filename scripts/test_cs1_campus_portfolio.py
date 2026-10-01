@@ -58,6 +58,16 @@ def energy_decision(readiness: str = "REVIEW_REQUIRED"):
     return {"decision_readiness": readiness, "zones": [] if readiness == "WITHHOLD" else [{"zone_id": "Z1", "recommended_mode": "SETBACK_REVIEW"}, {"zone_id": "Z2", "recommended_mode": "NORMAL_SERVICE_REVIEW"}], "reason_codes": []}
 
 
+def space_decision(readiness: str = "REVIEW_REQUIRED"):
+    return {
+        "decision_readiness": readiness,
+        "selected_zone_ids": [] if readiness == "WITHHOLD" else ["L1", "L3"],
+        "selected_capacity": None if readiness == "WITHHOLD" else 100,
+        "energy_savings_claim_allowed": False,
+        "reason_codes": [],
+    }
+
+
 def shared_capacity_decision(readiness: str = "REVIEW_REQUIRED"):
     return {
         "decision_readiness": readiness,
@@ -77,6 +87,7 @@ def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> Non
         classroom_plan=classroom_plan(),
         food_decision=food_decision(),
         energy_decision=energy_decision(),
+        space_decision=space_decision(),
         shared_capacity_decision=shared_capacity_decision(),
     )
     assert result["contract_version"] == "campus-ops-v1.0"
@@ -87,10 +98,13 @@ def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> Non
     assert result["cross_domain_signals"]["campus_demand_context"]["north"] == 900
     assert result["cross_domain_signals"]["food_recommended_production"] == 505
     assert result["cross_domain_signals"]["energy_zone_modes"] == {"Z1": "SETBACK_REVIEW", "Z2": "NORMAL_SERVICE_REVIEW"}
+    assert result["cross_domain_signals"]["space_selected_zone_ids"] == ["L1", "L3"]
+    assert result["cross_domain_signals"]["space_selected_capacity"] == 100
     assert result["cross_domain_signals"]["shared_capacity_allocations"] == {"study": 7, "charging": 3}
     assert result["cross_domain_signals"]["shuttle_capacity_shortfall_routes"] == ["south-north"]
     assert result["cross_domain_signals"]["unassigned_sessions"] == ["B"]
     assert result["cross_domain_signals"]["building_attendance_targets"]["B-SOUTH-M"] == 70
+    assert result["domain_status"]["space"] == "REVIEW_REQUIRED"
     assert result["domain_status"]["shared_capacity"] == "REVIEW_REQUIRED"
     assert "CROSS_DOMAIN_CONFLICTS_REQUIRE_OPERATOR_REVIEW" in result["reason_codes"]
 
@@ -112,16 +126,20 @@ def test_partial_domain_withhold_does_not_fabricate_missing_signal() -> None:
         classroom_plan=classroom_plan(),
         food_decision=food_decision("WITHHOLD"),
         energy_decision=energy_decision("WITHHOLD"),
+        space_decision=space_decision("WITHHOLD"),
         shared_capacity_decision=shared_capacity_decision("WITHHOLD"),
     )
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert result["cross_domain_signals"]["shuttle_capacity_shortfall_routes"] == []
     assert result["cross_domain_signals"]["food_recommended_production"] is None
     assert result["cross_domain_signals"]["energy_zone_modes"] == {}
+    assert result["cross_domain_signals"]["space_selected_zone_ids"] == []
+    assert result["cross_domain_signals"]["space_selected_capacity"] is None
     assert result["cross_domain_signals"]["shared_capacity_allocations"] == {}
     assert "DOMAIN_WITHHELD_SHUTTLE" in result["reason_codes"]
     assert "DOMAIN_WITHHELD_FOOD" in result["reason_codes"]
     assert "DOMAIN_WITHHELD_ENERGY" in result["reason_codes"]
+    assert "DOMAIN_WITHHELD_SPACE" in result["reason_codes"]
     assert "DOMAIN_WITHHELD_SHARED_CAPACITY" in result["reason_codes"]
 
 
@@ -133,6 +151,7 @@ def test_portfolio_contains_no_achieved_impact_claim_fields() -> None:
         classroom_plan=classroom_plan(),
         food_decision=food_decision(),
         energy_decision=energy_decision(),
+        space_decision=space_decision(),
         shared_capacity_decision=shared_capacity_decision(),
     )
     serialized = repr(result).lower()
