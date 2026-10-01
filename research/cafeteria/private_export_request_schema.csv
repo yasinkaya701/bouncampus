@@ -1,0 +1,49 @@
+dataset,field,required,grain,type,example_semantics,privacy_class,decision_use,validation_rule
+service_outcomes,service_id,YES,service,string,stable service key,NON_PERSONAL,target_join,unique within service table
+service_outcomes,service_date,YES,service,date,calendar date,NON_PERSONAL,target_join,valid ISO date
+service_outcomes,campus_id,YES,service,string,serving campus,NON_PERSONAL,segment,controlled vocabulary
+service_outcomes,service_type,YES,service,enum,breakfast/lunch/dinner/package,NON_PERSONAL,segment,controlled vocabulary
+service_outcomes,served_count,YES,service,integer,total meals actually served,AGGREGATE,primary_target,finite >= 0
+service_outcomes,measurement_source,YES,service,string,BUCard/POS/reconciled ledger,NON_PERSONAL,provenance,nonempty
+production,service_id,YES,service_or_batch,string,join key,NON_PERSONAL,decision_eval,must exist in service_outcomes when final
+production,batch_id,NO,batch,string,production/replenishment batch,NON_PERSONAL,batch_optimization,unique within service
+production,prepared_count,YES,service_or_batch,integer,portions prepared/released,AGGREGATE,decision_eval,finite >= 0
+production,batch_ready_at,NO,batch,timestamp,when batch became available,NON_PERSONAL,batch_timing,valid timestamp
+waste,service_id,YES,service_or_measurement,string,join key,NON_PERSONAL,objective,must map to service
+waste,waste_value,YES,measurement,float,measured avoidable food waste,AGGREGATE,objective,finite >= 0
+waste,waste_unit,YES,measurement,enum,kg/portion,NON_PERSONAL,objective,explicit unit required
+waste,waste_scope,YES,measurement,enum,production_leftover/plate/combined/other,NON_PERSONAL,objective,never mix scopes silently
+waste,measured_at,YES,measurement,timestamp,measurement timestamp,NON_PERSONAL,audit,valid timestamp
+waste,measurement_method,YES,measurement,string,scale/portion count/other,NON_PERSONAL,quality,nonempty
+reservation_snapshots,service_id,YES,snapshot,string,join key,NON_PERSONAL,feature,must map to service
+reservation_snapshots,snapshot_at,YES,snapshot,timestamp,when count was known,NON_PERSONAL,leakage_control,<= decision cutoff when used
+reservation_snapshots,active_reservations,YES,snapshot,integer,current active reservations,AGGREGATE,feature,finite >= 0
+reservation_reconciliation,service_id,YES,service,string,join key,NON_PERSONAL,feature_learning,must map to service
+reservation_reconciliation,reserved_served_count,YES,service,integer,reserved users who actually consumed,AGGREGATE,show_rate,finite >= 0
+reservation_reconciliation,unreserved_served_count,YES,service,integer,served demand without active reservation,AGGREGATE,walkin_component,finite >= 0
+reservation_reconciliation,reconciled_at,YES,service,timestamp,when reconciliation was final,NON_PERSONAL,audit,post-service allowed
+stockout,service_id,YES,event,string,join key,NON_PERSONAL,shortage_objective,must map to service
+stockout,item_id,NO,event,string,item/menu component if tracked,NON_PERSONAL,shortage_objective,nullable
+stockout,stockout_at,YES,event,timestamp,time unavailable to diners,NON_PERSONAL,shortage_objective,within service window
+stockout,affected_portions,NO,event,integer,estimated unmet portions if operationally measured,AGGREGATE,shortage_objective,finite >= 0
+menu_poll,poll_id,YES,candidate,string,poll identifier,NON_PERSONAL,preference_target,stable
+menu_poll,service_id,NO,candidate,string,winning/planned service if linkable,NON_PERSONAL,preference_join,nullable
+menu_poll,candidate_name,YES,candidate,string,candidate dish/menu,NON_PERSONAL,preference_target,nonempty
+menu_poll,vote_count,YES,candidate,integer,anonymous aggregate votes,AGGREGATE,preference_target,finite >= 0
+menu_poll,poll_open_at,YES,poll,timestamp,opening time,NON_PERSONAL,leakage_control,valid timestamp
+menu_poll,poll_close_at,YES,poll,timestamp,closing time,NON_PERSONAL,leakage_control,>= open
+menu_poll,eligible_population,NO,poll,integer,eligible users if known,AGGREGATE,normalization,finite >= votes if semantics support
+menu_poll,winner_flag,NO,candidate,bool,official winner,NON_PERSONAL,preference_target,boolean
+tasting,service_id,YES,aggregate,string,join key,NON_PERSONAL,quality_target,must map to service
+tasting,questionnaire_version,YES,aggregate,string,form/schema version,NON_PERSONAL,comparability,nonempty
+tasting,metric_name,YES,aggregate,string,taste/appearance/overall/etc,NON_PERSONAL,quality_target,nonempty
+tasting,mean_score,YES,aggregate,float,aggregate rating,AGGREGATE,quality_target,within documented scale
+tasting,response_n,YES,aggregate,integer,number of responses,AGGREGATE,weighting,finite > 0
+operator_decisions,decision_id,YES,decision,string,decision audit key,NON_PERSONAL,evaluation,unique
+operator_decisions,service_id,YES,decision,string,target service,NON_PERSONAL,evaluation,must map to service
+operator_decisions,information_cutoff_at,YES,decision,timestamp,last admissible input time,NON_PERSONAL,leakage_control,<= freeze
+operator_decisions,decision_freeze_at,YES,decision,timestamp,last useful action time,NON_PERSONAL,operational_reachability,> cutoff when applicable
+operator_decisions,recommended_count,NO,decision,float,model/policy recommendation,NON_PERSONAL,evaluation,finite >= 0
+operator_decisions,operator_planned_count,NO,decision,float,human plan after review,NON_PERSONAL,evaluation,finite >= 0
+operator_decisions,override_flag,NO,decision,bool,whether recommendation was changed,NON_PERSONAL,human_loop,strict boolean
+operator_decisions,override_reason,NO,decision,string,reason category/text,NON_PERSONAL,human_loop,required when override true
