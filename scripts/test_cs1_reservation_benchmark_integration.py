@@ -48,6 +48,21 @@ def fixture_rows() -> list[dict[str, str]]:
     ]
 
 
+def reproducibility_kwargs() -> dict[str, object]:
+    return {
+        "dataset_id": "reservation-fixture-v1",
+        "dataset_provenance_class": "MEASURED_OPERATIONAL",
+        "dataset_data_class": "MEASURED",
+        "dataset_checksum_sha256": "b" * 64,
+        "git_commit_sha": "0123456789abcdef0123456789abcdef01234567",
+        "target_definition": "served portions per service",
+        "decision_time_cutoff_rule": "reservations frozen before production decision",
+        "evaluation_window": "fixture rows 1-4 in chronological order",
+        "model_version": None,
+        "model_feature_ids": None,
+    }
+
+
 def test_reservation_candidates_join_forecast_and_decision_benchmarks() -> None:
     benchmark = load_benchmark_module()
     report = benchmark.build_report(
@@ -63,6 +78,7 @@ def test_reservation_candidates_join_forecast_and_decision_benchmarks() -> None:
         unreserved_column="unreserved",
         excess_cost=1.0,
         shortage_cost=3.0,
+        **reproducibility_kwargs(),
     )
 
     assert "raw_reservation" in report["forecast_candidates"]
@@ -80,6 +96,8 @@ def test_reservation_candidates_join_forecast_and_decision_benchmarks() -> None:
         == "SENSITIVITY_PARAMETER_NOT_OBSERVED_ECONOMICS"
     )
     assert report["decision_evaluation"]["common_support_n"] > 0
+    assert report["reproducibility"]["status"] == "COMPLETE"
+    assert report["reproducibility"]["eligibility_conclusion"] == "OFFLINE_EVALUATION_ONLY"
     assert "savings" in report["claim_boundary"].lower()
 
 
@@ -99,6 +117,7 @@ def test_partial_reservation_contract_is_rejected() -> None:
             unreserved_column=None,
             excess_cost=1.0,
             shortage_cost=1.0,
+            **reproducibility_kwargs(),
         )
     except ValueError as exc:
         assert "reservation reconciliation requires" in str(exc)
