@@ -13,6 +13,7 @@ from app.decision.classroom_policy import allocate_classrooms
 from app.decision.food_ops_policy import plan_food_production
 from app.decision.shared_capacity_policy import allocate_shared_capacity
 from app.decision.shuttle_policy import plan_shuttle_capacity
+from app.decision.space_activation_policy import plan_space_activation
 
 router = APIRouter(prefix="/api/v1/campus-ops", tags=["campus-ops"])
 
@@ -53,6 +54,17 @@ class EnergyPlanRequest(BaseModel):
     upstream_readiness: str = "REVIEW_REQUIRED"
 
 
+class SpaceActivationRequest(BaseModel):
+    occupancy_scenarios: list[dict[str, Any]]
+    zones: list[dict[str, Any]]
+    idle_capacity_weight: float
+    shortage_weight: float
+    min_point_service_ratio: float = 0.9
+    zone_inventory_provenance: str = "UNAVAILABLE"
+    occupancy_provenance: str = "UNAVAILABLE"
+    upstream_readiness: str = "REVIEW_REQUIRED"
+
+
 class SharedCapacityRequest(BaseModel):
     total_capacity: int
     requests: list[dict[str, Any]]
@@ -71,6 +83,16 @@ class EnergyPlanConfig(BaseModel):
     medium_utilization_threshold: float
 
 
+class SpaceActivationConfig(BaseModel):
+    occupancy_scenarios: list[dict[str, Any]]
+    zones: list[dict[str, Any]]
+    idle_capacity_weight: float
+    shortage_weight: float
+    min_point_service_ratio: float = 0.9
+    zone_inventory_provenance: str = "UNAVAILABLE"
+    occupancy_provenance: str = "UNAVAILABLE"
+
+
 class SharedCapacityConfig(BaseModel):
     total_capacity: int
     requests: list[dict[str, Any]]
@@ -82,6 +104,7 @@ class CampusPortfolioRequest(BaseModel):
     classroom_plan: dict[str, Any] | None = None
     food_decision: dict[str, Any] | None = None
     energy_decision: dict[str, Any] | None = None
+    space_activation_decision: dict[str, Any] | None = None
     shared_capacity_decision: dict[str, Any] | None = None
 
 
@@ -97,6 +120,7 @@ class CampusOpsPlanRequest(BaseModel):
     attendance_provenance: str = "UNAVAILABLE"
     food: FoodPlanConfig | None = None
     energy: EnergyPlanConfig | None = None
+    space_activation: SpaceActivationConfig | None = None
     shared_capacity: SharedCapacityConfig | None = None
 
 
@@ -114,6 +138,7 @@ def get_campus_ops_contract() -> dict[str, Any]:
             "classroom",
             "food",
             "energy",
+            "space_activation",
             "shared_capacity",
             "portfolio",
         ],
@@ -202,6 +227,23 @@ def build_energy_plan(payload: EnergyPlanRequest) -> dict[str, Any]:
         raise _unprocessable(exc) from exc
 
 
+@router.post("/space-activation/plan")
+def build_space_activation_plan(payload: SpaceActivationRequest) -> dict[str, Any]:
+    try:
+        return plan_space_activation(
+            occupancy_scenarios=payload.occupancy_scenarios,
+            zones=payload.zones,
+            idle_capacity_weight=payload.idle_capacity_weight,
+            shortage_weight=payload.shortage_weight,
+            min_point_service_ratio=payload.min_point_service_ratio,
+            zone_inventory_provenance=payload.zone_inventory_provenance,
+            occupancy_provenance=payload.occupancy_provenance,
+            upstream_readiness=payload.upstream_readiness,
+        )
+    except ValueError as exc:
+        raise _unprocessable(exc) from exc
+
+
 @router.post("/shared-capacity/allocate")
 def build_shared_capacity_plan(payload: SharedCapacityRequest) -> dict[str, Any]:
     try:
@@ -222,6 +264,7 @@ def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
             classroom_plan=payload.classroom_plan,
             food_decision=payload.food_decision,
             energy_decision=payload.energy_decision,
+            space_activation_decision=payload.space_activation_decision,
             shared_capacity_decision=payload.shared_capacity_decision,
         )
     except ValueError as exc:
@@ -271,6 +314,19 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
                 upstream_readiness=readiness,
             )
 
+        space_activation = None
+        if payload.space_activation is not None:
+            space_activation = plan_space_activation(
+                occupancy_scenarios=payload.space_activation.occupancy_scenarios,
+                zones=payload.space_activation.zones,
+                idle_capacity_weight=payload.space_activation.idle_capacity_weight,
+                shortage_weight=payload.space_activation.shortage_weight,
+                min_point_service_ratio=payload.space_activation.min_point_service_ratio,
+                zone_inventory_provenance=payload.space_activation.zone_inventory_provenance,
+                occupancy_provenance=payload.space_activation.occupancy_provenance,
+                upstream_readiness=readiness,
+            )
+
         shared_capacity = None
         if payload.shared_capacity is not None:
             shared_capacity = allocate_shared_capacity(
@@ -284,6 +340,7 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
             classroom_plan=classroom,
             food_decision=food,
             energy_decision=energy,
+            space_activation_decision=space_activation,
             shared_capacity_decision=shared_capacity,
         )
         return {
@@ -292,6 +349,7 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
             "classroom": classroom,
             "food": food,
             "energy": energy,
+            "space_activation": space_activation,
             "shared_capacity": shared_capacity,
             "portfolio": portfolio,
         }
