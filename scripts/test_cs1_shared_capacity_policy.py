@@ -21,26 +21,46 @@ def load_policy():
     return module
 
 
-def test_minimums_then_registered_priority_fill_capacity() -> None:
-    policy = load_policy()
-    result = policy.allocate_shared_capacity(
-        total_capacity=10,
-        requests=[
+def allocate(policy, **overrides):
+    kwargs = {
+        "total_capacity": 10,
+        "capacity_provenance": "OFFICIAL_SNAPSHOT",
+        "requests": [
             {"request_id": "study", "minimum": 2, "desired": 7, "priority_weight": 3},
             {"request_id": "charging", "minimum": 1, "desired": 5, "priority_weight": 1},
         ],
-    )
+    }
+    kwargs.update(overrides)
+    return policy.allocate_shared_capacity(**kwargs)
+
+
+def test_minimums_then_registered_priority_fill_verified_capacity() -> None:
+    policy = load_policy()
+    result = allocate(policy)
     allocations = {row["request_id"]: row["allocated"] for row in result["allocations"]}
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert sum(allocations.values()) == 10
     assert allocations["study"] == 7
     assert allocations["charging"] == 3
+    assert result["capacity_provenance"] == "OFFICIAL_SNAPSHOT"
+    assert result["capacity_semantics"] == "VERIFIED_AGGREGATE_RESOURCE_INVENTORY"
     assert result["automatic_execution_allowed"] is False
+
+
+def test_unverified_capacity_fails_closed() -> None:
+    policy = load_policy()
+    for provenance in ("MODEL_ESTIMATE", "POLICY_HEURISTIC", "UNAVAILABLE"):
+        result = allocate(policy, capacity_provenance=provenance)
+        assert result["decision_readiness"] == "WITHHOLD"
+        assert result["allocations"] == []
+        assert result["capacity_provenance"] == provenance
+        assert "UNVERIFIED_SHARED_CAPACITY" in result["reason_codes"]
 
 
 def test_minimums_above_capacity_fail_closed() -> None:
     policy = load_policy()
-    result = policy.allocate_shared_capacity(
+    result = allocate(
+        policy,
         total_capacity=4,
         requests=[
             {"request_id": "a", "minimum": 3, "desired": 3, "priority_weight": 1},
@@ -54,8 +74,8 @@ def test_minimums_above_capacity_fail_closed() -> None:
 
 def test_malformed_request_fails_closed() -> None:
     policy = load_policy()
-    result = policy.allocate_shared_capacity(
-        total_capacity=10,
+    result = allocate(
+        policy,
         requests=[{"request_id": "a", "minimum": 4, "desired": 2, "priority_weight": 1}],
     )
     assert result["decision_readiness"] == "WITHHOLD"
