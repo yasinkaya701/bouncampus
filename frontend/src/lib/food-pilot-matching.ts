@@ -36,11 +36,16 @@ function field(record: Record<string, unknown>, camelCase: string, snakeCase: st
   return record[camelCase] ?? record[snakeCase];
 }
 
+function stringField(record: Record<string, unknown>, camelCase: string, snakeCase: string) {
+  const value = field(record, camelCase, snakeCase);
+  return typeof value === 'string' ? value : '';
+}
+
 export function normalizeMatchedPilotMeasurement(candidate: Record<string, unknown>) {
   return {
-    pairId: field(candidate, 'pairId', 'pair_id'),
-    date: candidate.date,
-    serviceId: field(candidate, 'serviceId', 'service_id'),
+    pairId: stringField(candidate, 'pairId', 'pair_id'),
+    date: typeof candidate.date === 'string' ? candidate.date : '',
+    serviceId: stringField(candidate, 'serviceId', 'service_id'),
     arm: candidate.arm,
     modelForecastMeals: field(candidate, 'modelForecastMeals', 'model_forecast_meals') ?? null,
     producedPortions: field(candidate, 'producedPortions', 'produced_portions'),
@@ -50,12 +55,12 @@ export function normalizeMatchedPilotMeasurement(candidate: Record<string, unkno
     earlySellout: field(candidate, 'earlySellout', 'early_sellout'),
     operatorOverride: field(candidate, 'operatorOverride', 'operator_override'),
     notes: candidate.notes,
-  } as MatchedPilotServiceMeasurement;
+  } as unknown as MatchedPilotServiceMeasurement;
 }
 
 export function validateMatchedPilotMeasurement(measurement: MatchedPilotServiceMeasurement) {
   const errors = validatePilotMeasurement(measurement);
-  if (typeof measurement.pairId !== 'string' || !measurement.pairId.trim()) {
+  if (!measurement.pairId.trim()) {
     errors.push('pairId is required for matched-pilot evaluation');
   }
   return errors;
@@ -70,7 +75,7 @@ export function analyzeMatchedPilotDesign(
   const duplicatePairArmKeys = new Set<string>();
 
   measurements.forEach((measurement, index) => {
-    const pairId = typeof measurement.pairId === 'string' ? measurement.pairId.trim() : '';
+    const pairId = measurement.pairId.trim();
     if (!pairId) {
       missingPairIdRows.push(index);
       return;
