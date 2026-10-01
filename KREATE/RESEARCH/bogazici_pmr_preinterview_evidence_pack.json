@@ -1,0 +1,259 @@
+{
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH_NOT_PMR",
+  "purpose": "Machine-readable source-to-question map for Boğaziçi dining PMR preparation.",
+  "claim_boundary": [
+    "Public role listings are routing evidence, not customer validation.",
+    "Control-organization membership does not prove daily quantity or payment authority.",
+    "BUCampus and BUCard product existence does not prove historical data access.",
+    "Food-waste totals do not establish the causal share attributable to overproduction.",
+    "No item in this file may be promoted to INTERVIEW EVIDENCE without a real completed interview."
+  ],
+  "sources": [
+    {
+      "source_id": "PMR-S01",
+      "title": "University Executive Board Committees and Commissions - Dining Control Organization",
+      "url": "https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246",
+      "source_type": "FIRST_PARTY_PUBLIC_WEB",
+      "owner_domain": "CONTRACT_CONTROL",
+      "priority": "P0",
+      "public_facts": [
+        "Boğaziçi publicly lists a Yemekhane, Yemek Pişirme ve Yemek Dağıtım Kontrol Teşkilatı.",
+        "Principal members listed at research date include Ayhan Soylu as president, Barış Pancar, Aygül Demir, Ahmed Musab Taş and Mustafa Tunç."
+      ],
+      "unresolved": [
+        "daily quantity authority",
+        "acceptance and hakediş fields",
+        "inspection cadence",
+        "shortage and excess recording",
+        "change authority before production"
+      ],
+      "pmr_questions": [
+        "Which record defines accepted contractor service quantity?",
+        "Are ordered, produced, delivered and served quantities distinguished?",
+        "How are shortages, substitutions, leftovers and service failures documented?",
+        "Who can approve a quantity or allocation change, and until when?"
+      ]
+    },
+    {
+      "source_id": "PMR-S02",
+      "title": "Sustainable Food Choices on Campus",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/233-sustainable-food-choices-on-campus/1313",
+      "source_type": "FIRST_PARTY_PUBLIC_WEB",
+      "owner_domain": "FOOD_OPERATIONS",
+      "priority": "P0",
+      "public_facts": [
+        "The Food Services Branch page publicly lists Aygül Demir Yolasığmazoğlu as Branch Manager.",
+        "It publicly lists Barış Pancar and Gül Güler as Food Engineers.",
+        "It publishes campus-specific meal windows.",
+        "It states that meals are prepared in the North Campus cafeteria kitchen and procurement-to-service stages are carried out by the contractor under an SKS technical specification."
+      ],
+      "unresolved": [
+        "production quantity owner",
+        "forecasting owner",
+        "batch freeze time",
+        "campus and channel allocation process",
+        "operational records visible to each role"
+      ],
+      "pmr_questions": [
+        "Walk through the most recent normal lunch from menu approval to final service quantity.",
+        "When are ingredients committed and when does cooking become costly to change?",
+        "Is production one batch or multiple adjustable batches?",
+        "What is recorded for produced, delivered, served, returned, leftover and discarded food?"
+      ]
+    },
+    {
+      "source_id": "PMR-S03",
+      "title": "SKS 2025 Activity Report / 2026-2027 Goals",
+      "url": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096",
+      "source_type": "FIRST_PARTY_PUBLIC_WEB",
+      "owner_domain": "FOOD_OPERATIONS",
+      "priority": "P0",
+      "public_facts": [
+        "The report displays 6 dining halls and 6,000 daily meals.",
+        "It displays 2,000 packaged meals.",
+        "It reports packaged-meal distribution, a North Campus kiosk, a 2,386-participant satisfaction survey and BUCampus menu selection.",
+        "It lists daily meal rating through BUCampus among 2026-2027 goals."
+      ],
+      "semantic_warning": "Do not add displayed activity counts together without owner confirmation; they may use different denominators and counting semantics.",
+      "unresolved": [
+        "whether packaged meals share the same production pool",
+        "when allocation by campus or channel occurs",
+        "whether BUCampus feedback is used operationally",
+        "whether any intent signal exists before the freeze point"
+      ],
+      "pmr_questions": [
+        "Are packaged meals planned from the same production pool as dining-hall service?",
+        "At what point is quantity split across campuses and channels?",
+        "Can surplus be reallocated between channels or campuses?",
+        "Are BUCampus menu-selection or rating signals used before quantity decisions?"
+      ]
+    },
+    {
+      "source_id": "PMR-S04",
+      "title": "Campus Food Waste Tracking",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "source_type": "FIRST_PARTY_PUBLIC_WEB",
+      "owner_domain": "WASTE_MEASUREMENT",
+      "priority": "P0",
+      "public_facts": [
+        "Boğaziçi publicly reports 48,251 kg total food waste for 2025.",
+        "The page publishes monthly food-waste values and amounts delivered to İSTAÇ for recycling."
+      ],
+      "unresolved": [
+        "pre-consumer versus post-consumer share",
+        "edible surplus versus preparation loss",
+        "campus and meal attribution",
+        "generation date versus collection date semantics"
+      ],
+      "pmr_questions": [
+        "What physical material enters the published food-waste total?",
+        "Where and when is it weighed?",
+        "Can pre-consumer surplus, preparation loss and plate waste be separated?",
+        "Which source record is authoritative for a prospective pilot?"
+      ]
+    },
+    {
+      "source_id": "PMR-S05",
+      "title": "BİD Service Inventory / BUCard and BUCAMPUS",
+      "url": "https://bilgiislem.bogazici.edu.tr/tr/pages/hizmet-envanteri/3513",
+      "additional_url": "https://bilgiislem.bogazici.edu.tr/",
+      "source_type": "FIRST_PARTY_PUBLIC_WEB",
+      "owner_domain": "DIGITAL_DATA",
+      "priority": "P1",
+      "public_facts": [
+        "The service inventory includes dining-related BUCard services.",
+        "The IT department publicly presents BUCAMPUS among university digital products/services."
+      ],
+      "unresolved": [
+        "historical event retention",
+        "aggregate exportability",
+        "timestamp semantics",
+        "duplicate/refund handling",
+        "pre-decision latency",
+        "pilot approval path"
+      ],
+      "pmr_questions": [
+        "Are dining BUCard or QR events retained historically?",
+        "Can privacy-safe date x campus x meal-window aggregates be exported?",
+        "Are BUCampus menu-selection or rating events retained as aggregate counts?",
+        "When are these records available relative to the production freeze time?"
+      ]
+    },
+    {
+      "source_id": "PMR-S06",
+      "title": "Mediko Dietetics",
+      "url": "https://mediko.bogazici.edu.tr/tr/announcements/diyetisyenlik-hizmetimiz-baslamistir/2845",
+      "additional_url": "https://mediko.bogazici.edu.tr/tr/pages/diyetisyenler/2664",
+      "source_type": "FIRST_PARTY_PUBLIC_WEB",
+      "owner_domain": "NUTRITION_CONSTRAINTS",
+      "priority": "P1",
+      "public_facts": [
+        "Mediko publicly identifies Ayhan Soylu and Ahmet Musab Taş in dietetics-related pages.",
+        "The dining control-organization source separately lists Ayhan Soylu and a similarly named Ahmed Musab Taş."
+      ],
+      "semantic_warning": "The sources use Ahmet/Ahmed spelling variants. Do not silently normalize identity; verify in PMR if relevant.",
+      "unresolved": [
+        "nutrition constraints on quantity changes",
+        "special-diet forecasting semantics",
+        "food-safety exclusions from optimization"
+      ],
+      "pmr_questions": [
+        "Which nutrition or gram constraints are non-negotiable when quantities change?",
+        "Are special-diet, vegetarian or vegan quantities forecast separately?",
+        "Which food-safety or nutrition requirements must remain outside automated optimization?"
+      ]
+    },
+    {
+      "source_id": "PMR-S07",
+      "title": "Current 2026-2027 Boğaziçi food-service procurement",
+      "url": "https://www.ihaledetay.com/2025-1727143",
+      "additional_url": "https://ekapveri.com/ihale/ekap-2025-1727143/",
+      "official_access_surface": "https://ekap.kik.gov.tr/EKAP/",
+      "source_type": "PUBLIC_PROCUREMENT_RECORD_AND_MIRRORS",
+      "owner_domain": "CONTRACT_ECONOMICS",
+      "priority": "P0",
+      "public_facts": [
+        "Current procurement identifier is İKN 2025/1727143.",
+        "Existing repository research records it as a 2026-2027 unit-price service procurement with 3.13 million listed meal units and TEMAŞ as current contractor."
+      ],
+      "unresolved": [
+        "daily call-off mechanics",
+        "revision deadline",
+        "accepted and payable quantity",
+        "unserved-production payment",
+        "excess-cost incidence",
+        "shortage deductions",
+        "progress-payment record semantics"
+      ],
+      "pmr_questions": [
+        "What is the operational name of the quantity sent to the contractor?",
+        "Which quantity is used for acceptance or hakediş?",
+        "Can the quantity be revised and until when?",
+        "Who captures financial value from improved quantity accuracy?"
+      ]
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "PMR-RH-01",
+      "hypothesis": "A daily production or allocation decision exists before service and can be changed at a useful time.",
+      "status": "UNKNOWN",
+      "falsifier": "Owner says quantity is fixed externally, too early, or cannot be adjusted materially."
+    },
+    {
+      "id": "PMR-RH-02",
+      "hypothesis": "Service-level quantity records exist and are usable for retrospective baseline construction.",
+      "status": "UNKNOWN",
+      "falsifier": "Records are absent, too aggregated, semantically inconsistent, or inaccessible."
+    },
+    {
+      "id": "PMR-RH-03",
+      "hypothesis": "Edible pre-consumer surplus is a material part of the tracked food-waste problem.",
+      "status": "UNKNOWN",
+      "falsifier": "Measured waste is dominated by plate, preparation, or other streams."
+    },
+    {
+      "id": "PMR-RH-04",
+      "hypothesis": "Campus or service-channel allocation is a distinct operational control point.",
+      "status": "PLAUSIBLE_PUBLIC_CONTEXT_NOT_VALIDATED",
+      "falsifier": "Channels do not share a controllable production pool or allocation cannot change."
+    },
+    {
+      "id": "PMR-RH-05",
+      "hypothesis": "At least one privacy-safe demand or intent signal is available before freeze time.",
+      "status": "UNKNOWN",
+      "falsifier": "Candidate signals are unavailable, inaccessible, or arrive after the decision."
+    },
+    {
+      "id": "PMR-RH-06",
+      "hypothesis": "Improved quantity accuracy creates value for at least one decision owner without unacceptable shortage risk.",
+      "status": "UNKNOWN",
+      "falsifier": "Contract incentives neutralize value or service risk dominates."
+    },
+    {
+      "id": "PMR-RH-07",
+      "hypothesis": "Existing preference and feedback mechanisms leave residual uncertainty that justifies forecasting or decision support.",
+      "status": "UNKNOWN",
+      "falsifier": "Reservation, intent, or simple rules already remove the actionable uncertainty more cheaply."
+    }
+  ],
+  "interview_order": [
+    "Food Services Branch manager plus one Food Engineer",
+    "Dining Control Organization owner/member for unresolved acceptance and contract-execution semantics",
+    "TEMAŞ local project or production operator",
+    "BİD data owner",
+    "Waste or sustainability measurement owner",
+    "SKS senior owner for bounded approval or escalation"
+  ],
+  "stop_browsing_require_primary_evidence": [
+    "exact daily quantity owner and freeze time",
+    "hakediş and acceptance quantity semantics",
+    "excess versus shortage financial incidence",
+    "pre-consumer share of the 48,251 kg food-waste total",
+    "historical BUCard or BUCampus exportability",
+    "operational use of BUCampus menu votes or ratings",
+    "TEMAŞ internal forecasting heuristic",
+    "real batch and reallocation flexibility"
+  ]
+}
