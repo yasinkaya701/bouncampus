@@ -1,9 +1,20 @@
+#!/usr/bin/env python3
+"""API smoke coverage for the CS1 campus operations router."""
+
+from __future__ import annotations
+
+import sys
 import unittest
+from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+ROOT = Path(__file__).resolve().parents[1]
+BACKEND = ROOT / "backend"
+if str(BACKEND) not in sys.path:
+    sys.path.insert(0, str(BACKEND))
 
-from app.routers import operations
+from fastapi import FastAPI  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from app.routers import operations  # noqa: E402
 
 
 class CampusOperationsApiTests(unittest.TestCase):
