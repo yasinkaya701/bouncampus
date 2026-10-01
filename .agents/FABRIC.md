@@ -8,12 +8,15 @@ This document defines the control plane for parallel AI/human work. It extends `
 
 Implementation and review can happen concurrently. Final product truth remains serialized by the requirement that every `master` integration PR contains the latest `master` and passes exact-head CI.
 
+There are five execution roles but still four human team members. Execution-role count and human/PMR count are separate concepts.
+
 ## Control plane
 
 - Durable product truth: `master`
 - Role integration branches:
   - `role/ie-customer-discovery`
   - `role/ee-physical-systems`
+  - `role/ehb-embedded-integration`
   - `role/cs1-decision-intelligence`
   - `role/cs2-product-strategy`
 - Short-lived implementation branches: `agent/<lane>/<task>`
@@ -22,9 +25,23 @@ Implementation and review can happen concurrently. Final product truth remains s
 
 Task JSON remains the authority for ownership, dependencies, path claims, leases, human gates, and final integration evidence.
 
+## Role boundaries relevant to the fabric
+
+### EE
+
+Owns measurement architecture, measurement-method/sensor choice, calibration, uncertainty, measurement semantics, and field/pilot validity.
+
+### EHB
+
+Owns embedded electronics, PCB, firmware, communications, controller-side power/interface implementation, bring-up, device protocol, buffering/recovery, and HW↔SW integration.
+
+### Shared EE ↔ EHB
+
+System-level hardware verification and the EE↔EHB interface contract are shared. Any task changing voltage/current, pinout, sampling, calibration persistence, protocol, packet schema, quality flags, power budget, fault states, or validation method must identify both roles as impacted and receive dual review.
+
 ## Parallel PR model
 
-The repository-wide single-PR lock no longer exists.
+The repository-wide single-PR lock does not exist.
 
 Two PR classes are expected:
 
@@ -36,6 +53,16 @@ agent/<lane>/<task> -> role/<role>
 
 Feature PRs allow each role to integrate independently. Up to 3 may be open against a role branch at once.
 
+Recommended EHB lanes:
+
+```text
+agent/ehb-hardware/<task>
+agent/ehb-firmware/<task>
+agent/ehb-comms/<task>
+agent/ehb-integration/<task>
+agent/ehb-verification/<task>
+```
+
 ### Role integration PR
 
 ```text
@@ -44,7 +71,7 @@ role/<role> -> master
 
 Each role may have at most one open integration PR to `master` at a time. Different roles may have integration PRs open concurrently.
 
-A `master` PR is mergeable only if it contains the current `master` base SHA. Therefore, after any `master` merge, other open role PRs must sync and revalidate before merging.
+A `master` PR is mergeable only if it contains the current `master` base SHA. After any `master` merge, other open role PRs must sync and revalidate before merging.
 
 Repository-wide policy/bootstrap changes may use `agent/quality-release/<task> -> master`.
 
@@ -76,12 +103,7 @@ To claim a task:
 
 A material commit or meaningful validation checkpoint should refresh the heartbeat.
 
-A stale lease may be reclaimed only when:
-
-- TTL expired;
-- the task is not actively integrating/verifying;
-- no repository evidence shows fresh execution;
-- the reclaim is recorded.
+A stale lease may be reclaimed only when TTL expired, the task is not actively integrating/verifying, no repository evidence shows fresh execution, and the reclaim is recorded.
 
 ## File ownership
 
@@ -95,6 +117,8 @@ A stale lease may be reclaimed only when:
 
 Parallel PRs do not weaken path ownership.
 
+For EE/EHB parallel work, a stable interface contract is the prerequisite for independent path ownership. If the interface is still changing, define it first instead of letting both roles diverge silently.
+
 ## Human gates
 
 Allowed human gates:
@@ -105,9 +129,11 @@ Allowed human gates:
 - `EXTERNAL_COMMITMENT`
 - `PRODUCT_DIRECTION`
 
-Normal engineering decisions, branches, PRs, tests, conflict resolution, and reversible changes are autonomous.
+Normal engineering decisions, branches, PRs, tests, conflict resolution, reversible changes, firmware design, circuit design, and technical architecture choices are autonomous.
 
 `WAITING_HUMAN` is valid only when a real gate is pending, one concrete question is recorded, and independent work is already complete.
+
+EHB is a technical continuous-execution role: routine post-task checkpoints are OFF, just like EE and CS1. Physical-risk actions still require `PHYSICAL_SAFETY`.
 
 ## Integration protocol
 
@@ -118,9 +144,10 @@ The owning workstream agent:
 1. updates from the latest role branch;
 2. resolves conflicts deliberately;
 3. passes targeted and repository-required checks;
-4. opens/updates the feature PR;
-5. drives exact-head CI green;
-6. merges into the role branch.
+4. documents cross-role interface impact where applicable;
+5. opens/updates the feature PR;
+6. drives exact-head CI green;
+7. merges into the role branch.
 
 This is staging, not final completion.
 
@@ -158,11 +185,13 @@ When detected:
 
 Prefer repository-visible state:
 
-- task JSON
-- dependency IDs
-- branch/PR references
-- blocker evidence
-- explicit integration notes
+- task JSON;
+- dependency IDs;
+- branch/PR references;
+- blocker evidence;
+- explicit integration notes;
+- EE↔EHB interface contracts;
+- EHB↔CS1 data-contract notes.
 
 Do not require synchronous human relay.
 
@@ -175,13 +204,6 @@ python scripts/agent_fabric_check.py
 python scripts/test_agent_fabric_check.py
 ```
 
-CI additionally enforces:
+The unit suite includes a repository-level regression check requiring `role/ehb-embedded-integration` and split EE/EHB/shared hardware ownership in `.agents/fabric.json`.
 
-- approved PR base/head topology;
-- latest-target-base ancestry;
-- per-role feature PR concurrency;
-- feature preservation;
-- exact-head repository validation;
-- merged-PR provenance for `master`;
-- normal merge-commit semantics;
-- post-merge containment through `agent_exit_gate.py`.
+CI additionally enforces approved PR base/head topology, latest-target-base ancestry, per-role feature PR concurrency, feature preservation, exact-head repository validation, merged-PR provenance for `master`, normal merge-commit semantics, and post-merge containment through `agent_exit_gate.py`.
