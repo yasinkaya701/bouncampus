@@ -83,6 +83,7 @@ def request_payload():
                 {"demand": 120, "weight": 0.25},
             ],
             "max_capacity": 130,
+            "capacity_provenance": "OFFICIAL_SNAPSHOT",
             "waste_weight": 1.0,
             "shortage_weight": 3.0,
             "method_eligibility": "PILOT_ELIGIBLE",
@@ -156,6 +157,7 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
     assert result["classroom"]["room_inventory_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["classroom"]["attendance_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["food"]["recommended_production"] == 100
+    assert result["food"]["capacity_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["energy"]["zones"][0]["recommended_mode"] == "NORMAL_SERVICE_REVIEW"
     assert result["space_activation"]["selected_zone_ids"] == ["L1", "L3"]
     assert result["space_activation"]["energy_savings_claim_allowed"] is False
@@ -176,6 +178,7 @@ def test_unverified_capacity_inputs_fail_closed_through_combined_api() -> None:
     raw["shuttle_routes"][0]["capacity_provenance"] = "MODEL_ESTIMATE"
     raw["room_inventory_provenance"] = "MODEL_ESTIMATE"
     raw["attendance_provenance"] = "MODEL_ESTIMATE"
+    raw["food"]["capacity_provenance"] = "MODEL_ESTIMATE"
     raw["space_activation"]["zone_inventory_provenance"] = "MODEL_ESTIMATE"
     payload = campus_ops.CampusOpsPlanRequest(**raw)
     result = campus_ops.plan_campus_operations(payload)
@@ -183,6 +186,8 @@ def test_unverified_capacity_inputs_fail_closed_through_combined_api() -> None:
     assert result["shuttle"]["routes"] == []
     assert result["classroom"]["decision_readiness"] == "WITHHOLD"
     assert result["classroom"]["assignments"] == []
+    assert result["food"]["decision_readiness"] == "WITHHOLD"
+    assert result["food"]["recommended_production"] is None
     assert result["space_activation"]["decision_readiness"] == "WITHHOLD"
     assert result["space_activation"]["selected_zone_ids"] == []
 
