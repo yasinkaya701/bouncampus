@@ -73,6 +73,17 @@ def food_decision(readiness: str = "REVIEW_REQUIRED"):
     }
 
 
+def energy_decision(readiness: str = "REVIEW_REQUIRED"):
+    return {
+        "decision_readiness": readiness,
+        "zones": [] if readiness == "WITHHOLD" else [
+            {"zone_id": "Z1", "recommended_mode": "SETBACK_REVIEW"},
+            {"zone_id": "Z2", "recommended_mode": "NORMAL_SERVICE_REVIEW"},
+        ],
+        "reason_codes": [],
+    }
+
+
 def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> None:
     portfolio = load_module("campus_portfolio", "backend/app/decision/campus_portfolio.py")
     result = portfolio.build_campus_portfolio(
@@ -80,6 +91,7 @@ def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> Non
         shuttle_plan=shuttle_plan(),
         classroom_plan=classroom_plan(),
         food_decision=food_decision(),
+        energy_decision=energy_decision(),
     )
     assert result["contract_version"] == "campus-ops-v1.0"
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
@@ -88,6 +100,10 @@ def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> Non
     assert result["cross_domain_signals"]["campus_demand_context"]["south"] == 600
     assert result["cross_domain_signals"]["campus_demand_context"]["north"] == 900
     assert result["cross_domain_signals"]["food_recommended_production"] == 505
+    assert result["cross_domain_signals"]["energy_zone_modes"] == {
+        "Z1": "SETBACK_REVIEW",
+        "Z2": "NORMAL_SERVICE_REVIEW",
+    }
     assert result["cross_domain_signals"]["shuttle_capacity_shortfall_routes"] == ["south-north"]
     assert result["cross_domain_signals"]["unassigned_sessions"] == ["B"]
     assert result["cross_domain_signals"]["building_attendance_targets"]["B-SOUTH-M"] == 70
@@ -114,12 +130,15 @@ def test_partial_domain_withhold_does_not_fabricate_missing_signal() -> None:
         },
         classroom_plan=classroom_plan(),
         food_decision=food_decision("WITHHOLD"),
+        energy_decision=energy_decision("WITHHOLD"),
     )
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert result["cross_domain_signals"]["shuttle_capacity_shortfall_routes"] == []
     assert result["cross_domain_signals"]["food_recommended_production"] is None
+    assert result["cross_domain_signals"]["energy_zone_modes"] == {}
     assert "DOMAIN_WITHHELD_SHUTTLE" in result["reason_codes"]
     assert "DOMAIN_WITHHELD_FOOD" in result["reason_codes"]
+    assert "DOMAIN_WITHHELD_ENERGY" in result["reason_codes"]
 
 
 def test_portfolio_contains_no_achieved_impact_claim_fields() -> None:
@@ -129,6 +148,7 @@ def test_portfolio_contains_no_achieved_impact_claim_fields() -> None:
         shuttle_plan=shuttle_plan(),
         classroom_plan=classroom_plan(),
         food_decision=food_decision(),
+        energy_decision=energy_decision(),
     )
     serialized = repr(result).lower()
     for forbidden in (
