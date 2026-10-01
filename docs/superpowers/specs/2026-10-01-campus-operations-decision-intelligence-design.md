@@ -184,6 +184,8 @@ Every material source used by CS1 decision logic should normalize into:
 
 `published_at` or an equivalent availability timestamp controls decision-time eligibility. If a source becomes available after the cutoff, it cannot influence that decision.
 
+Input adapters may accept legacy source labels only as explicit aliases. In particular, the existing campus-state TDD fixture uses `PUBLIC_SOURCE`; the source-health layer must normalize that alias to the canonical emitted provenance `OFFICIAL_PUBLIC`. Canonical decision outputs must not emit the legacy alias.
+
 ### 7.2 CampusState
 
 Contract version: `campus-ops-v1.0`.
