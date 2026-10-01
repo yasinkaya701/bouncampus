@@ -20,6 +20,36 @@ def base_config() -> dict:
         "control_branch": "agent-coordination",
         "coordination_task_dir": ".agents/coordination/tasks",
         "branch_pattern": "^agent/[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$",
+        "role_branches": {
+            "ie": "role/ie-customer-discovery",
+            "ee": "role/ee-physical-systems",
+            "ehb": "role/ehb-embedded-integration",
+            "cs1": "role/cs1-decision-intelligence",
+            "cs2": "role/cs2-product-strategy",
+        },
+        "hardware": {
+            "ownership": {
+                "ee": [
+                    "measurement-architecture",
+                    "sensor-measurement-selection",
+                    "calibration",
+                    "uncertainty",
+                    "field-verification",
+                ],
+                "ehb": [
+                    "embedded-electronics",
+                    "pcb",
+                    "firmware",
+                    "communications",
+                    "power-interface-implementation",
+                    "bring-up",
+                    "hw-sw-integration",
+                ],
+                "shared": ["system-verification", "ee-ehb-interface-contract"],
+            },
+            "playbook": "KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md",
+            "physical_safety_gate_required": True,
+        },
         "integration": {
             "max_open_pull_requests": 1,
             "merge_method": "merge",
@@ -151,6 +181,9 @@ class RepoFixture:
         path = self.root / ".agents/coordination/tasks" / f"{value['id']}.json"
         path.write_text(json.dumps(value), encoding="utf-8")
 
+    def write_config(self, value: dict) -> None:
+        (self.root / ".agents/fabric.json").write_text(json.dumps(value), encoding="utf-8")
+
     def close(self) -> None:
         self.temp.cleanup()
 
@@ -214,6 +247,24 @@ class AgentFabricTests(unittest.TestCase):
         self.repo.add(value)
         errors, _, _ = self.validate()
         self.assertTrue(any("validated_head_sha" in error for error in errors))
+
+    def test_fabric_requires_independent_ehb_role(self) -> None:
+        config = base_config()
+        del config["role_branches"]["ehb"]
+        self.repo.write_config(config)
+        errors, _, _ = self.validate()
+        self.assertTrue(any("EHB" in error and "role_branches" in error for error in errors))
+
+    def test_fabric_rejects_single_owner_hardware_model(self) -> None:
+        config = base_config()
+        config["hardware"] = {
+            "primary_role": "ee",
+            "playbook": "KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md",
+            "physical_safety_gate_required": True,
+        }
+        self.repo.write_config(config)
+        errors, _, _ = self.validate()
+        self.assertTrue(any("hardware.ownership" in error and "EE" in error and "EHB" in error for error in errors))
 
 
 if __name__ == "__main__":
