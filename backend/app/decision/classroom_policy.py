@@ -27,6 +27,8 @@ CONTRACT_VERSION = CONTRACT.CONTRACT_VERSION
 
 LIMITATIONS = (
     "NO_LIVE_REGISTRAR_INTEGRATION_CLAIM",
+    "NO_UNVERIFIED_ROOM_CAPACITY_CLAIM",
+    "NO_UNVERIFIED_ENROLLMENT_CLAIM",
     "NO_STUDENT_LEVEL_TIMETABLE_TRACKING",
     "GREEDY_HEURISTIC_NOT_GLOBAL_OPTIMUM",
     "OPERATOR_APPROVAL_REQUIRED_BEFORE_ROOM_CHANGE",
@@ -35,6 +37,8 @@ LIMITATIONS = (
 
 
 def _finite(value: Any, *, field: str, minimum: float | None = None) -> float:
+    if isinstance(value, bool):
+        raise ValueError(f"{field} must be numeric")
     try:
         numeric = float(value)
     except (TypeError, ValueError) as exc:
@@ -53,12 +57,25 @@ def _positive(value: Any, *, field: str) -> float:
     return numeric
 
 
+def _strict_bool(value: Any, *, field: str, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if not isinstance(value, bool):
+        raise ValueError(f"{field} must be boolean")
+    return value
+
+
 def _normalize_equipment(value: Any, *, field: str) -> set[str]:
     if value is None:
         return set()
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes, bytearray)):
         raise ValueError(f"{field} must be a list")
-    return {str(item).strip().lower() for item in value if str(item).strip()}
+    normalized: set[str] = set()
+    for item in value:
+        if not isinstance(item, str) or not item.strip():
+            raise ValueError(f"{field} entries must be non-empty strings")
+        normalized.add(item.strip().lower())
+    return normalized
 
 
 def _normalize_room(room: Mapping[str, Any]) -> dict[str, Any]:
@@ -83,7 +100,9 @@ def _normalize_room(room: Mapping[str, Any]) -> dict[str, Any]:
         "building_id": building_id,
         "campus": campus,
         "capacity": int(round(capacity)),
-        "accessible": bool(room.get("accessible", False)),
+        "accessible": _strict_bool(
+            room.get("accessible", False), field=f"room {room_id} accessible"
+        ),
         "equipment": _normalize_equipment(
             room.get("equipment", []), field=f"room {room_id} equipment"
         ),
@@ -120,7 +139,10 @@ def _normalize_session(session: Mapping[str, Any]) -> dict[str, Any]:
         "start_minute": int(round(start)),
         "end_minute": int(round(end)),
         "expected_attendance": int(round(attendance)),
-        "accessibility_required": bool(session.get("accessibility_required", False)),
+        "accessibility_required": _strict_bool(
+            session.get("accessibility_required", False),
+            field=f"session {session_id} accessibility_required",
+        ),
         "equipment_required": _normalize_equipment(
             session.get("equipment_required", []),
             field=f"session {session_id} equipment_required",
@@ -152,17 +174,43 @@ def _feasible(
     )
 
 
+def _withhold(
+    reason_code: str,
+    *,
+    room_inventory_provenance: str,
+    attendance_provenance: str,
+) -> dict[str, Any]:
+    return {
+        "contract_version": CONTRACT_VERSION,
+        "decision_provenance": "POLICY_HEURISTIC",
+        "decision_readiness": "WITHHOLD",
+        "abstained": True,
+        "operator_approval_required": True,
+        "automatic_execution_allowed": False,
+        "room_inventory_provenance": room_inventory_provenance,
+        "attendance_provenance": attendance_provenance,
+        "assignments": [],
+        "unassigned": [],
+        "building_loads": {},
+        "reason_codes": [reason_code],
+        "limitations": list(LIMITATIONS),
+    }
+
+
 def allocate_classrooms(
     sessions: Sequence[Mapping[str, Any]],
     rooms: Sequence[Mapping[str, Any]],
     *,
     upstream_readiness: str = "REVIEW_REQUIRED",
+    room_inventory_provenance: str = "UNAVAILABLE",
+    attendance_provenance: str = "UNAVAILABLE",
 ) -> dict[str, Any]:
-    """Allocate sessions to rooms using hard feasibility constraints first.
+    """Allocate sessions to rooms using verified inputs and hard constraints first.
 
-    The current v1 allocator is intentionally transparent and greedy. It chooses the
-    feasible room with the lowest spare-seat + energy-score penalty and exposes
-    unassigned sessions for operator review rather than violating hard constraints.
+    This v1 allocator is intentionally transparent and greedy. Capacity-sensitive
+    assignments are emitted only when both room inventory and attendance/enrollment
+    inputs have verified operational provenance. The result always requires human
+    approval and never writes a registrar booking automatically.
     """
 
     CONTRACT.validate_no_person_level_data(sessions, path="sessions")
@@ -171,35 +219,38 @@ def allocate_classrooms(
     normalized_upstream = str(upstream_readiness).upper()
     if normalized_upstream not in CONTRACT.READINESS_STATES:
         raise ValueError(f"unsupported upstream_readiness: {upstream_readiness}")
-    if normalized_upstream == "WITHHOLD":
-        return {
-            "contract_version": CONTRACT_VERSION,
-            "decision_provenance": "POLICY_HEURISTIC",
-            "decision_readiness": "WITHHOLD",
-            "abstained": True,
-            "operator_approval_required": True,
-            "automatic_execution_allowed": False,
-            "assignments": [],
-            "unassigned": [],
-            "building_loads": {},
-            "reason_codes": ["UPSTREAM_CAMPUS_STATE_WITHHELD"],
-            "limitations": list(LIMITATIONS),
-        }
 
+    room_provenance = CONTRACT.normalize_provenance(
+        room_inventory_provenance, field="room_inventory_provenance"
+    )
+    attendance_source = CONTRACT.normalize_provenance(
+        attendance_provenance, field="attendance_provenance"
+    )
+
+    if normalized_upstream == "WITHHOLD":
+        return _withhold(
+            "UPSTREAM_CAMPUS_STATE_WITHHELD",
+            room_inventory_provenance=room_provenance,
+            attendance_provenance=attendance_source,
+        )
     if not sessions or not rooms:
-        return {
-            "contract_version": CONTRACT_VERSION,
-            "decision_provenance": "POLICY_HEURISTIC",
-            "decision_readiness": "WITHHOLD",
-            "abstained": True,
-            "operator_approval_required": True,
-            "automatic_execution_allowed": False,
-            "assignments": [],
-            "unassigned": [],
-            "building_loads": {},
-            "reason_codes": ["NO_SESSIONS_OR_ROOMS_SUPPLIED"],
-            "limitations": list(LIMITATIONS),
-        }
+        return _withhold(
+            "NO_SESSIONS_OR_ROOMS_SUPPLIED",
+            room_inventory_provenance=room_provenance,
+            attendance_provenance=attendance_source,
+        )
+    if room_provenance not in CONTRACT.VERIFIED_CAPACITY_PROVENANCE:
+        return _withhold(
+            "UNVERIFIED_ROOM_INVENTORY",
+            room_inventory_provenance=room_provenance,
+            attendance_provenance=attendance_source,
+        )
+    if attendance_source not in CONTRACT.VERIFIED_CAPACITY_PROVENANCE:
+        return _withhold(
+            "UNVERIFIED_ATTENDANCE_INPUT",
+            room_inventory_provenance=room_provenance,
+            attendance_provenance=attendance_source,
+        )
 
     normalized_rooms = [_normalize_room(room) for room in rooms]
     room_ids = [room["room_id"] for room in normalized_rooms]
@@ -259,6 +310,8 @@ def allocate_classrooms(
                 "utilization_pct": round(
                     (session["expected_attendance"] / chosen["capacity"]) * 100.0, 2
                 ),
+                "room_inventory_provenance": room_provenance,
+                "attendance_provenance": attendance_source,
                 "assignment_provenance": "POLICY_HEURISTIC",
             }
         )
@@ -277,7 +330,9 @@ def allocate_classrooms(
     return {
         "contract_version": CONTRACT_VERSION,
         "decision_provenance": "POLICY_HEURISTIC",
-        "demand_provenance": "MODEL_ESTIMATE",
+        "demand_provenance": attendance_source,
+        "room_inventory_provenance": room_provenance,
+        "attendance_provenance": attendance_source,
         "decision_readiness": "REVIEW_REQUIRED",
         "abstained": False,
         "operator_approval_required": True,
