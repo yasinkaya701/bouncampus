@@ -26,6 +26,10 @@ def ts(day: int, hour: int) -> str:
     return f"2026-10-{day:02d}T{hour:02d}:00:00+03:00"
 
 
+def reconciled(n: int = 4) -> list[bool]:
+    return [True] * n
+
+
 def test_context_correction_is_strictly_past_only() -> None:
     context_signal = load_context_signal()
     kwargs = dict(
@@ -33,6 +37,7 @@ def test_context_correction_is_strictly_past_only() -> None:
         context_keys=["menu:A", "menu:A", "menu:B", "menu:A"],
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
+        outcome_reconciled=reconciled(),
         min_history=2,
         min_context_history=2,
         shrinkage_strength=2.0,
@@ -53,6 +58,7 @@ def test_context_correction_is_strictly_past_only() -> None:
     assert math.isclose(first["baseline_forecast"][3], 106.66666666666667)
     assert math.isclose(first["context_forecast"][3], 110.83333333333334)
     assert first["leakage_policy"] == "PAST_RECONCILED_ROWS_ONLY"
+    assert first["reconciliation_policy"] == "EXPLICIT_CALLER_ACCEPTED_OUTCOME_REQUIRED"
 
 
 def test_signal_published_after_cutoff_cannot_change_decision() -> None:
@@ -63,6 +69,7 @@ def test_signal_published_after_cutoff_cannot_change_decision() -> None:
         context_keys=["calendar:teaching", "calendar:teaching", "calendar:teaching", "calendar:teaching"],
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 12)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
+        outcome_reconciled=reconciled(),
         min_history=2,
         min_context_history=2,
         shrinkage_strength=1.0,
@@ -81,6 +88,7 @@ def test_sparse_context_falls_back_to_history_only_baseline() -> None:
         context_keys=["menu:A", "menu:A", "menu:B", "menu:B"],
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
+        outcome_reconciled=reconciled(),
         min_history=2,
         min_context_history=2,
         shrinkage_strength=2.0,
@@ -90,6 +98,28 @@ def test_sparse_context_falls_back_to_history_only_baseline() -> None:
     assert report["context_applied"][3] is False
     assert report["context_forecast"][3] == report["baseline_forecast"][3]
     assert "INSUFFICIENT_CONTEXT_HISTORY" in report["reason_codes"][3]
+
+
+def test_unreconciled_historical_outlier_cannot_influence_later_forecast() -> None:
+    context_signal = load_context_signal()
+    report = context_signal.generate_context_residual_forecasts(
+        base_forecasts=[100, 100, 100, 100],
+        actual_demand=[100, 1000, 100, 100],
+        context_keys=["menu:A", "menu:A", "menu:A", "menu:A"],
+        signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
+        decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
+        outcome_reconciled=[True, False, True, True],
+        min_history=2,
+        min_context_history=2,
+        shrinkage_strength=0.0,
+    )
+
+    assert report["history_n"] == [0, 1, 1, 2]
+    assert report["context_history_n"] == [0, 1, 1, 2]
+    assert report["baseline_forecast"][3] == 100.0
+    assert report["context_forecast"][3] == 100.0
+    assert report["context_applied"][3] is True
+    assert "OUTCOME_NOT_RECONCILED_NOT_LEARNED" in report["reason_codes"][1]
 
 
 def test_context_ablation_uses_identical_support_and_explicit_decision_loss() -> None:
@@ -121,6 +151,7 @@ def test_median_residual_estimator_resists_single_historical_outlier() -> None:
         context_keys=["menu:A", "menu:A", "menu:A", "menu:A"],
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
+        outcome_reconciled=reconciled(),
         min_history=3,
         min_context_history=3,
         shrinkage_strength=0.0,
@@ -138,6 +169,7 @@ def main() -> int:
         test_context_correction_is_strictly_past_only,
         test_signal_published_after_cutoff_cannot_change_decision,
         test_sparse_context_falls_back_to_history_only_baseline,
+        test_unreconciled_historical_outlier_cannot_influence_later_forecast,
         test_context_ablation_uses_identical_support_and_explicit_decision_loss,
         test_median_residual_estimator_resists_single_historical_outlier,
     ]
