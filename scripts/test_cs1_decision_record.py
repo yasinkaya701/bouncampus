@@ -87,6 +87,15 @@ def test_override_requires_reason_and_actionable_modes_require_operator_action()
     assert "OPERATOR_ACTION_REQUIRED" in missing_action["reason_codes"]
 
 
+def test_operator_override_must_be_explicit_boolean() -> None:
+    contract = load_contract()
+    ambiguous = contract.validate_decision_record(
+        valid_record(operator_override="false", operator_override_reason=None)
+    )
+    assert ambiguous["record_status"] == "RECONCILIATION_REQUIRED"
+    assert "OPERATOR_OVERRIDE_MUST_BE_BOOLEAN" in ambiguous["reason_codes"]
+
+
 def test_verified_outcome_requires_reconciled_service_truth() -> None:
     contract = load_contract()
     incomplete = contract.validate_decision_record(
@@ -94,6 +103,8 @@ def test_verified_outcome_requires_reconciled_service_truth() -> None:
     )
     assert incomplete["record_status"] == "RECONCILIATION_REQUIRED"
     assert "VERIFIED_OUTCOME_REQUIRES_ACTUAL_SERVED" in incomplete["reason_codes"]
+    assert "VERIFIED_OUTCOME_REQUIRES_ACTUAL_SURPLUS" in incomplete["reason_codes"]
+    assert "VERIFIED_OUTCOME_REQUIRES_SHORTAGE_EVENT" in incomplete["reason_codes"]
     assert "VERIFIED_OUTCOME_REQUIRES_ACCEPTED_SERVICE_RECORD" in incomplete["reason_codes"]
 
     verified = contract.validate_decision_record(
@@ -130,6 +141,7 @@ if __name__ == "__main__":
         test_valid_advisory_record_is_audit_ready_but_not_pilot_evidence,
         test_record_fails_closed_when_decision_misses_freeze_or_uses_future_information,
         test_override_requires_reason_and_actionable_modes_require_operator_action,
+        test_operator_override_must_be_explicit_boolean,
         test_verified_outcome_requires_reconciled_service_truth,
         test_shadow_mode_does_not_fake_operator_action,
     ]
