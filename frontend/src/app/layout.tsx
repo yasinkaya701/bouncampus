@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './polish.css';
-import Header from '@/components/shared/Header';
-import Footer from '@/components/shared/Footer';
+import AppShell from '@/components/shared/AppShell';
 import { LocaleProvider } from '@/lib/i18n';
 import { getSiteUrl } from '@/lib/site-url';
 import 'leaflet/dist/leaflet.css';
@@ -45,11 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-screen text-[#111712]">
         <LocaleProvider>
           <a href="#main-content" className="bc-skip-link">Skip to main content</a>
-          <Header />
-          <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pt-10">
-            {children}
-          </main>
-          <Footer />
+          <AppShell>{children}</AppShell>
         </LocaleProvider>
       </body>
     </html>
