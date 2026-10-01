@@ -56,6 +56,23 @@ def test_ineligible_method_cannot_trigger_disagreement_review() -> None:
     assert result["method_assessments"]["sandbox"]["eligible_for_stage"] is False
 
 
+def test_no_comparable_eligible_estimate_withholds_stability() -> None:
+    stability = load_stability()
+    result = stability.assess_method_disagreement(
+        {"baseline": 100.0, "sandbox": 180.0},
+        selected_method_id="baseline",
+        method_eligibility={
+            "baseline": "PILOT_ELIGIBLE",
+            "sandbox": "SANDBOX_ONLY",
+        },
+        stage="PILOT",
+        max_relative_disagreement_pct=10.0,
+    )
+    assert result["assessment_status"] == "WITHHOLD"
+    assert result["max_relative_disagreement_pct"] is None
+    assert "NO_COMPARABLE_ELIGIBLE_ESTIMATE" in result["reason_codes"]
+
+
 def test_small_positive_selected_estimate_uses_true_relative_disagreement() -> None:
     stability = load_stability()
     result = stability.assess_method_disagreement(
@@ -148,6 +165,7 @@ def main() -> int:
     tests = [
         test_method_disagreement_requires_review_past_registered_gate,
         test_ineligible_method_cannot_trigger_disagreement_review,
+        test_no_comparable_eligible_estimate_withholds_stability,
         test_small_positive_selected_estimate_uses_true_relative_disagreement,
         test_zero_selected_estimate_withholds_relative_disagreement,
         test_policy_sensitivity_requires_review_when_target_is_unstable,
