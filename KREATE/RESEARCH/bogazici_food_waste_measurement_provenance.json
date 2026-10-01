@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "research_pack_id": "BOGAZICI_FOOD_WASTE_MEASUREMENT_PROVENANCE",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "claim_boundary": [
+    "not_PMR",
+    "not_current_waste_stage_decomposition",
+    "not_longitudinal_causal_trend",
+    "not_measured_product_impact"
+  ],
+  "published_series": [
+    {
+      "year": 2023,
+      "published_total_food_waste_kg": 24300,
+      "published_waste_oil_kg": 5500,
+      "published_granularity": "daily",
+      "published_fields": ["waste_portions", "waste_kg"],
+      "derived_numeric_observation": "published waste_kg values repeatedly equal waste_portions * 0.30 kg across visible daily rows and monthly totals",
+      "measurement_method": "UNRESOLVED",
+      "comparability_status": "DO_NOT_CHAIN_AS_TREND_WITH_2024_2025_WITHOUT_OWNER_CONFIRMATION",
+      "source_url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/16-bogazici-university-sustainability-yayin-20250512-140721.pdf"
+    },
+    {
+      "year": 2024,
+      "published_total_food_waste_kg": 50993,
+      "published_recovered_food_kg": 29776,
+      "published_recovery_rate_percent": 58.4,
+      "published_waste_oil_kg": 5710,
+      "published_granularity": "monthly",
+      "scope_wording": "food waste collected from dining halls and canteens / university food-waste collection and recovery reporting",
+      "taxonomy_orientation": "collection_and_recovery_path",
+      "comparability_status": "METHOD_SCOPE_NOT_PROVEN_EQUIVALENT_TO_2023",
+      "source_url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking"
+    },
+    {
+      "year": 2025,
+      "published_total_food_waste_kg": 48251,
+      "published_delivered_to_istac_kg": 33430,
+      "published_waste_oil_kg": 6305,
+      "published_granularity": "monthly",
+      "taxonomy_orientation": "collection_and_transfer_path",
+      "known_anomalies": [
+        {
+          "month": "August",
+          "total_food_waste_kg": 1502,
+          "delivered_to_istac_kg": 3550,
+          "issue": "delivered amount exceeds same-month total despite page note saying delivered amounts are included within totals"
+        },
+        {
+          "month": "October",
+          "total_food_waste_kg": 1334,
+          "delivered_to_istac_kg": 4850,
+          "issue": "delivered amount exceeds same-month total despite page note saying delivered amounts are included within totals"
+        }
+      ],
+      "comparability_status": "DO_NOT_INFER_RECOVERY_RATE_OR_TREND_UNTIL_EVENT_TIME_SEMANTICS_RESOLVED",
+      "source_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310"
+    }
+  ],
+  "derived_arithmetic_context": {
+    "2023_to_2024_raw_percent_change": 109.85,
+    "2024_to_2025_raw_percent_change": -5.38,
+    "2025_istac_divided_by_total_percent": 69.28,
+    "usage_rule": "arithmetic_context_only_not_operational_trend_or_official_2025_recovery_rate"
+  },
+  "critical_provenance_questions": [
+    "what operationally counted as one waste portion in 2023",
+    "whether 2023 kg was physically weighed or calculated from portion count",
+    "if calculated what conversion factor and rationale were used",
+    "which campuses facilities and service channels were included each year",
+    "whether measurement method or reporting owner changed between 2023 and 2024",
+    "whether 2024 and 2025 total food waste means generated collected or transferred waste",
+    "whether dining halls and canteens are combined",
+    "whether waste can be separated by preparation unserved service-line and plate stages",
+    "whether ISTAC month means generation month pickup month or transfer month",
+    "why August and October 2025 delivered amounts exceed same-month total"
+  ],
+  "public_taxonomy_limitation": {
+    "current_orientation": [
+      "food_scraps",
+      "bread_scraps",
+      "compostable_organic",
+      "waste_oil",
+      "shelter_transfer",
+      "ISTAC_transfer",
+      "surplus_donation"
+    ],
+    "missing_causal_stages": [
+      "preparation_waste",
+      "unserved_cooked_surplus",
+      "service_line_leftover",
+      "plate_waste",
+      "menu_rejection",
+      "spoilage"
+    ],
+    "product_implication": "public reporting cannot by itself validate that production mismatch materially causes avoidable waste"
+  },
+  "minimum_pilot_fields": [
+    "service_id",
+    "date",
+    "campus",
+    "meal_period",
+    "service_regime",
+    "produced_portions",
+    "served_portions",
+    "preparation_waste_kg",
+    "unserved_edible_surplus_kg",
+    "plate_waste_kg",
+    "other_food_waste_kg",
+    "recovered_or_donated_kg",
+    "istac_transfer_kg",
+    "waste_oil_kg",
+    "measurement_method",
+    "measurement_timestamp",
+    "source_owner",
+    "notes"
+  ],
+  "fallback_minimum_boundary": [
+    "pre_consumer_or_unserved_kg",
+    "post_consumer_plate_kg"
+  ],
+  "metric_hierarchy": {
+    "tier_1_production_decision": [
+      "unserved_edible_surplus_kg_per_served_meal",
+      "excess_portions_per_produced_portion",
+      "shortage_events",
+      "sellout_minutes_before_end"
+    ],
+    "tier_2_broader_physical_waste": [
+      "pre_consumer_waste_kg_per_served_meal",
+      "plate_waste_kg_per_served_meal",
+      "total_food_waste_kg_per_served_meal"
+    ],
+    "tier_3_downstream_disposition": [
+      "recovery_kg",
+      "compost_kg",
+      "shelter_kg",
+      "istac_transfer_kg",
+      "donation_kg"
+    ],
+    "tier_4_modeled_impact": [
+      "TRY_impact",
+      "CO2e_impact",
+      "water_impact"
+    ]
+  },
+  "forbidden_inferences": [
+    "food_waste_doubled_in_2024",
+    "2025_reduction_was_caused_by_sustainability_measures",
+    "2025_food_recovery_rate_is_69_3_percent",
+    "all_48251_kg_is_caused_by_demand_forecast_error",
+    "a_forecast_model_will_reduce_the_entire_published_food_waste_total"
+  ],
+  "decision_updates": [
+    {
+      "condition": "unserved surplus is material",
+      "direction": "KEEP production quantity allocation wedge"
+    },
+    {
+      "condition": "preparation waste dominates",
+      "direction": "MODIFY toward recipe preparation process control"
+    },
+    {
+      "condition": "plate waste dominates",
+      "direction": "MODIFY toward menu portion choice behavior or preference interventions"
+    },
+    {
+      "condition": "waste-stage data unavailable but produced served counts exist",
+      "direction": "RUN narrower excess-portions pilot and avoid broad food-waste reduction claim"
+    },
+    {
+      "condition": "neither stage data nor produced served data available",
+      "direction": "DEFER measured field-impact claim"
+    }
+  ],
+  "sources": [
+    "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+    "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+    "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/16-bogazici-university-sustainability-yayin-20250512-140721.pdf",
+    "https://kurumsalveri.bogazici.edu.tr/tr/pages/1225-policy-for-minimisation-of-plastic-use/1419"
+  ]
+}
