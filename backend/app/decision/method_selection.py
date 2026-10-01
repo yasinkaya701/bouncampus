@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from typing import Mapping, Sequence
 
-SUPPORTED_LOWER_IS_BETTER_METRICS = ("mae", "rmse", "wape_pct")
+SUPPORTED_LOWER_IS_BETTER_METRICS = ("mae", "rmse", "wape_pct", "mean_loss")
 STAGE_ELIGIBILITY = {
     "OFFLINE_EVALUATION": frozenset(
         {"EVALUATED_OFFLINE", "PILOT_ELIGIBLE", "PILOT_EVALUATED"}
