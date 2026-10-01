@@ -9,6 +9,8 @@ import { useLocale, type Locale } from '@/lib/i18n';
 
 const primaryNav = [
   { href: '/', tr: 'Genel bakış', en: 'Overview' },
+  { href: '/campus-ops', tr: 'Operasyon', en: 'Operations' },
+  { href: '/campus-ops/shuttle-frequency', tr: 'Mekik planı', en: 'Shuttle plan' },
   { href: '/food-waste', tr: 'Yemek atığı', en: 'Food waste' },
   { href: '/decisions', tr: 'Kararlar', en: 'Decisions' },
   { href: '/data', tr: 'Kanıt', en: 'Evidence' },
@@ -21,6 +23,12 @@ const secondaryNav = [
   { href: '/scenarios', tr: 'Senaryolar', en: 'Scenarios' },
   { href: '/lab', tr: 'Lab', en: 'Lab' },
 ];
+
+function isNavActive(pathname: string, href: string) {
+  if (href === '/') return pathname === '/';
+  if (href === '/campus-ops') return pathname === '/campus-ops';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 function LocaleButton({ value, current, onClick }: { value: Locale; current: Locale; onClick: () => void }) {
   return (
@@ -58,7 +66,7 @@ export default function Header() {
 
           <nav className="hidden h-full items-center gap-6 lg:flex" aria-label={t('Ana navigasyon', 'Primary navigation')}>
             {primaryNav.map(link => {
-              const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              const active = isNavActive(pathname, link.href);
               return (
                 <Link
                   key={link.href}
@@ -105,7 +113,7 @@ export default function Header() {
           <div className="mx-auto grid w-full max-w-[1440px] gap-5 px-4 py-5 sm:px-6">
             <nav className="grid grid-cols-2 gap-2" aria-label={t('Mobil navigasyon', 'Mobile navigation')}>
               {primaryNav.map(link => {
-                const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+                const active = isNavActive(pathname, link.href);
                 return (
                   <Link key={link.href} href={link.href} className={`rounded-lg border px-3 py-3 text-[11px] font-bold ${active ? 'border-[#18372b] bg-[#18372b] text-white' : 'border-[#111712]/10 bg-white text-[#4f5751]'}`}>
                     {locale === 'tr' ? link.tr : link.en}

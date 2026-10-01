@@ -18,13 +18,16 @@ concurrency:
 jobs:
   merge-discipline:
     if: github.event_name == 'pull_request'
-    runs-on: [self-hosted, macOS, ARM64, bouncampus]
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out exact PR head
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Validate PR topology and per-role concurrency
         env:
@@ -94,11 +97,14 @@ jobs:
 
   master-merge-audit:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: [self-hosted, macOS, ARM64, bouncampus]
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Require merged-PR provenance and normal merge commit
         env:
@@ -131,9 +137,12 @@ jobs:
           python scripts/agent_exit_gate.py --branch-head "$branch_head" --master-ref HEAD
 
   feature-registry:
-    runs-on: [self-hosted, macOS, ARM64, bouncampus]
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Validate registered feature files
         run: python scripts/verify_feature_preservation.py
       - name: Validate agent fabric policy
@@ -142,7 +151,7 @@ jobs:
         run: python -m py_compile scripts/agent_exit_gate.py
 
   frontend:
-    runs-on: [self-hosted, macOS, ARM64, bouncampus]
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
@@ -151,6 +160,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
       - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - run: npm run lint
@@ -159,13 +170,12 @@ jobs:
           NEXT_TELEMETRY_DISABLED: '1'
 
   repository-data:
-    runs-on: [self-hosted, macOS, ARM64, bouncampus]
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.11
-        run: |
-          uv venv --python 3.11 "$RUNNER_TEMP/bouncampus-python"
-          echo "$RUNNER_TEMP/bouncampus-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Compile repository Python
         run: python -m compileall -q backend/app scripts
       - name: Test autonomous agent fabric

@@ -43,7 +43,18 @@ import { useLocale } from '@/lib/i18n';
 type FoodApi = {
   demandContext: {
     available: boolean;
+    actionable: boolean;
+    planningCandidate: {
+      portions: number;
+      baselinePortions: number;
+      lowerBound: number;
+      upperBound: number;
+      signalCoveragePct: number;
+      sourceReadiness: DecisionReadiness;
+      semantics: 'ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER';
+    } | null;
     productionBand: ProductionDecisionBand | null;
+    decisionAssessment: ProductionDecisionBand | null;
     provenance: 'MODEL_ESTIMATE';
     note: string;
   };
@@ -91,8 +102,14 @@ export default function FoodWastePage() {
       .catch(() => setFood(null));
   }, []);
 
-  const band = food?.demandContext.productionBand ?? null;
-  const canApprovePilot = band?.decisionReadiness === 'PILOT_READY';
+  const planningCandidate = food?.demandContext.planningCandidate ?? null;
+  const assessmentBand = food?.demandContext.productionBand ?? food?.demandContext.decisionAssessment ?? null;
+  const planningTarget = planningCandidate?.portions ?? assessmentBand?.recommendedTarget ?? null;
+  const band = assessmentBand && planningTarget != null
+    ? { ...assessmentBand, recommendedTarget: planningTarget }
+    : null;
+  const advisoryOnly = Boolean(planningCandidate) && !Boolean(food?.demandContext.actionable);
+  const canApprovePilot = Boolean(food?.demandContext.actionable) && band?.decisionReadiness === 'PILOT_READY';
   const signals = useMemo<SignalView[]>(
     () => (band?.signals ?? []).map(signal => ({ ...signal, source: signalSource[signal.id] })),
     [band],
@@ -213,10 +230,10 @@ export default function FoodWastePage() {
               <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricCard
                   icon={Users}
-                  label={t('Önerilen', 'Recommended')}
+                  label={advisoryOnly ? t('Planlama adayı', 'Planning candidate') : t('Önerilen', 'Recommended')}
                   value={band ? band.recommendedTarget.toLocaleString(numberLocale) : '—'}
                   unit={t('öğün', 'meals')}
-                  footer={band ? t('MODEL_ESTIMATE · ölçüm değil', 'MODEL_ESTIMATE · not measured') : t('Karar bağlamı bekleniyor', 'Waiting for decision context')}
+                  footer={band ? (advisoryOnly ? t('MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL · mutfak emri değil', 'MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL · not a kitchen order') : t('MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL', 'MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL')) : t('Karar bağlamı bekleniyor', 'Waiting for decision context')}
                 />
                 <MetricCard
                   icon={BarChart3}
@@ -246,7 +263,7 @@ export default function FoodWastePage() {
                     <div className="flex flex-col gap-2 border-b border-[#e4e7e4] px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-[18px] font-semibold tracking-[-0.025em] text-[#151b17]">{t('Üretim önerisi', 'Production recommendation')}</h2>
+                          <h2 className="text-[18px] font-semibold tracking-[-0.025em] text-[#151b17]">{advisoryOnly ? t('Planlama adayı', 'Planning candidate') : t('Üretim önerisi', 'Production recommendation')}</h2>
                           <span className="rounded-md bg-[#e6f5ee] px-2 py-1 text-[8px] font-semibold tracking-[0.04em] text-[#27654d]">MODEL_ESTIMATE</span>
                           <CircleHelp size={12} className="text-[#7d857f]" />
                         </div>
