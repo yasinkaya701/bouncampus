@@ -372,7 +372,8 @@ export function allocateRooms(
       .filter(decision => decision.recommendation !== null)
       .map(decision => decision.recommendation!.requestId),
     unassignedRequestIds: decisions
-      .filter(decision => decision.recommendation === null)
-      .map((decision, index) => requests[index]?.requestId ?? decision.decisionId),
+      .map((decision, index) => ({ decision, requestId: requests[index]?.requestId ?? decision.decisionId }))
+      .filter(({ decision }) => decision.recommendation === null)
+      .map(({ requestId }) => requestId),
   };
 }
