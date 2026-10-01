@@ -1,0 +1,82 @@
+{
+  "research_date": "2026-10-01",
+  "status": "PUBLIC_SOURCE_ROUTING_ONLY",
+  "role_boundary": "service_support_owner != application_maintainer != data_steward != business_owner != decision_owner != access_authority",
+  "systems": [
+    {
+      "system": "BUIS_OBIKAS",
+      "public_route": ["Ogrenci Isleri Daire Baskanligi", "Bilgi Islem support"],
+      "safe_inference": "student information automation exists and Student Affairs is an authoritative service route",
+      "unknowns": ["schema", "historical_snapshots", "exports", "schedule_revision_history"],
+      "source": "https://bilgiislem.bogazici.edu.tr/tr/pages/hizmet-envanteri/3513"
+    },
+    {
+      "system": "classroom_scheduling",
+      "public_route": ["Kayit Isleri Sube Mudurlugu"],
+      "safe_inference": "general-use classroom scheduling is performed by Registration Branch",
+      "unknowns": ["actual_scheduler", "tool", "freeze_time", "hard_soft_constraints", "revision_history"],
+      "source": "https://oidb.bogazici.edu.tr/tr/pages/derslikler-hakkinda/4422"
+    },
+    {
+      "system": "BUCampus",
+      "public_route": ["Bilgi Islem Daire Baskanligi"],
+      "safe_inference": "BID accepts BUCampus support and development requests",
+      "unknowns": ["event_retention", "analytics_tables", "feature_domain_owner", "export_rights"],
+      "source": "https://bilgiislem.bogazici.edu.tr/tr/pages/hizmet-envanteri/3513"
+    },
+    {
+      "system": "BUCard_dining",
+      "public_route": ["Saglik Kultur ve Spor Daire Baskanligi", "Bilgi Islem Daire Baskanligi"],
+      "safe_inference": "BUCard is a campus identity/payment surface and cafeteria loading routes through SKS+BID",
+      "unknowns": ["meal_transaction_semantics", "timestamps", "refund_duplicates", "campus_terminal_mapping", "retention", "historical_export"],
+      "recommended_label_until_validated": "CANDIDATE_SERVED_DEMAND_PROXY",
+      "source": "https://bilgiislem.bogazici.edu.tr/tr/pages/hizmet-envanteri/3513"
+    },
+    {
+      "system": "shuttle_timetable",
+      "public_route": ["mekik.bogazici.edu.tr", "BUCampus transport surface"],
+      "safe_inference": "routes and scheduled departure times are public",
+      "unknowns": ["canonical_timetable_owner", "actual_trip_times", "vehicle_assignments", "ridership_counts", "queue_counts"],
+      "sources": ["https://mekik.bogazici.edu.tr/", "https://bilgiislem.bogazici.edu.tr/tr/pages/ulasim/8597"]
+    },
+    {
+      "system": "wireless_network",
+      "public_route": ["Bilgi Islem Daire Baskanligi"],
+      "safe_inference": "managed wireless infrastructure exists",
+      "unknowns": ["AP_telemetry_retention", "privacy_approval", "room_mapping", "historical_client_counts"],
+      "warning": "raw_wifi_client_count_is_not_measured_occupancy",
+      "source": "https://bilgiislem.bogazici.edu.tr/tr/pages/hizmet-envanteri/3513"
+    },
+    {
+      "system": "water_measurement_governance",
+      "public_route": ["Su Yonetimi Komisyonu", "Yapi Isleri ve Teknik Daire", "Birim Su Idari Sorumlulari"],
+      "safe_inference": "formal measurement, monitoring and quarterly reporting responsibility exists",
+      "unknowns": ["meter_topology", "raw_sampling_cadence", "granularity", "anomaly_workflow"],
+      "source": "https://kurumsalveri.bogazici.edu.tr/tr/pages/1541-water-discharge-guidelines-and-standards/1972"
+    },
+    {
+      "system": "energy_management",
+      "public_route": ["Energy Management Team", "facilities route to confirm"],
+      "safe_inference": "ISO 50001 system regularly measures/analyzes energy",
+      "unknowns": ["BMS_EMS_granularity", "alarms", "control_access", "API_or_export", "verification_baseline"],
+      "source": "https://kurumsalveri.bogazici.edu.tr/tr/pages/724-plan-to-reduce-energy-consumption/1367"
+    }
+  ],
+  "access_request_progression": [
+    "public_aggregate",
+    "owner_validated_internal_aggregate",
+    "pseudonymous_or_event_level_only_if_necessary",
+    "individual_level_only_if_strictly_justified_and_approved"
+  ],
+  "required_provenance_fields": [
+    "source_system",
+    "business_owner",
+    "technical_owner",
+    "semantic_validator",
+    "access_authority",
+    "observed_at",
+    "available_at",
+    "transformation_version",
+    "privacy_class"
+  ]
+}
