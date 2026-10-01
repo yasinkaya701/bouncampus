@@ -3,6 +3,7 @@ import {
   FOOD_DECISION_POLICY,
   scoreFoodWastePilot,
 } from '@/lib/food-waste';
+import { summarizeMatchedPilotEffects } from '@/lib/food-pilot-pair-effects';
 import {
   MATCHED_FOOD_WASTE_PILOT_PROTOCOL,
   analyzeMatchedPilotDesign,
@@ -30,6 +31,7 @@ export async function GET() {
         'exactly one CONTROL and one INTERVENTION service per pair_id',
         'no duplicate pair_id + arm combinations',
         'minimum matched pairs',
+        'matched-pair normalized-waste effect summary',
         'duplicate service detection',
         '100% intervention forecast retention',
         'normalized waste-reduction target',
@@ -100,25 +102,31 @@ export async function POST(request: Request) {
   }
 
   const scorecard = scoreFoodWastePilot(typed);
+  const pairedEffects = summarizeMatchedPilotEffects(typed);
   const minimumMatchedPairs = MATCHED_FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMatchedPairs;
   const enoughMatchedPairs = matching.matchedPairCount >= minimumMatchedPairs;
+  const pairEffectsComplete = pairedEffects.matchedPairCount === matching.matchedPairCount;
   const promotableAsPilotResult =
     enoughMatchedPairs
+    && pairEffectsComplete
     && scorecard.gates.dataQualityPassed
     && scorecard.gates.enoughEvidence
     && scorecard.status !== 'INSUFFICIENT_EVIDENCE';
 
   return NextResponse.json({
     scorecard,
+    pairedEffects,
     matching: {
       ...matching,
       minimumMatchedPairs,
       enoughMatchedPairs,
+      pairEffectsComplete,
     },
     protocolVersion: MATCHED_FOOD_WASTE_PILOT_PROTOCOL.version,
     decisionPolicyVersion: FOOD_DECISION_POLICY.version,
     evidencePromotion: {
-      dataQualityPassed: scorecard.gates.dataQualityPassed && matching.structurePassed,
+      dataQualityPassed:
+        scorecard.gates.dataQualityPassed && matching.structurePassed && pairEffectsComplete,
       enoughEvidence: scorecard.gates.enoughEvidence && enoughMatchedPairs,
       promotableAsPilotResult,
       promotableAsGeneralizedClimateImpact: false,
