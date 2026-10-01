@@ -64,6 +64,8 @@ assert.match(foodRoute, /diagnosticProductionBand/);
 assert.match(foodRoute, /recommendedTarget:\s*sourceAssessment\.predictedMeals/);
 assert.match(foodRoute, /ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER/);
 
+// The operator surface must keep a diagnostic portion candidate visible while
+// preserving the non-actionable WITHHOLD/approval boundary for sandbox methods.
 const page = readFileSync(resolve(frontendRoot, 'src/app/food-waste/page.tsx'), 'utf8');
 assert.match(page, /planningCandidate/);
 assert.match(page, /Planlama adayı/);
