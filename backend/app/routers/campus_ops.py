@@ -13,6 +13,7 @@ from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
+from app.decision.solar_site_planning import analyze_room_solar_exposure, rank_new_building_orientations
 from app.decision.water_advisory import plan_water_advisory
 
 router = APIRouter(prefix="/api/v1/ops", tags=["campus-operations"])
@@ -39,6 +40,8 @@ def capabilities() -> dict[str, Any]:
             "shuttle",
             "space_activation",
             "class_scheduling",
+            "solar_exposure",
+            "site_orientation",
             "shared_capacity",
             "energy_advisory",
             "water_advisory",
@@ -48,7 +51,7 @@ def capabilities() -> dict[str, Any]:
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
-        "truth_boundary": "No live cafeteria POS, shuttle GPS, room-occupancy, BMS, smart-meter/water-meter, Wi-Fi/turnstile, or registrar telemetry is implied by these optimization endpoints.",
+        "truth_boundary": "No live cafeteria POS, shuttle GPS, room-occupancy, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
         "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
@@ -110,6 +113,32 @@ def optimize_classes(payload: dict[str, Any]) -> dict[str, Any]:
         classes=_payload_value(payload, "classes", []),
         rooms=_payload_value(payload, "rooms", []),
         building_mismatch_weight=_payload_value(payload, "building_mismatch_weight", 0.0),
+        solar_exposure_weight=_payload_value(payload, "solar_exposure_weight", 0.0),
+    )
+
+
+@router.post("/solar")
+def solar_review(payload: dict[str, Any]) -> dict[str, Any]:
+    _validate(payload)
+    return analyze_room_solar_exposure(
+        latitude_deg=_payload_value(payload, "latitude_deg", None),
+        longitude_deg=_payload_value(payload, "longitude_deg", None),
+        timestamps=_payload_value(payload, "timestamps", []),
+        rooms=_payload_value(payload, "rooms", []),
+        class_sessions=_payload_value(payload, "class_sessions", []),
+        affected_threshold=_payload_value(payload, "affected_threshold", 0.25),
+    )
+
+
+@router.post("/site-orientation")
+def site_orientation(payload: dict[str, Any]) -> dict[str, Any]:
+    _validate(payload)
+    return rank_new_building_orientations(
+        latitude_deg=_payload_value(payload, "latitude_deg", None),
+        longitude_deg=_payload_value(payload, "longitude_deg", None),
+        timestamps=_payload_value(payload, "timestamps", []),
+        facade_program=_payload_value(payload, "facade_program", []),
+        candidate_orientations_deg=_payload_value(payload, "candidate_orientations_deg", []),
     )
 
 
