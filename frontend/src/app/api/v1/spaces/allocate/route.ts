@@ -12,6 +12,23 @@ export const dynamic = 'force-dynamic';
 
 const scheduleIndex = buildRoomScheduleIndex(courseSnapshot as CourseSnapshot);
 
+const source = {
+  term: courseSnapshotMeta.term,
+  capturedAt: courseSnapshotMeta.captured_at,
+  sourceUrl: courseSnapshotMeta.source_url,
+  sourceClass: courseSnapshotMeta.source_class,
+  refreshRequiredAfter: courseSnapshotMeta.refresh_required_after,
+};
+
+const truthBoundary = {
+  liveRoomOccupancyConnected: false,
+  accessControlConnected: false,
+  bmsConnected: false,
+  universityVerifiedRoomCapacityConnected: false,
+  automaticRoomBooking: false,
+  note: 'Recommendations check the official course-schedule snapshot and within-batch conflicts. They do not prove real-time room vacancy or booking authority.',
+};
+
 function parseSpaceRequest(value: unknown): SpaceAllocationRequest | null {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
   const item = value as Record<string, unknown>;
@@ -45,6 +62,31 @@ function parseRoomCapacities(value: unknown): Record<string, number> | undefined
     output[roomId.trim()] = capacity;
   }
   return output;
+}
+
+export async function GET() {
+  const now = Date.now();
+  const refreshDeadline = Date.parse(courseSnapshotMeta.refresh_required_after);
+  const stale = Number.isFinite(refreshDeadline) ? now > refreshDeadline : true;
+
+  return NextResponse.json(
+    {
+      source,
+      inventory: {
+        roomsObservedInScheduleSnapshot: scheduleIndex.roomIds.length,
+        roomIds: scheduleIndex.roomIds,
+        roomCapacitySource: 'UNAVAILABLE',
+      },
+      readiness: stale ? 'REVIEW_REQUIRED' : 'READY',
+      reasonCodes: stale ? ['COURSE_SNAPSHOT_REFRESH_REQUIRED'] : ['COURSE_SNAPSHOT_WITHIN_REFRESH_WINDOW'],
+      truthBoundary,
+    },
+    {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    },
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -95,25 +137,12 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       ...batch,
-      source: {
-        term: courseSnapshotMeta.term,
-        capturedAt: courseSnapshotMeta.captured_at,
-        sourceUrl: courseSnapshotMeta.source_url,
-        sourceClass: courseSnapshotMeta.source_class,
-        refreshRequiredAfter: courseSnapshotMeta.refresh_required_after,
-      },
+      source,
       inventory: {
         roomsObservedInScheduleSnapshot: scheduleIndex.roomIds.length,
         roomCapacitySource: roomCapacities ? 'USER_SUPPLIED_REQUEST_DATA' : 'UNAVAILABLE',
       },
-      truthBoundary: {
-        liveRoomOccupancyConnected: false,
-        accessControlConnected: false,
-        bmsConnected: false,
-        universityVerifiedRoomCapacityConnected: false,
-        automaticRoomBooking: false,
-        note: 'Recommendations check the official course-schedule snapshot and within-batch conflicts. They do not prove real-time room vacancy or booking authority.',
-      },
+      truthBoundary,
     },
     {
       headers: {
