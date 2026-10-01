@@ -60,7 +60,6 @@ export async function GET(request: Request) {
   const decisionAssessment = applyMethodEligibility(sourceAssessment, {
     methodEligibility: 'SANDBOX_ONLY',
   });
-  const productionBand = decisionAssessment.abstained ? null : decisionAssessment;
   const planningCandidate = dashboardAvailable && sourceAssessment.predictedMeals > 0
     ? {
         portions: sourceAssessment.predictedMeals,
@@ -76,6 +75,15 @@ export async function GET(request: Request) {
         automaticKitchenDispatch: false,
       }
     : null;
+  const diagnosticProductionBand = planningCandidate
+    ? {
+        ...decisionAssessment,
+        recommendedTarget: sourceAssessment.predictedMeals,
+      }
+    : null;
+  const productionBand = decisionAssessment.abstained
+    ? diagnosticProductionBand
+    : decisionAssessment;
 
   return NextResponse.json({
     contractVersion: 'food-intelligence-v1.2',
@@ -95,7 +103,7 @@ export async function GET(request: Request) {
       decisionAssessment,
       provenance: FOOD_DECISION_POLICY.forecastProvenance,
       methodEligibility: decisionAssessment.methodEligibility,
-      note: 'The planningCandidate is a menu-adjusted advisory model estimate and remains visible for diagnosis even when method eligibility withholds an actionable production recommendation. It is not cafeteria POS, production, served-meal telemetry, or an authorized kitchen order.',
+      note: 'The planningCandidate is a menu-adjusted advisory model estimate and remains visible for diagnosis even when method eligibility withholds an actionable production recommendation. productionBand may expose that candidate for operator review while decisionReadiness remains WITHHOLD; it is not cafeteria POS, production, served-meal telemetry, or an authorized kitchen order.',
     },
     decisionPolicy: {
       version: FOOD_DECISION_POLICY.version,
@@ -110,7 +118,7 @@ export async function GET(request: Request) {
       humanApprovalRequired: FOOD_DECISION_POLICY.operatorApprovalRequired,
       automaticKitchenDispatch: FOOD_DECISION_POLICY.autoDispatchAllowed,
       limitations: FOOD_DECISION_POLICY.limitations,
-      withholdRule: 'WITHHOLD when there is no positive demand estimate, a required source is unavailable, or the selected method is SANDBOX_ONLY/RETIRED.',
+      withholdRule: 'WITHHOLD when there is no positive demand estimate, a required source is unavailable, or the selected method is SANDBOX_ONLY/RETIRED. A diagnostic planning candidate may remain visible but is not actionable.',
       pilotRule: 'PILOT_READY additionally requires a method explicitly promoted to PILOT_ELIGIBLE or PILOT_EVALUATED; source coverage alone can never promote a sandbox model.',
     },
     baselineEvaluation: {
