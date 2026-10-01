@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.decision.building_energy_policy import plan_building_energy
-from app.decision.campus_contract import CONTRACT_VERSION
+from app.decision.campus_contract import CONTRACT_VERSION, PROVENANCE_STATES
 from app.decision.campus_portfolio import build_campus_portfolio
 from app.decision.campus_state import build_campus_state
 from app.decision.classroom_policy import allocate_classrooms
@@ -32,6 +32,8 @@ class ShuttlePlanRequest(BaseModel):
 class ClassroomAllocationRequest(BaseModel):
     sessions: list[dict[str, Any]]
     rooms: list[dict[str, Any]]
+    room_inventory_provenance: str = "UNAVAILABLE"
+    attendance_provenance: str = "UNAVAILABLE"
     upstream_readiness: str = "REVIEW_REQUIRED"
 
 
@@ -91,6 +93,8 @@ class CampusOpsPlanRequest(BaseModel):
     reserve_ratio: float = 0.10
     sessions: list[dict[str, Any]] = Field(default_factory=list)
     rooms: list[dict[str, Any]] = Field(default_factory=list)
+    room_inventory_provenance: str = "UNAVAILABLE"
+    attendance_provenance: str = "UNAVAILABLE"
     food: FoodPlanConfig | None = None
     energy: EnergyPlanConfig | None = None
     shared_capacity: SharedCapacityConfig | None = None
@@ -114,7 +118,7 @@ def get_campus_ops_contract() -> dict[str, Any]:
             "portfolio",
         ],
         "decision_readiness_states": ["PILOT_READY", "REVIEW_REQUIRED", "WITHHOLD"],
-        "provenance_states": ["PUBLIC_SOURCE", "MODEL_ESTIMATE", "POLICY_HEURISTIC", "MEASURED_PILOT"],
+        "provenance_states": list(PROVENANCE_STATES),
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
         "privacy_boundary": (
@@ -135,7 +139,11 @@ def get_campus_ops_contract() -> dict[str, Any]:
 @router.post("/state")
 def build_state(payload: CampusStateRequest) -> dict[str, Any]:
     try:
-        return build_campus_state(payload.zones, payload.sources, decision_time=payload.decision_time)
+        return build_campus_state(
+            payload.zones,
+            payload.sources,
+            decision_time=payload.decision_time,
+        )
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -143,7 +151,11 @@ def build_state(payload: CampusStateRequest) -> dict[str, Any]:
 @router.post("/shuttle/plan")
 def build_shuttle_plan(payload: ShuttlePlanRequest) -> dict[str, Any]:
     try:
-        return plan_shuttle_capacity(payload.routes, reserve_ratio=payload.reserve_ratio, upstream_readiness=payload.upstream_readiness)
+        return plan_shuttle_capacity(
+            payload.routes,
+            reserve_ratio=payload.reserve_ratio,
+            upstream_readiness=payload.upstream_readiness,
+        )
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -151,7 +163,13 @@ def build_shuttle_plan(payload: ShuttlePlanRequest) -> dict[str, Any]:
 @router.post("/classrooms/allocate")
 def build_classroom_plan(payload: ClassroomAllocationRequest) -> dict[str, Any]:
     try:
-        return allocate_classrooms(payload.sessions, payload.rooms, upstream_readiness=payload.upstream_readiness)
+        return allocate_classrooms(
+            payload.sessions,
+            payload.rooms,
+            upstream_readiness=payload.upstream_readiness,
+            room_inventory_provenance=payload.room_inventory_provenance,
+            attendance_provenance=payload.attendance_provenance,
+        )
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -187,7 +205,10 @@ def build_energy_plan(payload: EnergyPlanRequest) -> dict[str, Any]:
 @router.post("/shared-capacity/allocate")
 def build_shared_capacity_plan(payload: SharedCapacityRequest) -> dict[str, Any]:
     try:
-        return allocate_shared_capacity(total_capacity=payload.total_capacity, requests=payload.requests)
+        return allocate_shared_capacity(
+            total_capacity=payload.total_capacity,
+            requests=payload.requests,
+        )
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -211,10 +232,24 @@ def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
 def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
     """Run one decision-cutoff-consistent advisory planning pass across CS1 domains."""
     try:
-        state = build_campus_state(payload.zones, payload.sources, decision_time=payload.decision_time)
+        state = build_campus_state(
+            payload.zones,
+            payload.sources,
+            decision_time=payload.decision_time,
+        )
         readiness = state["decision_readiness"]
-        shuttle = plan_shuttle_capacity(payload.shuttle_routes, reserve_ratio=payload.reserve_ratio, upstream_readiness=readiness)
-        classroom = allocate_classrooms(payload.sessions, payload.rooms, upstream_readiness=readiness)
+        shuttle = plan_shuttle_capacity(
+            payload.shuttle_routes,
+            reserve_ratio=payload.reserve_ratio,
+            upstream_readiness=readiness,
+        )
+        classroom = allocate_classrooms(
+            payload.sessions,
+            payload.rooms,
+            upstream_readiness=readiness,
+            room_inventory_provenance=payload.room_inventory_provenance,
+            attendance_provenance=payload.attendance_provenance,
+        )
 
         food = None
         if payload.food is not None:
