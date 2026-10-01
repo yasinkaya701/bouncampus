@@ -27,28 +27,37 @@ def generate_reservation_baselines(
     reserved_served_demand: Sequence[float | int | None],
     unreserved_demand: Sequence[float | int | None],
     *,
+    actual_demand: Sequence[float | int | None],
     min_history: int = 2,
+    decomposition_tolerance: float = 1e-6,
 ) -> dict[str, object]:
-    """Build raw and corrected reservation baselines from past reconciled services.
+    """Build raw and corrected reservation baselines from reconciled past services.
 
     The transparent correction is::
 
         current_reservations * historical_show_rate
         + historical_mean_unreserved_demand
 
-    A historical row is learnable only when all three counts are finite and
-    non-negative and reserved-served demand does not exceed active reservations.
-    Current-service outcomes are appended only after its forecast is produced,
-    preventing target leakage. Excluded rows and baseline WITHHOLD states are
-    returned with explicit reason codes rather than being silently discarded.
+    A historical row is learnable only when all four counts are finite and
+    non-negative, reserved-served demand does not exceed active reservations, and
+    ``reserved_served_demand + unreserved_demand`` reconciles to measured actual
+    demand within the explicit numeric tolerance. Current-service outcomes are
+    appended only after its forecast is produced, preventing target leakage.
+    Excluded rows and baseline WITHHOLD states are returned with explicit reason
+    codes rather than being silently discarded or coerced.
     """
 
     if min_history < 1:
         raise ValueError("min_history must be >= 1")
+    tolerance = _to_optional_non_negative_float(decomposition_tolerance)
+    if tolerance is None:
+        raise ValueError("decomposition_tolerance must be finite and non-negative")
+
     lengths = {
         len(active_reservations_at_cutoff),
         len(reserved_served_demand),
         len(unreserved_demand),
+        len(actual_demand),
     }
     if len(lengths) != 1:
         raise ValueError("reservation reconciliation inputs must have the same length")
@@ -65,6 +74,7 @@ def generate_reservation_baselines(
         _to_optional_non_negative_float(value)
         for value in unreserved_demand
     ]
+    actual = [_to_optional_non_negative_float(value) for value in actual_demand]
 
     corrected: list[float | None] = []
     history_n: list[int] = []
@@ -105,6 +115,7 @@ def generate_reservation_baselines(
         reservation = reservations[index]
         served_from_reservation = reserved_served[index]
         served_without_reservation = unreserved[index]
+        measured_actual = actual[index]
         reconciliation_reasons: list[str] = []
         if reservation is None:
             reconciliation_reasons.append("MISSING_OR_INVALID_ACTIVE_RESERVATIONS")
@@ -112,6 +123,8 @@ def generate_reservation_baselines(
             reconciliation_reasons.append("MISSING_OR_INVALID_RESERVED_SERVED_DEMAND")
         if served_without_reservation is None:
             reconciliation_reasons.append("MISSING_OR_INVALID_UNRESERVED_DEMAND")
+        if measured_actual is None:
+            reconciliation_reasons.append("MISSING_OR_INVALID_ACTUAL_DEMAND")
         if (
             reservation is not None
             and served_from_reservation is not None
@@ -120,6 +133,17 @@ def generate_reservation_baselines(
             reconciliation_reasons.append(
                 "RESERVED_SERVED_EXCEEDS_ACTIVE_RESERVATIONS"
             )
+        if (
+            served_from_reservation is not None
+            and served_without_reservation is not None
+            and measured_actual is not None
+            and abs(
+                (served_from_reservation + served_without_reservation)
+                - measured_actual
+            )
+            > tolerance
+        ):
+            reconciliation_reasons.append("SERVED_DEMAND_DECOMPOSITION_MISMATCH")
 
         if reconciliation_reasons:
             reconciliation_status.append("EXCLUDED")
@@ -144,6 +168,8 @@ def generate_reservation_baselines(
         "reconciled_row_count": reconciled_row_count,
         "excluded_row_count": excluded_row_count,
         "semantics": "RESERVATION_IS_INTENT_NOT_SERVED_DEMAND",
+        "reconciliation_identity": "RESERVED_SERVED_PLUS_UNRESERVED_EQUALS_ACTUAL_DEMAND",
+        "decomposition_tolerance": tolerance,
         "result_scope": "OFFLINE_BASELINE_ONLY",
         "leakage_policy": "PAST_RECONCILED_SERVICES_ONLY",
     }
