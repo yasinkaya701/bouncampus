@@ -13,6 +13,7 @@ from app.decision.campus_ops import (
 from app.decision.campus_orchestrator import build_integrated_campus_plan
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
+from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
 
@@ -41,6 +42,7 @@ def capabilities() -> dict[str, Any]:
             "space_activation",
             "class_scheduling",
             "shared_capacity",
+            "energy_advisory",
             "bundle",
             "integrated_plan",
         ],
@@ -118,6 +120,16 @@ def allocate_resources(payload: dict[str, Any]) -> dict[str, Any]:
     return allocate_shared_capacity(
         total_capacity=_payload_value(payload, "total_capacity", None),
         requests=_payload_value(payload, "requests", []),
+    )
+
+
+@router.post("/energy")
+def optimize_energy(payload: dict[str, Any]) -> dict[str, Any]:
+    _validate(payload)
+    return plan_energy_advisory(
+        zones=_payload_value(payload, "zones", []),
+        low_utilization_threshold=_payload_value(payload, "low_utilization_threshold", None),
+        medium_utilization_threshold=_payload_value(payload, "medium_utilization_threshold", None),
     )
 
 
