@@ -11,6 +11,7 @@ from app.decision.campus_portfolio import build_campus_portfolio
 from app.decision.campus_state import build_campus_state
 from app.decision.classroom_policy import allocate_classrooms
 from app.decision.food_ops_policy import plan_food_production
+from app.decision.shared_capacity_policy import allocate_shared_capacity
 from app.decision.shuttle_policy import plan_shuttle_capacity
 
 router = APIRouter(prefix="/api/v1/campus-ops", tags=["campus-ops"])
@@ -50,6 +51,11 @@ class EnergyPlanRequest(BaseModel):
     upstream_readiness: str = "REVIEW_REQUIRED"
 
 
+class SharedCapacityRequest(BaseModel):
+    total_capacity: int
+    requests: list[dict[str, Any]]
+
+
 class FoodPlanConfig(BaseModel):
     demand_scenarios: list[dict[str, Any]]
     max_capacity: float
@@ -63,12 +69,18 @@ class EnergyPlanConfig(BaseModel):
     medium_utilization_threshold: float
 
 
+class SharedCapacityConfig(BaseModel):
+    total_capacity: int
+    requests: list[dict[str, Any]]
+
+
 class CampusPortfolioRequest(BaseModel):
     campus_state: dict[str, Any]
     shuttle_plan: dict[str, Any] | None = None
     classroom_plan: dict[str, Any] | None = None
     food_decision: dict[str, Any] | None = None
     energy_decision: dict[str, Any] | None = None
+    shared_capacity_decision: dict[str, Any] | None = None
 
 
 class CampusOpsPlanRequest(BaseModel):
@@ -81,6 +93,7 @@ class CampusOpsPlanRequest(BaseModel):
     rooms: list[dict[str, Any]] = Field(default_factory=list)
     food: FoodPlanConfig | None = None
     energy: EnergyPlanConfig | None = None
+    shared_capacity: SharedCapacityConfig | None = None
 
 
 def _unprocessable(exc: ValueError) -> HTTPException:
@@ -97,15 +110,11 @@ def get_campus_ops_contract() -> dict[str, Any]:
             "classroom",
             "food",
             "energy",
+            "shared_capacity",
             "portfolio",
         ],
         "decision_readiness_states": ["PILOT_READY", "REVIEW_REQUIRED", "WITHHOLD"],
-        "provenance_states": [
-            "PUBLIC_SOURCE",
-            "MODEL_ESTIMATE",
-            "POLICY_HEURISTIC",
-            "MEASURED_PILOT",
-        ],
+        "provenance_states": ["PUBLIC_SOURCE", "MODEL_ESTIMATE", "POLICY_HEURISTIC", "MEASURED_PILOT"],
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
         "privacy_boundary": (
@@ -126,11 +135,7 @@ def get_campus_ops_contract() -> dict[str, Any]:
 @router.post("/state")
 def build_state(payload: CampusStateRequest) -> dict[str, Any]:
     try:
-        return build_campus_state(
-            payload.zones,
-            payload.sources,
-            decision_time=payload.decision_time,
-        )
+        return build_campus_state(payload.zones, payload.sources, decision_time=payload.decision_time)
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -138,11 +143,7 @@ def build_state(payload: CampusStateRequest) -> dict[str, Any]:
 @router.post("/shuttle/plan")
 def build_shuttle_plan(payload: ShuttlePlanRequest) -> dict[str, Any]:
     try:
-        return plan_shuttle_capacity(
-            payload.routes,
-            reserve_ratio=payload.reserve_ratio,
-            upstream_readiness=payload.upstream_readiness,
-        )
+        return plan_shuttle_capacity(payload.routes, reserve_ratio=payload.reserve_ratio, upstream_readiness=payload.upstream_readiness)
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -150,11 +151,7 @@ def build_shuttle_plan(payload: ShuttlePlanRequest) -> dict[str, Any]:
 @router.post("/classrooms/allocate")
 def build_classroom_plan(payload: ClassroomAllocationRequest) -> dict[str, Any]:
     try:
-        return allocate_classrooms(
-            payload.sessions,
-            payload.rooms,
-            upstream_readiness=payload.upstream_readiness,
-        )
+        return allocate_classrooms(payload.sessions, payload.rooms, upstream_readiness=payload.upstream_readiness)
     except ValueError as exc:
         raise _unprocessable(exc) from exc
 
@@ -187,6 +184,14 @@ def build_energy_plan(payload: EnergyPlanRequest) -> dict[str, Any]:
         raise _unprocessable(exc) from exc
 
 
+@router.post("/shared-capacity/allocate")
+def build_shared_capacity_plan(payload: SharedCapacityRequest) -> dict[str, Any]:
+    try:
+        return allocate_shared_capacity(total_capacity=payload.total_capacity, requests=payload.requests)
+    except ValueError as exc:
+        raise _unprocessable(exc) from exc
+
+
 @router.post("/portfolio")
 def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
     try:
@@ -196,6 +201,7 @@ def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
             classroom_plan=payload.classroom_plan,
             food_decision=payload.food_decision,
             energy_decision=payload.energy_decision,
+            shared_capacity_decision=payload.shared_capacity_decision,
         )
     except ValueError as exc:
         raise _unprocessable(exc) from exc
@@ -204,24 +210,11 @@ def build_portfolio(payload: CampusPortfolioRequest) -> dict[str, Any]:
 @router.post("/plan")
 def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
     """Run one decision-cutoff-consistent advisory planning pass across CS1 domains."""
-
     try:
-        state = build_campus_state(
-            payload.zones,
-            payload.sources,
-            decision_time=payload.decision_time,
-        )
+        state = build_campus_state(payload.zones, payload.sources, decision_time=payload.decision_time)
         readiness = state["decision_readiness"]
-        shuttle = plan_shuttle_capacity(
-            payload.shuttle_routes,
-            reserve_ratio=payload.reserve_ratio,
-            upstream_readiness=readiness,
-        )
-        classroom = allocate_classrooms(
-            payload.sessions,
-            payload.rooms,
-            upstream_readiness=readiness,
-        )
+        shuttle = plan_shuttle_capacity(payload.shuttle_routes, reserve_ratio=payload.reserve_ratio, upstream_readiness=readiness)
+        classroom = allocate_classrooms(payload.sessions, payload.rooms, upstream_readiness=readiness)
 
         food = None
         if payload.food is not None:
@@ -243,12 +236,20 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
                 upstream_readiness=readiness,
             )
 
+        shared_capacity = None
+        if payload.shared_capacity is not None:
+            shared_capacity = allocate_shared_capacity(
+                total_capacity=payload.shared_capacity.total_capacity,
+                requests=payload.shared_capacity.requests,
+            )
+
         portfolio = build_campus_portfolio(
             campus_state=state,
             shuttle_plan=shuttle,
             classroom_plan=classroom,
             food_decision=food,
             energy_decision=energy,
+            shared_capacity_decision=shared_capacity,
         )
         return {
             "state": state,
@@ -256,6 +257,7 @@ def plan_campus_operations(payload: CampusOpsPlanRequest) -> dict[str, Any]:
             "classroom": classroom,
             "food": food,
             "energy": energy,
+            "shared_capacity": shared_capacity,
             "portfolio": portfolio,
         }
     except ValueError as exc:
