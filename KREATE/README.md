@@ -48,22 +48,39 @@ Submit the strongest evidence-backed KREATE application by **2026-10-08 23:59** 
 - New product features without PMR support.
 - Extra modeling, climate conversion, or hardware work that does not create evidence needed for the application.
 
-## Roles and ownership
+## Human PMR ownership
 
-| Role | KREATE responsibility |
+The human team still has **four people**. PMR/interview ownership remains person-based:
+
+| Human PMR lead role | KREATE responsibility |
 | --- | --- |
-| IE — Customer Discovery & Market Lead | Beachhead, persona, workflow, decision owner, PMR quality; leads 4 interviews. |
-| EE — Physical Systems & Measurement Lead | Measurement feasibility, operational data availability, technical measurement risks; leads 4 interviews. |
-| CS1 — Decision Intelligence Lead | Decision logic, model/technical assumptions, feasibility and failure conditions; leads 4 interviews. |
-| CS2 — Product Strategy, Evidence Synthesis & Application Lead | Rubric coverage, evidence synthesis, application draft and claim traceability; leads 4 interviews. |
+| IE — Customer Discovery & Market Lead | Beachhead, persona, workflow, decision owner, PMR quality; leads 4 target interviews. |
+| EE — Physical Systems & Measurement Lead | Measurement feasibility, operational data availability, technical measurement risks; leads 4 target interviews. |
+| CS1 — Decision Intelligence Lead | Decision logic, model/technical assumptions, feasibility and failure conditions; leads 4 target interviews. |
+| CS2 — Product Strategy, Evidence Synthesis & Application Lead | Rubric coverage, evidence synthesis, application draft and claim traceability; leads 4 target interviews. |
 
 **CS2 owns final synthesis. Domain owners must sign off factual claims in their area before submission.**
+
+## Execution-role architecture
+
+Repository execution uses **five roles**:
+
+1. IE — Customer Discovery & Market Lead
+2. EE — Physical Systems & Measurement Lead
+3. **EHB — Embedded Hardware, Communications & Integration Lead**
+4. CS1 — Decision Intelligence Lead
+5. CS2 — Product Strategy, Evidence Synthesis & Application Lead
+
+EHB is an independent execution/ownership role, not a fifth human and not an EE sub-role. It may be staffed by the appropriate human plus autonomous agents.
+
+EE owns measurement correctness: measurand, measurement architecture, calibration, uncertainty, physical workflow and field validity. EHB owns implementation-heavy embedded work: electronics, controller/PCB, firmware, communications, buffering/recovery, bring-up and HW↔SW integration. Cross-boundary changes use the EE↔EHB interface contract and dual review. See [ROLES/05_EHB_EMBEDDED_HARDWARE_COMMUNICATIONS_INTEGRATION_LEAD.md](./ROLES/05_EHB_EMBEDDED_HARDWARE_COMMUNICATIONS_INTEGRATION_LEAD.md) and [HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md](./HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md).
 
 ## PMR target
 
 - Target: **16 distinct interviews**.
 - Hard minimum: **12 distinct interviews**.
-- Each teammate leads **4** target interviews.
+- Each human teammate leads **4** target interviews.
+- Adding EHB does **not** add `EHB-01..04` slots or change the target to 20 interviews.
 - A conversation counts toward the tracker only when a real stakeholder conversation occurred and the repo contains notes sufficient to create at least one traceable evidence item or an explicit finding of no promotable evidence.
 - Never invent names, quotes, organizations, incidents, or outcomes to fill the tracker.
 
@@ -124,6 +141,7 @@ Rules:
 - [EXPERIMENTS/EXPERIMENT_TEMPLATE.md](./EXPERIMENTS/EXPERIMENT_TEMPLATE.md) — bounded experiment record.
 - [FEATURES.md](./FEATURES.md) — evidence-gated feature backlog.
 - [APPLICATION_RUBRIC.md](./APPLICATION_RUBRIC.md) — rubric closure board + final claim ledger.
+- [HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md](./HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md) — shared measurement/embedded interface contract.
 - [`../docs/assumptions.md`](../docs/assumptions.md) — existing product truth boundary and methodology.
 - [`../docs/food-waste-pilot-protocol.md`](../docs/food-waste-pilot-protocol.md) — existing falsifiable pilot protocol.
 
