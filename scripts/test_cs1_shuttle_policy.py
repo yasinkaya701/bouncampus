@@ -27,6 +27,7 @@ def route(**overrides):
         "forecast_demand": 180,
         "vehicle_capacity": 50,
         "available_vehicles": 2,
+        "capacity_provenance": "OFFICIAL_SNAPSHOT",
         "service_window_min": 120,
         "round_trip_min": 40,
         "min_headway_min": 10,
@@ -51,6 +52,8 @@ def test_recommends_capacity_without_claiming_live_gps() -> None:
     assert item["trips_required"] == 4
     assert item["max_supported_trips"] == 6
     assert item["capacity_feasible"] is True
+    assert item["capacity_provenance"] == "OFFICIAL_SNAPSHOT"
+    assert item["capacity_verified"] is True
     assert 10 <= item["recommended_headway_min"] <= 30
     assert "NO_LIVE_SHUTTLE_GPS_CLAIM" in result["limitations"]
 
@@ -67,6 +70,21 @@ def test_oversubscribed_route_surfaces_shortage_for_review() -> None:
     assert item["unserved_seat_demand_estimate"] > 0
     assert "ROUTE_CAPACITY_SHORTFALL_SOUTH-NORTH" in result["reason_codes"]
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
+
+
+def test_unverified_capacity_withholds_capacity_sensitive_plan() -> None:
+    policy = load_module("shuttle_policy_truth_boundary", "backend/app/decision/shuttle_policy.py")
+    for provenance in (None, "MODEL_ESTIMATE", "POLICY_HEURISTIC"):
+        candidate = route(capacity_provenance=provenance)
+        result = policy.plan_shuttle_capacity(
+            [candidate],
+            reserve_ratio=0.10,
+            upstream_readiness="REVIEW_REQUIRED",
+        )
+        assert result["decision_readiness"] == "WITHHOLD"
+        assert result["abstained"] is True
+        assert result["routes"] == []
+        assert "UNVERIFIED_SHUTTLE_CAPACITY" in result["reason_codes"]
 
 
 def test_withholds_when_upstream_state_is_withheld() -> None:
