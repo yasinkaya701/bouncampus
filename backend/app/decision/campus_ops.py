@@ -232,6 +232,123 @@ def optimize_shuttle_plan(
     }
 
 
+def optimize_space_plan(
+    *,
+    occupancy_scenarios: Sequence[Mapping[str, Any]],
+    zones: Sequence[Mapping[str, Any]],
+    idle_capacity_weight: Any,
+    shortage_weight: Any,
+    min_point_service_ratio: Any = 0.9,
+) -> dict[str, Any]:
+    """Select which registered spaces/zones to open under occupancy uncertainty.
+
+    ``activation_weight`` is an abstract caller-registered relative operating weight.
+    It is not kWh, currency, carbon, or measured savings. Therefore this contract
+    never promotes an energy-savings claim.
+    """
+
+    result = {
+        **_base("SPACE_ACTIVATION_RECOMMENDATION"),
+        "energy_savings_claim_allowed": False,
+    }
+    scenarios = _scenarios(occupancy_scenarios)
+    idle_weight = _number(idle_capacity_weight, minimum=0.0)
+    shortage = _number(shortage_weight, minimum=0.0)
+    service_ratio = _number(min_point_service_ratio, minimum=0.0)
+    if (
+        scenarios is None
+        or idle_weight is None
+        or shortage is None
+        or service_ratio is None
+        or service_ratio > 1.0
+    ):
+        return {
+            **result,
+            "decision_readiness": "WITHHOLD",
+            "selected_zone_ids": [],
+            "selected_capacity": None,
+            "reason_codes": ["INVALID_OR_UNUSABLE_SPACE_POLICY_INPUTS"],
+        }
+
+    options: list[tuple[str, float, float]] = []
+    seen: set[str] = set()
+    for row in zones or ():
+        if not isinstance(row, Mapping):
+            options = []
+            break
+        zone_id = _text(row.get("zone_id"))
+        capacity = _number(row.get("capacity"), minimum=0.0)
+        activation = _number(row.get("activation_weight", 0.0), minimum=0.0)
+        if (
+            zone_id is None
+            or zone_id in seen
+            or capacity is None
+            or capacity <= 0
+            or activation is None
+        ):
+            options = []
+            break
+        seen.add(zone_id)
+        options.append((zone_id, capacity, activation))
+
+    if not options or len(options) > 18:
+        return {
+            **result,
+            "decision_readiness": "WITHHOLD",
+            "selected_zone_ids": [],
+            "selected_capacity": None,
+            "reason_codes": ["INVALID_OR_EXCESSIVE_SPACE_OPTIONS"],
+        }
+
+    full_capacity = sum(capacity for _, capacity, _ in options)
+    if any(full_capacity + 1e-9 < service_ratio * demand for demand, _ in scenarios):
+        return {
+            **result,
+            "decision_readiness": "WITHHOLD",
+            "selected_zone_ids": [],
+            "selected_capacity": int(round(full_capacity)),
+            "reason_codes": ["SPACE_CAPACITY_BELOW_REGISTERED_SERVICE_FLOOR"],
+        }
+
+    candidates: list[tuple[float, float, tuple[str, ...]]] = []
+    for size in range(1, len(options) + 1):
+        for subset in combinations(options, size):
+            ids = tuple(sorted(item[0] for item in subset))
+            capacity = sum(item[1] for item in subset)
+            if any(capacity + 1e-9 < service_ratio * demand for demand, _ in scenarios):
+                continue
+            activation = sum(item[2] for item in subset)
+            expected_loss = activation + sum(
+                probability
+                * (
+                    idle_weight * max(capacity - demand, 0.0)
+                    + shortage * max(demand - capacity, 0.0)
+                )
+                for demand, probability in scenarios
+            )
+            candidates.append((expected_loss, capacity, ids))
+
+    if not candidates:
+        return {
+            **result,
+            "decision_readiness": "WITHHOLD",
+            "selected_zone_ids": [],
+            "selected_capacity": None,
+            "reason_codes": ["NO_SPACE_BUNDLE_MEETS_SERVICE_FLOOR"],
+        }
+
+    objective, capacity, ids = min(candidates, key=lambda item: (item[0], item[1], item[2]))
+    return {
+        **result,
+        "decision_readiness": "REVIEW_REQUIRED",
+        "selected_zone_ids": list(ids),
+        "selected_capacity": int(round(capacity)),
+        "expected_registered_loss": objective,
+        "registered_min_point_service_ratio": service_ratio,
+        "reason_codes": ["OPERATOR_REVIEW_REQUIRED"],
+    }
+
+
 def optimize_class_schedule(
     *,
     classes: Sequence[Mapping[str, Any]],
