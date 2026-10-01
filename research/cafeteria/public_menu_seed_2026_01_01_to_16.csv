@@ -1,0 +1,33 @@
+service_date,weekday_tr,service_type,dish_1,dish_2,dish_3,dish_4,dish_5,dish_6,dish_7,dish_8,source_url,truth_class
+2026-01-01,Per,OGLE,Alaca Çorba,Etli Dolma,Zy.Dolma,Zy.Barbunya,Su Böreği,Salata,Ice Tea,Supangle,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-01,Per,AKSAM,Domates Çorba,Etli Mantı,Etsiz Mantı,Zy.Barbunya,Zy.Enginar,Limonata,Mercimek Köfte,Meyve,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-02,Cu,OGLE,Krutonlu Ezogelin Çorba,Sweet Chili Soslu Tavuk,Nohut Tava,Patatesli Kol Böreği,Kremalı Makarna,Ayran,Çiğ köfte,Cevizli Kadayıf,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-02,Cu,AKSAM,Tarhana Çorba,Şinitsel,Pırasa Yemeği,Soslu Makarna,Pirinç Pilavı,Salata,Portakallı Gazoz,Keşkül,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-03,Ct,OGLE,Şehriye Çorba,Etli Nohut Yemeği,Nohut Yemeği,Bulgur Pilavı,Pirinç Pilavı,Soda,Turşu,İncirli Puding,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-03,Ct,AKSAM,Krutonlu Süzme Mercimek Çorba,Etli Patlıcan Musakka,Şakşuka,Pirinç Pilavı,Fırın Makarna,Cacık,Gazoz,Cevizli Kadayıf,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-04,Pa,OGLE,Kış Çorba,İzmir Köfte,Bamya Yemeği,Garnitürlü Pirinç Pilavı,Domatesli Bulgur Pilavı,Yoğurt,Limonata,Mısırlı Salata,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-04,Pa,AKSAM,Erişteli Yeşil Mercimek Çorbası,Çıtır Tavuk,Mısırlı Mücver,Melek Pilavı,Kekik Soslu Makarna,Mevsim Salata,Portakallı Gazoz,Tulumba Tatlısı,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-05,Pt,OGLE,Şafak Çorba,Paris Soslu Tavuk,Zy.Enginar,Sebzeli Makarna,Pirinç Pilavı,Ice Tea,Ballı Balım Tatlısı,Tabule,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-05,Pt,AKSAM,Mantar Çorba,Tas Kebabı,Patates Graten,Pirinç Pilavı,Bulgur Pilavı,Ayran,Meyve,Coleslaw Salata,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-06,Sa,OGLE,Mahluta Çorba,Tavuk Tantuni,Portakallı Kereviz Yemeği,Mısırlı Pirinç Pilavı,Soslu Makarna,Kereviz Salatası,Meyve,Cheesecake,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-06,Sa,AKSAM,Şehriye Çorba,Kabak Beğendili Köfte,Nohutlu Kabak Yemeği,Şark Pilavı,Pirinç Pilavı,Kola,Şekerpare,Rus Salatası,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-07,Çar,OGLE,Havuç Çorba,Meksika Soslu Hindi Sote,Patates Yemeği,Mısırlı Pirinç Pilavı,Sebzeli Makarna,Ayran,Kısır,Meyve,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-07,Çar,AKSAM,Vitamin Çorba,Bahçıvan Kebabı,Taze Fasulye Yemeği,Nohutlu Pirinç Pilavı,Meyhane Pilavı,Ice Tea,Pembe Sultan,Kadayıflı Muhallebi,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-08,Per,OGLE,Ezogelin Çorba,Çıtır Balık,Sebze Buketi,Napoliten Soslu Makarna,Zy.Barbunya,Ice Tea,Tahin Helva,Roka Salatası,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-08,Per,AKSAM,Saray Çorba,Ekşili Köfte,Vegan Misket Köfte,Havuçlu Pirinç Pilavı,Domates Soslu Spagetti,Yeşil Mercimek Salatası,Kola,Şöbiyet,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-09,Cu,OGLE,Domates Çorba,Fesleğen Soslu Misket Köfte,Sebze Graten,Pirinç Pilavı,Zy. Barbunya,Ice Tea,Coleslaw Salata,Tahinli Muhallebi,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-09,Cu,AKSAM,Krutonlu Ezogelin Çorba,Etli Kuru Fasulye,Kuru Fasülye Yemeği,Pirinç Pilavı,Bulgur Pilavı,Ayran,Turşu,Profiterol,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-10,Ct,OGLE,Süleymaniye Çorba,Tavuk Döner,Nohutlu Kabak Kalye,Garnitürlü Pirinç Pilavı,Domatesli Bulgur Pilavı,Coleslaw Salata,Çiğ köfte,Ayran,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-10,Ct,AKSAM,Cennet Çorba,Bodrum Köfte,İmambayıldı,Melek Pilavı,Bulgur Pilavı,Piyaz,Kola,Saray Sarma,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-11,Pa,OGLE,Süzme Mercimek Çorba,Pizza,Mısırlı Patates Köftesi,Zy.Enginar,Zy.Orbit Fasulye,Çilekli Puding,Gazoz,Rus Salatası,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-11,Pa,AKSAM,Kereviz Çorba,Kibrit Kebabı,Yeşil Mercimek Yemeği,Soslu Spagetti,Pirinç Pilavı,Kısır,Ballı Balım Tatlısı,Kefir,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-12,Pt,OGLE,Tarhana Çorba,Macar Gulaş,Pırasa Yemeği,Nohutlu Pirinç Pilavı,Sebzeli Bulgur Pilavı,Kola,Cevizli Salata,Meyve,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-12,Pt,AKSAM,Alaca Çorba,Orman Kebabı,Sebze Sote,Pirinç Pilavı,Fırın Makarna,Yoğurt,Limonata,Cevizli Kadayıf,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-13,Sa,OGLE,Brokoli Çorba,Sweet Chili Soslu Tavuk,Mantar Sote,Zerdeçallı Pirinç Pilavı,Kremalı Makarna,Kefir,Pembe Sultan,Meyve,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-13,Sa,AKSAM,Ezogelin Çorba,Mitite Köfte,Patates Graten,Mısırlı Pirinç Pilavı,Köri Soslu Makarna,Balkabaklı Magnolia,Ayran,Çiğ köfte,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-14,Çar,OGLE,Anadolu Çorbası,Mezgit Tava,Nohut Tava,Melek Pilavı,Zy. Barbunya,Roka Salata,Tahin Helva,Soda,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-14,Çar,AKSAM,Krutonlu Domates Çorba,Et Döner,Brüksel Lahana Yemeği,Nohutlu Pirinç Pilavı,Domatesli Bulgur Pilavı,Tiramisu,Ice Tea,Coleslaw Salata,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-15,Per,OGLE,Bakliyat Çorba,Kağıt Kebabı,Kereviz Yemeği,Su Böreği,Kuskus,Mısırlı Mor Salata,Limonata,Meyve,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-15,Per,AKSAM,Havuç Çorba,Kök Kanat,Vegan köfte,Soslu Makarna,Mantarlı Pirinç Pilavı,Şöbiyet,Acılı Ezme,Meyveli Soda,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-16,Cu,OGLE,Antep Çorba,Tavuk Tikka,Falafel,Kekik Soslu Makarna,Nohutlu Pirinç Pilavı,Cheesecake,Ice Tea,Tarator,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
+2026-01-16,Cu,AKSAM,Süzme Mercimek Çorba,İçli Köfte,Yeşil Mercimek Yemeği,Zy. Sarma,Zy.Enginar,Ayran,Gazoz,Meyve,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,OFFICIAL_PUBLIC
