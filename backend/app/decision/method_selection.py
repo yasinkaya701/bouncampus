@@ -26,6 +26,23 @@ def _metric_value(value):
     return numeric
 
 
+def _strict_non_negative_int(value, *, name: str, minimum: int) -> int:
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must be an integer")
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+    if not math.isfinite(numeric) or not numeric.is_integer():
+        raise ValueError(f"{name} must be an integer")
+    integer = int(numeric)
+    if integer < minimum:
+        if minimum == 1:
+            raise ValueError(f"{name} must be >= 1")
+        raise ValueError(f"{name} must be >= {minimum}")
+    return integer
+
+
 def _withhold(
     *,
     baseline_id: str,
@@ -86,9 +103,20 @@ def select_method(
         raise ValueError(
             f"primary_metric must be one of {SUPPORTED_LOWER_IS_BETTER_METRICS!r}"
         )
-    if isinstance(min_common_support_n, bool) or min_common_support_n < 1:
-        raise ValueError("min_common_support_n must be >= 1")
-    min_improvement = float(min_relative_improvement_pct)
+
+    min_support = _strict_non_negative_int(
+        min_common_support_n,
+        name="min_common_support_n",
+        minimum=1,
+    )
+    if isinstance(min_relative_improvement_pct, bool):
+        raise ValueError("min_relative_improvement_pct must be finite and non-negative")
+    try:
+        min_improvement = float(min_relative_improvement_pct)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "min_relative_improvement_pct must be finite and non-negative"
+        ) from exc
     if not math.isfinite(min_improvement) or min_improvement < 0:
         raise ValueError("min_relative_improvement_pct must be finite and non-negative")
 
@@ -96,20 +124,18 @@ def select_method(
     if not isinstance(metrics, Mapping):
         raise ValueError("comparison must contain a metrics mapping")
 
-    common_support_raw = comparison.get("common_support_n", 0)
-    if isinstance(common_support_raw, bool):
-        raise ValueError("comparison common_support_n must be an integer")
-    try:
-        common_support_n = int(common_support_raw)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("comparison common_support_n must be an integer") from exc
-    if common_support_n < min_common_support_n:
+    common_support_n = _strict_non_negative_int(
+        comparison.get("common_support_n", 0),
+        name="comparison common_support_n",
+        minimum=0,
+    )
+    if common_support_n < min_support:
         return _withhold(
             baseline_id=baseline_id,
             stage=stage,
             primary_metric=primary_metric,
             common_support_n=common_support_n,
-            min_common_support_n=min_common_support_n,
+            min_common_support_n=min_support,
             min_relative_improvement_pct=min_improvement,
             reason_codes=["INSUFFICIENT_COMMON_SUPPORT"],
         )
@@ -121,7 +147,7 @@ def select_method(
             stage=stage,
             primary_metric=primary_metric,
             common_support_n=common_support_n,
-            min_common_support_n=min_common_support_n,
+            min_common_support_n=min_support,
             min_relative_improvement_pct=min_improvement,
             reason_codes=["DESIGNATED_BASELINE_MISSING"],
         )
@@ -133,7 +159,7 @@ def select_method(
             stage=stage,
             primary_metric=primary_metric,
             common_support_n=common_support_n,
-            min_common_support_n=min_common_support_n,
+            min_common_support_n=min_support,
             min_relative_improvement_pct=min_improvement,
             reason_codes=["DESIGNATED_BASELINE_METRIC_UNAVAILABLE"],
         )
@@ -146,7 +172,7 @@ def select_method(
             stage=stage,
             primary_metric=primary_metric,
             common_support_n=common_support_n,
-            min_common_support_n=min_common_support_n,
+            min_common_support_n=min_support,
             min_relative_improvement_pct=min_improvement,
             reason_codes=["BASELINE_NOT_ELIGIBLE_FOR_STAGE"],
         )
@@ -156,12 +182,17 @@ def select_method(
     if candidate_method_ids is None:
         candidate_ids = [name for name in metrics if name != baseline_id]
     else:
+        if isinstance(candidate_method_ids, (str, bytes)):
+            raise ValueError("candidate_method_ids must be a sequence of method IDs")
         candidate_ids = []
         seen: set[str] = set()
         for name in candidate_method_ids:
-            if name != baseline_id and name not in seen:
-                candidate_ids.append(name)
-                seen.add(name)
+            if not isinstance(name, str) or not name.strip():
+                raise ValueError("candidate_method_ids must be a sequence of method IDs")
+            normalized_name = name.strip()
+            if normalized_name != baseline_id and normalized_name not in seen:
+                candidate_ids.append(normalized_name)
+                seen.add(normalized_name)
 
     candidate_assessments: dict[str, dict[str, object]] = {}
     eligible_candidates: list[tuple[str, float, float | None]] = []
@@ -216,7 +247,7 @@ def select_method(
             stage=stage,
             primary_metric=primary_metric,
             common_support_n=common_support_n,
-            min_common_support_n=min_common_support_n,
+            min_common_support_n=min_support,
             min_relative_improvement_pct=min_improvement,
             reason_codes=["NO_COMPARABLE_ELIGIBLE_CANDIDATE"],
         )
@@ -264,7 +295,7 @@ def select_method(
         "selected_metric": selected_metric,
         "relative_improvement_pct_vs_baseline": improvement_pct,
         "common_support_n": common_support_n,
-        "min_common_support_n": min_common_support_n,
+        "min_common_support_n": min_support,
         "min_relative_improvement_pct": min_improvement,
         "stage": stage,
         "candidate_assessments": candidate_assessments,
