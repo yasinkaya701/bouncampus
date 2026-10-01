@@ -16,6 +16,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 | If you are working on… | Read first | Then |
 | --- | --- | --- |
 | Any role / choosing next work | [Campus Decision Surface Atlas](./CAMPUS_DECISION_SURFACE_ATLAS.md) | [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) |
+| Data access / system ownership | [Boğaziçi Data & System Ownership Map](./BOGAZICI_DATA_SYSTEM_OWNERSHIP_MAP.md) | [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md) |
 | PMR / dining owner discovery | [Boğaziçi PMR Pre-Interview Evidence Pack](./BOGAZICI_PMR_PREINTERVIEW_EVIDENCE_PACK.md) | Food Operations + Procurement packs |
 | CS1 dining model | [Food Operations Deep Dive](./BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md) | Academic Decision Intelligence + Metric Provenance |
 | Classroom allocation | [Classroom Allocation & Occupancy](./BOGAZICI_CLASSROOM_ALLOCATION_AND_OCCUPANCY.md) | Atlas + machine-readable classroom map |
@@ -28,6 +29,7 @@ This directory contains secondary/public-source research prepared for KREATE age
 | Pack | Purpose | Machine-readable companion |
 | --- | --- | --- |
 | [Campus Decision Surface Atlas](./CAMPUS_DECISION_SURFACE_ATLAS.md) | Cross-domain owner/decision/data/falsifier map covering dining, classroom allocation, shuttle scheduling, water and energy; keeps dining as P0 while identifying adjacent P1 decision modules. | [`campus_decision_surface_atlas.json`](./campus_decision_surface_atlas.json) |
+| [Boğaziçi Data & System Ownership Map](./BOGAZICI_DATA_SYSTEM_OWNERSHIP_MAP.md) | Cross-domain routing for BUIS/ÖBİKAS, classroom scheduling, BUCampus, BUCard, shuttle, Wi-Fi, water and energy; separates service support, data stewardship, business ownership and access authority. | [`bogazici_data_system_ownership_map.json`](./bogazici_data_system_ownership_map.json) |
 | [Boğaziçi PMR Pre-Interview Evidence Pack](./BOGAZICI_PMR_PREINTERVIEW_EVIDENCE_PACK.md) | Converts strongest current public-source dining findings into interview routing, falsifiers, exact questions and stop-browsing boundaries. | [`bogazici_pmr_preinterview_evidence_pack.json`](./bogazici_pmr_preinterview_evidence_pack.json) |
 | [Boğaziçi Classroom Allocation & Occupancy](./BOGAZICI_CLASSROOM_ALLOCATION_AND_OCCUPANCY.md) | Maps the classroom scheduling owner, 2025 room-capacity inventory, data semantics, optimization baselines, occupancy caveats and PMR falsifiers. | [`bogazici_classroom_decision_map.json`](./bogazici_classroom_decision_map.json) |
 | [Boğaziçi Shuttle Operations & Demand](./BOGAZICI_SHUTTLE_OPERATIONS_AND_DEMAND.md) | Maps public route/timetable surfaces, aggregate shuttle signals, candidate demand/scheduling model, baselines and operator PMR questions. | [`bogazici_shuttle_decision_map.json`](./bogazici_shuttle_decision_map.json) |
@@ -52,29 +54,30 @@ This directory contains secondary/public-source research prepared for KREATE age
 ### Any new agent
 
 1. [Campus Decision Surface Atlas](./CAMPUS_DECISION_SURFACE_ATLAS.md) — understand the P0/P1/P2 decision hierarchy.
-2. [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) — map research into role-specific execution.
-3. [Boğaziçi Sustainability 2025](./BOGAZICI_SUSTAINABILITY_2025.md) — broad campus baseline and claim firewall.
-4. [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) — numeric/data-quality constraints.
+2. [Boğaziçi Data & System Ownership Map](./BOGAZICI_DATA_SYSTEM_OWNERSHIP_MAP.md) — identify business/technical/data/access owners before requesting data.
+3. [Agent Next Actions](./AGENT_NEXT_ACTIONS.md) — map research into role-specific execution.
+4. [Boğaziçi Sustainability 2025](./BOGAZICI_SUSTAINABILITY_2025.md) — broad campus baseline and claim firewall.
+5. [Boğaziçi Source Reconciliation Matrix](./BOGAZICI_SOURCE_RECONCILIATION.md) — numeric/data-quality constraints.
 
 ### Dining / PMR / model work
 
-5. [Boğaziçi PMR Pre-Interview Evidence Pack](./BOGAZICI_PMR_PREINTERVIEW_EVIDENCE_PACK.md).
-6. [Food Operations Deep Dive](./BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md).
-7. [Procurement & Contract](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md).
-8. [Türkiye dining procurement benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md).
-9. [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md).
+6. [Boğaziçi PMR Pre-Interview Evidence Pack](./BOGAZICI_PMR_PREINTERVIEW_EVIDENCE_PACK.md).
+7. [Food Operations Deep Dive](./BOGAZICI_FOOD_OPERATIONS_DEEP_DIVE.md).
+8. [Procurement & Contract](./BOGAZICI_FOOD_PROCUREMENT_CONTRACT.md).
+9. [Türkiye dining procurement benchmark](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_BENCHMARK.md).
+10. [Academic Decision Intelligence](./ACADEMIC_DECISION_INTELLIGENCE.md).
 
 ### Classroom / mobility adjacency
 
-10. [Classroom Allocation & Occupancy](./BOGAZICI_CLASSROOM_ALLOCATION_AND_OCCUPANCY.md).
-11. [Shuttle Operations & Demand](./BOGAZICI_SHUTTLE_OPERATIONS_AND_DEMAND.md).
-12. Return to the [Campus Decision Surface Atlas](./CAMPUS_DECISION_SURFACE_ATLAS.md) before building either module; both are **P1 hypotheses**, not validated pivots.
+11. [Classroom Allocation & Occupancy](./BOGAZICI_CLASSROOM_ALLOCATION_AND_OCCUPANCY.md).
+12. [Shuttle Operations & Demand](./BOGAZICI_SHUTTLE_OPERATIONS_AND_DEMAND.md).
+13. Return to the [Campus Decision Surface Atlas](./CAMPUS_DECISION_SURFACE_ATLAS.md) before building either module; both are **P1 hypotheses**, not validated pivots.
 
 ### Platform / expansion / pitch strategy
 
-13. [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md).
-14. [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md).
-15. [Market Segmentation & Beachhead](./MARKET_SEGMENTATION_AND_BEACHHEAD.md).
+14. [Türkiye Policy, Ranking & Institutional Pull](./TURKIYE_POLICY_RANKING_PULL.md).
+15. [Metric Provenance & Verification](./METRIC_PROVENANCE_AND_VERIFICATION.md).
+16. [Market Segmentation & Beachhead](./MARKET_SEGMENTATION_AND_BEACHHEAD.md).
 
 ## How agents should consume a pack
 
@@ -90,7 +93,8 @@ This directory contains secondary/public-source research prepared for KREATE age
 10. Treat external academic intervention effects as design references, never as Boğaziçi/BOUNCAMPUS measured outcomes.
 11. For classroom work, preserve `quota`, `registered`, `attendance`, `room_capacity`, and `estimated_occupancy` as distinct fields.
 12. For shuttle work, preserve `scheduled_departure`, `actual_departure`, `capacity`, `boarded`, `queue/left_behind`, and `estimated_demand` as distinct fields.
-13. Prefer a transparent baseline and owner-review loop before complex ML or autonomous control.
+13. Before requesting data, distinguish `business_owner`, `technical_owner`, `semantic_validator`, and `access_authority`; never infer data access from a public service listing.
+14. Prefer a transparent baseline and owner-review loop before complex ML or autonomous control.
 
 ## Current cross-pack synthesis
 
