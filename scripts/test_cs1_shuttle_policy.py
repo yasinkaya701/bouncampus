@@ -72,6 +72,20 @@ def test_oversubscribed_route_surfaces_shortage_for_review() -> None:
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
 
 
+def test_service_window_shorter_than_round_trip_does_not_invent_trip_capacity() -> None:
+    policy = load_module("shuttle_policy_short_window", "backend/app/decision/shuttle_policy.py")
+    result = policy.plan_shuttle_capacity(
+        [route(service_window_min=30, round_trip_min=40, forecast_demand=10)],
+        reserve_ratio=0.0,
+        upstream_readiness="REVIEW_REQUIRED",
+    )
+    item = result["routes"][0]
+    assert item["max_supported_trips"] == 0
+    assert item["capacity_feasible"] is False
+    assert item["unserved_seat_demand_estimate"] == 10
+    assert "ROUTE_CAPACITY_SHORTFALL_SOUTH-NORTH" in result["reason_codes"]
+
+
 def test_unverified_capacity_withholds_capacity_sensitive_plan() -> None:
     policy = load_module("shuttle_policy_truth_boundary", "backend/app/decision/shuttle_policy.py")
     for provenance in (None, "MODEL_ESTIMATE", "POLICY_HEURISTIC"):
