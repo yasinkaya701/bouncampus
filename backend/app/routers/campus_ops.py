@@ -7,11 +7,11 @@ from fastapi import APIRouter
 from app.decision.campus_ops import (
     allocate_shared_capacity,
     build_campus_ops_bundle,
-    optimize_food_production,
     optimize_shuttle_plan,
     optimize_space_plan,
 )
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
+from app.decision.food_production import optimize_food_production
 
 router = APIRouter(prefix="/api/v1/ops", tags=["campus-operations"])
 
@@ -47,7 +47,9 @@ def optimize_food(payload: dict[str, Any]) -> dict[str, Any]:
         max_capacity=_payload_value(payload, "max_capacity", None),
         waste_weight=_payload_value(payload, "waste_weight", None),
         shortage_weight=_payload_value(payload, "shortage_weight", None),
-        method_eligibility=str(_payload_value(payload, "method_eligibility", "EVALUATED_OFFLINE")),
+        method_eligibility=str(
+            _payload_value(payload, "method_eligibility", "SANDBOX_ONLY")
+        ),
     )
 
 
