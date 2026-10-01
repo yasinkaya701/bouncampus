@@ -81,13 +81,13 @@
   },
   "lease": {
     "claimed_at": "2026-09-30T19:46:00Z",
-    "heartbeat_at": "2026-10-01T11:58:37Z",
+    "heartbeat_at": "2026-10-01T12:04:30Z",
     "ttl_minutes": 360
   },
   "blocker": {
     "kind": "INFRASTRUCTURE",
     "summary": "PR #67 exact-head CI is partially queued on the required self-hosted macOS/ARM64 runner.",
-    "evidence": "CI run 36833849451: feature-registry passed on bouncampus-runner-1; frontend, merge-discipline, and repository-data remain queued with runner_id=0.",
+    "evidence": "CI run 36833849451 is still queued on head b7099421bfe6ba75d66d2c92c7546926f52ba19f; feature-registry executed but the remaining required jobs have not completed.",
     "next_action": "Keep PR #67 open and merge only after all required exact-head CI jobs execute successfully."
   },
   "integration": {
@@ -110,6 +110,8 @@
     "Feature head 783ee20a8ede6fcab9be0e30b7991be7b2f6aaa4 triggered a successful Vercel preview deployment; d20d6165 only changes repository validation logic and does not alter deployable product code.",
     "Does not intentionally modify .github/workflows/ci.yml; that file is inherited unchanged from the synchronized role branch.",
     "Role integration PR #67 is open from role/cs1-decision-intelligence to master at head b7099421bfe6ba75d66d2c92c7546926f52ba19f; master base remains 7fbb0ec45ab840ce316a12e21f82ab7ae1181309.",
-    "Cross-agent follow-up PRs #68, #69, and #70 are isolated on non-overlapping CS1-owned paths and remain separate from the core integration until #67 lands and fresh exact-head CI permits convergence."
+    "Audit correction: the earlier note claiming PRs #68, #69, and #70 were all non-overlapping was wrong. PR #68 edits pilot-score/pilot-template paths still owned by this INTEGRATING task, and PR #69 edits scripts/cs1_baseline_benchmark.py, also still owned here. Both PRs were converted to draft and must not merge or continue overlapping integration until this task reaches MERGED_VERIFIED.",
+    "PR #70 currently uses new method-selection/stability/context-signal paths that do not overlap this task's declared product paths, but it was also converted to draft because exact-head CI is queued, its scope is still growing, and the no-comparable-method fail-closed semantics remain unresolved.",
+    "Control-plane drift detected during audit: agent-coordination/.agents/fabric.json is behind master/.agents/fabric.json and does not yet contain the current role-branch parallel-feature policy. Avoid treating stale control metadata as authority for new active claims until governance synchronizes it."
   ]
 }
