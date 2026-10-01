@@ -20,6 +20,7 @@
     "scripts/test_cs1_shuttle_policy.py",
     "scripts/test_cs1_classroom_policy.py",
     "scripts/test_cs1_campus_portfolio.py",
+    "scripts/test_cs1_campus_ops_router.py",
     "KREATE/EXPERIMENTS/CS1_CAMPUS_OPS_V1.md"
   ],
   "acceptance_criteria": [
@@ -30,14 +31,15 @@
     "No student identifiers, BUCard identifiers, scholarship data, or inferred individual movement profiles are accepted by the decision contracts",
     "All outputs distinguish MODEL_ESTIMATE, POLICY_HEURISTIC, PUBLIC_SOURCE, and MEASURED_PILOT-style provenance without promoting unsupported impact claims",
     "Missing or contradictory required evidence produces WITHHOLD or REVIEW_REQUIRED instead of a confident recommendation",
-    "Focused regression tests cover nominal, oversubscribed, malformed, conflicting, accessibility/equipment, and insufficient-evidence cases",
-    "FastAPI exposes the campus-operations contract without claiming live BMS, shuttle GPS, turnstile, Wi-Fi, POS, or registrar integrations"
+    "Focused regression tests cover nominal, oversubscribed, malformed, conflicting, accessibility/equipment, insufficient-evidence, and API orchestration cases",
+    "FastAPI exposes both domain endpoints and one combined campus-operations planning endpoint without claiming live BMS, shuttle GPS, turnstile, Wi-Fi, POS, or registrar integrations"
   ],
   "validation_commands": [
     "python scripts/test_cs1_campus_state.py",
     "python scripts/test_cs1_shuttle_policy.py",
     "python scripts/test_cs1_classroom_policy.py",
     "python scripts/test_cs1_campus_portfolio.py",
+    "python scripts/test_cs1_campus_ops_router.py",
     "python -m compileall -q backend/app scripts",
     "python scripts/kreate_check.py"
   ],
@@ -51,7 +53,7 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T12:06:00Z",
-    "heartbeat_at": "2026-10-01T12:06:00Z",
+    "heartbeat_at": "2026-10-01T12:15:00Z",
     "ttl_minutes": 360
   },
   "blocker": {
