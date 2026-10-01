@@ -11,7 +11,7 @@ from typing import Mapping, Sequence
 
 
 def _to_optional_non_negative_float(value):
-    if value is None:
+    if value is None or isinstance(value, bool):
         return None
     try:
         numeric = float(value)
