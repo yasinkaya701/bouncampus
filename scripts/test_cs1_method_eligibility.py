@@ -10,8 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 VERIFIED_REACHABILITY = {
     "decision_surface": "PRODUCTION_QUANTITY",
+    "decision_surface_verified": True,
     "operator_authority_confirmed": True,
     "minutes_before_freeze": 90,
+    "change_feasible_before_freeze": True,
 }
 
 
@@ -50,6 +52,8 @@ def test_pilot_eligible_method_may_be_pilot_ready_with_healthy_context() -> None
         decision_reachability=VERIFIED_REACHABILITY,
     )
     assert decision["decision_reachability_status"] == "REACHABLE"
+    assert decision["decision_surface_verified"] is True
+    assert decision["change_feasible_before_freeze"] is True
     assert decision["decision_readiness"] == "PILOT_READY"
     assert decision["abstained"] is False
     assert decision["recommended_production"] == 1000
