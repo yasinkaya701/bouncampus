@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  FOOD_DECISION_POLICY,
   FOOD_WASTE_PILOT_PROTOCOL,
   scoreFoodWastePilot,
   validatePilotMeasurement,
@@ -10,10 +11,25 @@ export async function GET() {
   return NextResponse.json({
     endpoint: 'POST /api/v1/food/pilot-score',
     protocol: FOOD_WASTE_PILOT_PROTOCOL,
+    decisionPolicyVersion: FOOD_DECISION_POLICY.version,
     requestShape: {
       measurements: FOOD_WASTE_PILOT_PROTOCOL.measurementFields,
     },
-    note: 'Scores measured aggregate service outcomes only. It does not create or simulate pilot measurements.',
+    evidencePromotion: {
+      inputEvidenceClass: 'MEASURED_PILOT_DATA',
+      outputEvidenceClass: 'PILOT_SCORECARD',
+      generalizedImpactClaimAllowed: false,
+      requiredChecks: [
+        'row-level measurement validity',
+        'duplicate service detection',
+        'minimum services per arm',
+        '100% intervention forecast retention',
+        'normalized waste-reduction target',
+        'early-sellout guardrail',
+        'manual food-safety review outside numeric scorecard',
+      ],
+    },
+    note: 'Scores measured service outcomes only. It never creates or simulates pilot measurements.',
   });
 }
 
@@ -25,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'INVALID_JSON' }, { status: 400 });
   }
 
-  if (!payload || typeof payload !== 'object') {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return NextResponse.json({ error: 'INVALID_BODY' }, { status: 400 });
   }
 
@@ -47,15 +63,27 @@ export async function POST(request: Request) {
 
   if (validationErrors.length) {
     return NextResponse.json(
-      { error: 'INVALID_MEASUREMENTS', validationErrors },
+      {
+        error: 'INVALID_MEASUREMENTS',
+        validationErrors,
+        evidencePromotionBlocked: true,
+      },
       { status: 400 },
     );
   }
 
   const typed = measurements as PilotServiceMeasurement[];
+  const scorecard = scoreFoodWastePilot(typed);
   return NextResponse.json({
-    scorecard: scoreFoodWastePilot(typed),
+    scorecard,
     protocolVersion: FOOD_WASTE_PILOT_PROTOCOL.version,
-    claimBoundary: 'PROMISING is a pilot classification, not a generalized climate-impact claim.',
+    decisionPolicyVersion: FOOD_DECISION_POLICY.version,
+    evidencePromotion: {
+      dataQualityPassed: scorecard.gates.dataQualityPassed,
+      enoughEvidence: scorecard.gates.enoughEvidence,
+      promotableAsPilotResult: scorecard.status !== 'INSUFFICIENT_EVIDENCE',
+      promotableAsGeneralizedClimateImpact: false,
+    },
+    claimBoundary: FOOD_WASTE_PILOT_PROTOCOL.evidenceBoundary,
   });
 }
