@@ -1,0 +1,18 @@
+dataset_family,period,url,availability,coverage_note,truth_class
+monthly_menu,2025-03,https://yemekhane.bogazici.edu.tr/aylik-menu/2025-03,VERIFIED_PUBLIC,"Lunch/dinner menu archive; search result exposes multiple March services",OFFICIAL_PUBLIC
+monthly_menu,2025-12,https://yemekhane.bogazici.edu.tr/aylik-menu/2025-12,VERIFIED_PUBLIC,"Lunch/dinner menu archive; December services exposed",OFFICIAL_PUBLIC
+monthly_menu,2026-01,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-01,VERIFIED_PUBLIC,"Parsed into 62 service rows in this branch",OFFICIAL_PUBLIC
+monthly_menu,2026-08,https://yemekhane.bogazici.edu.tr/aylik-menu/2026-08,VERIFIED_PUBLIC,"Lunch/dinner archive; summer service regime visible",OFFICIAL_PUBLIC
+monthly_menu,2026-10,https://yemekhane.bogazici.edu.tr/aylik-menu,VERIFIED_PUBLIC,"Current month page as of 2026-10-01",OFFICIAL_PUBLIC
+package_menu,2025-05,https://yemekhane.bogazici.edu.tr/paket-menu/2025-05,VERIFIED_PUBLIC,"Package lunch/dinner archive",OFFICIAL_PUBLIC
+package_menu,2025-10,https://yemekhane.bogazici.edu.tr/paket-menu/2025-10,VERIFIED_PUBLIC,"Package lunch/dinner archive",OFFICIAL_PUBLIC
+package_menu,2026-01,https://yemekhane.bogazici.edu.tr/paket-menu/2026-01,VERIFIED_PUBLIC,"Package lunch/dinner archive",OFFICIAL_PUBLIC
+package_menu,2026-10,https://yemekhane.bogazici.edu.tr/paket-menu,VERIFIED_PUBLIC,"Current package menu as of 2026-10-01",OFFICIAL_PUBLIC
+breakfast_menu,2026-06,https://yemekhane.bogazici.edu.tr/kahvalti-menu/2026-06,VERIFIED_PUBLIC,"Breakfast archive; useful for service-regime and cross-meal demand features",OFFICIAL_PUBLIC
+dish_category_index,current,https://yemekhane.bogazici.edu.tr/yemek-fotogralari,VERIFIED_PUBLIC,"Official lists for soups, mains, vegan/vegetarian, sides, desserts and package foods",OFFICIAL_PUBLIC
+dish_detail,current,https://yemekhane.bogazici.edu.tr/ana-yemekler/pilic-emense,VERIFIED_PUBLIC,"Example structured dish page: kcal, cooked portion grams, ingredients",OFFICIAL_PUBLIC
+dish_detail,current,https://yemekhane.bogazici.edu.tr/ana-yemekler/pilic-topkapi,VERIFIED_PUBLIC,"Example structured dish page: kcal, cooked portion grams, ingredients",OFFICIAL_PUBLIC
+dish_detail,current,https://yemekhane.bogazici.edu.tr/secmeliler/piyaz,VERIFIED_PUBLIC,"Example structured selectable dish page",OFFICIAL_PUBLIC
+dish_detail,current,https://yemekhane.bogazici.edu.tr/corbalar/vitamin-corba,VERIFIED_PUBLIC,"Example structured soup page",OFFICIAL_PUBLIC
+dish_detail,current,https://yemekhane.bogazici.edu.tr/yardimci-yemekler/pirinc-pilavi,VERIFIED_PUBLIC,"Example structured side dish page",OFFICIAL_PUBLIC
+homepage_daily,current,https://yemekhane.bogazici.edu.tr/,VERIFIED_PUBLIC,"Daily menu exposes semantic roles; selected items also expose kcal/portion data and current price table",OFFICIAL_PUBLIC
