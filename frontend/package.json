@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "test:campus-operations": "node --experimental-strip-types scripts/campus-operations.test.mjs",
-    "typecheck": "npm run test:campus-operations && tsc --noEmit",
+    "test:shuttle-frequency": "node --experimental-strip-types scripts/shuttle-frequency.test.mjs",
+    "typecheck": "npm run test:campus-operations && npm run test:shuttle-frequency && tsc --noEmit",
     "verify": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
