@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "status": "SECONDARY_RESEARCH_TECHNICAL_DESIGN_NOT_LEGAL_ADVICE",
+  "scope": "Boğaziçi dining aggregate-data privacy minimization architecture",
+  "principles": [
+    "specified_explicit_legitimate_purpose",
+    "relevant_limited_proportionate_processing",
+    "necessary_retention_only",
+    "prefer_source_system_aggregation",
+    "no_direct_or_pseudonymous_identifiers_by_default"
+  ],
+  "preferred_architecture": [
+    "institutional_source_system_retains_raw_identifiable_events",
+    "owner_controlled_aggregation",
+    "privacy_safe_operational_counts",
+    "BOUNCAMPUS_aggregate_decision_model",
+    "provenance_and_measurement_metadata"
+  ],
+  "minimum_dataset": [
+    "DATE",
+    "CAMPUS",
+    "MEAL_CLASS",
+    "SERVICE_CHANNEL",
+    "SERVICE_REGIME",
+    "MENU_ID",
+    "INITIAL_REQUEST_QTY",
+    "FINAL_REQUEST_QTY",
+    "PRODUCED_QTY",
+    "AGGREGATE_SERVED_OR_ENTRY_COUNT",
+    "CONTRACT_ACCEPTED_QTY_IF_RELEASABLE",
+    "UNSERVED_SURPLUS_QTY",
+    "WASTE_QTY",
+    "SHORTAGE_EVENT"
+  ],
+  "not_needed_by_default": [
+    "student_name",
+    "student_number",
+    "BUCard_identifier",
+    "QR_token",
+    "individual_meal_history",
+    "individual_scholarship_status",
+    "individual_BUBizden_status",
+    "device_identifier",
+    "personal_contact_information"
+  ],
+  "support_policy_handling": {
+    "forbidden_person_level_features": ["scholarship_recipient_flag", "BUBizden_user_flag"],
+    "possible_aggregate_regime_context_if_operationally_justified": ["BUBIZDEN_ACTIVE", "MEAL_SCHOLARSHIP_POLICY_VERSION"]
+  },
+  "data_contract_metadata": [
+    "field_name",
+    "operational_purpose",
+    "source_system",
+    "aggregation_grain",
+    "contains_direct_identifier",
+    "contains_pseudonymous_identifier",
+    "reidentification_risk_reviewed",
+    "retention_window",
+    "owner",
+    "correction_policy"
+  ],
+  "pilot_acceptance_criteria": [
+    "every_field_maps_to_named_decision_or_metric",
+    "no_direct_student_or_staff_identifier_exported",
+    "pseudonymous_transaction_ids_absent_by_default",
+    "support_or_scholarship_identity_not_exported",
+    "aggregation_grain_reviewed_for_sparse_cell_risk",
+    "retention_window_documented",
+    "source_owner_and_correction_semantics_documented",
+    "outputs_are_aggregate_recommendations_not_person_level_classifications",
+    "source_owner_controls_raw_to_aggregate_transformation",
+    "limitations_preserved"
+  ],
+  "p0_data_owner_questions": [
+    "Can privacy-safe aggregate dining entry counts be exported by date, campus and meal window without user/card identifiers?",
+    "What is the natural time grain of the source system?",
+    "How do QR and BUCard event semantics differ?",
+    "Can events be reversed, refunded or duplicated?",
+    "Can student/staff/guest classes be separated in aggregate?",
+    "What retention history exists?",
+    "Can aggregation run inside Boğaziçi before export?"
+  ],
+  "forbidden_claims": [
+    "KVKK_compliant_without_institutional_legal_determination",
+    "names_removed_means_anonymous",
+    "team_has_BUCard_data_before_access",
+    "student_behavior_tracking_is_required",
+    "individual_support_status_is_needed_for_demand_forecasting"
+  ],
+  "sources": [
+    "https://www.kvkk.gov.tr/Icerik/6606/General-Principles-in-Processing-of-Personal-Data",
+    "https://www.kvkk.gov.tr/Icerik/2038/kisisel-verilerin-silinmesi-yok-edilmesi-veya-anonim-hale-getirilmesi",
+    "https://www.kvkk.gov.tr/Icerik/7138/2021-799",
+    "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0",
+    "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096",
+    "https://yemekhane.bogazici.edu.tr/bubizden-uygulamasi"
+  ]
+}

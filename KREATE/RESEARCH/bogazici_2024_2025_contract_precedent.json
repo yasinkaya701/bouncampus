@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "status": "HISTORICAL_PUBLIC_SOURCE_PRECEDENT_ONLY",
+  "canonical_historical_procurement": {
+    "ikn": "2023/1144278",
+    "kik_decision_no": "2023/UH.I-1542",
+    "decision_date": "2023-12-13",
+    "service_period": "2024-2025",
+    "source": "https://arsiv.kikkararlari.com/index.php?Itemid=71&id=74668&option=com_content&task=view"
+  },
+  "findings": [
+    {"id": "HIST-01", "claim": "North Campus was the designated production kitchen in the historical tender.", "current_contract_fact": false},
+    {"id": "HIST-02", "claim": "The authority described about 99.7% of historical tender volume as central-kitchen production distributed to six Istanbul campuses, with tiny remote-unit demand handled separately.", "current_contract_fact": false},
+    {"id": "HIST-03", "claim": "Historical listed quantities were 735,000 student breakfasts, 3,465,000 student meals and 476,500 staff meals.", "current_contract_fact": false},
+    {"id": "HIST-04", "claim": "Historical capacity requirements used 5,000 meals and 500 breakfasts as half of daily requirements.", "current_contract_fact": false},
+    {"id": "HIST-05", "claim": "Historical documents included backup-kitchen continuity requirements tied to serious contract non-compliance risk.", "current_contract_fact": false},
+    {"id": "HIST-06", "claim": "Historical main-course service offered meat and vegan alternatives within total meal quantity.", "current_contract_fact": false},
+    {"id": "HIST-07", "claim": "Selectable meal ratios were economically material enough to be challenged by a bidder.", "current_contract_fact": false},
+    {"id": "HIST-08", "claim": "A 14-day example menu and raw-input gram quantities were part of tender cost formation.", "current_contract_fact": false},
+    {"id": "HIST-09", "claim": "Historical contract penalties could be deducted from contractor payments.", "current_contract_fact": false},
+    {"id": "HIST-10", "claim": "North Campus kitchen renovation temporarily changed production origin at the start of the historical service period.", "current_contract_fact": false}
+  ],
+  "historical_line_items": [
+    {"class": "student_breakfast", "quantity": 735000, "unit": "meal"},
+    {"class": "student_lunch_or_dinner", "quantity": 3465000, "unit": "meal"},
+    {"class": "staff_lunch", "quantity": 476500, "unit": "meal"}
+  ],
+  "decision_dimensions_suggested_for_current_verification": [
+    "total_quantity",
+    "menu_mix",
+    "campus_allocation",
+    "production_site",
+    "service_continuity_state",
+    "shortage_or_service_penalty"
+  ],
+  "candidate_schema_fields": [
+    "production_site",
+    "service_channel",
+    "kitchen_state",
+    "campus_destination",
+    "menu_option",
+    "substitution_group",
+    "portion_or_recipe_grams",
+    "produced_qty",
+    "served_qty",
+    "surplus_or_waste_qty"
+  ],
+  "current_verification_questions": [
+    "Has production remained centered at North Campus under the current TEMAŞ contract?",
+    "Are total meal quantity and menu-option mix separately planned today?",
+    "Which current menu alternatives create the largest waste or shortage risk?",
+    "What current contract event produces a penalty or deduction?",
+    "What backup-production rule exists today?",
+    "Which historical operating regimes are visible in any training data?"
+  ],
+  "forbidden_current_inferences": [
+    "current_temas_backup_kitchen_requirement_equals_historical_requirement",
+    "current_penalty_rate_equals_historical_penalty_rate",
+    "current_payment_semantics_equal_historical_semantics",
+    "current_vegan_mix_is_unspecified",
+    "current_remote_volume_share_equals_0_3_percent",
+    "current_contract_contains_same_penalty_table"
+  ]
+}
