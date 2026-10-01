@@ -113,12 +113,33 @@ def test_context_ablation_uses_identical_support_and_explicit_decision_loss() ->
     assert comparison["result_scope"] == "OFFLINE_CONTEXT_ABLATION_ONLY"
 
 
+def test_median_residual_estimator_resists_single_historical_outlier() -> None:
+    context_signal = load_context_signal()
+    report = context_signal.generate_context_residual_forecasts(
+        base_forecasts=[100, 100, 100, 100],
+        actual_demand=[100, 100, 1000, 100],
+        context_keys=["menu:A", "menu:A", "menu:A", "menu:A"],
+        signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
+        decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
+        min_history=3,
+        min_context_history=3,
+        shrinkage_strength=0.0,
+        residual_statistic="MEDIAN",
+    )
+
+    assert report["baseline_forecast"][3] == 100.0
+    assert report["context_forecast"][3] == 100.0
+    assert report["context_applied"][3] is True
+    assert report["residual_statistic"] == "MEDIAN"
+
+
 def main() -> int:
     tests = [
         test_context_correction_is_strictly_past_only,
         test_signal_published_after_cutoff_cannot_change_decision,
         test_sparse_context_falls_back_to_history_only_baseline,
         test_context_ablation_uses_identical_support_and_explicit_decision_loss,
+        test_median_residual_estimator_resists_single_historical_outlier,
     ]
     for test in tests:
         test()
