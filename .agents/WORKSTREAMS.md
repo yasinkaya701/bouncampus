@@ -22,7 +22,7 @@ Valid states:
 ## Parallel integration rules
 
 - There is no repository-wide single-PR lock.
-- Each KREATE role has a long-lived `role/*` integration branch.
+- Each KREATE execution role has a long-lived `role/*` integration branch.
 - Short-lived `agent/<lane>/<task>` branches normally PR into the owning role branch.
 - Up to 3 feature PRs may be open against one role branch.
 - Each role may have at most one open role-to-`master` integration PR.
@@ -31,14 +31,21 @@ Valid states:
 - Active task path ownership remains exclusive.
 - A role-branch merge is staging; only verified `master` is final delivery.
 
+Five execution roles do not imply five humans. The team remains four people; PMR accounting remains tied to real people/interviews rather than role count.
+
 ## Role branches
 
-| Role | Branch |
-| --- | --- |
-| IE | `role/ie-customer-discovery` |
-| EE | `role/ee-physical-systems` |
-| CS1 | `role/cs1-decision-intelligence` |
-| CS2 | `role/cs2-product-strategy` |
+| Role | Branch | Final ownership focus |
+| --- | --- | --- |
+| IE | `role/ie-customer-discovery` | market/customer evidence |
+| EE | `role/ee-physical-systems` | measurement truth, calibration, uncertainty, field validity |
+| EHB | `role/ehb-embedded-integration` | embedded electronics, PCB, firmware, communications, HW↔SW integration |
+| CS1 | `role/cs1-decision-intelligence` | decision/model/data intelligence |
+| CS2 | `role/cs2-product-strategy` | product strategy, evidence synthesis, application |
+
+## EE ↔ EHB shared boundary
+
+The interface contract and system-level hardware verification are shared. Cross-boundary changes require explicit coordination and dual review; neither role may silently change voltage, pinout, sampling, protocol/schema, calibration persistence, power budget, or fault semantics.
 
 ## Active
 
@@ -49,6 +56,6 @@ New work should be represented in `.agents/coordination/tasks/*.json`; this tabl
 
 ## Historical note
 
-Work completed before the role-branch model may reference the former single integration PR discipline. Those records are historical evidence only and do not define current policy.
+Work completed before the five-role model may reference the former four-role or single-integration-PR discipline. Those records are historical evidence only and do not define current policy.
 
-Current authoritative policy is `AGENTS.md`, `.agents/FABRIC.md`, and `.agents/fabric.json`.
+Current authoritative policy is `AGENTS.md`, `.agents/FABRIC.md`, `.agents/fabric.json`, and the role documents under `KREATE/ROLES/`.
