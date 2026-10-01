@@ -50,6 +50,38 @@ def test_invalid_reconciliation_rows_are_not_learned_from() -> None:
     assert math.isclose(report["corrected_reservation"][3], 110.0)
 
 
+def test_reconciliation_diagnostics_explain_withhold_and_exclusions() -> None:
+    reservation = load_reservation_module()
+    report = reservation.generate_reservation_baselines(
+        [100, 100, 100, 100],
+        [80, 120, 90, 95],
+        [20, 10, 30, 25],
+        min_history=2,
+    )
+    assert report["reconciliation_status"] == [
+        "RECONCILED",
+        "EXCLUDED",
+        "RECONCILED",
+        "RECONCILED",
+    ]
+    assert (
+        "RESERVED_SERVED_EXCEEDS_ACTIVE_RESERVATIONS"
+        in report["reconciliation_reason_codes"][1]
+    )
+    assert report["reconciled_row_count"] == 3
+    assert report["excluded_row_count"] == 1
+    assert report["baseline_readiness"] == [
+        "WITHHOLD",
+        "WITHHOLD",
+        "WITHHOLD",
+        "BENCHMARK_READY",
+    ]
+    assert (
+        "INSUFFICIENT_RECONCILED_HISTORY"
+        in report["baseline_reason_codes"][2]
+    )
+
+
 def test_asymmetric_decision_loss_is_explicit_sensitivity_not_money() -> None:
     reservation = load_reservation_module()
     result = reservation.evaluate_decision_loss(
@@ -112,6 +144,7 @@ def main() -> int:
     tests = [
         test_reservation_first_baseline_is_past_only,
         test_invalid_reconciliation_rows_are_not_learned_from,
+        test_reconciliation_diagnostics_explain_withhold_and_exclusions,
         test_asymmetric_decision_loss_is_explicit_sensitivity_not_money,
         test_policy_comparison_uses_common_support_and_asymmetric_loss,
         test_validation_rejects_bad_alignment_and_costs,
