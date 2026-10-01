@@ -2,34 +2,44 @@
 
 ## Purpose
 
-BOUNCAMPUS is a multi-agent, four-role KREATE repository. Parallel development is encouraged. Integration is controlled by role branches, explicit path ownership, CI gates, and verified merges to `master`.
+BOUNCAMPUS is a multi-agent, five-execution-role KREATE repository. Parallel development is encouraged. Integration is controlled by role branches, explicit path ownership, CI gates, and verified merges to `master`.
 
 The repository optimizes for two things at the same time:
 
-1. let IE, EE, CS1, and CS2 move independently without waiting for a repository-wide PR lock;
-2. prevent stale branches, silent feature loss, and conflict-heavy merges from reaching `master`.
+1. let IE, EE, EHB, CS1, and CS2 move independently without waiting for a repository-wide PR lock;
+2. prevent stale branches, silent feature loss, weak evidence, and conflict-heavy merges from reaching `master`.
+
+Five execution roles do **not** imply five humans. The human team remains four people; PMR tracking remains person-based, not role-count-based.
 
 ## Core roles
 
-KREATE roles:
+KREATE execution roles:
 
 - **IE — Customer Discovery & Market Lead**
 - **EE — Physical Systems & Measurement Lead**
+- **EHB — Embedded Hardware, Communications & Integration Lead**
 - **CS1 — Decision Intelligence Lead**
 - **CS2 — Product Strategy, Evidence Synthesis & Application Lead**
 
 Engineering lanes such as `frontend-ux`, `api-product`, `campus-geo`, and `quality-release` remain valid task lanes. A lane may be executed under whichever KREATE role owns the outcome.
 
+Hardware is intentionally split:
+
+- EE owns measurement architecture, measurement-method/sensor selection, calibration, uncertainty, and field validity.
+- EHB owns embedded electronics, PCB, firmware, communications, controller-side power/interface implementation, bring-up, and HW↔SW integration.
+- System verification and the EE↔EHB interface contract are shared.
+
 ## Branch topology
 
 `master` is durable product truth.
 
-Each KREATE role has a long-lived integration branch:
+Each execution role has a long-lived integration branch:
 
 | Role | Long-lived branch |
 | --- | --- |
 | IE | `role/ie-customer-discovery` |
 | EE | `role/ee-physical-systems` |
+| EHB | `role/ehb-embedded-integration` |
 | CS1 | `role/cs1-decision-intelligence` |
 | CS2 | `role/cs2-product-strategy` |
 
@@ -40,6 +50,16 @@ role/<role>
   ├─ agent/<lane>/<task-a>
   ├─ agent/<lane>/<task-b>
   └─ agent/<lane>/<task-c>
+```
+
+Recommended EHB lanes:
+
+```text
+agent/ehb-hardware/<task>
+agent/ehb-firmware/<task>
+agent/ehb-comms/<task>
+agent/ehb-integration/<task>
+agent/ehb-verification/<task>
 ```
 
 Default flow:
@@ -90,7 +110,45 @@ Before implementation, a Workstream Agent must:
 
 Two active tasks must not own overlapping product paths. Parent/child ownership counts as overlap.
 
-If work must cross role boundaries, choose one primary role branch and document the cross-role impact. If the change is genuinely repository-wide, use the quality/release governance path rather than silently editing several role branches.
+If work crosses role boundaries, choose one primary role branch and document the cross-role impact. If the change is genuinely repository-wide, use the quality/release governance path rather than silently editing several role branches.
+
+## EE ↔ EHB coordination contract
+
+EE and EHB are independent roles with a mandatory interface contract whenever work crosses the measurement/electronics boundary.
+
+The relevant subset must be explicit before deep parallel implementation:
+
+- sensor/interface electrical requirements;
+- supply voltage/current limits;
+- connector/pinout;
+- ADC/interface expectations;
+- sampling rate/timing;
+- calibration-data ownership/persistence;
+- protocol and packet/event schema;
+- units/scaling;
+- quality/status/error flags;
+- power budget;
+- startup/shutdown behavior;
+- offline/fault/retry behavior;
+- test points and validation method.
+
+Decision rights:
+
+- measurement correctness → EE final owner;
+- embedded/comms/interface implementation → EHB final owner;
+- shared interface change → dual EE+EHB review;
+- model/decision semantics → CS1 final owner;
+- product/application framing → CS2 final owner.
+
+No silent voltage, pinout, sampling, schema, protocol, calibration-persistence, or power-budget change is allowed.
+
+## EHB ↔ CS1 coordination contract
+
+EHB owns reliable device-side representation/transport; CS1 owns decision/model semantics.
+
+Cross-role data work must align on timestamps/order, missing/invalid readings, quality flags, device metadata, duplicate handling, offline replay, schema versions, and API expectations that affect firmware behavior.
+
+A payload reaching the backend is not considered integrated if its semantics cannot be interpreted reliably.
 
 ## Feature PR requirements: task branch -> role branch
 
@@ -104,7 +162,8 @@ Before merging a feature PR into a role branch:
 4. repository CI required for the touched surfaces passes on the exact PR head;
 5. deletions/renames are intentional;
 6. conflicts are resolved by reviewing both sides, never by blind whole-file `ours`/`theirs`;
-7. the PR is small enough to understand and revert independently.
+7. the PR is small enough to understand and revert independently;
+8. any EE↔EHB interface changes have the required dual review.
 
 A task merged only into a role branch is **not** `MERGED_VERIFIED` and is not yet present in durable product truth.
 
@@ -118,14 +177,15 @@ It may merge only when all of the following are true:
 2. the PR head contains the exact current `master` base commit;
 3. `python scripts/verify_feature_preservation.py --base-ref <master-sha>` passes;
 4. `python scripts/agent_fabric_check.py` passes;
-5. `python scripts/kreate_check.py` passes;
-6. repository Python compilation/data validation passes;
-7. frontend `npm ci`, typecheck, lint, and build pass when the frontend is in CI;
-8. every deletion or rename is accounted for;
-9. cross-role/shared-file changes are explicitly called out in the PR checklist;
-10. CI is green on the exact PR head SHA;
-11. merge uses a normal merge commit;
-12. merged `master` is verified after merge.
+5. `python scripts/test_agent_fabric_check.py` passes;
+6. `python scripts/kreate_check.py` passes;
+7. repository Python compilation/data validation passes;
+8. frontend `npm ci`, typecheck, lint, and build pass when the frontend is in CI;
+9. every deletion or rename is accounted for;
+10. cross-role/shared-file changes are explicitly called out in the PR checklist;
+11. CI is green on the exact PR head SHA;
+12. merge uses a normal merge commit;
+13. merged `master` is verified after merge.
 
 If another PR lands first, the role PR becomes stale and must re-sync before merge. It does not get grandfathered through on previously green CI.
 
@@ -139,6 +199,7 @@ Treat these as shared/high-conflict surfaces:
 - root build/deployment configuration
 - dependency lockfiles
 - shared API/data contracts
+- EE↔EHB interface contracts
 - feature registry
 - KREATE claim/evidence policy files
 
@@ -148,6 +209,32 @@ A PR touching a shared/high-conflict surface must:
 - list other active workstreams that could be affected;
 - preserve both valid sides during conflict resolution;
 - run the broad repository validation gates, not only a narrow unit test.
+
+## Hardware engineering policy
+
+Hardware work is first-class engineering work, not presentation polish. The detailed execution contract lives in `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`.
+
+Hardware work should be decomposed by ownership rather than forcing all work under EE:
+
+**EE measurement work:** measurement requirement, measurement-method/sensor choice, calibration, uncertainty, field/pilot validation.
+
+**EHB implementation work:** controller/MCU, electronics, power/interface implementation, firmware, communications, PCB/interconnect, bring-up, protocol, backend-device integration.
+
+**Shared:** system verification and interface contract.
+
+Hardware agents MUST preserve the distinction between:
+
+- `ASSUMPTION`
+- `DATASHEET`
+- `CALCULATION`
+- `SIMULATION`
+- `BENCH_TEST`
+- `FIELD_TEST`
+- `PRODUCTION_EVIDENCE`
+
+A simulation, CAD render, datasheet value, or AI-generated schematic is not bench evidence.
+
+Physical actions that can create real risk remain subject to the `PHYSICAL_SAFETY` gate. Designing, simulating, calculating, coding firmware, and non-energized review are autonomous; dangerous energization, high-current/high-voltage testing, unsafe battery work, destructive testing, hazardous actuator motion, or consequential field installation require appropriate human approval/supervision.
 
 ## Merge-before-completion contract
 
@@ -162,7 +249,7 @@ For an accepted task to become `MERGED_VERIFIED`:
 5. `python scripts/agent_exit_gate.py --branch-head <task-or-integration-head>` must prove the validated work is contained in `master`;
 6. integration evidence must be recorded in coordination state.
 
-Several compatible tasks may share one role-to-`master` integration PR. They may also integrate independently. The old repository-wide integration slot no longer exists.
+Several compatible tasks may share one role-to-`master` integration PR. They may also integrate independently.
 
 ## Human-by-exception policy
 
@@ -176,7 +263,7 @@ Human input is required only for:
 4. `EXTERNAL_COMMITMENT`
 5. `PRODUCT_DIRECTION`
 
-Routine branch creation, PR creation, conflict resolution, reversible refactors, tests, and merge execution are not human gates.
+Routine branch creation, PR creation, conflict resolution, reversible refactors, tests, technical architecture selection, and merge execution are not human gates.
 
 ## Role-specific post-work checkpoint
 
@@ -185,13 +272,20 @@ The strategic checkpoint remains role scoped:
 - **IE: CHECKPOINT ON**
 - **CS2: CHECKPOINT ON**
 - **EE: CHECKPOINT OFF**
+- **EHB: CHECKPOINT OFF**
 - **CS1: CHECKPOINT OFF**
 
 Detailed behavior lives in `KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`.
 
 IE/CS2 should surface a user decision after completing a package when the next step is a genuine strategic branch such as a different beachhead, buyer, major product thesis, or application narrative.
 
-EE/CS1 should continue to the next highest-value aligned technical task unless one of the explicit human gates applies.
+EE/EHB/CS1 should continue to the next highest-value aligned technical task unless one of the explicit human gates applies.
+
+## PMR count and role count
+
+PMR remains a four-human responsibility. The current tracker target stays at **16 interviews**, approximately four lead interviews per human team member.
+
+Do not create EHB-01..04 interview slots merely because EHB exists as a fifth execution role. EHB may support or conduct interviews as staffed, but interview accounting follows real people and actual interviews, not execution-role count.
 
 ## Feature preservation
 
@@ -201,7 +295,7 @@ Before a `master` merge:
 
 - start from latest `master`;
 - account for deletions and renames;
-- update `.github/feature-registry.json` for new durable features when applicable;
+- update `.github/feature-registry.json` for new durable product features when applicable;
 - run feature-preservation checks;
 - run agent-fabric checks;
 - run the full relevant CI suite;
@@ -232,4 +326,4 @@ Real-world PMR, interview claims, pilot measurements, and KREATE evidence remain
 11. Mark included tasks `MERGED_VERIFIED`.
 12. Delete disposable feature branches when practical.
 
-See `.agents/FABRIC.md` and `docs/development-workflow.md` for the operational protocol.
+See `.agents/FABRIC.md`, `KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md`, and `docs/development-workflow.md` for the operational protocol.
