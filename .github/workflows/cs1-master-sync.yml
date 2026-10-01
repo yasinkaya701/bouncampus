@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   merge-master:
-    if: github.event.head_commit.message == 'chore(cs1): prepare conflict-safe master sync'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +29,6 @@ jobs:
 
           set +e
           git merge --no-commit --no-ff origin/master
-          merge_status=$?
           set -e
 
           conflicts="$(git diff --name-only --diff-filter=U | sort)"
@@ -41,8 +39,6 @@ jobs:
             exit 1
           fi
 
-          # Preserve the newer master UX for the two overlapping surfaces, then
-          # layer the CS1 decision semantics/navigation back onto that UX.
           git show origin/master:frontend/src/app/food-waste/page.tsx > frontend/src/app/food-waste/page.tsx
           git show origin/master:frontend/src/components/shared/Header.tsx > frontend/src/components/shared/Header.tsx
 
