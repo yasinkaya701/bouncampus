@@ -8,6 +8,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+VERIFIED_REACHABILITY = {
+    "decision_surface": "PRODUCTION_QUANTITY",
+    "operator_authority_confirmed": True,
+    "minutes_before_freeze": 90,
+}
+
 
 def load_module(name: str, relative_path: str):
     path = ROOT / relative_path
@@ -41,7 +47,9 @@ def test_pilot_eligible_method_may_be_pilot_ready_with_healthy_context() -> None
         {"schedule": True, "weather": True, "menu": True, "calendar": True},
         model_id="measured-baseline-v1",
         method_eligibility="PILOT_ELIGIBLE",
+        decision_reachability=VERIFIED_REACHABILITY,
     )
+    assert decision["decision_reachability_status"] == "REACHABLE"
     assert decision["decision_readiness"] == "PILOT_READY"
     assert decision["abstained"] is False
     assert decision["recommended_production"] == 1000
