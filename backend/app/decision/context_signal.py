@@ -68,26 +68,26 @@ def generate_context_residual_forecasts(
     context_keys: Sequence[Any],
     signal_available_at: Sequence[Any],
     decision_cutoff_at: Sequence[Any],
+    outcome_reconciled: Sequence[bool],
     min_history: int,
     min_context_history: int,
     shrinkage_strength: float,
     residual_statistic: str = "MEAN",
 ) -> dict[str, object]:
-    """Generate transparent context-corrected forecasts without target leakage.
+    """Generate transparent context-corrected forecasts without truth leakage.
 
-    For each row, the raw base forecast is first corrected for global historical
-    bias using only earlier reconciled rows. If the current context was known by
-    the decision cutoff and has enough prior observations, its historical
-    residual statistic is partially pooled toward the corresponding global
-    residual statistic::
+    For each row, the base forecast may be corrected from residual history built
+    only from earlier rows explicitly marked as reconciled/accepted by the caller.
+    If the current context was known by decision cutoff and has enough accepted
+    prior observations, its residual statistic is partially pooled toward the
+    corresponding global residual statistic::
 
         weight = n_context / (n_context + shrinkage_strength)
         correction = weight * context_stat + (1 - weight) * global_stat
 
-    `MEAN` preserves ordinary residual correction; `MEDIAN` is available as a
-    transparent robust option when a small number of event/outlier services would
-    otherwise dominate the correction. The current row's actual demand is
-    appended to history only after its forecasts have been produced.
+    `MEAN` preserves ordinary residual correction; `MEDIAN` is a transparent robust
+    option for isolated event/outlier services. The current row is learned only
+    after its forecast is produced, so it cannot leak into its own recommendation.
     """
 
     lengths = {
@@ -96,6 +96,7 @@ def generate_context_residual_forecasts(
         len(context_keys),
         len(signal_available_at),
         len(decision_cutoff_at),
+        len(outcome_reconciled),
     }
     if len(lengths) != 1:
         raise ValueError("context-signal inputs must have the same length")
@@ -111,6 +112,8 @@ def generate_context_residual_forecasts(
         raise ValueError(
             f"residual_statistic must be one of {tuple(sorted(SUPPORTED_RESIDUAL_STATISTICS))!r}"
         )
+    if any(not isinstance(value, bool) for value in outcome_reconciled):
+        raise ValueError("outcome_reconciled must contain explicit booleans")
 
     global_residuals: list[float] = []
     context_residuals: dict[str, list[float]] = defaultdict(list)
@@ -128,6 +131,7 @@ def generate_context_residual_forecasts(
         key = _context_key(context_keys[index])
         available = _aware_timestamp(signal_available_at[index])
         cutoff = _aware_timestamp(decision_cutoff_at[index])
+        reconciled = outcome_reconciled[index]
         signal_usable = (
             key is not None
             and available is not None
@@ -181,14 +185,19 @@ def generate_context_residual_forecasts(
         baseline_forecast.append(baseline)
         context_forecast.append(contextual)
         context_applied.append(applied)
-        reason_codes.append(reasons)
 
-        # Learn only after prediction, so the row cannot leak into its own forecast.
-        if base is not None and actual is not None:
+        # Learn only after prediction and only from explicitly reconciled truth.
+        if not reconciled:
+            reasons.append("OUTCOME_NOT_RECONCILED_NOT_LEARNED")
+        elif base is None or actual is None:
+            reasons.append("INVALID_RECONCILED_OUTCOME_NOT_LEARNED")
+        else:
             residual = actual - base
             global_residuals.append(residual)
             if signal_usable and key is not None:
                 context_residuals[key].append(residual)
+
+        reason_codes.append(reasons)
 
     return {
         "baseline_forecast": baseline_forecast,
@@ -202,6 +211,7 @@ def generate_context_residual_forecasts(
         "shrinkage_strength": shrinkage,
         "residual_statistic": statistic,
         "leakage_policy": "PAST_RECONCILED_ROWS_ONLY",
+        "reconciliation_policy": "EXPLICIT_CALLER_ACCEPTED_OUTCOME_REQUIRED",
         "availability_policy": "SIGNAL_MUST_BE_PUBLISHED_BY_DECISION_CUTOFF",
         "result_scope": "OFFLINE_CONTEXT_CORRECTION_ONLY",
         "claim_boundary": (
