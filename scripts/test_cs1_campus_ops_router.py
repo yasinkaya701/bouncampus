@@ -74,6 +74,8 @@ def request_payload():
                 "energy_cost_score": 0.6,
             }
         ],
+        "room_inventory_provenance": "OFFICIAL_SNAPSHOT",
+        "attendance_provenance": "OFFICIAL_SNAPSHOT",
         "food": {
             "demand_scenarios": [
                 {"demand": 90, "weight": 0.25},
@@ -130,7 +132,10 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
     }
     assert result["state"]["decision_time"] == "2026-10-01T10:00:00Z"
     assert result["shuttle"]["routes"][0]["route_id"] == "south-north"
+    assert result["shuttle"]["routes"][0]["capacity_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["classroom"]["assignments"][0]["room_id"] == "M101"
+    assert result["classroom"]["room_inventory_provenance"] == "OFFICIAL_SNAPSHOT"
+    assert result["classroom"]["attendance_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["food"]["recommended_production"] == 100
     assert result["energy"]["zones"][0]["recommended_mode"] == "NORMAL_SERVICE_REVIEW"
     allocations = {row["request_id"]: row["allocated"] for row in result["shared_capacity"]["allocations"]}
@@ -140,6 +145,21 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
     assert result["portfolio"]["domain_status"]["food"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["energy"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["shared_capacity"] == "REVIEW_REQUIRED"
+
+
+def test_unverified_capacity_inputs_fail_closed_through_combined_api() -> None:
+    from app.routers import campus_ops
+
+    raw = request_payload()
+    raw["shuttle_routes"][0]["capacity_provenance"] = "MODEL_ESTIMATE"
+    raw["room_inventory_provenance"] = "MODEL_ESTIMATE"
+    raw["attendance_provenance"] = "MODEL_ESTIMATE"
+    payload = campus_ops.CampusOpsPlanRequest(**raw)
+    result = campus_ops.plan_campus_operations(payload)
+    assert result["shuttle"]["decision_readiness"] == "WITHHOLD"
+    assert result["shuttle"]["routes"] == []
+    assert result["classroom"]["decision_readiness"] == "WITHHOLD"
+    assert result["classroom"]["assignments"] == []
 
 
 def test_optional_domains_can_be_omitted_without_fabricated_outputs() -> None:
@@ -178,6 +198,8 @@ def test_contract_and_main_preserve_truth_boundary() -> None:
         "portfolio",
     }
     assert tuple(contract["provenance_states"]) == PROVENANCE_STATES
+    assert "OFFICIAL_SNAPSHOT" in contract["provenance_states"]
+    assert "PUBLIC_SOURCE" not in contract["provenance_states"]
 
     main_source = (ROOT / "backend/app/main.py").read_text(encoding="utf-8")
     assert "campus_ops" in main_source
