@@ -56,6 +56,22 @@ def test_ineligible_method_cannot_trigger_disagreement_review() -> None:
     assert result["method_assessments"]["sandbox"]["eligible_for_stage"] is False
 
 
+def test_small_positive_selected_estimate_uses_true_relative_disagreement() -> None:
+    stability = load_stability()
+    result = stability.assess_method_disagreement(
+        {"baseline": 0.25, "model": 0.50},
+        selected_method_id="baseline",
+        method_eligibility={
+            "baseline": "PILOT_ELIGIBLE",
+            "model": "PILOT_ELIGIBLE",
+        },
+        stage="PILOT",
+        max_relative_disagreement_pct=50.0,
+    )
+    assert result["assessment_status"] == "REVIEW_REQUIRED"
+    assert result["max_relative_disagreement_pct"] == 100.0
+
+
 def test_zero_selected_estimate_withholds_relative_disagreement() -> None:
     stability = load_stability()
     result = stability.assess_method_disagreement(
@@ -103,6 +119,18 @@ def test_policy_sensitivity_withholds_when_required_scenario_is_missing() -> Non
     assert "REQUIRED_SENSITIVITY_SCENARIO_UNAVAILABLE" in result["reason_codes"]
 
 
+def test_small_positive_reference_uses_true_relative_sensitivity() -> None:
+    stability = load_stability()
+    result = stability.assess_policy_sensitivity(
+        {"registered": 0.25, "higher_shortage_weight": 0.50},
+        reference_policy_id="registered",
+        max_relative_target_change_pct=50.0,
+        required_scenario_ids=("higher_shortage_weight",),
+    )
+    assert result["assessment_status"] == "REVIEW_REQUIRED"
+    assert result["max_relative_target_change_pct"] == 100.0
+
+
 def test_zero_reference_target_withholds_relative_sensitivity() -> None:
     stability = load_stability()
     result = stability.assess_policy_sensitivity(
@@ -120,9 +148,11 @@ def main() -> int:
     tests = [
         test_method_disagreement_requires_review_past_registered_gate,
         test_ineligible_method_cannot_trigger_disagreement_review,
+        test_small_positive_selected_estimate_uses_true_relative_disagreement,
         test_zero_selected_estimate_withholds_relative_disagreement,
         test_policy_sensitivity_requires_review_when_target_is_unstable,
         test_policy_sensitivity_withholds_when_required_scenario_is_missing,
+        test_small_positive_reference_uses_true_relative_sensitivity,
         test_zero_reference_target_withholds_relative_sensitivity,
     ]
     for test in tests:
