@@ -64,12 +64,22 @@ def classroom_plan():
     }
 
 
+def food_decision(readiness: str = "REVIEW_REQUIRED"):
+    return {
+        "decision_readiness": readiness,
+        "recommended_production": None if readiness == "WITHHOLD" else 505,
+        "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
+        "reason_codes": [],
+    }
+
+
 def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> None:
     portfolio = load_module("campus_portfolio", "backend/app/decision/campus_portfolio.py")
     result = portfolio.build_campus_portfolio(
         campus_state=campus_state(),
         shuttle_plan=shuttle_plan(),
         classroom_plan=classroom_plan(),
+        food_decision=food_decision(),
     )
     assert result["contract_version"] == "campus-ops-v1.0"
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
@@ -77,6 +87,7 @@ def test_portfolio_exposes_cross_domain_pressure_without_auto_execution() -> Non
     assert result["operator_approval_required"] is True
     assert result["cross_domain_signals"]["campus_demand_context"]["south"] == 600
     assert result["cross_domain_signals"]["campus_demand_context"]["north"] == 900
+    assert result["cross_domain_signals"]["food_recommended_production"] == 505
     assert result["cross_domain_signals"]["shuttle_capacity_shortfall_routes"] == ["south-north"]
     assert result["cross_domain_signals"]["unassigned_sessions"] == ["B"]
     assert result["cross_domain_signals"]["building_attendance_targets"]["B-SOUTH-M"] == 70
@@ -102,10 +113,13 @@ def test_partial_domain_withhold_does_not_fabricate_missing_signal() -> None:
             "reason_codes": ["UPSTREAM_CAMPUS_STATE_WITHHELD"],
         },
         classroom_plan=classroom_plan(),
+        food_decision=food_decision("WITHHOLD"),
     )
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert result["cross_domain_signals"]["shuttle_capacity_shortfall_routes"] == []
+    assert result["cross_domain_signals"]["food_recommended_production"] is None
     assert "DOMAIN_WITHHELD_SHUTTLE" in result["reason_codes"]
+    assert "DOMAIN_WITHHELD_FOOD" in result["reason_codes"]
 
 
 def test_portfolio_contains_no_achieved_impact_claim_fields() -> None:
@@ -114,6 +128,7 @@ def test_portfolio_contains_no_achieved_impact_claim_fields() -> None:
         campus_state=campus_state(),
         shuttle_plan=shuttle_plan(),
         classroom_plan=classroom_plan(),
+        food_decision=food_decision(),
     )
     serialized = repr(result).lower()
     for forbidden in (
