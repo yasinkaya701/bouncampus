@@ -11,6 +11,7 @@ from app.models.energy import EnergyModel
 from app.models.food_demand import FoodDemandPredictor
 from app.models.occupancy import OccupancyPredictor
 from app.optimizers.action_engine import ActionEngine
+from app.optimizers.energy_potential import estimate_energy_potential
 from app.optimizers.food_optimizer import FoodOptimizer
 from app.schemas import (
     ActionItem,
@@ -124,14 +125,14 @@ def get_dashboard(date_val: Optional[str] = None):
         signal_availability=food_signal_availability,
     )
 
-    # Energy figures remain model estimates from weather/profile assumptions. Food
-    # waste is deliberately excluded from monetary/impact totals before a real pilot.
-    temp = live_weather["temperature"]
-    hvac_factor = 1.0 + max(0, abs(temp - 22.0) * 0.04)
-    predicted_energy_mwh = round(11.2 * hvac_factor, 1)
-    kwh_saved = round(predicted_energy_mwh * 0.14 * 1000, 0)
-    co2_avoided_kg = round(kwh_saved * 0.47, 1)
-    potential_saving_tl = round(kwh_saved * 2.8, 0)
+    # Energy outputs are scenario estimates from explicit registered assumptions.
+    # The shared calculator prevents dashboard and impact endpoints from drifting to
+    # unrelated hard-coded numbers.
+    energy_potential = estimate_energy_potential(live_weather["temperature"])
+    predicted_energy_mwh = energy_potential["predicted_energy_mwh"]
+    kwh_saved = energy_potential["kwh_saved"]
+    co2_avoided_kg = energy_potential["co2_avoided_kg"]
+    potential_saving_tl = energy_potential["cost_saved_tl"]
 
     if food_decision["abstained"]:
         food_action = ActionItem(
@@ -206,15 +207,18 @@ def get_dashboard(date_val: Optional[str] = None):
 @router.get("/metrics/impact", response_model=ImpactMetrics)
 def get_impact_metrics(date_val: Optional[str] = None):
     del date_val
+    live_weather = real_service.fetch_live_weather()
+    energy_potential = estimate_energy_potential(live_weather["temperature"])
     return ImpactMetrics(
-        kwh_saved=300.0,
-        co2_avoided_kg=141.0,
+        kwh_saved=energy_potential["kwh_saved"],
+        co2_avoided_kg=energy_potential["co2_avoided_kg"],
         food_waste_avoided_kg=None,
-        cost_saved_tl=840.0,
+        cost_saved_tl=energy_potential["cost_saved_tl"],
         energy_provenance="MODEL_ESTIMATE",
         food_waste_impact_status="UNMEASURED",
         note=(
-            "Energy values are model-estimated potential from configured assumptions. "
-            "Food-waste impact remains UNMEASURED until a valid matched pilot is completed."
+            "Energy values are scenario potential from configured assumptions and current weather context; "
+            "they are not measured savings. Food-waste impact remains UNMEASURED until a valid matched pilot "
+            "is completed."
         ),
     )
