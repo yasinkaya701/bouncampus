@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { recommendShuttleItinerary } from '../src/lib/decision-intelligence/shuttle-policy.ts';
 import { buildRoomScheduleIndex, allocateRooms } from '../src/lib/decision-intelligence/space-allocation.ts';
+import { recommendBuildingReview } from '../src/lib/decision-intelligence/building-review-policy.ts';
 
 const network = {
   source: { url: 'https://example.edu/shuttle' },
@@ -108,6 +109,52 @@ const freshMeta = {
   );
   assert.equal(stale.decisions[0].readiness, 'REVIEW_REQUIRED');
   assert.ok(stale.decisions[0].reasonCodes.includes('COURSE_SNAPSHOT_REFRESH_REQUIRED'));
+}
+
+const energyScenarios = [
+  {
+    building_id: 'B1',
+    building_name: 'Building One',
+    baseline_kwh: 900,
+    optimized_kwh: 700,
+    saving_kwh: 200,
+    saving_percent: 22,
+    savings: { kwh_saved: 200, cost_saved_tl: 560, co2_avoided_kg: 94 },
+  },
+  {
+    building_id: 'B2',
+    building_name: 'Building Two',
+    baseline_kwh: 800,
+    optimized_kwh: 650,
+    saving_kwh: 150,
+    saving_percent: 19,
+    savings: { kwh_saved: 150, cost_saved_tl: 420, co2_avoided_kg: 70.5 },
+  },
+];
+
+{
+  const review = recommendBuildingReview(energyScenarios, {
+    scheduleSourceUrl: 'https://example.edu/schedule',
+    weatherSource: 'Open-Meteo live API',
+    nowIso: '2026-10-01T12:00:00Z',
+  });
+  assert.equal(review.readiness, 'REVIEW_REQUIRED');
+  assert.equal(review.recommendation?.buildingId, 'B1');
+  assert.equal(review.recommendation?.mode, 'FIELD_VERIFICATION_ONLY');
+  assert.equal(review.automaticDispatchAllowed, false);
+  assert.ok(review.reasonCodes.includes('MODEL_SCENARIO_NOT_METERED_SAVINGS'));
+  assert.ok(review.reasonCodes.includes('FIELD_VERIFICATION_REQUIRED'));
+}
+
+{
+  const review = recommendBuildingReview([], {
+    scheduleSourceUrl: 'https://example.edu/schedule',
+    weatherSource: 'fallback assumption',
+    nowIso: '2026-10-01T12:00:00Z',
+  });
+  assert.equal(review.readiness, 'WITHHOLD');
+  assert.equal(review.recommendation, null);
+  assert.ok(review.reasonCodes.includes('NO_BUILDING_ENERGY_SCENARIO'));
 }
 
 console.log('campus operations policy tests passed');
