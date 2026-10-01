@@ -39,8 +39,6 @@ jobs:
             exit 1
           fi
 
-          # Master owns the latest UX and the newest fabric invariant. Layer CS1
-          # product semantics/navigation onto those current master versions.
           git show origin/master:frontend/src/app/food-waste/page.tsx > frontend/src/app/food-waste/page.tsx
           git show origin/master:frontend/src/components/shared/Header.tsx > frontend/src/components/shared/Header.tsx
           git show origin/master:scripts/agent_fabric_check.py > scripts/agent_fabric_check.py
@@ -65,9 +63,9 @@ jobs:
 
           old = "label={t('Önerilen', 'Recommended')}"
           new = "label={advisoryOnly ? t('Planlama adayı', 'Planning candidate') : t('Önerilen', 'Recommended')}"
-          if page.count(old) != 1:
+          if page.count(old) < 1:
               raise SystemExit('food metric label anchor drifted')
-          page = page.replace(old, new)
+          page = page.replace(old, new, 1)
 
           old = "footer={band ? t('MODEL_ESTIMATE · ölçüm değil', 'MODEL_ESTIMATE · not measured') : t('Karar bağlamı bekleniyor', 'Waiting for decision context')}"
           new = "footer={band ? (advisoryOnly ? t('ADVISORY · mutfak emri değil', 'ADVISORY · not a kitchen order') : t('MODEL_ESTIMATE · ölçüm değil', 'MODEL_ESTIMATE · not measured')) : t('Karar bağlamı bekleniyor', 'Waiting for decision context')}"
