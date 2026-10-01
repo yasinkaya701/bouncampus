@@ -60,12 +60,9 @@ def _normalize_method_eligibility(value: Any) -> tuple[str, bool]:
 
 
 def _normalize_minutes_before_freeze(value: Any) -> float | None:
-    if value is None or isinstance(value, bool):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return None
+    numeric = float(value)
     if not math.isfinite(numeric):
         return None
     return numeric
@@ -99,7 +96,11 @@ def _assess_decision_reachability(
         }
 
     raw_surface = decision_reachability.get("decision_surface")
-    decision_surface = str(raw_surface).strip().upper() if raw_surface is not None else ""
+    decision_surface = (
+        raw_surface.strip().upper()
+        if isinstance(raw_surface, str)
+        else ""
+    )
     if not decision_surface:
         decision_surface = None
 
