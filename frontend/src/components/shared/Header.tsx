@@ -3,30 +3,25 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Building2,
-  BusFront,
-  CalendarDays,
-  CheckSquare2,
-  Compass,
-  Database,
-  LayoutDashboard,
-  Leaf,
-  Trophy,
-  Utensils,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowUpRight, Database, Menu, ShieldCheck, Utensils, X } from 'lucide-react';
 import { useLocale, type Locale } from '@/lib/i18n';
 
 const primaryNav = [
-  { href: '/', tr: 'Kontrol merkezi', en: 'Command center', icon: LayoutDashboard },
-  { href: '/campus-ops', tr: 'Operasyon', en: 'Operations', icon: Compass },
-  { href: '/campus-ops/shuttle-frequency', tr: 'Mekik planı', en: 'Shuttle plan', icon: BusFront },
-  { href: '/food-waste', tr: 'Yemek atığı', en: 'Food waste', icon: Utensils },
-  { href: '/decisions', tr: 'Kararlar', en: 'Decisions', icon: CheckSquare2 },
-  { href: '/data', tr: 'Kanıt', en: 'Evidence', icon: Database },
-  { href: '/buildings', tr: 'Binalar', en: 'Buildings', icon: Building2 },
-  { href: '/mobility', tr: 'Mekik', en: 'Shuttle', icon: BusFront },
-  { href: '/scenarios', tr: 'Senaryolar', en: 'Scenarios', icon: Compass },
+  { href: '/', tr: 'Genel bakış', en: 'Overview' },
+  { href: '/campus-ops', tr: 'Operasyon', en: 'Operations' },
+  { href: '/campus-ops/shuttle-frequency', tr: 'Mekik planı', en: 'Shuttle plan' },
+  { href: '/food-waste', tr: 'Yemek atığı', en: 'Food waste' },
+  { href: '/decisions', tr: 'Kararlar', en: 'Decisions' },
+  { href: '/data', tr: 'Kanıt', en: 'Evidence' },
+];
+
+const secondaryNav = [
+  { href: '/buildings', tr: 'Binalar', en: 'Buildings' },
+  { href: '/mobility', tr: 'Ulaşım', en: 'Mobility' },
+  { href: '/courses', tr: 'Dersler', en: 'Courses' },
+  { href: '/scenarios', tr: 'Senaryolar', en: 'Scenarios' },
+  { href: '/lab', tr: 'Lab', en: 'Lab' },
 ];
 
 function isNavActive(pathname: string, href: string) {
@@ -41,7 +36,7 @@ function LocaleButton({ value, current, onClick }: { value: Locale; current: Loc
       type="button"
       onClick={onClick}
       aria-pressed={current === value}
-      className={`rounded-lg px-2.5 py-1.5 text-[9px] font-black tracking-[0.06em] transition ${current === value ? 'bg-[#071c33] text-white shadow-sm' : 'text-slate-400 hover:text-slate-900'}`}
+      className={`bc-focus-ring rounded-md px-2 py-1 text-[10px] font-bold transition ${current === value ? 'bg-[#18372b] text-white' : 'text-[#70776f] hover:text-[#111712]'}`}
     >
       {value.toUpperCase()}
     </button>
@@ -51,37 +46,35 @@ function LocaleButton({ value, current, onClick }: { value: Locale; current: Loc
 export default function Header() {
   const pathname = usePathname();
   const { locale, setLocale, t } = useLocale();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-950/[0.06] bg-[#f8faf7]/88 shadow-[0_8px_30px_rgba(7,17,31,.025)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#f8faf7]/76">
-      <div className="mx-auto flex min-h-[74px] w-full max-w-[1520px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 items-center gap-6">
-          <Link href="/" className="bc-focus-ring group flex shrink-0 items-center gap-3 rounded-xl">
-            <span className="relative h-10 w-10 overflow-hidden rounded-[13px] shadow-[0_10px_24px_rgba(7,28,51,.16)] ring-1 ring-slate-950/[0.06] transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_32px_rgba(7,28,51,.22)]">
-              <Image src="/assets/bouncampus-mark.svg" alt="" fill sizes="40px" className="object-cover" priority />
+    <header className="sticky top-0 z-50 border-b border-[#111712]/10 bg-[#f4f1ea]/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[68px] w-full max-w-[1440px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-8">
+          <Link href="/" className="bc-focus-ring flex shrink-0 items-center gap-3 rounded-lg" aria-label="BOUNCAMPUS home">
+            <span className="relative h-9 w-9 overflow-hidden rounded-[10px] border border-[#111712]/10 bg-white">
+              <Image src="/assets/bouncampus-mark.svg" alt="" fill sizes="36px" className="object-cover" priority />
             </span>
-            <div className="hidden sm:block">
-              <div className="flex items-center gap-2">
-                <div className="text-[14px] font-black tracking-[-0.04em] text-slate-950">BOUNCAMPUS</div>
-                <span className="rounded-full border border-emerald-900/10 bg-emerald-50 px-1.5 py-0.5 text-[7px] font-black uppercase tracking-[0.12em] text-emerald-700">KREATE</span>
-              </div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                <Leaf size={8} /> {t('Campus climate ops · food waste first', 'Campus climate ops · food waste first')}
-              </div>
+            <div className="leading-none">
+              <div className="text-[13px] font-black tracking-[-0.02em] text-[#111712]">BOUNCAMPUS</div>
+              <div className="mt-1 text-[8px] font-bold uppercase tracking-[0.18em] text-[#778078]">KREATE · decision system</div>
             </div>
           </Link>
 
-          <nav className="hidden items-center rounded-[14px] border border-slate-950/[0.07] bg-white/76 p-1 shadow-[0_10px_28px_rgba(7,17,31,.035)] xl:flex">
+          <nav className="hidden h-full items-center gap-6 lg:flex" aria-label={t('Ana navigasyon', 'Primary navigation')}>
             {primaryNav.map(link => {
               const active = isNavActive(pathname, link.href);
-              const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`bc-focus-ring flex items-center gap-1.5 rounded-[10px] px-3 py-2 text-[10px] font-bold transition duration-200 ${active ? 'bg-[#071c33] text-white shadow-[0_8px_18px_rgba(7,28,51,.14)]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-950'}`}
+                  className={`bc-focus-ring relative flex h-full items-center rounded-sm text-[11px] font-bold transition ${active ? 'text-[#111712]' : 'text-[#6d746e] hover:text-[#111712]'}`}
                 >
-                  <Icon size={12} strokeWidth={2.2} /> {locale === 'tr' ? link.tr : link.en}
+                  {locale === 'tr' ? link.tr : link.en}
+                  {active && <span className="absolute inset-x-0 bottom-0 h-[2px] bg-[#18372b]" />}
                 </Link>
               );
             })}
@@ -89,37 +82,72 @@ export default function Header() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div className="hidden items-center gap-2 rounded-full border border-[#173f67]/10 bg-[#edf5f8] px-3 py-2 text-[8px] font-black uppercase tracking-[0.1em] text-[#173f67] 2xl:flex">
-            <CalendarDays size={10} /> {t('KREATE · 15 Ekim', 'KREATE · 15 Oct')}
+          <div className="hidden items-center gap-2 text-[9px] font-bold uppercase tracking-[0.12em] text-[#617067] xl:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#7aa15f]" />
+            {t('İnsan onaylı', 'Human approved')}
           </div>
-          <div className="hidden items-center gap-2 rounded-full border border-emerald-900/10 bg-emerald-50/80 px-3 py-2 text-[9px] font-black text-emerald-800 lg:flex">
-            <span className="bc-live-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            {t('Karar motoru aktif', 'Decision engine active')}
-          </div>
-          <div className="flex rounded-xl border border-slate-950/[0.08] bg-white/80 p-0.5 shadow-sm" aria-label={t('Dil seçimi', 'Language selection')}>
+          <div className="hidden rounded-lg border border-[#111712]/10 bg-white p-0.5 sm:flex" aria-label={t('Dil seçimi', 'Language selection')}>
             <LocaleButton value="tr" current={locale} onClick={() => setLocale('tr')} />
             <LocaleButton value="en" current={locale} onClick={() => setLocale('en')} />
           </div>
-          <Link href="/demo" className="bc-focus-ring hidden items-center gap-1.5 rounded-xl bg-[#071c33] px-3.5 py-2.5 text-[10px] font-black text-white shadow-[0_10px_24px_rgba(7,28,51,.14)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#0b3153] sm:flex">
-            <Trophy size={12} /> {t('Jüri modu', 'Jury mode')}
+          <Link
+            href="/demo"
+            className="bc-focus-ring hidden items-center gap-2 rounded-lg bg-[#18372b] px-3.5 py-2.5 text-[10px] font-black text-white transition hover:bg-[#244a3a] sm:flex"
+          >
+            {t('Jüri modu', 'Jury mode')} <ArrowUpRight size={12} />
           </Link>
+          <button
+            type="button"
+            className="bc-focus-ring grid h-10 w-10 place-items-center rounded-lg border border-[#111712]/10 bg-white text-[#111712] lg:hidden"
+            onClick={() => setMenuOpen(value => !value)}
+            aria-expanded={menuOpen}
+            aria-label={t('Menüyü aç/kapat', 'Toggle menu')}
+          >
+            {menuOpen ? <X size={17} /> : <Menu size={17} />}
+          </button>
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-[1520px] gap-1.5 overflow-x-auto px-4 pb-2.5 xl:hidden sm:px-6 lg:px-8">
-        {primaryNav.map(link => {
-          const active = isNavActive(pathname, link.href);
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[9px] font-black transition ${active ? 'bg-[#071c33] text-white shadow-sm' : 'border border-slate-950/[0.08] bg-white/80 text-slate-500 hover:text-slate-900'}`}
-            >
-              <Icon size={10} /> {locale === 'tr' ? link.tr : link.en}
-            </Link>
-          );
-        })}
+      {menuOpen && (
+        <div className="border-t border-[#111712]/10 bg-[#f4f1ea] lg:hidden">
+          <div className="mx-auto grid w-full max-w-[1440px] gap-5 px-4 py-5 sm:px-6">
+            <nav className="grid grid-cols-2 gap-2" aria-label={t('Mobil navigasyon', 'Mobile navigation')}>
+              {primaryNav.map(link => {
+                const active = isNavActive(pathname, link.href);
+                return (
+                  <Link key={link.href} href={link.href} className={`rounded-lg border px-3 py-3 text-[11px] font-bold ${active ? 'border-[#18372b] bg-[#18372b] text-white' : 'border-[#111712]/10 bg-white text-[#4f5751]'}`}>
+                    {locale === 'tr' ? link.tr : link.en}
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="border-t border-[#111712]/10 pt-4">
+              <div className="mb-2 text-[9px] font-black uppercase tracking-[0.16em] text-[#858b85]">{t('Diğer modüller', 'Other modules')}</div>
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                {secondaryNav.map(link => (
+                  <Link key={link.href} href={link.href} className="text-[10px] font-bold text-[#616961] hover:text-[#111712]">
+                    {locale === 'tr' ? link.tr : link.en}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3 border-t border-[#111712]/10 pt-4">
+              <div className="flex items-center gap-2 text-[9px] font-bold text-[#5f685f]"><ShieldCheck size={12} /> {t('Kaynak ve model ayrımı görünür', 'Source/model boundary visible')}</div>
+              <div className="flex rounded-lg border border-[#111712]/10 bg-white p-0.5">
+                <LocaleButton value="tr" current={locale} onClick={() => setLocale('tr')} />
+                <LocaleButton value="en" current={locale} onClick={() => setLocale('en')} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="hidden border-t border-[#111712]/[0.06] bg-white/35 2xl:block">
+        <div className="mx-auto flex h-8 w-full max-w-[1440px] items-center gap-5 px-8 text-[9px] font-bold text-[#777e78]">
+          <span className="flex items-center gap-1.5"><Utensils size={10} /> {t('Odak: yemek atığını önlemek', 'Focus: prevent food waste')}</span>
+          <span className="h-3 w-px bg-[#111712]/10" />
+          <span className="flex items-center gap-1.5"><Database size={10} /> {t('Kamu verisi + model tahmini', 'Public data + model estimate')}</span>
+        </div>
       </div>
     </header>
   );

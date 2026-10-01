@@ -82,6 +82,8 @@ Use this section for application, PMR, evidence, experiment, or claim-bearing ch
 - [ ] Material claims are classified correctly.
 - [ ] Every material claim has an evidence ID or remains explicitly `HYPOTHESIS`/`UNKNOWN`.
 - [ ] AI did not fabricate interviews, quotes, personas, pilot results, accuracy, climate impact, hardware performance, live data, or savings.
+- [ ] No AI-generated interview, quote, persona, pilot result, metric, or field observation is represented as human or measured evidence.
+- [ ] No fabricated evidence, measurement, source, result, or operational claim is included.
 - [ ] Human evidence attestation is recorded when required.
 - [ ] Known limitations are disclosed.
 
