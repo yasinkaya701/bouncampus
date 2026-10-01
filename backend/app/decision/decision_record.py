@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime
+import math
 from typing import Any, Mapping, Sequence
 
 DECISION_STAGES = ("SHADOW", "ADVISORY", "BOUNDED_INTERVENTION")
@@ -32,6 +33,8 @@ def _optional_non_negative_number(name: str, value: Any) -> float | int | None:
         return None
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError(f"{name} must be numeric or null")
+    if not math.isfinite(float(value)):
+        raise ValueError(f"{name} must be finite")
     if value < 0:
         raise ValueError(f"{name} must be non-negative")
     return value
@@ -141,6 +144,8 @@ def record_operator_action(
 ) -> dict[str, Any]:
     if record.get("decision_stage") == "SHADOW":
         raise ValueError("shadow mode must not record operator action")
+    if not isinstance(operator_override, bool):
+        raise ValueError("operator_override must be boolean")
     if record.get("operator_action") is not None:
         raise ValueError("operator action is already recorded")
 
