@@ -142,6 +142,29 @@ def test_insufficient_common_support_withholds_selection() -> None:
     assert "INSUFFICIENT_COMMON_SUPPORT" in result["reason_codes"]
 
 
+def test_fractional_common_support_is_rejected() -> None:
+    gate = load_gate()
+    data = comparison()
+    data["common_support_n"] = 10.9
+    try:
+        gate.select_method(
+            data,
+            baseline_id="baseline",
+            method_eligibility={
+                "baseline": "PILOT_ELIGIBLE",
+                "model": "EVALUATED_OFFLINE",
+            },
+            stage="OFFLINE_EVALUATION",
+            primary_metric="mae",
+            min_common_support_n=10,
+            min_relative_improvement_pct=0.0,
+        )
+    except ValueError as exc:
+        assert "common_support_n must be an integer" in str(exc)
+    else:
+        raise AssertionError("fractional common support must not be silently truncated")
+
+
 def test_malformed_baseline_metric_fails_closed() -> None:
     gate = load_gate()
     data = comparison()
@@ -215,6 +238,7 @@ def main() -> int:
         test_sandbox_candidate_fails_closed_even_if_metric_is_best,
         test_pilot_stage_excludes_offline_only_candidate,
         test_insufficient_common_support_withholds_selection,
+        test_fractional_common_support_is_rejected,
         test_malformed_baseline_metric_fails_closed,
         test_malformed_candidate_metric_cannot_crash_or_promote,
         test_decision_loss_can_be_registered_as_primary_metric,
