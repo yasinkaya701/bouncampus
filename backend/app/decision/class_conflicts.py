@@ -1,6 +1,6 @@
 """Conflict-aware hardening for the CS1 class room/slot optimizer.
 
-The base campus-ops scheduler already owns room capacity, room feature, room/slot
+The base class-assignment solver owns room capacity, room feature, room/slot
 collision, and building mismatch logic. This module adds a separate hard constraint
 for classes that must not overlap in time (for example, a shared instructor or
 student cohort) without duplicating the room solver.
@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 from typing import Any, Mapping, Sequence
 
-from app.decision.campus_ops import _base, optimize_class_schedule
+from app.decision.class_assignment import _base, optimize_class_schedule
 
 MAX_CONFLICT_SLOT_PLANS = 20_000
 
@@ -65,7 +65,8 @@ def optimize_conflict_aware_class_schedule(
 
     To preserve one source of truth for room feasibility, this function searches
     only the conflict-constrained slot choices and delegates every candidate to
-    ``campus_ops.optimize_class_schedule`` for room assignment and objective scoring.
+    ``class_assignment.optimize_class_schedule`` for room assignment and objective
+    scoring.
     """
 
     if not isinstance(classes, Sequence) or isinstance(classes, (str, bytes)):
