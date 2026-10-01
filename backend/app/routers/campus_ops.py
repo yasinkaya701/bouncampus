@@ -10,6 +10,7 @@ from app.decision.campus_ops import (
     optimize_class_schedule,
     optimize_food_production,
     optimize_shuttle_plan,
+    optimize_space_plan,
 )
 
 router = APIRouter(prefix="/api/v1/ops", tags=["campus-operations"])
@@ -23,7 +24,14 @@ def _payload_value(payload: dict[str, Any], key: str, default: Any) -> Any:
 @router.get("/capabilities")
 def capabilities() -> dict[str, Any]:
     return {
-        "modules": ["food", "shuttle", "class_scheduling", "shared_capacity", "bundle"],
+        "modules": [
+            "food",
+            "shuttle",
+            "space_activation",
+            "class_scheduling",
+            "shared_capacity",
+            "bundle",
+        ],
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
@@ -49,6 +57,17 @@ def optimize_shuttle(payload: dict[str, Any]) -> dict[str, Any]:
         demand_scenarios=_payload_value(payload, "demand_scenarios", []),
         departure_options=_payload_value(payload, "departure_options", []),
         empty_seat_weight=_payload_value(payload, "empty_seat_weight", None),
+        shortage_weight=_payload_value(payload, "shortage_weight", None),
+        min_point_service_ratio=_payload_value(payload, "min_point_service_ratio", 0.9),
+    )
+
+
+@router.post("/spaces")
+def optimize_spaces(payload: dict[str, Any]) -> dict[str, Any]:
+    return optimize_space_plan(
+        occupancy_scenarios=_payload_value(payload, "occupancy_scenarios", []),
+        zones=_payload_value(payload, "zones", []),
+        idle_capacity_weight=_payload_value(payload, "idle_capacity_weight", None),
         shortage_weight=_payload_value(payload, "shortage_weight", None),
         min_point_service_ratio=_payload_value(payload, "min_point_service_ratio", 0.9),
     )
