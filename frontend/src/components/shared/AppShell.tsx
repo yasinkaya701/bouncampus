@@ -10,9 +10,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isOperatorConsole) {
     return (
-      <main id="main-content" className="min-h-screen bg-[#f5f6f5]">
+      <div id="main-content" className="min-h-screen bg-[#f5f6f5]">
         {children}
-      </main>
+      </div>
     );
   }
 
