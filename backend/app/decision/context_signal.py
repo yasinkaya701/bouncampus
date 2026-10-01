@@ -11,7 +11,10 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime
 import math
+from statistics import median
 from typing import Any, Sequence
+
+SUPPORTED_RESIDUAL_STATISTICS = frozenset({"MEAN", "MEDIAN"})
 
 
 def _non_negative_number(value: Any) -> float | None:
@@ -50,8 +53,12 @@ def _aware_timestamp(value: Any) -> datetime | None:
     return parsed
 
 
-def _mean(values: Sequence[float]) -> float:
-    return sum(values) / len(values)
+def _aggregate_residual(values: Sequence[float], statistic: str) -> float:
+    if statistic == "MEAN":
+        return sum(values) / len(values)
+    if statistic == "MEDIAN":
+        return float(median(values))
+    raise ValueError(f"unsupported residual statistic {statistic!r}")
 
 
 def generate_context_residual_forecasts(
@@ -64,20 +71,23 @@ def generate_context_residual_forecasts(
     min_history: int,
     min_context_history: int,
     shrinkage_strength: float,
+    residual_statistic: str = "MEAN",
 ) -> dict[str, object]:
     """Generate transparent context-corrected forecasts without target leakage.
 
     For each row, the raw base forecast is first corrected for global historical
     bias using only earlier reconciled rows. If the current context was known by
-    the decision cutoff and has enough prior observations, its historical mean
-    residual is partially pooled toward the global residual mean:
+    the decision cutoff and has enough prior observations, its historical
+    residual statistic is partially pooled toward the corresponding global
+    residual statistic::
 
         weight = n_context / (n_context + shrinkage_strength)
-        correction = weight * context_mean + (1 - weight) * global_mean
+        correction = weight * context_stat + (1 - weight) * global_stat
 
-    The current row's actual demand is appended to history only after its
-    forecasts have been produced. Thus changing the current/future outcome cannot
-    change its own recommendation.
+    `MEAN` preserves ordinary residual correction; `MEDIAN` is available as a
+    transparent robust option when a small number of event/outlier services would
+    otherwise dominate the correction. The current row's actual demand is
+    appended to history only after its forecasts have been produced.
     """
 
     lengths = {
@@ -96,6 +106,11 @@ def generate_context_residual_forecasts(
     shrinkage = float(shrinkage_strength)
     if not math.isfinite(shrinkage) or shrinkage < 0:
         raise ValueError("shrinkage_strength must be finite and non-negative")
+    statistic = str(residual_statistic or "").strip().upper()
+    if statistic not in SUPPORTED_RESIDUAL_STATISTICS:
+        raise ValueError(
+            f"residual_statistic must be one of {tuple(sorted(SUPPORTED_RESIDUAL_STATISTICS))!r}"
+        )
 
     global_residuals: list[float] = []
     context_residuals: dict[str, list[float]] = defaultdict(list)
@@ -132,10 +147,10 @@ def generate_context_residual_forecasts(
             reasons.append("BASE_FORECAST_UNAVAILABLE")
         else:
             if len(global_residuals) >= min_history:
-                global_mean = _mean(global_residuals)
-                baseline = max(base + global_mean, 0.0)
+                global_stat = _aggregate_residual(global_residuals, statistic)
+                baseline = max(base + global_stat, 0.0)
             else:
-                global_mean = 0.0
+                global_stat = 0.0
                 baseline = base
                 reasons.append("INSUFFICIENT_GLOBAL_HISTORY_FOR_RESIDUAL_CORRECTION")
 
@@ -152,13 +167,13 @@ def generate_context_residual_forecasts(
             elif len(key_history) < min_context_history:
                 reasons.append("INSUFFICIENT_CONTEXT_HISTORY")
             else:
-                context_mean = _mean(key_history)
+                context_stat = _aggregate_residual(key_history, statistic)
                 weight = (
                     1.0
                     if shrinkage == 0
                     else len(key_history) / (len(key_history) + shrinkage)
                 )
-                correction = weight * context_mean + (1.0 - weight) * global_mean
+                correction = weight * context_stat + (1.0 - weight) * global_stat
                 contextual = max(base + correction, 0.0)
                 applied = True
                 reasons.append("CONTEXT_RESIDUAL_CORRECTION_APPLIED")
@@ -185,6 +200,7 @@ def generate_context_residual_forecasts(
         "min_history": min_history,
         "min_context_history": min_context_history,
         "shrinkage_strength": shrinkage,
+        "residual_statistic": statistic,
         "leakage_policy": "PAST_RECONCILED_ROWS_ONLY",
         "availability_policy": "SIGNAL_MUST_BE_PUBLISHED_BY_DECISION_CUTOFF",
         "result_scope": "OFFLINE_CONTEXT_CORRECTION_ONLY",
