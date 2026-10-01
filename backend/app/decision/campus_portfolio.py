@@ -106,6 +106,21 @@ def _building_attendance_targets(
     return output
 
 
+def _food_recommended_production(food_decision: Mapping[str, Any] | None) -> int | None:
+    if food_decision is None or _readiness(food_decision) == "WITHHOLD":
+        return None
+    value = food_decision.get("recommended_production")
+    if isinstance(value, bool):
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    if numeric < 0 or not numeric.is_integer():
+        return None
+    return int(numeric)
+
+
 def build_campus_portfolio(
     *,
     campus_state: Mapping[str, Any],
@@ -171,6 +186,7 @@ def build_campus_portfolio(
     unassigned = _unassigned_sessions(classroom_plan)
     building_targets = _building_attendance_targets(classroom_plan)
     campus_context = _campus_demand_context(campus_state)
+    food_target = _food_recommended_production(food_decision)
 
     if shuttle_shortfalls or unassigned:
         reason_codes.append("CROSS_DOMAIN_CONFLICTS_REQUIRE_OPERATOR_REVIEW")
@@ -178,6 +194,7 @@ def build_campus_portfolio(
     cross_domain_signals = {
         "campus_demand_context": campus_context,
         "food_demand_context": dict(campus_context),
+        "food_recommended_production": food_target,
         "energy_occupancy_context": dict(campus_context),
         "shuttle_capacity_shortfall_routes": shuttle_shortfalls,
         "unassigned_sessions": unassigned,
