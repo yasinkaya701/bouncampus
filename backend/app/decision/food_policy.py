@@ -4,7 +4,7 @@ import math
 from typing import Any, Mapping
 
 POLICY_VERSION = "food-decision-v1.1"
-REACHABILITY_POLICY_VERSION = "decision-reachability-v1.0"
+REACHABILITY_POLICY_VERSION = "decision-reachability-v1.1"
 FORECAST_PROVENANCE = "MODEL_ESTIMATE"
 DECISION_PROVENANCE = "POLICY_HEURISTIC"
 BAND_SEMANTICS = "PLANNING_RANGE_NOT_CALIBRATED_INTERVAL"
@@ -71,23 +71,30 @@ def _normalize_minutes_before_freeze(value: Any) -> float | None:
     return numeric
 
 
+def _normalize_optional_bool(value: Any) -> bool | None:
+    return value if isinstance(value, bool) else None
+
+
 def _assess_decision_reachability(
     decision_reachability: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
-    """Classify whether a recommendation can still reach a real operator decision.
+    """Classify whether a recommendation can still reach a verified real decision.
 
-    Reachability is intentionally operational, not predictive: it does not claim that
-    the forecast is accurate, that the workflow is adopted, or that impact occurred.
-    Unknown timing/authority prevents `PILOT_READY`; known absence of authority or a
-    closed decision window fails closed to `WITHHOLD`.
+    Reachability is operational, not predictive. A free-form control-surface name is
+    insufficient by itself: the surface must have been verified, operator authority
+    must be confirmed, the decision window must still be open, and the workflow must
+    be confirmed changeable before freeze. Unknown evidence prevents `PILOT_READY`;
+    known impossibility fails closed to `WITHHOLD`.
     """
 
     if not isinstance(decision_reachability, Mapping):
         return {
             "status": "UNVERIFIED",
             "decision_surface": None,
+            "decision_surface_verified": None,
             "operator_authority_confirmed": None,
             "minutes_before_freeze": None,
+            "change_feasible_before_freeze": None,
             "reason_codes": ["DECISION_REACHABILITY_UNVERIFIED"],
         }
 
@@ -96,10 +103,17 @@ def _assess_decision_reachability(
     if not decision_surface:
         decision_surface = None
 
-    raw_authority = decision_reachability.get("operator_authority_confirmed")
-    authority_confirmed = raw_authority if isinstance(raw_authority, bool) else None
+    surface_verified = _normalize_optional_bool(
+        decision_reachability.get("decision_surface_verified")
+    )
+    authority_confirmed = _normalize_optional_bool(
+        decision_reachability.get("operator_authority_confirmed")
+    )
     minutes_before_freeze = _normalize_minutes_before_freeze(
         decision_reachability.get("minutes_before_freeze")
+    )
+    change_feasible_before_freeze = _normalize_optional_bool(
+        decision_reachability.get("change_feasible_before_freeze")
     )
 
     reasons: list[str] = []
@@ -107,18 +121,26 @@ def _assess_decision_reachability(
 
     if decision_surface is None:
         reasons.append("DECISION_SURFACE_UNSPECIFIED")
+    if surface_verified is not True:
+        reasons.append("DECISION_SURFACE_UNVERIFIED")
 
     if authority_confirmed is False:
-        reasons.append("DECISION_AUTHORITY_UNCONFIRMED")
+        reasons.append("DECISION_AUTHORITY_DENIED")
         hard_block = True
     elif authority_confirmed is None:
-        reasons.append("DECISION_AUTHORITY_UNCONFIRMED")
+        reasons.append("DECISION_AUTHORITY_UNKNOWN")
 
     if minutes_before_freeze is None:
         reasons.append("DECISION_FREEZE_TIME_UNKNOWN")
     elif minutes_before_freeze <= 0:
         reasons.append("DECISION_WINDOW_CLOSED")
         hard_block = True
+
+    if change_feasible_before_freeze is False:
+        reasons.append("DECISION_CHANGE_NOT_FEASIBLE_BEFORE_FREEZE")
+        hard_block = True
+    elif change_feasible_before_freeze is None:
+        reasons.append("DECISION_CHANGE_FEASIBILITY_UNKNOWN")
 
     if hard_block:
         status = "UNREACHABLE"
@@ -131,8 +153,10 @@ def _assess_decision_reachability(
     return {
         "status": status,
         "decision_surface": decision_surface,
+        "decision_surface_verified": surface_verified,
         "operator_authority_confirmed": authority_confirmed,
         "minutes_before_freeze": minutes_before_freeze,
+        "change_feasible_before_freeze": change_feasible_before_freeze,
         "reason_codes": reasons,
     }
 
@@ -151,8 +175,9 @@ def build_food_decision(
     probabilities or calibrated confidence intervals. Method eligibility is a hard
     readiness gate: generated/sandbox methods may be inspected but cannot produce
     an actionable pilot recommendation. Operational reachability is a separate gate:
-    `PILOT_READY` requires a named decision surface, confirmed operator authority,
-    and an open decision window; known non-reachability forces `WITHHOLD`.
+    `PILOT_READY` requires a verified decision surface, confirmed operator authority,
+    an open decision window, and confirmed ability to change the decision before
+    freeze. Known non-reachability forces `WITHHOLD`.
     """
 
     normalized_eligibility, unknown_eligibility = _normalize_method_eligibility(
@@ -235,8 +260,12 @@ def build_food_decision(
         "decision_readiness": readiness,
         "decision_reachability_status": reachability["status"],
         "decision_surface": reachability["decision_surface"],
+        "decision_surface_verified": reachability["decision_surface_verified"],
         "operator_authority_confirmed": reachability["operator_authority_confirmed"],
         "minutes_before_freeze": reachability["minutes_before_freeze"],
+        "change_feasible_before_freeze": reachability[
+            "change_feasible_before_freeze"
+        ],
         "abstained": abstained,
         "operator_approval_required": True,
         "automatic_kitchen_dispatch": False,
