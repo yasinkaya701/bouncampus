@@ -21,35 +21,52 @@ def load_food_policy():
     return module
 
 
-def test_registered_asymmetric_loss_selects_operator_review_target() -> None:
-    policy = load_food_policy()
-    result = policy.plan_food_production(
-        demand_scenarios=[
+def plan(policy, **overrides):
+    kwargs = {
+        "demand_scenarios": [
             {"demand": 90, "weight": 0.25},
             {"demand": 100, "weight": 0.50},
             {"demand": 120, "weight": 0.25},
         ],
-        max_capacity=130,
-        waste_weight=1.0,
-        shortage_weight=3.0,
-        method_eligibility="PILOT_ELIGIBLE",
-    )
+        "max_capacity": 130,
+        "capacity_provenance": "OFFICIAL_SNAPSHOT",
+        "waste_weight": 1.0,
+        "shortage_weight": 3.0,
+        "method_eligibility": "PILOT_ELIGIBLE",
+    }
+    kwargs.update(overrides)
+    return policy.plan_food_production(**kwargs)
+
+
+def test_registered_asymmetric_loss_selects_operator_review_target() -> None:
+    policy = load_food_policy()
+    result = plan(policy)
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert result["recommended_production"] == 100
+    assert result["max_capacity"] == 130
+    assert result["capacity_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["objective_units"] == "REGISTERED_RELATIVE_SENSITIVITY_UNITS"
     assert result["automatic_execution_allowed"] is False
     assert result["operator_approval_required"] is True
     assert result["reservation_semantics"] == "INTENT_SIGNAL_NOT_SERVED_DEMAND"
 
 
+def test_unverified_capacity_fails_closed() -> None:
+    policy = load_food_policy()
+    for provenance in ("MODEL_ESTIMATE", "POLICY_HEURISTIC", "UNAVAILABLE"):
+        result = plan(policy, capacity_provenance=provenance)
+        assert result["decision_readiness"] == "WITHHOLD"
+        assert result["recommended_production"] is None
+        assert result["capacity_provenance"] == provenance
+        assert "UNVERIFIED_FOOD_CAPACITY" in result["reason_codes"]
+
+
 def test_unusable_scenarios_fail_closed() -> None:
     policy = load_food_policy()
-    result = policy.plan_food_production(
+    result = plan(
+        policy,
         demand_scenarios=[{"demand": float("nan"), "weight": 1.0}],
         max_capacity=100,
-        waste_weight=1.0,
-        shortage_weight=1.0,
-        method_eligibility="PILOT_ELIGIBLE",
     )
     assert result["decision_readiness"] == "WITHHOLD"
     assert result["recommended_production"] is None
@@ -58,12 +75,12 @@ def test_unusable_scenarios_fail_closed() -> None:
 
 def test_zero_loss_weights_fail_closed_instead_of_inventing_zero_production() -> None:
     policy = load_food_policy()
-    result = policy.plan_food_production(
+    result = plan(
+        policy,
         demand_scenarios=[{"demand": 100, "weight": 1.0}],
         max_capacity=120,
         waste_weight=0.0,
         shortage_weight=0.0,
-        method_eligibility="PILOT_ELIGIBLE",
     )
     assert result["decision_readiness"] == "WITHHOLD"
     assert result["recommended_production"] is None
@@ -72,11 +89,10 @@ def test_zero_loss_weights_fail_closed_instead_of_inventing_zero_production() ->
 
 def test_sandbox_method_cannot_become_actionable_target() -> None:
     policy = load_food_policy()
-    result = policy.plan_food_production(
+    result = plan(
+        policy,
         demand_scenarios=[{"demand": 100, "weight": 1.0}],
         max_capacity=120,
-        waste_weight=1.0,
-        shortage_weight=3.0,
         method_eligibility="SANDBOX_ONLY",
     )
     assert result["decision_readiness"] == "WITHHOLD"
@@ -86,12 +102,10 @@ def test_sandbox_method_cannot_become_actionable_target() -> None:
 
 def test_upstream_withhold_propagates_without_inventing_food_target() -> None:
     policy = load_food_policy()
-    result = policy.plan_food_production(
+    result = plan(
+        policy,
         demand_scenarios=[{"demand": 100, "weight": 1.0}],
         max_capacity=120,
-        waste_weight=1.0,
-        shortage_weight=3.0,
-        method_eligibility="PILOT_ELIGIBLE",
         upstream_readiness="WITHHOLD",
     )
     assert result["decision_readiness"] == "WITHHOLD"
