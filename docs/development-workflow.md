@@ -1,74 +1,176 @@
-# Parallel Development & Merge Workflow
+# Multi-Human / Multi-Agent Development Workflow
 
-BOUNCAMPUS uses four long-lived KREATE role branches so the team can develop in parallel without turning `master` into a conflict queue.
+BOUNCAMPUS uses four persistent human-owned parent workstreams and scalable short-lived child-agent branches.
 
-## Branch map
+## Topology
 
 ```text
 master
-├─ role/ie-customer-discovery
-├─ role/ee-physical-systems
-├─ role/cs1-decision-intelligence
-└─ role/cs2-product-strategy
+  ↑ one serialized integration slot
+  ├─ work/ie/<parent>
+  ├─ work/ee/<parent>
+  ├─ work/cs1/<parent>
+  └─ work/cs2/<parent>
+       ↑ verified child fan-in
+       ├─ agent/<lane>/<task-a>
+       ├─ agent/<lane>/<task-b>
+       └─ ... 50+ children when safe
 ```
 
-Create short-lived feature branches from the role that owns the outcome:
+The parent branch is the human accountability/integration boundary. Child branches are the scalable execution units.
+
+## One human, one parent
+
+The KREATE team has exactly one persistent parent per role:
+
+- `HUMAN-IE`
+- `HUMAN-EE`
+- `HUMAN-CS1`
+- `HUMAN-CS2`
+
+A parent persists across multiple master integration batches. It does not end when one batch merges.
+
+## Child-agent branches
+
+Child agents use:
 
 ```text
-git switch role/cs1-decision-intelligence
-git pull
-git switch -c agent/decision-intelligence/forecast-calibration
+agent/<lane>/<task>
 ```
 
-Feature PR:
+A child:
+
+- belongs to exactly one parent;
+- declares `touched_paths`;
+- declares hard dependencies;
+- may declare `produces` / `consumes` artifacts;
+- owns one lease/heartbeat;
+- integrates into its parent branch only.
+
+Example:
 
 ```text
-agent/decision-intelligence/forecast-calibration
-    -> role/cs1-decision-intelligence
+agent/api-product/forecast-calibration
+  -> work/cs1/kreate
 ```
 
-Role integration PR:
-
-```text
-role/cs1-decision-intelligence
-    -> master
-```
-
-## Why this model
-
-The previous repository-wide one-PR lock prevented merge pileups but also serialized unrelated work. The role model keeps conflict domains separate while preserving a hard gate at `master`.
-
-Multiple PRs can be reviewed at once. They cannot merge stale into `master`.
+A child never targets `master` directly.
 
 ## Concurrency
 
-- Maximum open feature PRs per role branch: **3**
-- Maximum open role-to-`master` integration PRs per role: **1**
-- Different roles may have open `master` PRs concurrently.
-- There is no repository-wide PR cap.
+There is no configured child-agent count limit.
+
+Concurrency is admitted by:
+
+- dependency readiness;
+- active path non-overlap;
+- artifact availability;
+- runner/repository capacity;
+- parent fan-in throughput.
+
+Fifty non-conflicting child agents under one parent are valid. Two children editing overlapping paths are not.
+
+## Parent readiness
+
+A parent integration batch is ready only when:
+
+1. at least one new child has been verified into the parent;
+2. every pending required child is verified;
+3. optional incomplete children are explicitly optional;
+4. parent branch represents the validated combined batch.
+
+Previously promoted children recorded in parent `integration_history` are excluded from later batch readiness.
+
+## Parent pull requests
+
+Up to four PRs targeting `master` may be open concurrently, normally one per parent.
+
+- At most one may be non-draft.
+- The single non-draft PR owns the `master` integration slot.
+- Other parent PRs stay draft and may receive advisory CI/review.
+- Draft CI becomes stale when `master` changes.
+- The parent that acquires the slot must sync current `master` and rerun fresh exact-head CI.
+
+## Deterministic master queue
+
+Ready parents are ordered by:
+
+1. P0, P1, P2;
+2. dependency-unblocking value;
+3. oldest ready timestamp;
+4. parent ID.
+
+Agents do not ask a human which ready PR should merge next when the queue can decide mechanically.
 
 ## Merge gates
 
-Every PR must contain its current target base SHA.
+A merge-ready parent PR must:
 
-Every `master` PR must additionally:
+1. contain current `master`;
+2. contain verified child fan-in;
+3. pass `verify_feature_preservation.py`;
+4. pass Fabric validator/tests;
+5. pass KREATE validation;
+6. pass repository Python/data validation;
+7. pass frontend typecheck/lint/build while those checks remain part of CI;
+8. disclose shared-file impact;
+9. use a normal merge commit;
+10. pass post-merge `master` audit and `agent_exit_gate.py`.
 
-1. sync current `master`;
-2. pass feature-preservation checks;
-3. pass agent-fabric and KREATE validators;
-4. pass frontend/backend/data gates;
-5. reconcile shared-file changes;
-6. use a normal merge commit;
-7. pass post-merge verification.
+When another parent merges first, any waiting integration PR must resync and rerun exact-head CI.
 
-If PR A merges to `master`, PR B must sync that merge before PR B is eligible to merge.
+## After master merge
 
-## Shared files
+The parent does not terminate.
 
-Changes to `AGENTS.md`, `.agents/**`, `.github/**`, root configuration, lockfiles, shared contracts, and evidence-policy files are treated as high-conflict work. Call them out explicitly and run the broad validation suite.
+Record an immutable integration-history entry containing:
 
-## Task completion
+- PR number;
+- base master SHA;
+- validated parent head;
+- merge SHA;
+- post-merge verification time;
+- included child IDs.
 
-Merging a feature PR into a role branch is not final completion.
+Then clear current integration metadata and return the parent to `ACTIVE` for the next child wave.
 
-A task is complete only after the role branch containing it reaches `master` and post-merge verification succeeds.
+## Shared/high-conflict files
+
+Treat these as shared surfaces:
+
+- `AGENTS.md`
+- `.agents/**`
+- `.github/**`
+- root build/deployment configuration
+- lockfiles
+- shared API/data contracts
+- KREATE evidence/claim policy
+
+Child agents should avoid these unless the task explicitly owns the shared change. Shared changes require broad validation and cross-parent review.
+
+## Human involvement
+
+Humans are not routine merge coordinators or agent dispatchers.
+
+Only five human gates exist:
+
+- `EVIDENCE_ATTESTATION`
+- `IRREVERSIBLE_ACTION`
+- `PHYSICAL_SAFETY`
+- `EXTERNAL_COMMITMENT`
+- `PRODUCT_DIRECTION`
+
+Everything else should proceed through repository evidence, tests, reversible choices, and the deterministic queue.
+
+## Mechanical commands
+
+```bash
+python scripts/agent_fabric_check.py
+python scripts/agent_task.py summary
+python scripts/agent_task.py ready --parent HUMAN-CS1
+python scripts/agent_task.py next --parent HUMAN-CS1
+python scripts/agent_task.py parent-status HUMAN-CS1
+python scripts/agent_task.py queue
+```
+
+See `.agents/FABRIC.md` for the full contract.

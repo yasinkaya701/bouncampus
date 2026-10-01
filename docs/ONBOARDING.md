@@ -1,382 +1,270 @@
 # BOUNCAMPUS Team Onboarding
 
-This guide is for a teammate entering the repository for the first time. The goal is to get you from zero context to a useful, bounded contribution in roughly one focused session.
+This guide gets a teammate from zero context to a useful contribution without turning humans into merge coordinators or agent dispatchers.
 
-## First 30 minutes
-
-### 0–5 min — Clone and run the product
+## 1. Run the product
 
 ```bash
 git clone https://github.com/yasinkaya701/bouncampus.git
-cd bouncampus
-cd frontend
+cd bouncampus/frontend
 npm ci
 npm run dev
 ```
 
-Open:
-
-```text
-http://localhost:3000
-```
+Open `http://localhost:3000`.
 
 Requirements:
 
 - Git
-- Node.js **24.x**
-- Python **3.11+** only for backend/scripts/repository tooling
-
-Optional frontend environment file:
-
-```bash
-cp .env.example .env.local
-```
+- Node.js 24.x
+- Python 3.11+ for repository/backend tooling
 
 A separate FastAPI process is not required for normal frontend work because the active Next.js application has co-located `/api/v1` routes.
 
-### 5–10 min — Understand what we are actually building
+## 2. Understand the current KREATE truth boundary
 
-Visit in this order:
+Start with:
 
-1. `/demo` — short jury/product story.
-2. `/food-waste` — core decision workspace.
-3. `/food-waste/pilot` — measured pilot evidence workflow.
-4. `/data` — provenance and truth boundary.
-5. `/decisions` — human review / outcome loop.
+1. `/demo`
+2. `/food-waste`
+3. `/food-waste/pilot`
+4. `/data`
+5. `/decisions`
+6. [`../KREATE/README.md`](../KREATE/README.md)
 
-Then read the top section of [`README.md`](../README.md).
+The active beachhead/problem story remains evidence-gated. Do not invent private university telemetry, PMR, pilot outcomes, model metrics, hardware performance, or climate savings.
 
-The current wedge is **institutional food-waste prevention**. The product should help an operator make a better production decision without pretending estimates are live university telemetry.
+## 3. Know your one parent workstream
 
-Do not begin by exploring `legacy/`.
+Each human owns exactly one persistent parent:
 
-### 10–15 min — Find your role branch
-
-| Role | Core question | Integration branch |
+| Parent | Human role | Parent branch |
 | --- | --- | --- |
-| IE | Who has the problem, who buys, and what does real PMR show? | `role/ie-customer-discovery` |
-| EE | What can we reliably measure and validate in the physical operation? | `role/ee-physical-systems` |
-| CS1 | Can we make a better decision and prove it with realistic evaluation? | `role/cs1-decision-intelligence` |
-| CS2 | What should we build and what can we credibly claim? | `role/cs2-product-strategy` |
+| `HUMAN-IE` | Customer Discovery & Market Lead | `work/ie/kreate` |
+| `HUMAN-EE` | Physical Systems & Measurement Lead | `work/ee/kreate` |
+| `HUMAN-CS1` | Decision Intelligence Lead | `work/cs1/kreate` |
+| `HUMAN-CS2` | Product Strategy, Evidence Synthesis & Application Lead | `work/cs2/kreate` |
 
-Roles are ownership, not permission boundaries. If you identify useful work outside your nominal role, move it forward while keeping the outcome owner visible.
+The parent is an accountability/integration boundary, not a single small coding task. It persists across multiple master integration batches.
 
-Detailed role documents are under [`KREATE/ROLES/`](../KREATE/ROLES/).
+Detailed role guidance lives in [`../KREATE/ROLES/`](../KREATE/ROLES/).
 
-### 15–20 min — Pick one bounded task
+## 4. Child agents do most routine execution
 
-Check GitHub Issues and current Pull Requests.
-
-Prefer work with:
-
-- one clear outcome;
-- explicit acceptance criteria;
-- a small file/area scope;
-- a validation method;
-- no dependency on unavailable private data;
-- no need to fabricate interview/pilot evidence;
-- no active overlapping change in the same shared files.
-
-Bad first tasks:
+A parent may fan out any number of bounded child tasks:
 
 ```text
-improve the app
-redo the architecture
-make everything production-ready
-make the pitch better
-add AI everywhere
+HUMAN-CS1 / work/cs1/kreate
+├── agent/api-product/baseline
+├── agent/api-product/data-quality
+├── agent/api-product/uncertainty
+├── agent/quality-release/red-team
+└── ... 50+ children when contracts allow
 ```
 
-Better first tasks:
+There is no arbitrary agent-count ceiling.
 
-```text
-add empty-state copy for the pilot table
-validate a demand-baseline edge case
-write a measurement checklist for one pilot field
-prepare one interview guide for one stakeholder type
-trace one application claim back to its evidence ID
-```
+A child must have:
 
-### 20–25 min — Create a feature branch from the owning role
+- one `parent_id`;
+- one leased `owner_agent`;
+- explicit `touched_paths`;
+- dependencies;
+- acceptance criteria;
+- validation commands;
+- optional `produces` / `consumes` artifact IDs;
+- an explicit required/optional relationship to the parent batch.
 
-Fetch current state:
+Concurrency is limited by conflicts and dependencies, not by the number of agents.
+
+## 5. Branch correctly
+
+### Human parent branch
 
 ```bash
 git fetch origin --prune
+git switch work/cs1/kreate
 ```
 
-Example — CS1 task:
+### Child branch
 
 ```bash
-git switch role/cs1-decision-intelligence
-git pull --ff-only origin role/cs1-decision-intelligence
-git switch -c agent/decision-intelligence/demand-baseline
+git switch -c agent/api-product/forecast-calibration
 ```
 
-Examples for each role:
-
-```text
-agent/customer-discovery/interview-guide
-agent/physical-systems/pilot-measurement-sheet
-agent/decision-intelligence/forecast-calibration
-agent/product-strategy/evidence-matrix
-```
-
-Feature PRs go back to the role branch they came from. Role branches later integrate to `master`.
-
-Read [`development-workflow.md`](development-workflow.md) before changing branch topology or shared policy files.
-
-### 25–30 min — Make one change and prove it works
-
-For frontend work:
-
-```bash
-cd frontend
-npm run typecheck
-npm run lint
-```
-
-Before integration:
-
-```bash
-npm run build
-```
-
-Or:
-
-```bash
-npm run verify
-```
-
-For Python/repository work, from repo root:
-
-```bash
-python -m compileall -q backend/app scripts
-python scripts/agent_fabric_check.py
-python scripts/kreate_check.py
-```
-
-Run only the checks relevant to your work during development, but use the full required gates before integration.
-
-## Repository map
-
-### `frontend/`
-
-The active Next.js product.
-
-Typical work:
-
-- pages and components;
-- product states;
-- visualizations;
-- client interactions;
-- co-located API routes;
-- frontend data contracts.
-
-### `backend/`
-
-FastAPI research/backend service and supporting datasets.
-
-Use it when the task actually belongs in the Python service; do not duplicate logic simply because both stacks exist.
-
-### `KREATE/`
-
-Hackathon/application operating system:
-
-- role definitions;
-- PMR/evidence artifacts;
-- measurement plans;
-- application strategy;
-- hardware/pilot material;
-- evidence policy.
-
-This area contains claim-bearing material. Evidence quality matters more than polished prose.
-
-### `docs/`
-
-Maintained technical/product documentation. Start with:
-
-- `ONBOARDING.md`
-- `development-workflow.md`
-- `food-waste-pilot-protocol.md`
-- `architecture.md`
-
-### `scripts/`
-
-Repository automation, validation, agent-fabric tooling, release checks.
-
-Changes here can affect CI/repository safety. Test them carefully.
-
-### `.agents/`
-
-Machine-readable multi-agent coordination and policy. Do not casually edit this directory for normal product tasks.
-
-### `legacy/`
-
-Historical experiments and old mocks. Preserve when useful, but do not treat them as active architecture by default.
-
-## What should each role do first?
-
-### IE — Customer Discovery & Market Lead
-
-Start with reality, not application prose.
-
-Good first sequence:
-
-1. read current beachhead/persona assumptions;
-2. inspect existing PMR/evidence artifacts;
-3. identify one highest-value unknown;
-4. prepare or conduct a real interview/research task;
-5. record evidence separately from interpretation;
-6. update product assumptions only when evidence supports it.
-
-Never generate fake interviews or quotes to fill a gap.
-
-### EE — Physical Systems & Measurement Lead
-
-Start with what a real pilot can measure reliably.
-
-Good first sequence:
-
-1. read the food-waste pilot protocol;
-2. inspect current measurement assumptions;
-3. choose one uncertain field or sensor/process question;
-4. define the cheapest credible measurement method;
-5. record limitations and calibration needs;
-6. feed feasibility constraints back to IE/CS1/CS2.
-
-Do not add hardware simply because hardware looks impressive.
-
-### CS1 — Decision Intelligence Lead
-
-Start with a realistic baseline and decision cost, not model novelty.
-
-Good first sequence:
-
-1. inspect `/food-waste` and the decision contract;
-2. identify what input/output drives an operator decision;
-3. test one baseline, edge case, source-quality rule or uncertainty behavior;
-4. keep estimates labeled as estimates;
-5. add evaluation that can falsify the approach;
-6. expose technical constraints to product strategy.
-
-A simple transparent baseline with defensible evaluation is more useful than an impressive model with fake data.
-
-### CS2 — Product Strategy, Evidence Synthesis & Application Lead
-
-Start from evidence and contradictions.
-
-Good first sequence:
-
-1. inspect current problem/beachhead/persona claims;
-2. trace important application statements to evidence;
-3. mark unsupported statements as hypotheses/unknowns;
-4. identify the strongest strategic contradiction;
-5. convert evidence into product requirements and application narrative;
-6. surface genuine product-direction decisions to the team.
-
-Do not optimize application prose around claims the team cannot defend.
-
-## Working with agents
-
-Agents are support capacity, not evidence sources.
-
-Good uses:
-
-- code implementation;
-- test generation and debugging;
-- source-backed research synthesis;
-- data cleaning/analysis;
-- documentation maintenance;
-- red-team review;
-- repetitive validation.
-
-Bad uses:
-
-- inventing PMR;
-- inventing pilot results;
-- asserting private university data access;
-- fabricating model metrics;
-- hiding uncertainty behind polished language.
-
-If an agent changes a shared/high-conflict file, inspect the diff before integration.
-
-## Pull-request model
-
-### Feature PR
+Child PR:
 
 ```text
 agent/<lane>/<task>
         ↓
-role/<owning-role>
+work/<role>/kreate
 ```
 
-Up to three feature PRs may be open per role branch.
+A child never targets `master` directly.
 
-### Role integration PR
+Parent PR:
 
 ```text
-role/<owning-role>
+work/<role>/kreate
         ↓
 master
 ```
 
-A role integration PR must contain current `master`. If another master PR merges first, sync/revalidate before merging.
+Up to four parent/master PRs may exist concurrently. At most one may be non-draft and own the master integration slot.
 
-A feature existing on a role branch is not considered final delivery until it reaches verified `master`.
+## 6. Claim work mechanically
 
-## Shared files — coordinate before editing
+From an `agent-coordination` checkout/worktree, agents can use:
 
-High-conflict areas include:
-
-```text
-AGENTS.md
-.agents/**
-.github/**
-root configuration
-package-lock files
-shared API/data contracts
-KREATE evidence-policy files
+```bash
+python scripts/agent_task.py summary
+python scripts/agent_task.py ready --parent HUMAN-CS1
+python scripts/agent_task.py next --parent HUMAN-CS1
 ```
 
-If your task needs one of these, check current PRs first and keep the change as small as possible.
+The fabric rejects unsafe claims when:
 
-## Evidence checklist
+- hard dependencies are unresolved;
+- an in-fabric consumed artifact is unavailable;
+- active `touched_paths` overlap another task;
+- a critical human gate blocks the task.
 
-Before writing or merging a material claim, ask:
+## 7. Humans are exception handlers, not routine dispatchers
 
-1. Is this a public fact, measured result, estimate, heuristic, interpretation, hypothesis, or unknown?
-2. Where is the source/evidence?
-3. Does the wording overstate what the evidence proves?
-4. Are limitations visible?
-5. Would a skeptical judge understand exactly what is measured versus modeled?
+Do not stop for permission on normal research, architecture, model selection, hardware comparison, drafting, coding, tests, docs, branch operations, conflict resolution, or merge work.
 
-If you cannot answer those questions, downgrade the claim rather than polishing it.
+Humans are required only for:
 
-## Before opening a feature PR
+1. `EVIDENCE_ATTESTATION`
+2. `IRREVERSIBLE_ACTION`
+3. `PHYSICAL_SAFETY`
+4. `EXTERNAL_COMMITMENT`
+5. `PRODUCT_DIRECTION`
 
-Check:
+If none applies, keep working.
 
-- correct target role branch;
-- bounded diff;
-- relevant validation passed;
-- no unrelated deletions;
-- evidence/claim boundary preserved;
-- screenshots included for meaningful UI changes;
-- limitations disclosed;
-- shared-file changes explicitly called out.
+## 8. Evidence still belongs to reality
 
-Use [`../CONTRIBUTING.md`](../CONTRIBUTING.md) for the complete contribution rules.
+Agents may prepare interview guides, research sources, summarize notes, inspect evidence gaps, code, test, simulate, and red-team claims.
 
-## Fast links
+Agents may not self-attest:
 
-- [`../README.md`](../README.md) — project + team entrypoint
-- [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — contribution rules
-- [`development-workflow.md`](development-workflow.md) — branch/merge architecture
-- [`../AGENTS.md`](../AGENTS.md) — full execution policy
-- [`../KREATE/ROLES/`](../KREATE/ROLES/) — role playbooks
-- [`food-waste-pilot-protocol.md`](food-waste-pilot-protocol.md) — pilot evidence contract
+- that an interview happened;
+- that a quote is real;
+- that a pilot result occurred;
+- that measured savings exist;
+- that a hardware bench result exists;
+- that a model metric was achieved.
 
-## One sentence to remember
+Use the KREATE evidence ledger and human attestation when required.
 
-**Pick a bounded question, work from the owning role branch, prove your change, preserve the truth boundary, and do not call it delivered until it reaches verified `master`.**
+## 9. Hardware workflow
+
+EE/hardware work begins at [`../KREATE/HARDWARE/README.md`](../KREATE/HARDWARE/README.md).
+
+Typical child lanes:
+
+- `hw-measurement`
+- `hw-sensors`
+- `hw-power`
+- `hw-firmware`
+- `hw-pcb`
+- `hw-mechanical`
+- `hw-calibration`
+- `hw-verification`
+
+Hardware claims keep their real maturity: ASSUMPTION, DATASHEET, CALCULATION, SIMULATION, BENCH_TEST, FIELD_TEST, or PRODUCTION_EVIDENCE.
+
+## 10. Validation
+
+During development, run targeted checks. Before parent integration, run the full relevant gates.
+
+Repository:
+
+```bash
+python -m compileall -q backend/app scripts
+python scripts/test_agent_fabric_check.py
+python scripts/test_agent_task.py
+python scripts/agent_fabric_check.py
+python scripts/kreate_check.py
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm ci --no-audit --no-fund
+npm run typecheck
+npm run lint
+npm run build
+```
+
+Feature preservation:
+
+```bash
+python scripts/verify_feature_preservation.py --base-ref <current-master-sha>
+```
+
+## 11. Parent integration
+
+A parent batch is ready only when at least one new child is verified into the parent and every pending required child is verified.
+
+Ready parents enter a deterministic queue:
+
+1. priority;
+2. dependency-unblocking value;
+3. oldest ready time;
+4. parent ID.
+
+The selected parent:
+
+1. acquires the sole non-draft master slot;
+2. syncs current `master`;
+3. reruns exact-head CI;
+4. merges via normal merge commit;
+5. verifies resulting `master`;
+6. records the batch in parent `integration_history`;
+7. returns the parent to `ACTIVE`.
+
+## 12. Repository map
+
+- `frontend/` — active Next.js product
+- `backend/` — supporting Python service/research backend
+- `KREATE/` — PMR/evidence/application/hardware operating system
+- `docs/` — maintained technical/product documentation
+- `scripts/` — validators and agent-fabric tooling
+- `.agents/` — machine-readable coordination/policy
+- `legacy/` — historical experiments; not active architecture by default
+
+## 13. Good first child tasks
+
+Good:
+
+```text
+validate one decision edge case
+red-team one application claim against evidence IDs
+compare two measurement architectures
+prepare one interview guide for one stakeholder type
+add one missing failure-mode test
+check one BOM/sensor assumption against a source
+```
+
+Bad:
+
+```text
+improve everything
+redo the whole architecture
+make the pitch amazing
+add AI everywhere
+make hardware impressive
+```
+
+Bound the work so an agent can own it, test it, and fan it into the parent without creating hidden conflicts.
+
+## Primary references
+
+- [`development-workflow.md`](development-workflow.md)
+- [`../AGENTS.md`](../AGENTS.md)
+- [`../.agents/FABRIC.md`](../.agents/FABRIC.md)
+- [`../KREATE/ROLES/README.md`](../KREATE/ROLES/README.md)
+- [`../KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md`](../KREATE/ROLES/USER_DECISION_CHECKPOINT_PROTOCOL.md)

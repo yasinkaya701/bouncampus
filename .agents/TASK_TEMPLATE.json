@@ -1,16 +1,20 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "TASK-TODO",
   "title": "TODO",
   "priority": "P1",
   "lane": "quality-release",
   "state": "BACKLOG",
+  "parent_id": null,
+  "required_for_parent": true,
   "owner_agent": null,
   "branch": null,
   "depends_on": [],
   "touched_paths": [],
   "acceptance_criteria": [],
   "validation_commands": [],
+  "produces": [],
+  "consumes": [],
   "human_gate": {
     "kind": "NONE",
     "status": "NOT_REQUIRED",
@@ -25,6 +29,12 @@
     "ttl_minutes": 360
   },
   "blocker": null,
+  "child_integration": {
+    "target_parent_branch": null,
+    "validated_head_sha": null,
+    "integrated_commit_sha": null,
+    "verified_at": null
+  },
   "integration": {
     "pull_request": null,
     "validated_head_sha": null,
@@ -32,6 +42,6 @@
     "post_merge_verified_at": null
   },
   "notes": [
-    "EXAMPLE/TODO template only. Do not treat this file as an active task."
+    "EXAMPLE/TODO template only. New v2 child tasks require parent_id before leaving BACKLOG."
   ]
 }
