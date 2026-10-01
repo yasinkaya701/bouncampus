@@ -56,6 +56,16 @@ def test_future_or_missing_required_source_fails_closed() -> None:
     assert "SOURCE_NOT_AVAILABLE_AT_DECISION_TIME_OCCUPANCY_MODEL" in result["reason_codes"]
 
 
+def test_occupancy_above_declared_capacity_fails_closed() -> None:
+    state = load_state()
+    zones = valid_zones()
+    zones[0]["occupancy_estimate"] = 1200
+    result = state.build_campus_state(zones, valid_sources(), decision_time="2026-10-01T10:00:00+03:00")
+    assert result["decision_readiness"] == "WITHHOLD"
+    assert result["abstained"] is True
+    assert "OCCUPANCY_ESTIMATE_EXCEEDS_CAPACITY_SOUTH-ACADEMIC" in result["reason_codes"]
+
+
 def test_person_level_identifiers_are_rejected() -> None:
     state = load_state()
     zones = valid_zones()
