@@ -32,6 +32,27 @@ export const MATCHED_FOOD_WASTE_PILOT_PROTOCOL = {
   evidenceBoundary: `${FOOD_WASTE_PILOT_PROTOCOL.evidenceBoundary} Unmatched services cannot be promoted as matched-pilot evidence.`,
 } as const;
 
+function field(record: Record<string, unknown>, camelCase: string, snakeCase: string) {
+  return record[camelCase] ?? record[snakeCase];
+}
+
+export function normalizeMatchedPilotMeasurement(candidate: Record<string, unknown>) {
+  return {
+    pairId: field(candidate, 'pairId', 'pair_id'),
+    date: candidate.date,
+    serviceId: field(candidate, 'serviceId', 'service_id'),
+    arm: candidate.arm,
+    modelForecastMeals: field(candidate, 'modelForecastMeals', 'model_forecast_meals') ?? null,
+    producedPortions: field(candidate, 'producedPortions', 'produced_portions'),
+    servedPortions: field(candidate, 'servedPortions', 'served_portions'),
+    edibleSurplusKg: field(candidate, 'edibleSurplusKg', 'edible_surplus_kg'),
+    wasteKg: field(candidate, 'wasteKg', 'waste_kg'),
+    earlySellout: field(candidate, 'earlySellout', 'early_sellout'),
+    operatorOverride: field(candidate, 'operatorOverride', 'operator_override'),
+    notes: candidate.notes,
+  } as MatchedPilotServiceMeasurement;
+}
+
 export function validateMatchedPilotMeasurement(measurement: MatchedPilotServiceMeasurement) {
   const errors = validatePilotMeasurement(measurement);
   if (typeof measurement.pairId !== 'string' || !measurement.pairId.trim()) {
