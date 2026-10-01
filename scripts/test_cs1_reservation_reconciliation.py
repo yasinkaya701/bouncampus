@@ -26,6 +26,7 @@ def test_reservation_first_baseline_is_past_only() -> None:
         [100, 100, 100, 100],
         [80, 90, 100, 0],
         [20, 30, 40, 1000],
+        actual_demand=[100, 120, 140, 1000],
         min_history=2,
     )
     assert report["raw_reservation"] == [100.0, 100.0, 100.0, 100.0]
@@ -43,6 +44,7 @@ def test_invalid_reconciliation_rows_are_not_learned_from() -> None:
         [100, 100, 100, 100],
         [80, 120, 90, 95],
         [20, 10, 30, 25],
+        actual_demand=[100, 130, 120, 120],
         min_history=2,
     )
     assert report["history_n"] == [0, 1, 1, 2]
@@ -56,6 +58,7 @@ def test_reconciliation_diagnostics_explain_withhold_and_exclusions() -> None:
         [100, 100, 100, 100],
         [80, 120, 90, 95],
         [20, 10, 30, 25],
+        actual_demand=[100, 130, 120, 120],
         min_history=2,
     )
     assert report["reconciliation_status"] == [
@@ -80,6 +83,26 @@ def test_reconciliation_diagnostics_explain_withhold_and_exclusions() -> None:
         "INSUFFICIENT_RECONCILED_HISTORY"
         in report["baseline_reason_codes"][2]
     )
+
+
+def test_served_demand_decomposition_mismatch_is_excluded_from_history() -> None:
+    reservation = load_reservation_module()
+    report = reservation.generate_reservation_baselines(
+        [100, 100, 100, 100],
+        [80, 40, 90, 95],
+        [20, 80, 10, 5],
+        actual_demand=[100, 100, 100, 100],
+        min_history=2,
+    )
+    assert report["reconciliation_status"] == [
+        "RECONCILED",
+        "EXCLUDED",
+        "RECONCILED",
+        "RECONCILED",
+    ]
+    assert "SERVED_DEMAND_DECOMPOSITION_MISMATCH" in report["reconciliation_reason_codes"][1]
+    assert report["history_n"] == [0, 1, 1, 2]
+    assert math.isclose(report["corrected_reservation"][3], 100.0)
 
 
 def test_asymmetric_decision_loss_is_explicit_sensitivity_not_money() -> None:
@@ -120,7 +143,13 @@ def test_policy_comparison_uses_common_support_and_asymmetric_loss() -> None:
 def test_validation_rejects_bad_alignment_and_costs() -> None:
     reservation = load_reservation_module()
     try:
-        reservation.generate_reservation_baselines([1], [1, 2], [0], min_history=1)
+        reservation.generate_reservation_baselines(
+            [1],
+            [1, 2],
+            [0],
+            actual_demand=[1],
+            min_history=1,
+        )
     except ValueError as exc:
         assert "same length" in str(exc)
     else:
@@ -146,6 +175,7 @@ def test_malformed_observation_is_excluded_instead_of_crashing() -> None:
         [100, "bad", 100],
         [80, 90, 95],
         [20, 30, 25],
+        actual_demand=[100, 120, 120],
         min_history=1,
     )
     assert report["reconciliation_status"] == ["RECONCILED", "EXCLUDED", "RECONCILED"]
@@ -158,6 +188,7 @@ def main() -> int:
         test_reservation_first_baseline_is_past_only,
         test_invalid_reconciliation_rows_are_not_learned_from,
         test_reconciliation_diagnostics_explain_withhold_and_exclusions,
+        test_served_demand_decomposition_mismatch_is_excluded_from_history,
         test_asymmetric_decision_loss_is_explicit_sensitivity_not_money,
         test_policy_comparison_uses_common_support_and_asymmetric_loss,
         test_validation_rejects_bad_alignment_and_costs,
