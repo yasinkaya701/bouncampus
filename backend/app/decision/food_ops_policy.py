@@ -122,6 +122,8 @@ def plan_food_production(
     shortage = _finite_nonnegative(shortage_weight)
     if capacity is None or waste is None or shortage is None:
         return _withhold("INVALID_FOOD_POLICY_INPUTS")
+    if waste + shortage <= 0:
+        return _withhold("NON_IDENTIFYING_FOOD_OBJECTIVE")
 
     max_units = int(math.floor(capacity))
 
