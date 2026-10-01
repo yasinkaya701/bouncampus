@@ -44,6 +44,29 @@ def comparison(
     }
 
 
+def base_kwargs() -> dict[str, object]:
+    return {
+        "baseline_id": "baseline",
+        "method_eligibility": {
+            "baseline": "PILOT_ELIGIBLE",
+            "model": "EVALUATED_OFFLINE",
+        },
+        "stage": "OFFLINE_EVALUATION",
+        "primary_metric": "mae",
+        "min_common_support_n": 10,
+        "min_relative_improvement_pct": 0.0,
+    }
+
+
+def assert_raises_value_error(callable_obj, expected_text: str) -> None:
+    try:
+        callable_obj()
+    except ValueError as exc:
+        assert expected_text in str(exc)
+    else:
+        raise AssertionError(f"expected ValueError containing {expected_text!r}")
+
+
 def test_candidate_must_earn_promotion_over_baseline() -> None:
     gate = load_gate()
     result = gate.select_method(
@@ -144,18 +167,7 @@ def test_malformed_baseline_metric_fails_closed() -> None:
     gate = load_gate()
     data = comparison()
     data["metrics"]["baseline"]["mae"] = "not-a-number"
-    result = gate.select_method(
-        data,
-        baseline_id="baseline",
-        method_eligibility={
-            "baseline": "PILOT_ELIGIBLE",
-            "model": "EVALUATED_OFFLINE",
-        },
-        stage="OFFLINE_EVALUATION",
-        primary_metric="mae",
-        min_common_support_n=10,
-        min_relative_improvement_pct=0.0,
-    )
+    result = gate.select_method(data, **base_kwargs())
     assert result["selection_status"] == "WITHHOLD"
     assert result["selected_method"] is None
     assert "DESIGNATED_BASELINE_METRIC_UNAVAILABLE" in result["reason_codes"]
@@ -165,18 +177,7 @@ def test_malformed_candidate_metric_withholds_when_no_comparable_candidate_remai
     gate = load_gate()
     data = comparison()
     data["metrics"]["model"]["mae"] = "bad"
-    result = gate.select_method(
-        data,
-        baseline_id="baseline",
-        method_eligibility={
-            "baseline": "PILOT_ELIGIBLE",
-            "model": "EVALUATED_OFFLINE",
-        },
-        stage="OFFLINE_EVALUATION",
-        primary_metric="mae",
-        min_common_support_n=10,
-        min_relative_improvement_pct=0.0,
-    )
+    result = gate.select_method(data, **base_kwargs())
     assert result["selection_status"] == "WITHHOLD"
     assert result["selected_method"] is None
     assert "METRIC_UNAVAILABLE" in result["candidate_assessments"]["model"]["reason_codes"]
@@ -212,19 +213,47 @@ def test_explicit_candidate_subset_requires_at_least_one_comparable_candidate() 
     gate = load_gate()
     result = gate.select_method(
         comparison(),
-        baseline_id="baseline",
-        method_eligibility={
-            "baseline": "PILOT_ELIGIBLE",
-            "model": "EVALUATED_OFFLINE",
-        },
-        stage="OFFLINE_EVALUATION",
-        primary_metric="mae",
-        min_common_support_n=10,
-        min_relative_improvement_pct=0.0,
+        **base_kwargs(),
         candidate_method_ids=[],
     )
     assert result["selection_status"] == "WITHHOLD"
     assert "NO_COMPARABLE_ELIGIBLE_CANDIDATE" in result["reason_codes"]
+
+
+def test_fractional_or_boolean_support_controls_are_rejected() -> None:
+    gate = load_gate()
+    fractional_support = comparison()
+    fractional_support["common_support_n"] = 10.9
+    assert_raises_value_error(
+        lambda: gate.select_method(fractional_support, **base_kwargs()),
+        "common_support_n must be an integer",
+    )
+
+    kwargs = base_kwargs()
+    kwargs["min_common_support_n"] = 10.5
+    assert_raises_value_error(
+        lambda: gate.select_method(comparison(), **kwargs),
+        "min_common_support_n must be an integer",
+    )
+
+    kwargs = base_kwargs()
+    kwargs["min_relative_improvement_pct"] = True
+    assert_raises_value_error(
+        lambda: gate.select_method(comparison(), **kwargs),
+        "min_relative_improvement_pct must be finite and non-negative",
+    )
+
+
+def test_candidate_method_ids_must_not_be_a_string() -> None:
+    gate = load_gate()
+    assert_raises_value_error(
+        lambda: gate.select_method(
+            comparison(),
+            **base_kwargs(),
+            candidate_method_ids="model",
+        ),
+        "candidate_method_ids must be a sequence of method IDs",
+    )
 
 
 def main() -> int:
@@ -238,6 +267,8 @@ def main() -> int:
         test_malformed_candidate_metric_withholds_when_no_comparable_candidate_remains,
         test_decision_loss_can_be_registered_as_primary_metric,
         test_explicit_candidate_subset_requires_at_least_one_comparable_candidate,
+        test_fractional_or_boolean_support_controls_are_rejected,
+        test_candidate_method_ids_must_not_be_a_string,
     ]
     for test in tests:
         test()
