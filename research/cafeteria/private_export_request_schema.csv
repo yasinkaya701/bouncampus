@@ -26,19 +26,27 @@ stockout,service_id,YES,event,string,join key,NON_PERSONAL,shortage_objective,mu
 stockout,item_id,NO,event,string,item/menu component if tracked,NON_PERSONAL,shortage_objective,nullable
 stockout,stockout_at,YES,event,timestamp,time unavailable to diners,NON_PERSONAL,shortage_objective,within service window
 stockout,affected_portions,NO,event,integer,estimated unmet portions if operationally measured,AGGREGATE,shortage_objective,finite >= 0
-menu_poll,poll_id,YES,candidate,string,poll identifier,NON_PERSONAL,preference_target,stable
-menu_poll,service_id,NO,candidate,string,winning/planned service if linkable,NON_PERSONAL,preference_join,nullable
-menu_poll,candidate_name,YES,candidate,string,candidate dish/menu,NON_PERSONAL,preference_target,nonempty
-menu_poll,vote_count,YES,candidate,integer,anonymous aggregate votes,AGGREGATE,preference_target,finite >= 0
+menu_poll,poll_id,YES,poll,string,poll identifier,NON_PERSONAL,preference_join,stable
 menu_poll,poll_open_at,YES,poll,timestamp,opening time,NON_PERSONAL,leakage_control,valid timestamp
 menu_poll,poll_close_at,YES,poll,timestamp,closing time,NON_PERSONAL,leakage_control,>= open
-menu_poll,eligible_population,NO,poll,integer,eligible users if known,AGGREGATE,normalization,finite >= votes if semantics support
-menu_poll,winner_flag,NO,candidate,bool,official winner,NON_PERSONAL,preference_target,boolean
+menu_poll,target_service_date,YES,poll,date,Wednesday lunch date being selected,NON_PERSONAL,preference_join,valid date after poll close
+menu_poll,target_service_type,YES,poll,enum,typically lunch for documented menu poll,NON_PERSONAL,preference_join,controlled vocabulary
+menu_poll,candidate_group,YES,candidate,string,group of mutually exclusive options,NON_PERSONAL,preference_target,nonempty
+menu_poll,candidate_id,NO,candidate,string,stable option identifier if available,NON_PERSONAL,preference_target,unique within poll/group
+menu_poll,candidate_name,YES,candidate,string,candidate dish/menu option,NON_PERSONAL,preference_target,nonempty
+menu_poll,vote_count,YES,candidate,integer,anonymous aggregate votes,AGGREGATE,preference_target,finite >= 0
+menu_poll,eligible_population,NO,poll,integer,eligible users if known,AGGREGATE,normalization,finite >= max candidate votes
+menu_poll,winner_flag,NO,candidate,bool,official winner in candidate group,NON_PERSONAL,preference_target,boolean
+menu_poll,service_id,NO,poll,string,realized service join key once scheduled,NON_PERSONAL,preference_join,nullable
+menu_poll,source_exported_at,YES,poll,timestamp,export provenance timestamp,NON_PERSONAL,audit,valid timestamp
 tasting,service_id,YES,aggregate,string,join key,NON_PERSONAL,quality_target,must map to service
+tasting,tasting_at,YES,aggregate,timestamp,pre-service tasting time,NON_PERSONAL,temporal_provenance,should be before service start
 tasting,questionnaire_version,YES,aggregate,string,form/schema version,NON_PERSONAL,comparability,nonempty
 tasting,metric_name,YES,aggregate,string,taste/appearance/overall/etc,NON_PERSONAL,quality_target,nonempty
 tasting,mean_score,YES,aggregate,float,aggregate rating,AGGREGATE,quality_target,within documented scale
-tasting,response_n,YES,aggregate,integer,number of responses,AGGREGATE,weighting,finite > 0
+tasting,response_n,YES,aggregate,integer,number of responses,AGGREGATE,weighting,finite > 0 and expected small
+tasting,score_scale_min,YES,aggregate,float,question scale minimum,NON_PERSONAL,comparability,finite
+tasting,score_scale_max,YES,aggregate,float,question scale maximum,NON_PERSONAL,comparability,> min
 operator_decisions,decision_id,YES,decision,string,decision audit key,NON_PERSONAL,evaluation,unique
 operator_decisions,service_id,YES,decision,string,target service,NON_PERSONAL,evaluation,must map to service
 operator_decisions,information_cutoff_at,YES,decision,timestamp,last admissible input time,NON_PERSONAL,leakage_control,<= freeze
