@@ -45,6 +45,7 @@ def request_payload():
                 "forecast_demand": 180,
                 "vehicle_capacity": 50,
                 "available_vehicles": 2,
+                "capacity_provenance": "OFFICIAL_SNAPSHOT",
                 "service_window_min": 120,
                 "round_trip_min": 40,
                 "min_headway_min": 10,
@@ -159,6 +160,7 @@ def test_optional_domains_can_be_omitted_without_fabricated_outputs() -> None:
 
 
 def test_contract_and_main_preserve_truth_boundary() -> None:
+    from app.decision.campus_contract import PROVENANCE_STATES
     from app.routers import campus_ops
 
     contract = campus_ops.get_campus_ops_contract()
@@ -175,6 +177,7 @@ def test_contract_and_main_preserve_truth_boundary() -> None:
         "shared_capacity",
         "portfolio",
     }
+    assert tuple(contract["provenance_states"]) == PROVENANCE_STATES
 
     main_source = (ROOT / "backend/app/main.py").read_text(encoding="utf-8")
     assert "campus_ops" in main_source
