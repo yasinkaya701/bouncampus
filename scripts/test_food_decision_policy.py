@@ -16,8 +16,10 @@ from app.optimizers.food_optimizer import FoodOptimizer  # noqa: E402
 
 VERIFIED_REACHABILITY = {
     "decision_surface": "PRODUCTION_QUANTITY",
+    "decision_surface_verified": True,
     "operator_authority_confirmed": True,
     "minutes_before_freeze": 90,
+    "change_feasible_before_freeze": True,
 }
 
 
@@ -82,6 +84,8 @@ def test_marks_pilot_eligible_core_context_ready_but_keeps_human_gate() -> None:
     assert_claim_firewall(result)
     assert result["method_eligibility"] == "PILOT_ELIGIBLE"
     assert result["decision_reachability_status"] == "REACHABLE"
+    assert result["decision_surface_verified"] is True
+    assert result["change_feasible_before_freeze"] is True
     assert result["decision_readiness"] == "PILOT_READY"
     assert result["signal_coverage_pct"] == 70
     assert result["recommended"] == 1000
