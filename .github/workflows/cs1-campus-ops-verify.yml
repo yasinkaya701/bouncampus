@@ -1,0 +1,45 @@
+name: CS1 Campus Operations Verify
+
+on:
+  push:
+    branches:
+      - agent/cs1/campus-operations-suite
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cs1-campus-ops-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend-policy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test:campus-operations
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+
+  repository-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m compileall -q backend/app scripts
+      - run: python scripts/agent_fabric_check.py
+      - run: python scripts/kreate_check.py
