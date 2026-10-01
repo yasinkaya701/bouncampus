@@ -121,6 +121,30 @@ def test_space_matches_exhaustive_fractional_capacity_case() -> None:
     assert math.isclose(result["expected_registered_loss"], expected[0], abs_tol=1e-9)
 
 
+def test_float_noise_uses_policy_tie_break_not_binary_rounding() -> None:
+    planner = load_planner()
+    result = planner.optimize_shuttle_plan(
+        demand_scenarios=[{"demand": 25, "weight": 1.0}],
+        departure_options=[
+            {"departure_id": "D0", "capacity": 4.4, "activation_weight": 1.5},
+            {"departure_id": "D1", "capacity": 6.5, "activation_weight": 2.0},
+            {"departure_id": "D2", "capacity": 7.2, "activation_weight": 2.0},
+            {"departure_id": "D3", "capacity": 0.3, "activation_weight": 0.3},
+            {"departure_id": "D4", "capacity": 13.0, "activation_weight": 2.0},
+        ],
+        empty_seat_weight=0.0,
+        shortage_weight=2.0,
+        min_point_service_ratio=0.5,
+    )
+    # Both 24.9 and 26.7 have registered loss 6.0 mathematically. The policy
+    # tie-break is lower capacity, then lexicographic IDs; binary float noise must
+    # not flip that deterministic choice.
+    assert result["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["selected_capacity_exact"] == 24.9
+    assert result["selected_departure_ids"] == ["D0", "D2", "D3", "D4"]
+    assert math.isclose(result["expected_registered_loss"], 6.0, abs_tol=1e-9)
+
+
 def test_forty_shuttle_options_are_supported_exactly() -> None:
     planner = load_planner()
     options = [
