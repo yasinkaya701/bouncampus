@@ -32,13 +32,6 @@ def _validate_pct(value: float, *, name: str) -> float:
     return numeric
 
 
-def _validate_floor(value: float) -> float:
-    numeric = float(value)
-    if not math.isfinite(numeric) or numeric <= 0:
-        raise ValueError("denominator_floor must be finite and > 0")
-    return numeric
-
-
 def assess_method_disagreement(
     method_estimates: Mapping[str, object],
     *,
@@ -46,12 +39,13 @@ def assess_method_disagreement(
     method_eligibility: Mapping[str, str],
     stage: str,
     max_relative_disagreement_pct: float,
-    denominator_floor: float = 1.0,
 ) -> dict[str, object]:
     """Expose eligible-method disagreement without turning it into readiness proof.
 
     The threshold is an explicit registered policy input. Ineligible methods are
-    reported but cannot trigger review for the requested stage.
+    reported but cannot trigger review for the requested stage. Relative change is
+    always measured against the actual selected estimate; no arbitrary denominator
+    floor is permitted because that can understate instability for small values.
     """
 
     if stage not in STAGE_ELIGIBILITY:
@@ -60,7 +54,6 @@ def assess_method_disagreement(
         max_relative_disagreement_pct,
         name="max_relative_disagreement_pct",
     )
-    floor = _validate_floor(denominator_floor)
     allowed_states = STAGE_ELIGIBILITY[stage]
 
     selected_state = method_eligibility.get(selected_method_id, "SANDBOX_ONLY")
@@ -119,7 +112,6 @@ def assess_method_disagreement(
             ),
         }
 
-    denominator = max(abs(selected_estimate), floor)
     assessments: dict[str, dict[str, object]] = {}
     comparable_disagreements: list[float] = []
 
@@ -137,9 +129,13 @@ def assess_method_disagreement(
         if method_id == selected_method_id and estimate is not None:
             relative_disagreement = 0.0
         elif eligible_for_stage and estimate is not None:
-            relative_disagreement = (
-                abs(estimate - selected_estimate) / denominator
-            ) * 100.0
+            if selected_estimate == 0:
+                # Non-zero comparisons already fail closed above; zero vs zero is stable.
+                relative_disagreement = 0.0
+            else:
+                relative_disagreement = (
+                    abs(estimate - selected_estimate) / selected_estimate
+                ) * 100.0
             comparable_disagreements.append(relative_disagreement)
 
         assessments[method_id] = {
@@ -185,19 +181,19 @@ def assess_policy_sensitivity(
     reference_policy_id: str,
     max_relative_target_change_pct: float,
     required_scenario_ids: Sequence[str] | None = None,
-    denominator_floor: float = 1.0,
 ) -> dict[str, object]:
     """Gate target instability across caller-defined policy sensitivity scenarios.
 
     Scenario definitions and thresholds must be registered by the caller. This
     function does not infer economic weights or claim that the scenarios are learned.
+    Relative sensitivity is measured against the actual reference target without an
+    arbitrary denominator floor.
     """
 
     gate = _validate_pct(
         max_relative_target_change_pct,
         name="max_relative_target_change_pct",
     )
-    floor = _validate_floor(denominator_floor)
     reference_target = _finite_nonnegative(scenario_targets.get(reference_policy_id))
 
     if reference_target is None:
@@ -266,7 +262,6 @@ def assess_policy_sensitivity(
             ),
         }
 
-    denominator = max(abs(reference_target), floor)
     assessments: dict[str, dict[str, object]] = {}
     relative_changes: list[float] = []
 
@@ -279,7 +274,13 @@ def assess_policy_sensitivity(
         elif scenario_id == reference_policy_id:
             relative_change = 0.0
         else:
-            relative_change = abs(target - reference_target) / denominator * 100.0
+            if reference_target == 0:
+                # Non-zero comparisons already fail closed above; zero vs zero is stable.
+                relative_change = 0.0
+            else:
+                relative_change = (
+                    abs(target - reference_target) / reference_target
+                ) * 100.0
             relative_changes.append(relative_change)
 
         assessments[scenario_id] = {
