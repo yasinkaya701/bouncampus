@@ -56,6 +56,23 @@ def test_ineligible_method_cannot_trigger_disagreement_review() -> None:
     assert result["method_assessments"]["sandbox"]["eligible_for_stage"] is False
 
 
+def test_zero_selected_estimate_withholds_relative_disagreement() -> None:
+    stability = load_stability()
+    result = stability.assess_method_disagreement(
+        {"baseline": 0.0, "model": 1.0},
+        selected_method_id="baseline",
+        method_eligibility={
+            "baseline": "PILOT_ELIGIBLE",
+            "model": "PILOT_ELIGIBLE",
+        },
+        stage="PILOT",
+        max_relative_disagreement_pct=10.0,
+    )
+    assert result["assessment_status"] == "WITHHOLD"
+    assert result["max_relative_disagreement_pct"] is None
+    assert "ZERO_SELECTED_ESTIMATE_NO_RELATIVE_DISAGREEMENT" in result["reason_codes"]
+
+
 def test_policy_sensitivity_requires_review_when_target_is_unstable() -> None:
     stability = load_stability()
     result = stability.assess_policy_sensitivity(
@@ -86,12 +103,27 @@ def test_policy_sensitivity_withholds_when_required_scenario_is_missing() -> Non
     assert "REQUIRED_SENSITIVITY_SCENARIO_UNAVAILABLE" in result["reason_codes"]
 
 
+def test_zero_reference_target_withholds_relative_sensitivity() -> None:
+    stability = load_stability()
+    result = stability.assess_policy_sensitivity(
+        {"registered": 0.0, "higher_shortage_weight": 1.0},
+        reference_policy_id="registered",
+        max_relative_target_change_pct=10.0,
+        required_scenario_ids=("higher_shortage_weight",),
+    )
+    assert result["assessment_status"] == "WITHHOLD"
+    assert result["max_relative_target_change_pct"] is None
+    assert "ZERO_REFERENCE_TARGET_NO_RELATIVE_SENSITIVITY" in result["reason_codes"]
+
+
 def main() -> int:
     tests = [
         test_method_disagreement_requires_review_past_registered_gate,
         test_ineligible_method_cannot_trigger_disagreement_review,
+        test_zero_selected_estimate_withholds_relative_disagreement,
         test_policy_sensitivity_requires_review_when_target_is_unstable,
         test_policy_sensitivity_withholds_when_required_scenario_is_missing,
+        test_zero_reference_target_withholds_relative_sensitivity,
     ]
     for test in tests:
         test()
