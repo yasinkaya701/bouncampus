@@ -36,7 +36,8 @@ def generate_reservation_baselines(
     A historical row is learnable only when all three counts are finite and
     non-negative and reserved-served demand does not exceed active reservations.
     Current-service outcomes are appended only after its forecast is produced,
-    preventing target leakage.
+    preventing target leakage. Excluded rows and baseline WITHHOLD states are
+    returned with explicit reason codes rather than being silently discarded.
     """
 
     if min_history < 1:
@@ -64,16 +65,29 @@ def generate_reservation_baselines(
 
     corrected: list[float | None] = []
     history_n: list[int] = []
+    baseline_readiness: list[str] = []
+    baseline_reason_codes: list[list[str]] = []
+    reconciliation_status: list[str] = []
+    reconciliation_reason_codes: list[list[str]] = []
     reconciled_history: list[tuple[float, float, float]] = []
 
     for index, current_reservations in enumerate(reservations):
         history_n.append(len(reconciled_history))
-        if current_reservations is None or len(reconciled_history) < min_history:
+        readiness_reasons: list[str] = []
+        if current_reservations is None:
             corrected.append(None)
+            baseline_readiness.append("WITHHOLD")
+            readiness_reasons.append("MISSING_OR_INVALID_CURRENT_RESERVATIONS")
+        elif len(reconciled_history) < min_history:
+            corrected.append(None)
+            baseline_readiness.append("WITHHOLD")
+            readiness_reasons.append("INSUFFICIENT_RECONCILED_HISTORY")
         else:
             historical_reservations = sum(row[0] for row in reconciled_history)
             if historical_reservations <= 0:
                 corrected.append(None)
+                baseline_readiness.append("WITHHOLD")
+                readiness_reasons.append("ZERO_RESERVATION_HISTORY")
             else:
                 historical_reserved_served = sum(row[1] for row in reconciled_history)
                 show_rate = historical_reserved_served / historical_reservations
@@ -81,24 +95,51 @@ def generate_reservation_baselines(
                     reconciled_history
                 )
                 corrected.append(current_reservations * show_rate + expected_unreserved)
+                baseline_readiness.append("BENCHMARK_READY")
+                readiness_reasons.append("CORRECTED_RESERVATION_BASELINE_AVAILABLE")
+        baseline_reason_codes.append(readiness_reasons)
 
         reservation = reservations[index]
         served_from_reservation = reserved_served[index]
         served_without_reservation = unreserved[index]
+        reconciliation_reasons: list[str] = []
+        if reservation is None:
+            reconciliation_reasons.append("MISSING_OR_INVALID_ACTIVE_RESERVATIONS")
+        if served_from_reservation is None:
+            reconciliation_reasons.append("MISSING_OR_INVALID_RESERVED_SERVED_DEMAND")
+        if served_without_reservation is None:
+            reconciliation_reasons.append("MISSING_OR_INVALID_UNRESERVED_DEMAND")
         if (
             reservation is not None
             and served_from_reservation is not None
-            and served_without_reservation is not None
-            and served_from_reservation <= reservation
+            and served_from_reservation > reservation
         ):
+            reconciliation_reasons.append(
+                "RESERVED_SERVED_EXCEEDS_ACTIVE_RESERVATIONS"
+            )
+
+        if reconciliation_reasons:
+            reconciliation_status.append("EXCLUDED")
+        else:
+            reconciliation_status.append("RECONCILED")
             reconciled_history.append(
                 (reservation, served_from_reservation, served_without_reservation)
             )
+        reconciliation_reason_codes.append(reconciliation_reasons)
+
+    reconciled_row_count = reconciliation_status.count("RECONCILED")
+    excluded_row_count = len(reconciliation_status) - reconciled_row_count
 
     return {
         "raw_reservation": list(reservations),
         "corrected_reservation": corrected,
         "history_n": history_n,
+        "baseline_readiness": baseline_readiness,
+        "baseline_reason_codes": baseline_reason_codes,
+        "reconciliation_status": reconciliation_status,
+        "reconciliation_reason_codes": reconciliation_reason_codes,
+        "reconciled_row_count": reconciled_row_count,
+        "excluded_row_count": excluded_row_count,
         "semantics": "RESERVATION_IS_INTENT_NOT_SERVED_DEMAND",
         "result_scope": "OFFLINE_BASELINE_ONLY",
         "leakage_policy": "PAST_RECONCILED_SERVICES_ONLY",
