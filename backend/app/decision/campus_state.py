@@ -39,6 +39,8 @@ LIMITATIONS = (
 
 
 def _finite_nonnegative(value: Any, *, field: str) -> float:
+    if isinstance(value, bool):
+        raise ValueError(f"{field} must be numeric")
     try:
         numeric = float(value)
     except (TypeError, ValueError) as exc:
@@ -75,37 +77,76 @@ def _normalize_source(
     payload: Mapping[str, Any] | None,
     *,
     decision_time: datetime,
+    decision_time_raw: str,
     reason_codes: list[str],
 ) -> dict[str, Any]:
     item = dict(payload or {})
-    available = bool(item.get("available", False))
-    provenance = str(item.get("provenance", "")).upper()
+    available_raw = item.get("available", False)
+    if not isinstance(available_raw, bool):
+        raise ValueError(f"sources.{source_name}.available must be boolean")
+    available = available_raw
+
     published_at_raw = item.get("published_at")
+    fetched_at_raw = item.get("fetched_at")
     accepted = False
+    freshness_seconds: int | None = None
+    status = "UNAVAILABLE"
+
+    provenance_raw = item.get("provenance", "UNAVAILABLE")
+    provenance = CONTRACT.normalize_provenance(
+        provenance_raw, field=f"sources.{source_name}.provenance"
+    )
 
     if available:
-        if provenance not in CONTRACT.PROVENANCE_STATES:
-            reason_codes.append(f"INVALID_SOURCE_PROVENANCE_{source_name.upper()}")
-        elif published_at_raw is None:
+        if provenance == "UNAVAILABLE":
+            raise ValueError(
+                f"sources.{source_name}.provenance cannot be UNAVAILABLE when source is available"
+            )
+        if published_at_raw is None:
             reason_codes.append(f"MISSING_SOURCE_TIMESTAMP_{source_name.upper()}")
+            status = "PARTIAL"
         else:
             published_at = _parse_timestamp(
                 published_at_raw, field=f"sources.{source_name}.published_at"
             )
+            freshness_seconds = max(0, int((decision_time - published_at).total_seconds()))
             if published_at > decision_time:
                 reason_codes.append(
                     f"SOURCE_NOT_AVAILABLE_AT_DECISION_TIME_{source_name.upper()}"
                 )
+                status = "NOT_AVAILABLE_AT_DECISION_TIME"
+                freshness_seconds = None
             else:
                 accepted = True
+                status = "VERIFIED"
     else:
         reason_codes.append(f"MISSING_SOURCE_{source_name.upper()}")
+        status = "UNAVAILABLE"
+
+    if fetched_at_raw is not None:
+        _parse_timestamp(fetched_at_raw, field=f"sources.{source_name}.fetched_at")
+
+    coverage = item.get("coverage")
+    if coverage is not None:
+        coverage_number = _finite_nonnegative(
+            coverage, field=f"sources.{source_name}.coverage"
+        )
+        if coverage_number > 1:
+            raise ValueError(f"sources.{source_name}.coverage must be between 0 and 1")
+        coverage = coverage_number
 
     return {
+        "source_id": source_name,
+        "domain": source_name,
         "available": available,
         "accepted_at_decision_time": accepted,
-        "provenance": provenance or None,
+        "provenance": provenance,
         "published_at": published_at_raw,
+        "fetched_at": fetched_at_raw,
+        "decision_cutoff": decision_time_raw,
+        "freshness_seconds": freshness_seconds,
+        "coverage": coverage,
+        "status": status,
     }
 
 
@@ -153,13 +194,7 @@ def build_campus_state(
     *,
     decision_time: str,
 ) -> dict[str, Any]:
-    """Build a decision-time-safe aggregate campus state snapshot.
-
-    The state engine accepts only aggregate zone records. Required sources must have
-    been available by the decision cutoff; future information is never silently used.
-    Even with complete context, the pre-pilot engine remains REVIEW_REQUIRED rather
-    than claiming operational readiness from synthetic/model-only data.
-    """
+    """Build a decision-time-safe aggregate campus state snapshot."""
 
     CONTRACT.validate_no_person_level_data(zones, path="zones")
     CONTRACT.validate_no_person_level_data(sources or {}, path="sources")
@@ -172,11 +207,13 @@ def build_campus_state(
             name,
             (sources or {}).get(name),
             decision_time=cutoff,
+            decision_time_raw=decision_time,
             reason_codes=reason_codes,
         )
         for name in SOURCE_NAMES
         if name in REQUIRED_SOURCES or name in (sources or {})
     }
+    source_health = list(source_status.values())
 
     normalized_zones: list[dict[str, Any]] = []
     seen_zone_ids: set[str] = set()
@@ -235,6 +272,7 @@ def build_campus_state(
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
         "source_status": source_status,
+        "source_health": source_health,
         "zones": normalized_zones,
         "campus_totals": campus_totals,
         "reason_codes": list(dict.fromkeys(reason_codes)),
