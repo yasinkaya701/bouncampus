@@ -1,0 +1,31 @@
+name: CS1 Integration Fixer
+
+on:
+  push:
+    branches:
+      - role/cs1-decision-intelligence
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'run-fixer'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: role/cs1-decision-intelligence
+          fetch-depth: 0
+
+      - name: Apply deterministic integration fixes
+        run: python scripts/cs1_apply_integration_fix.py
+
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/src/lib/food-waste.ts frontend/src/app/food-waste/page.tsx .github/workflows/ci-hosted-fallback.yml
+          git diff --cached --check
+          git commit -m "fix(cs1): resolve master integration contracts"
+          git push origin HEAD:role/cs1-decision-intelligence
