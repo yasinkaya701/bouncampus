@@ -142,6 +142,31 @@ def test_insufficient_common_support_withholds_selection() -> None:
     assert "INSUFFICIENT_COMMON_SUPPORT" in result["reason_codes"]
 
 
+def test_decision_loss_can_be_registered_as_primary_metric() -> None:
+    gate = load_gate()
+    result = gate.select_method(
+        {
+            "metrics": {
+                "raw_reservation": {"mean_loss": 12.0},
+                "corrected_reservation": {"mean_loss": 9.0},
+            },
+            "common_support_n": 20,
+            "result_scope": "OFFLINE_DECISION_BENCHMARK_ONLY",
+        },
+        baseline_id="raw_reservation",
+        method_eligibility={
+            "raw_reservation": "PILOT_ELIGIBLE",
+            "corrected_reservation": "EVALUATED_OFFLINE",
+        },
+        stage="OFFLINE_EVALUATION",
+        primary_metric="mean_loss",
+        min_common_support_n=10,
+        min_relative_improvement_pct=10.0,
+    )
+    assert result["selected_method"] == "corrected_reservation"
+    assert result["relative_improvement_pct_vs_baseline"] == 25.0
+
+
 def main() -> int:
     tests = [
         test_candidate_must_earn_promotion_over_baseline,
@@ -149,6 +174,7 @@ def main() -> int:
         test_sandbox_candidate_fails_closed_even_if_metric_is_best,
         test_pilot_stage_excludes_offline_only_candidate,
         test_insufficient_common_support_withholds_selection,
+        test_decision_loss_can_be_registered_as_primary_metric,
     ]
     for test in tests:
         test()
