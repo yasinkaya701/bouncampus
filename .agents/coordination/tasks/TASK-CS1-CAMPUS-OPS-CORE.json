@@ -15,6 +15,7 @@
     "backend/app/decision/classroom_policy.py",
     "backend/app/decision/food_ops_policy.py",
     "backend/app/decision/building_energy_policy.py",
+    "backend/app/decision/shared_capacity_policy.py",
     "backend/app/decision/campus_portfolio.py",
     "backend/app/routers/campus_ops.py",
     "backend/app/main.py",
@@ -23,21 +24,23 @@
     "scripts/test_cs1_classroom_policy.py",
     "scripts/test_cs1_food_ops_policy.py",
     "scripts/test_cs1_building_energy_policy.py",
+    "scripts/test_cs1_shared_capacity_policy.py",
     "scripts/test_cs1_campus_portfolio.py",
     "scripts/test_cs1_campus_ops_router.py",
     "KREATE/EXPERIMENTS/CS1_CAMPUS_OPS_V1.md"
   ],
   "acceptance_criteria": [
-    "Campus state snapshots use aggregate campus/building/time-window signals only and carry explicit source provenance, decision-time cutoffs, and readiness semantics",
-    "Shuttle planning recommends bounded seat/headway capacity from aggregate demand and fleet constraints while failing closed on malformed or insufficient inputs",
-    "Classroom allocation enforces capacity, accessibility, equipment, time-conflict, and campus constraints before optimizing soft utilization/energy/movement costs",
-    "Food operations chooses only operator-reviewed production targets from explicit demand scenarios, capacity, registered sensitivity weights, and actionable method eligibility; no automatic kitchen dispatch is permitted",
+    "Campus state snapshots use aggregate campus/building/time-window signals only and carry explicit canonical source provenance, decision-time cutoffs, and readiness semantics",
+    "Shuttle planning emits capacity-sensitive output only from verified capacity provenance, recommends bounded seat/headway capacity from aggregate demand and fleet constraints, and never invents trips that do not fit the service window",
+    "Classroom allocation emits capacity-sensitive assignments only from verified room-inventory and attendance provenance and enforces capacity, accessibility, equipment, time-conflict, and campus constraints before soft utilization/energy scoring",
+    "Food operations chooses only operator-reviewed production targets from explicit demand scenarios, capacity, registered sensitivity weights, and actionable method eligibility; a non-identifying zero-weight objective is withheld and no automatic kitchen dispatch is permitted",
     "Building energy operations converts aggregate occupancy into operator-review modes using explicit registered thresholds and never emits BMS commands or achieved energy/carbon/cost savings",
-    "Cross-domain portfolio keeps dining, mobility, classroom, occupancy, and energy effects as separate decision-support signals and never auto-executes university operations",
-    "No student identifiers, BUCard identifiers, scholarship data, or inferred individual movement profiles are accepted by the decision contracts",
-    "All outputs distinguish MODEL_ESTIMATE, POLICY_HEURISTIC, PUBLIC_SOURCE, and MEASURED_PILOT-style provenance without promoting unsupported impact claims",
-    "Missing or contradictory required evidence produces WITHHOLD or REVIEW_REQUIRED instead of a confident recommendation",
-    "Focused regression tests cover nominal, oversubscribed, malformed, conflicting, accessibility/equipment, insufficient-evidence, food eligibility, energy thresholds, and API orchestration cases",
+    "Shared-capacity operations allocates aggregate integer capacity by registered minimums and priorities, rejects person-level allocation data, and requires operator review",
+    "Cross-domain portfolio keeps dining, mobility, classroom, occupancy, energy, and shared-resource effects as separate decision-support signals and never auto-executes university operations",
+    "No student identifiers, BUCard identifiers, scholarship data, device/Wi-Fi client identifiers, or inferred individual movement profiles are accepted by the decision contracts",
+    "Canonical provenance states and documented aliases are enforced without promoting unsupported inputs into verified capacity evidence",
+    "Missing, contradictory, future-leaking, or unverified required evidence produces WITHHOLD or REVIEW_REQUIRED instead of a confident recommendation",
+    "Focused regression tests cover nominal, oversubscribed, malformed, conflicting, accessibility/equipment, insufficient-evidence, provenance gating, food eligibility/objective edge cases, energy thresholds, shared capacity, and API orchestration cases",
     "FastAPI exposes domain endpoints and one combined campus-operations planning endpoint without claiming live BMS, shuttle GPS, turnstile, Wi-Fi, POS, or registrar integrations"
   ],
   "validation_commands": [
@@ -46,6 +49,7 @@
     "python scripts/test_cs1_classroom_policy.py",
     "python scripts/test_cs1_food_ops_policy.py",
     "python scripts/test_cs1_building_energy_policy.py",
+    "python scripts/test_cs1_shared_capacity_policy.py",
     "python scripts/test_cs1_campus_portfolio.py",
     "python scripts/test_cs1_campus_ops_router.py",
     "python -m compileall -q backend/app scripts",
@@ -61,14 +65,14 @@
   },
   "lease": {
     "claimed_at": "2026-10-01T12:06:00Z",
-    "heartbeat_at": "2026-10-01T12:23:00Z",
+    "heartbeat_at": "2026-10-01T12:37:00Z",
     "ttl_minutes": 360
   },
   "blocker": {
     "kind": "INTEGRATION_CAPACITY",
     "summary": "CS1 role branch already has three open feature PRs, so implementation may proceed on the task branch but must not open a fourth role-targeted PR until a slot is freed.",
     "evidence": "Open CS1 feature PRs #68, #69, and #70 target role/cs1-decision-intelligence; repository policy caps open feature PRs per role at three. Existing exact-head CI is also queued on the required self-hosted macOS/ARM64 runner.",
-    "next_action": "Keep the implementation isolated and verified on agent/api-product/cs1-campus-ops-core; open the feature PR only after a CS1 slot is freed, then require exact-head CI before merge."
+    "next_action": "Keep the implementation isolated and audited on agent/api-product/cs1-campus-ops-core; open the feature PR only after a CS1 slot is freed, then require exact-head CI before merge."
   },
   "integration": {
     "pull_request": null,
@@ -78,8 +82,9 @@
   },
   "notes": [
     "This task extends the existing food-focused CS1 decision intelligence into reusable campus operations without editing active food-core owned paths.",
-    "Food-ops and building-energy policy files added concurrently on the same task branch were reviewed and accepted into this task because they use the shared aggregate campus contract, retain explicit human review, and preserve the evidence boundary.",
-    "The combined API now supports campus state, shuttle, classroom, food operations, building energy, and cross-domain portfolio planning under one decision-time-aware contract.",
+    "Food-ops, building-energy, and shared-capacity policy files added concurrently on the same task branch were reviewed and accepted because they use the shared aggregate campus contract, retain explicit human review, and preserve the evidence boundary.",
+    "The combined API supports campus state, shuttle, classroom, food operations, building energy, shared-capacity allocation, and a cross-domain portfolio under one decision-time-aware contract.",
+    "Capacity-sensitive shuttle and classroom decisions now require verified provenance rather than treating model estimates as physical truth.",
     "The task deliberately avoids fabricating PMR, pilot outcomes, live telemetry, or achieved sustainability impact.",
     "Campus operations are advisory decision support; irreversible operational execution remains outside this package."
   ]
