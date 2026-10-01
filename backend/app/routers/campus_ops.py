@@ -16,6 +16,7 @@ from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
+from app.decision.water_advisory import plan_water_advisory
 
 router = APIRouter(prefix="/api/v1/ops", tags=["campus-operations"])
 
@@ -43,13 +44,14 @@ def capabilities() -> dict[str, Any]:
             "class_scheduling",
             "shared_capacity",
             "energy_advisory",
+            "water_advisory",
             "bundle",
             "integrated_plan",
         ],
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
-        "truth_boundary": "No live cafeteria POS, shuttle GPS, room-occupancy, BMS, Wi-Fi/turnstile, or registrar telemetry is implied by these optimization endpoints.",
+        "truth_boundary": "No live cafeteria POS, shuttle GPS, room-occupancy, BMS, smart-meter/water-meter, Wi-Fi/turnstile, or registrar telemetry is implied by these optimization endpoints.",
         "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
@@ -130,6 +132,16 @@ def optimize_energy(payload: dict[str, Any]) -> dict[str, Any]:
         zones=_payload_value(payload, "zones", []),
         low_utilization_threshold=_payload_value(payload, "low_utilization_threshold", None),
         medium_utilization_threshold=_payload_value(payload, "medium_utilization_threshold", None),
+    )
+
+
+@router.post("/water")
+def optimize_water(payload: dict[str, Any]) -> dict[str, Any]:
+    _validate(payload)
+    return plan_water_advisory(
+        zones=_payload_value(payload, "zones", []),
+        elevated_ratio_threshold=_payload_value(payload, "elevated_ratio_threshold", None),
+        critical_ratio_threshold=_payload_value(payload, "critical_ratio_threshold", None),
     )
 
 
