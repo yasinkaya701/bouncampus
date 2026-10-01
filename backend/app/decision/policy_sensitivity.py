@@ -5,6 +5,11 @@ from typing import Any, Mapping, Sequence
 
 PARAMETER_PROVENANCE = "SENSITIVITY_PARAMETER_NOT_OBSERVED_ECONOMICS"
 SCOPE = "POLICY_SENSITIVITY_ONLY"
+LIMITATIONS = (
+    "NO_OBSERVED_ECONOMIC_WEIGHTS",
+    "NO_OPERATIONAL_TARGET_SELECTED",
+    "NO_IMPACT_CLAIM",
+)
 
 
 def _finite_number(value: Any) -> float | None:
@@ -17,6 +22,27 @@ def _finite_number(value: Any) -> float | None:
     return number
 
 
+def _withhold(*, policy_version: str, reason: str) -> dict[str, Any]:
+    return {
+        "scope": SCOPE,
+        "policy_version": str(policy_version).strip(),
+        "parameter_provenance": PARAMETER_PROVENANCE,
+        "reference_target": None,
+        "scenario_count": 0,
+        "scenarios": [],
+        "min_target": None,
+        "max_target": None,
+        "target_span": None,
+        "relative_target_span_pct": None,
+        "registered_max_relative_target_span_pct": None,
+        "sensitivity_state": "WITHHOLD",
+        "readiness_effect": "WITHHOLD",
+        "selected_operational_target": None,
+        "reason_codes": [reason],
+        "limitations": list(LIMITATIONS),
+    }
+
+
 def assess_policy_sensitivity(
     reference_target: Any,
     scenarios: Sequence[Mapping[str, Any]],
@@ -26,32 +52,54 @@ def assess_policy_sensitivity(
 ) -> dict[str, Any]:
     reference = _finite_number(reference_target)
     threshold = _finite_number(max_relative_target_span_pct)
+    normalized_policy_version = str(policy_version).strip()
+
     if reference is None or reference <= 0:
-        raise ValueError("reference_target must be a positive finite number")
+        return _withhold(
+            policy_version=normalized_policy_version,
+            reason="INVALID_POLICY_SENSITIVITY_REFERENCE_TARGET",
+        )
     if threshold is None or threshold < 0:
-        raise ValueError("max_relative_target_span_pct must be a non-negative finite number")
-    if not str(policy_version).strip():
-        raise ValueError("policy_version is required")
+        return _withhold(
+            policy_version=normalized_policy_version,
+            reason="INVALID_POLICY_SENSITIVITY_THRESHOLD",
+        )
+    if not normalized_policy_version:
+        return _withhold(
+            policy_version="",
+            reason="MISSING_POLICY_VERSION",
+        )
     if len(scenarios) < 2:
-        raise ValueError("at least two policy scenarios are required")
+        return _withhold(
+            policy_version=normalized_policy_version,
+            reason="INSUFFICIENT_POLICY_SENSITIVITY_SCENARIOS",
+        )
 
     normalized = []
-    for index, scenario in enumerate(scenarios):
+    seen_ids: set[str] = set()
+    for scenario in scenarios:
         target = _finite_number(scenario.get("target"))
         shortage_weight = _finite_number(scenario.get("shortage_weight"))
         excess_weight = _finite_number(scenario.get("excess_weight"))
         buffer_pct = _finite_number(scenario.get("buffer_pct"))
         scenario_id = str(scenario.get("scenario_id") or "").strip()
-        if not scenario_id:
-            raise ValueError(f"scenario {index} requires scenario_id")
-        if target is None or target <= 0:
-            raise ValueError(f"scenario {scenario_id} target must be positive and finite")
-        if shortage_weight is None or shortage_weight < 0:
-            raise ValueError(f"scenario {scenario_id} shortage_weight must be non-negative and finite")
-        if excess_weight is None or excess_weight < 0:
-            raise ValueError(f"scenario {scenario_id} excess_weight must be non-negative and finite")
-        if buffer_pct is None:
-            raise ValueError(f"scenario {scenario_id} buffer_pct must be finite")
+        invalid = (
+            not scenario_id
+            or scenario_id in seen_ids
+            or target is None
+            or target <= 0
+            or shortage_weight is None
+            or shortage_weight < 0
+            or excess_weight is None
+            or excess_weight < 0
+            or buffer_pct is None
+        )
+        if invalid:
+            return _withhold(
+                policy_version=normalized_policy_version,
+                reason="INVALID_POLICY_SENSITIVITY_SCENARIO",
+            )
+        seen_ids.add(scenario_id)
         normalized.append(
             {
                 "scenario_id": scenario_id,
@@ -71,7 +119,7 @@ def assess_policy_sensitivity(
 
     return {
         "scope": SCOPE,
-        "policy_version": str(policy_version).strip(),
+        "policy_version": normalized_policy_version,
         "parameter_provenance": PARAMETER_PROVENANCE,
         "reference_target": reference,
         "scenario_count": len(normalized),
@@ -85,9 +133,5 @@ def assess_policy_sensitivity(
         "readiness_effect": "REVIEW_REQUIRED" if high else "NO_DOWNGRADE",
         "selected_operational_target": None,
         "reason_codes": ["POLICY_SENSITIVITY_HIGH" if high else "POLICY_SENSITIVITY_STABLE"],
-        "limitations": [
-            "NO_OBSERVED_ECONOMIC_WEIGHTS",
-            "NO_OPERATIONAL_TARGET_SELECTED",
-            "NO_IMPACT_CLAIM",
-        ],
+        "limitations": list(LIMITATIONS),
     }
