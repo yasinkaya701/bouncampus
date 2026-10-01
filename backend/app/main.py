@@ -2,15 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import (
-    actions,
-    campus_ops,
-    dashboard,
-    energy,
-    food,
-    occupancy,
-    scenarios,
-)
+from app.routers import actions, dashboard, energy, food, occupancy, scenarios
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -32,7 +24,6 @@ app.include_router(food.router)
 app.include_router(actions.router)
 app.include_router(scenarios.router)
 app.include_router(dashboard.router)
-app.include_router(campus_ops.router)
 
 
 @app.get("/")
