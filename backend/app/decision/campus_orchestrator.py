@@ -14,8 +14,11 @@ from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
+from app.decision.water_advisory import plan_water_advisory
 
-ALLOWED_MODULES = frozenset({"food", "shuttle", "spaces", "classes", "resources", "energy"})
+ALLOWED_MODULES = frozenset(
+    {"food", "shuttle", "spaces", "classes", "resources", "energy", "water"}
+)
 
 
 def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
@@ -87,6 +90,13 @@ def build_integrated_campus_plan(payload: Mapping[str, Any]) -> dict[str, Any]:
                 zones=state.get("zones", []),
                 low_utilization_threshold=config.get("low_utilization_threshold"),
                 medium_utilization_threshold=config.get("medium_utilization_threshold"),
+            )
+        if "water" in requested:
+            config = _mapping(requested["water"], name="modules.water")
+            results["water"] = plan_water_advisory(
+                zones=config.get("zones", []),
+                elevated_ratio_threshold=config.get("elevated_ratio_threshold"),
+                critical_ratio_threshold=config.get("critical_ratio_threshold"),
             )
 
     bundle_inputs: dict[str, Mapping[str, Any]] = {"campus_state": state, **results}
