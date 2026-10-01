@@ -26,6 +26,20 @@ def _metric_value(value):
     return numeric
 
 
+def _integer_support_count(value: object) -> int:
+    """Parse a non-negative integer count without silently truncating evidence."""
+
+    if isinstance(value, bool):
+        raise ValueError("comparison common_support_n must be an integer")
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("comparison common_support_n must be an integer") from exc
+    if not math.isfinite(numeric) or numeric < 0 or not numeric.is_integer():
+        raise ValueError("comparison common_support_n must be an integer")
+    return int(numeric)
+
+
 def _withhold(
     *,
     baseline_id: str,
@@ -93,11 +107,7 @@ def select_method(
     if not isinstance(metrics, Mapping):
         raise ValueError("comparison must contain a metrics mapping")
 
-    common_support_raw = comparison.get("common_support_n", 0)
-    try:
-        common_support_n = int(common_support_raw)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("comparison common_support_n must be an integer") from exc
+    common_support_n = _integer_support_count(comparison.get("common_support_n", 0))
     if common_support_n < min_common_support_n:
         return _withhold(
             baseline_id=baseline_id,
