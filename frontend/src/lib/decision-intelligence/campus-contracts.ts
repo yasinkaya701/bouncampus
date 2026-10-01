@@ -1,4 +1,4 @@
-export type CampusDecisionDomain = 'FOOD' | 'SHUTTLE' | 'SPACE';
+export type CampusDecisionDomain = 'FOOD' | 'SHUTTLE' | 'SPACE' | 'ENERGY' | 'OCCUPANCY';
 
 export type CampusDecisionReadiness = 'READY' | 'REVIEW_REQUIRED' | 'WITHHOLD';
 
@@ -8,6 +8,7 @@ export type CampusProvenanceClass =
   | 'DERIVED_SNAPSHOT'
   | 'USER_SUPPLIED'
   | 'POLICY_HEURISTIC'
+  | 'MODEL_ESTIMATE'
   | 'SCENARIO'
   | 'UNAVAILABLE';
 
