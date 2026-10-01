@@ -21,6 +21,10 @@ function optionalFinite(raw: string | null): number | undefined {
   return Number.isFinite(value) ? value : Number.NaN;
 }
 
+function isInvalidOptional(value: number | undefined) {
+  return value !== undefined && Number.isNaN(value);
+}
+
 export async function GET(request: NextRequest) {
   const now = new Date();
   const defaults = istanbulPlanningWindow(now);
@@ -30,13 +34,19 @@ export async function GET(request: NextRequest) {
   const hour = hourRaw === null || hourRaw.trim() === '' ? defaults.hour : Number(hourRaw);
   const eventMultiplier = optionalFinite(request.nextUrl.searchParams.get('eventMultiplier')) ?? 1;
   const queuePassengers = optionalFinite(request.nextUrl.searchParams.get('queuePassengers'));
+  const availableVehicles = optionalFinite(request.nextUrl.searchParams.get('availableVehicles'));
+  const roundTripMinutes = optionalFinite(request.nextUrl.searchParams.get('roundTripMinutes'));
+  const vehicleCapacity = optionalFinite(request.nextUrl.searchParams.get('vehicleCapacity'));
 
   if (
     !Number.isInteger(hour)
     || hour < 0
     || hour > 23
     || Number.isNaN(eventMultiplier)
-    || (queuePassengers !== undefined && Number.isNaN(queuePassengers))
+    || isInvalidOptional(queuePassengers)
+    || isInvalidOptional(availableVehicles)
+    || isInvalidOptional(roundTripMinutes)
+    || isInvalidOptional(vehicleCapacity)
   ) {
     return NextResponse.json({ error: 'invalid_frequency_context' }, { status: 400 });
   }
@@ -70,12 +80,19 @@ export async function GET(request: NextRequest) {
     weatherSourceId: weather.source.ok ? weather.source.url : null,
     eventMultiplier,
     operatorQueuePassengers: queuePassengers ?? null,
+    availableVehicles: availableVehicles ?? null,
+    roundTripMinutes: roundTripMinutes ?? null,
+    vehicleCapacity: vehicleCapacity ?? null,
   });
 
+  // Keep this baseline schedule-only. Fleet and queue/event scenario inputs affect the
+  // selected planning window, not the reference day curve shown to the operator.
   const hourlyPlan = Array.from({ length: 13 }, (_, index) => 9 + index).map(planningHour => {
     const scheduleOnly = recommendShuttleFrequency({ ...common, hour: planningHour });
     return { hour: planningHour, readiness: scheduleOnly.readiness, reasonCodes: scheduleOnly.reasonCodes, recommendation: scheduleOnly.recommendation };
   });
+
+  const fleetInputPresent = availableVehicles !== undefined || roundTripMinutes !== undefined || vehicleCapacity !== undefined;
 
   return NextResponse.json({
     decision,
@@ -102,7 +119,17 @@ export async function GET(request: NextRequest) {
         nextDeparture: shuttleFeed.next_departure,
         source: shuttleFeed.source,
       } : null,
-      scenarioInputs: { eventMultiplier, operatorQueuePassengers: queuePassengers ?? null },
+      scenarioInputs: {
+        eventMultiplier,
+        operatorQueuePassengers: queuePassengers ?? null,
+        fleet: {
+          availableVehicles: availableVehicles ?? null,
+          roundTripMinutes: roundTripMinutes ?? null,
+          vehicleCapacity: vehicleCapacity ?? null,
+          provenance: fleetInputPresent ? 'USER_SUPPLIED' : 'UNAVAILABLE',
+          verifiedTelemetry: false,
+        },
+      },
     },
     truthBoundary: {
       recommendationType: 'ADVISORY_FREQUENCY_POLICY_HEURISTIC',
@@ -111,6 +138,7 @@ export async function GET(request: NextRequest) {
       liveOccupancyConnected: false,
       verifiedFleetCapacityConnected: false,
       verifiedTurnaroundConnected: false,
+      userSuppliedFleetContextVerified: false,
       automaticDispatch: false,
       officialTimetableRemainsAuthoritative: true,
     },

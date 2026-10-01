@@ -30,6 +30,40 @@ assert.ok(wetEvent.reasonCodes.includes('RAIN_PRESSURE_APPLIED'));
 assert.ok(wetEvent.reasonCodes.includes('EVENT_SCENARIO_PRESSURE_APPLIED'));
 assert.equal(wetEvent.automaticDispatchAllowed, false);
 assert.equal(wetEvent.recommendation?.fleetFeasibilityStatus, 'UNVERIFIED');
+assert.equal(wetEvent.recommendation?.operationalHeadwayMinutes, wetEvent.recommendation?.targetHeadwayMinutes);
+
+const constrainedFleet = recommendShuttleFrequency({
+  routeId: 'south-north-loop', serviceType: 'campus_loop', day: 'Th', hour: 16,
+  courses, snapshotMeta: staleMeta, nowIso: '2026-10-01T15:40:00+03:00',
+  availableVehicles: 2, roundTripMinutes: 30, vehicleCapacity: 40,
+});
+assert.equal(constrainedFleet.readiness, 'REVIEW_REQUIRED');
+assert.equal(constrainedFleet.recommendation?.targetHeadwayMinutes, 10);
+assert.equal(constrainedFleet.recommendation?.requiredVehiclesForTarget, 3);
+assert.equal(constrainedFleet.recommendation?.fleetMinimumHeadwayMinutes, 15);
+assert.equal(constrainedFleet.recommendation?.operationalHeadwayMinutes, 15);
+assert.equal(constrainedFleet.recommendation?.operationalDeparturesPerHour, 4);
+assert.equal(constrainedFleet.recommendation?.hourlySeatCapacityEstimate, 160);
+assert.equal(constrainedFleet.recommendation?.fleetFeasibilityStatus, 'USER_SUPPLIED_CONSTRAINED');
+assert.ok(constrainedFleet.reasonCodes.includes('USER_SUPPLIED_FLEET_CONTEXT'));
+assert.ok(constrainedFleet.reasonCodes.includes('FLEET_CONSTRAINS_DEMAND_TARGET'));
+
+const feasibleFleet = recommendShuttleFrequency({
+  routeId: 'south-north-loop', serviceType: 'campus_loop', day: 'Th', hour: 16,
+  courses, snapshotMeta: staleMeta, nowIso: '2026-10-01T15:40:00+03:00',
+  availableVehicles: 4, roundTripMinutes: 30,
+});
+assert.equal(feasibleFleet.recommendation?.requiredVehiclesForTarget, 3);
+assert.equal(feasibleFleet.recommendation?.fleetMinimumHeadwayMinutes, 8);
+assert.equal(feasibleFleet.recommendation?.operationalHeadwayMinutes, 10);
+assert.equal(feasibleFleet.recommendation?.fleetFeasibilityStatus, 'USER_SUPPLIED_FEASIBLE');
+
+const incompleteFleet = recommendShuttleFrequency({
+  routeId: 'south-north-loop', serviceType: 'campus_loop', day: 'Th', hour: 16,
+  courses, snapshotMeta: staleMeta, availableVehicles: 2,
+});
+assert.equal(incompleteFleet.readiness, 'WITHHOLD');
+assert.ok(incompleteFleet.reasonCodes.includes('INCOMPLETE_FLEET_CONTEXT'));
 
 const noPulseBase = recommendShuttleFrequency({ routeId: 'south-north-loop', serviceType: 'campus_loop', day: 'Th', hour: 12, courses, snapshotMeta: staleMeta, nowIso: '2026-10-01T11:40:00+03:00' });
 const noPulseEvent = recommendShuttleFrequency({ routeId: 'south-north-loop', serviceType: 'campus_loop', day: 'Th', hour: 12, courses, snapshotMeta: staleMeta, nowIso: '2026-10-01T11:40:00+03:00', eventMultiplier: 3 });

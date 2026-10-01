@@ -2,6 +2,7 @@ export type ShuttleFrequencyServiceType = 'campus_loop' | 'inter_campus';
 export type ShuttlePressureBand = 'LOW' | 'MODERATE' | 'HIGH' | 'SURGE';
 export type ScheduleCoverage = 'FULL' | 'PARTIAL' | 'NONE';
 export type ShuttleDominantDirection = 'SOUTH_TO_NORTH' | 'NORTH_TO_SOUTH' | 'BALANCED' | 'UNRESOLVED';
+export type ShuttleFleetFeasibilityStatus = 'UNVERIFIED' | 'USER_SUPPLIED_FEASIBLE' | 'USER_SUPPLIED_CONSTRAINED';
 
 export type ShuttleCourseRecord = {
   code?: string;
@@ -30,6 +31,9 @@ export type ShuttleFrequencyInput = {
   eventMultiplier?: number;
   operatorQueuePassengers?: number | null;
   officialDepartureTimes?: string[];
+  availableVehicles?: number | null;
+  roundTripMinutes?: number | null;
+  vehicleCapacity?: number | null;
 };
 
 export type ShuttleFrequencyRecommendation = {
@@ -48,9 +52,17 @@ export type ShuttleFrequencyRecommendation = {
   pressureBand: ShuttlePressureBand;
   targetHeadwayMinutes: number;
   targetDeparturesPerHour: number;
+  operationalHeadwayMinutes: number;
+  operationalDeparturesPerHour: number;
+  availableVehicles: number | null;
+  roundTripMinutes: number | null;
+  vehicleCapacity: number | null;
+  requiredVehiclesForTarget: number | null;
+  fleetMinimumHeadwayMinutes: number | null;
+  hourlySeatCapacityEstimate: number | null;
   currentPublishedHeadwayMinutes: number | null;
   publishedScheduleComparison: 'INCREASE_FREQUENCY_CANDIDATE' | 'MAINTAIN_OR_REVIEW' | 'DECREASE_FREQUENCY_CANDIDATE' | 'NO_COMPARABLE_PUBLISHED_HEADWAY';
-  fleetFeasibilityStatus: 'UNVERIFIED';
+  fleetFeasibilityStatus: ShuttleFleetFeasibilityStatus;
   automaticDispatch: false;
 };
 
@@ -100,6 +112,7 @@ const LIMITATIONS = [
   'NO_LIVE_SHUTTLE_GPS',
   'NO_LIVE_SHUTTLE_OCCUPANCY',
   'NO_VERIFIED_FLEET_OR_TURNAROUND_FEASIBILITY',
+  'USER_SUPPLIED_FLEET_CONTEXT_IS_NOT_TELEMETRY',
   'COURSE_SCHEDULE_ACTIVITY_IS_NOT_OBSERVED_RIDERSHIP',
   'DIRECTIONAL_VALUES_ARE_SCHEDULE_MOVEMENT_PROXIES_NOT_OBSERVED_OD_TRIPS',
   'NO_AUTOMATIC_TIMETABLE_MUTATION',
@@ -246,6 +259,10 @@ function validRange(value: number | undefined | null, min: number, max: number):
   return value === undefined || value === null || (Number.isFinite(value) && value >= min && value <= max);
 }
 
+function validIntegerRange(value: number | undefined | null, min: number, max: number): boolean {
+  return value === undefined || value === null || (Number.isInteger(value) && Number(value) >= min && Number(value) <= max);
+}
+
 function clockMinutes(value: string): number | null {
   const match = value.trim().match(/^(\d{1,2}):(\d{2})$/);
   if (!match) return null;
@@ -276,6 +293,22 @@ export function recommendShuttleFrequency(input: ShuttleFrequencyInput): Frequen
   }
   if (!validRange(input.eventMultiplier, 1, 3) || !validRange(input.operatorQueuePassengers, 0, 10000)) {
     return withhold(input, generatedAt, ['INVALID_CONTEXT_FACTOR']);
+  }
+
+  const hasFleetContext = input.availableVehicles !== undefined && input.availableVehicles !== null
+    || input.roundTripMinutes !== undefined && input.roundTripMinutes !== null
+    || input.vehicleCapacity !== undefined && input.vehicleCapacity !== null;
+  const hasFleetCore = input.availableVehicles !== undefined && input.availableVehicles !== null
+    && input.roundTripMinutes !== undefined && input.roundTripMinutes !== null;
+  if (hasFleetContext && !hasFleetCore) {
+    return withhold(input, generatedAt, ['INCOMPLETE_FLEET_CONTEXT']);
+  }
+  if (
+    !validIntegerRange(input.availableVehicles, 1, 100)
+    || !validRange(input.roundTripMinutes, 1, 600)
+    || !validIntegerRange(input.vehicleCapacity, 1, 500)
+  ) {
+    return withhold(input, generatedAt, ['INVALID_FLEET_CONTEXT']);
   }
 
   const scope = ROUTE_SCOPE[input.routeId] ?? { campuses: [], coverage: 'NONE' as const };
@@ -322,21 +355,54 @@ export function recommendShuttleFrequency(input: ShuttleFrequencyInput): Frequen
   }
 
   pressureIndex = Math.max(0, Math.min(3, pressureIndex));
-  const headway = HEADWAYS[input.serviceType][pressureIndex];
+  const targetHeadway = HEADWAYS[input.serviceType][pressureIndex];
+  const targetDeparturesPerHour = Number((60 / targetHeadway).toFixed(2));
+
+  let fleetFeasibilityStatus: ShuttleFleetFeasibilityStatus = 'UNVERIFIED';
+  let requiredVehiclesForTarget: number | null = null;
+  let fleetMinimumHeadwayMinutes: number | null = null;
+  let operationalHeadwayMinutes = targetHeadway;
+  let operationalDeparturesPerHour = targetDeparturesPerHour;
+  let hourlySeatCapacityEstimate: number | null = null;
+
+  if (hasFleetCore) {
+    const availableVehicles = Number(input.availableVehicles);
+    const roundTripMinutes = Number(input.roundTripMinutes);
+    requiredVehiclesForTarget = Math.ceil(roundTripMinutes / targetHeadway);
+    fleetMinimumHeadwayMinutes = Math.ceil(roundTripMinutes / availableVehicles);
+    operationalHeadwayMinutes = Math.max(targetHeadway, fleetMinimumHeadwayMinutes);
+    operationalDeparturesPerHour = Number((60 / operationalHeadwayMinutes).toFixed(2));
+    fleetFeasibilityStatus = operationalHeadwayMinutes > targetHeadway
+      ? 'USER_SUPPLIED_CONSTRAINED'
+      : 'USER_SUPPLIED_FEASIBLE';
+
+    reasons.push('USER_SUPPLIED_FLEET_CONTEXT');
+    if (fleetFeasibilityStatus === 'USER_SUPPLIED_CONSTRAINED') reasons.push('FLEET_CONSTRAINS_DEMAND_TARGET');
+    if (input.vehicleCapacity !== undefined && input.vehicleCapacity !== null) {
+      hourlySeatCapacityEstimate = Number((operationalDeparturesPerHour * input.vehicleCapacity).toFixed(1));
+      reasons.push('USER_SUPPLIED_VEHICLE_CAPACITY');
+    }
+    provenance.push({
+      sourceClass: 'USER_SUPPLIED',
+      sourceId: 'operator-fleet-context',
+      note: `${availableVehicles} vehicles; ${roundTripMinutes} min round trip${input.vehicleCapacity ? `; ${input.vehicleCapacity} seats/vehicle` : ''}. Not verified telemetry.`,
+    });
+  }
+
   const publishedHeadway = estimatePublishedHeadwayMinutes(input.officialDepartureTimes, input.hour);
   let comparison: ShuttleFrequencyRecommendation['publishedScheduleComparison'] = 'NO_COMPARABLE_PUBLISHED_HEADWAY';
   if (publishedHeadway !== null) {
-    comparison = headway < publishedHeadway - 1
+    comparison = operationalHeadwayMinutes < publishedHeadway - 1
       ? 'INCREASE_FREQUENCY_CANDIDATE'
-      : headway > publishedHeadway + 1
+      : operationalHeadwayMinutes > publishedHeadway + 1
         ? 'DECREASE_FREQUENCY_CANDIDATE'
         : 'MAINTAIN_OR_REVIEW';
   }
 
   provenance.push({
     sourceClass: 'POLICY_HEURISTIC',
-    sourceId: 'cs1-shuttle-frequency-policy-v2',
-    note: 'Directional values are movement proxies from aggregate class start/end activity. Fleet/driver/turnaround feasibility must be verified before timetable change.',
+    sourceId: 'cs1-shuttle-frequency-policy-v3',
+    note: 'Directional values are movement proxies from aggregate class start/end activity. User-supplied fleet context constrains the advisory headway but does not authorize dispatch.',
   });
 
   return {
@@ -364,11 +430,19 @@ export function recommendShuttleFrequency(input: ShuttleFrequencyInput): Frequen
       pressureBasisSeatsEstimate: directional.pressureBasisSeats,
       scenarioAdjustedPressureBasisSeatsEstimate,
       pressureBand: BANDS[pressureIndex],
-      targetHeadwayMinutes: headway,
-      targetDeparturesPerHour: Number((60 / headway).toFixed(2)),
+      targetHeadwayMinutes: targetHeadway,
+      targetDeparturesPerHour,
+      operationalHeadwayMinutes,
+      operationalDeparturesPerHour,
+      availableVehicles: hasFleetCore ? Number(input.availableVehicles) : null,
+      roundTripMinutes: hasFleetCore ? Number(input.roundTripMinutes) : null,
+      vehicleCapacity: input.vehicleCapacity ?? null,
+      requiredVehiclesForTarget,
+      fleetMinimumHeadwayMinutes,
+      hourlySeatCapacityEstimate,
       currentPublishedHeadwayMinutes: publishedHeadway,
       publishedScheduleComparison: comparison,
-      fleetFeasibilityStatus: 'UNVERIFIED',
+      fleetFeasibilityStatus,
       automaticDispatch: false,
     },
   };

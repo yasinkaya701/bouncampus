@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { CloudRain, Gauge, Loader2, RefreshCw } from 'lucide-react';
+import { BusFront, CloudRain, Gauge, Loader2, RefreshCw } from 'lucide-react';
 import { useLocale } from '@/lib/i18n';
 import { shuttleRoutes } from '@/lib/shuttle-network';
 
@@ -19,9 +19,17 @@ type Recommendation = {
   pressureBand: 'LOW' | 'MODERATE' | 'HIGH' | 'SURGE';
   targetHeadwayMinutes: number;
   targetDeparturesPerHour: number;
+  operationalHeadwayMinutes: number;
+  operationalDeparturesPerHour: number;
+  availableVehicles: number | null;
+  roundTripMinutes: number | null;
+  vehicleCapacity: number | null;
+  requiredVehiclesForTarget: number | null;
+  fleetMinimumHeadwayMinutes: number | null;
+  hourlySeatCapacityEstimate: number | null;
   currentPublishedHeadwayMinutes: number | null;
   publishedScheduleComparison: string;
-  fleetFeasibilityStatus: 'UNVERIFIED';
+  fleetFeasibilityStatus: 'UNVERIFIED' | 'USER_SUPPLIED_FEASIBLE' | 'USER_SUPPLIED_CONSTRAINED';
 };
 
 type FrequencyResponse = {
@@ -57,6 +65,9 @@ export default function ShuttleFrequencyPlanner() {
   const [hour, setHour] = useState(String(initial.hour));
   const [eventMultiplier, setEventMultiplier] = useState('1');
   const [queuePassengers, setQueuePassengers] = useState('');
+  const [availableVehicles, setAvailableVehicles] = useState('');
+  const [roundTripMinutes, setRoundTripMinutes] = useState('');
+  const [vehicleCapacity, setVehicleCapacity] = useState('');
   const [result, setResult] = useState<FrequencyResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +78,9 @@ export default function ShuttleFrequencyPlanner() {
     try {
       const params = new URLSearchParams({ routeId, day, hour, eventMultiplier });
       if (queuePassengers.trim()) params.set('queuePassengers', queuePassengers.trim());
+      if (availableVehicles.trim()) params.set('availableVehicles', availableVehicles.trim());
+      if (roundTripMinutes.trim()) params.set('roundTripMinutes', roundTripMinutes.trim());
+      if (vehicleCapacity.trim()) params.set('vehicleCapacity', vehicleCapacity.trim());
       const response = await fetch(`/api/v1/shuttles/frequency?${params.toString()}`, { cache: 'no-store' });
       const body = await response.json() as FrequencyResponse | { error?: string };
       if (!response.ok) throw new Error('error' in body && body.error ? body.error : 'frequency_plan_failed');
@@ -98,14 +112,19 @@ export default function ShuttleFrequencyPlanner() {
       : rec?.dominantDirection === 'BALANCED'
         ? t('Dengeli', 'Balanced')
         : t('Çözümlenemedi', 'Unresolved');
+  const fleetLabel = rec?.fleetFeasibilityStatus === 'USER_SUPPLIED_CONSTRAINED'
+    ? t('Filo hedefi kısıtlıyor', 'Fleet constrains target')
+    : rec?.fleetFeasibilityStatus === 'USER_SUPPLIED_FEASIBLE'
+      ? t('Filo hedefi karşılıyor', 'Fleet meets target')
+      : t('Filo doğrulanmadı', 'Fleet unverified');
 
   return (
     <section className="rounded-[28px] border border-slate-900/[0.08] bg-white p-5 shadow-[0_16px_45px_rgba(15,23,42,.045)] sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.14em] text-[#173f67]"><Gauge size={12} /> {t('Mekik sıklık planlayıcı', 'Shuttle frequency planner')}</div>
-          <h2 className="mt-2 text-[28px] font-black tracking-[-0.05em] text-slate-950">{t('Ders dalgasını headway önerisine çevir', 'Turn class waves into a headway recommendation')}</h2>
-          <p className="mt-2 max-w-3xl text-[10px] leading-5 text-slate-500">{t('Ders başlangıç/bitiş aktivitesini yönsel hareket proxy’sine çevirir; haricî yağmur verisi, operatör senaryosu ve kuyruk gözlemiyle birlikte değerlendirir. Filo/şoför/tur süresi doğrulanmadan resmî tarifeyi değiştirmez.', 'Transforms class start/end activity into a directional movement proxy, then combines it with external rain data, operator scenarios and aggregate queue observations. It never changes the official timetable without verified fleet, driver and turnaround feasibility.')}</p>
+          <h2 className="mt-2 text-[28px] font-black tracking-[-0.05em] text-slate-950">{t('Ders dalgasını uygulanabilir headway önerisine çevir', 'Turn class waves into an operational headway recommendation')}</h2>
+          <p className="mt-2 max-w-3xl text-[10px] leading-5 text-slate-500">{t('Program baskısı, yağmur, etkinlik ve kuyruk sinyallerinden talep hedefi çıkarır. Araç sayısı ile tur süresi girildiğinde hedefi filo kapasitesine göre sınırlar; bu girdiler operatör senaryosudur, doğrulanmış telemetri değildir.', 'Builds a demand target from schedule pressure, rain, events and queues. When vehicle count and round-trip time are supplied, it constrains the target by fleet feasibility; these are operator scenario inputs, not verified telemetry.')}</p>
         </div>
         <div className="flex items-center gap-2">
           {result?.context.weather.rain === true ? <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[9px] font-black text-sky-800"><CloudRain size={10} /> RAIN</span> : null}
@@ -113,7 +132,7 @@ export default function ShuttleFrequencyPlanner() {
         </div>
       </div>
 
-      <form onSubmit={submit} className="mt-5 grid gap-3 md:grid-cols-6">
+      <form onSubmit={submit} className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-9">
         <Field label={t('Hat', 'Route')} wide>
           <select value={routeId} onChange={e => setRouteId(e.target.value)} className="input-shell">
             {shuttleRoutes.map(route => <option key={route.id} value={route.id}>{locale === 'tr' ? route.nameTr : route.nameEn}</option>)}
@@ -130,38 +149,69 @@ export default function ShuttleFrequencyPlanner() {
         <Field label={t('Etkinlik çarpanı', 'Event multiplier')}>
           <input value={eventMultiplier} onChange={e => setEventMultiplier(e.target.value)} type="number" min="1" max="3" step="0.25" className="input-shell" />
         </Field>
-        <Field label={t('Kuyruk · opsiyonel', 'Queue · optional')}>
+        <Field label={t('Kuyruk · ops.', 'Queue · opt.')}>
           <input value={queuePassengers} onChange={e => setQueuePassengers(e.target.value)} type="number" min="0" max="10000" placeholder="0" className="input-shell" />
+        </Field>
+        <Field label={t('Araç sayısı · ops.', 'Vehicles · opt.')}>
+          <input value={availableVehicles} onChange={e => setAvailableVehicles(e.target.value)} type="number" min="1" max="100" placeholder="4" className="input-shell" />
+        </Field>
+        <Field label={t('Tur süresi dk · ops.', 'Round trip min · opt.')}>
+          <input value={roundTripMinutes} onChange={e => setRoundTripMinutes(e.target.value)} type="number" min="1" max="600" placeholder="30" className="input-shell" />
+        </Field>
+        <Field label={t('Araç kapasitesi · ops.', 'Seats/vehicle · opt.')}>
+          <input value={vehicleCapacity} onChange={e => setVehicleCapacity(e.target.value)} type="number" min="1" max="500" placeholder="40" className="input-shell" />
         </Field>
         <div className="flex items-end">
           <button type="submit" disabled={loading} className="bc-focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-[#071c33] px-4 py-2.5 text-[10px] font-black text-white disabled:opacity-50">{loading ? <Loader2 className="animate-spin" size={13} /> : <RefreshCw size={13} />} {t('Hesapla', 'Compute')}</button>
         </div>
       </form>
+      <p className="mt-2 text-[8px] leading-4 text-slate-400">{t('Filo senaryosu için araç sayısı ve tur süresini birlikte gir. Araç kapasitesi yalnızca koltuk/saat tahmini için opsiyoneldir.', 'For a fleet scenario, provide vehicle count and round-trip time together. Vehicle capacity is optional and only used for seats/hour estimation.')}</p>
 
       {error ? <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 font-mono text-[9px] text-rose-800">{error}</div> : null}
+      {result?.decision.readiness === 'WITHHOLD' ? (
+        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3">
+          <div className="text-[9px] font-black text-rose-900">{t('Öneri durduruldu', 'Recommendation withheld')}</div>
+          <div className="mt-2 flex flex-wrap gap-1.5">{result.decision.reasonCodes.map(code => <span key={code} className="rounded-md border border-rose-200 bg-white px-2 py-1 font-mono text-[8px] font-bold text-rose-700">{code}</span>)}</div>
+        </div>
+      ) : null}
 
       {rec ? (
-        <div className="mt-5 grid gap-3 lg:grid-cols-[.8fr_1.2fr]">
+        <div className="mt-5 grid gap-3 lg:grid-cols-[.82fr_1.18fr]">
           <div className="rounded-2xl bg-[#071c33] p-5 text-white">
-            <div className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">{t('Önerilen sefer aralığı', 'Recommended headway')}</div>
-            <div className="mt-3 flex items-end gap-2"><span className="text-[52px] font-black leading-none tracking-[-0.08em]">{rec.targetHeadwayMinutes}</span><span className="pb-1 text-[11px] font-black text-white/55">{t('dk', 'min')}</span></div>
-            <div className="mt-2 text-[10px] text-white/55">{rec.targetDeparturesPerHour} {t('sefer/saat adayı', 'departures/hour candidate')} · {rec.pressureBand}</div>
-            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.05] p-3">
-              <div className="text-[8px] font-black uppercase tracking-[0.1em] text-white/40">{t('Baskın yön', 'Dominant direction')}</div>
-              <div className="mt-1 text-[16px] font-black">{dominantDirectionLabel}</div>
+            <div className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">{t('Uygulanabilir sefer aralığı', 'Operational headway')}</div>
+            <div className="mt-3 flex items-end gap-2"><span className="text-[52px] font-black leading-none tracking-[-0.08em]">{rec.operationalHeadwayMinutes}</span><span className="pb-1 text-[11px] font-black text-white/55">{t('dk', 'min')}</span></div>
+            <div className="mt-2 text-[10px] text-white/55">{rec.operationalDeparturesPerHour} {t('sefer/saat', 'departures/hour')} · {rec.pressureBand}</div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="rounded-xl border border-white/10 bg-white/[0.05] p-3">
+                <div className="text-[8px] font-black uppercase tracking-[0.1em] text-white/40">{t('Talep hedefi', 'Demand target')}</div>
+                <div className="mt-1 text-[16px] font-black">{rec.targetHeadwayMinutes} {t('dk', 'min')}</div>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.05] p-3">
+                <div className="text-[8px] font-black uppercase tracking-[0.1em] text-white/40">{t('Baskın yön', 'Dominant direction')}</div>
+                <div className="mt-1 text-[14px] font-black">{dominantDirectionLabel}</div>
+              </div>
+            </div>
+            <div className={`mt-2 rounded-xl border p-3 text-[9px] font-black ${rec.fleetFeasibilityStatus === 'USER_SUPPLIED_CONSTRAINED' ? 'border-amber-300/25 bg-amber-300/10 text-amber-100' : 'border-white/10 bg-white/[0.04] text-white/65'}`}>
+              <BusFront className="mr-1.5 inline-block" size={11} /> {fleetLabel}
             </div>
           </div>
           <div className="rounded-2xl border border-slate-900/[0.07] bg-[#f7f9f6] p-4">
             <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
-              <Metric label={t('Program etkisi', 'Schedule seats')} value={String(rec.scheduleAffectedSeatsEstimate)} />
               <Metric label={t('Baskı bazı', 'Pressure basis')} value={String(rec.pressureBasisSeatsEstimate)} />
               <Metric label={t('Güney → Kuzey', 'South → North')} value={rec.southToNorthProxySeatsEstimate === null ? '—' : String(rec.southToNorthProxySeatsEstimate)} />
               <Metric label={t('Kuzey → Güney', 'North → South')} value={rec.northToSouthProxySeatsEstimate === null ? '—' : String(rec.northToSouthProxySeatsEstimate)} />
+              <Metric label={t('Gerekli araç', 'Vehicles needed')} value={rec.requiredVehiclesForTarget === null ? '—' : String(rec.requiredVehiclesForTarget)} />
+              <Metric label={t('Mevcut araç', 'Vehicles available')} value={rec.availableVehicles === null ? '—' : String(rec.availableVehicles)} />
+              <Metric label={t('Koltuk/saat', 'Seats/hour')} value={rec.hourlySeatCapacityEstimate === null ? '—' : String(rec.hourlySeatCapacityEstimate)} />
+              <Metric label={t('Filo min. headway', 'Fleet min headway')} value={rec.fleetMinimumHeadwayMinutes === null ? '—' : `${rec.fleetMinimumHeadwayMinutes}m`} />
+              <Metric label={t('Tur süresi', 'Round trip')} value={rec.roundTripMinutes === null ? '—' : `${rec.roundTripMinutes}m`} />
+              <Metric label={t('Araç kapasitesi', 'Seats/vehicle')} value={rec.vehicleCapacity === null ? '—' : String(rec.vehicleCapacity)} />
+              <Metric label={t('Program etkisi', 'Schedule seats')} value={String(rec.scheduleAffectedSeatsEstimate)} />
               <Metric label={t('Senaryo sonrası', 'Scenario-adjusted')} value={String(rec.scenarioAdjustedPressureBasisSeatsEstimate)} />
               <Metric label={t('Yayınlı headway', 'Published headway')} value={rec.currentPublishedHeadwayMinutes === null ? '—' : `${rec.currentPublishedHeadwayMinutes}m`} />
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">{result?.decision.reasonCodes.map(code => <span key={code} className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono text-[8px] font-bold text-slate-500">{code}</span>)}</div>
-            <p className="mt-3 text-[9px] leading-4 text-slate-500">{t('Yön değerleri gerçek origin-destination yolculukları değil, program başlangıç/bitişlerinden türetilmiş hareket proxy’leridir. Filo uygunluğu UNVERIFIED ve otomatik dispatch kapalıdır.', 'Directional values are not observed origin-destination trips; they are movement proxies derived from class starts/ends. Fleet feasibility is UNVERIFIED and automatic dispatch is disabled.')}</p>
+            <p className="mt-3 text-[9px] leading-4 text-slate-500">{t('Yön değerleri gerçek origin-destination yolculukları değildir. Filo değerleri operatör girdisidir; araç/GPS/turnaround telemetrisi olarak doğrulanmamıştır. Otomatik dispatch kapalıdır.', 'Directional values are not observed origin-destination trips. Fleet values are operator inputs and are not verified vehicle/GPS/turnaround telemetry. Automatic dispatch remains disabled.')}</p>
           </div>
         </div>
       ) : null}
@@ -175,14 +225,14 @@ export default function ShuttleFrequencyPlanner() {
         </div>
       ) : null}
 
-      {result ? <div className="mt-4 border-t border-slate-900/[0.06] pt-3 text-[8px] font-bold text-slate-400">{result.context.courseSnapshot.term} · weather: {result.context.weather.source.provenance} · fleet feasibility: UNVERIFIED · official timetable authoritative</div> : null}
+      {result ? <div className="mt-4 border-t border-slate-900/[0.06] pt-3 text-[8px] font-bold text-slate-400">{result.context.courseSnapshot.term} · weather: {result.context.weather.source.provenance} · fleet: {rec?.fleetFeasibilityStatus ?? 'UNVERIFIED'} · official timetable authoritative</div> : null}
       <style jsx>{` .input-shell { width: 100%; margin-top: .375rem; border-radius: .75rem; border: 1px solid rgb(226 232 240); background: white; padding: .625rem .75rem; font-size: 11px; font-weight: 700; color: rgb(30 41 59); } `}</style>
     </section>
   );
 }
 
 function Field({ label, wide = false, children }: { label: string; wide?: boolean; children: React.ReactNode }) {
-  return <label className={`text-[9px] font-black uppercase tracking-[0.08em] text-slate-500 ${wide ? 'md:col-span-2' : ''}`}>{label}{children}</label>;
+  return <label className={`text-[9px] font-black uppercase tracking-[0.08em] text-slate-500 ${wide ? 'xl:col-span-2' : ''}`}>{label}{children}</label>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
