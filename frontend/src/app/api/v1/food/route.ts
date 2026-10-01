@@ -98,7 +98,7 @@ export async function GET(request: Request) {
       automaticKitchenDispatch: FOOD_DECISION_POLICY.autoDispatchAllowed,
       limitations: FOOD_DECISION_POLICY.limitations,
       withholdRule: 'WITHHOLD when there is no positive demand estimate, a required source is unavailable, the selected method is SANDBOX_ONLY/RETIRED, or a known operational constraint makes the decision unreachable.',
-      pilotRule: 'PILOT_READY requires a PILOT_ELIGIBLE/PILOT_EVALUATED method plus a verified control surface, confirmed operator authority, an open decision window, and confirmed ability to change the decision before freeze. Unknown reachability remains REVIEW_REQUIRED.',
+      pilotRule: 'PILOT_READY additionally requires a method explicitly promoted to PILOT_ELIGIBLE or PILOT_EVALUATED; source coverage alone can never promote a sandbox model. Reachability must also verify the control surface, operator authority, an open decision window, and the ability to change the decision before freeze.',
     },
     baselineEvaluation: {
       status: 'READY_FOR_MEASURED_DATA',
