@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Merge current master and resolve only expected UI overlaps
+      - name: Merge current master and resolve only expected overlaps
         run: |
           set -euo pipefail
           git config user.name 'bouncampus-merge-bot'
@@ -32,15 +32,18 @@ jobs:
           set -e
 
           conflicts="$(git diff --name-only --diff-filter=U | sort)"
-          unexpected="$(printf '%s\n' "$conflicts" | grep -Ev '^(frontend/src/app/food-waste/page.tsx|frontend/src/components/shared/Header.tsx)$' || true)"
+          unexpected="$(printf '%s\n' "$conflicts" | grep -Ev '^(frontend/src/app/food-waste/page.tsx|frontend/src/components/shared/Header.tsx|scripts/agent_fabric_check.py)$' || true)"
           if [ -n "$unexpected" ]; then
             echo 'Unexpected conflicts:'
             printf '%s\n' "$unexpected"
             exit 1
           fi
 
+          # Master owns the latest UX and the newest fabric invariant. Layer CS1
+          # product semantics/navigation onto those current master versions.
           git show origin/master:frontend/src/app/food-waste/page.tsx > frontend/src/app/food-waste/page.tsx
           git show origin/master:frontend/src/components/shared/Header.tsx > frontend/src/components/shared/Header.tsx
+          git show origin/master:scripts/agent_fabric_check.py > scripts/agent_fabric_check.py
 
           python - <<'PY'
           from pathlib import Path
@@ -100,7 +103,7 @@ jobs:
           header_path.write_text(header)
           PY
 
-          git add frontend/src/app/food-waste/page.tsx frontend/src/components/shared/Header.tsx
+          git add frontend/src/app/food-waste/page.tsx frontend/src/components/shared/Header.tsx scripts/agent_fabric_check.py
           git rm .github/workflows/cs1-master-sync.yml
 
           remaining="$(git diff --name-only --diff-filter=U)"
@@ -111,5 +114,5 @@ jobs:
           fi
 
           git diff --cached --check
-          git commit -m 'Merge master into CS1 role integration line' -m 'Preserve the latest master food-waste UX and shared header while retaining CS1 advisory planning-candidate semantics and campus-operations navigation.'
+          git commit -m 'Merge master into CS1 role integration line' -m 'Preserve the latest master food-waste UX, shared header, and fabric invariant while retaining CS1 advisory planning-candidate semantics and campus-operations navigation.'
           git push origin HEAD:agent/cs1/master-sync
