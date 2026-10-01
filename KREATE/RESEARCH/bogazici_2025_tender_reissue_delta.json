@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "research_pack_id": "BOGAZICI_2025_TENDER_REISSUE_DELTA",
+  "status": "SECONDARY_PUBLIC_PROCUREMENT_RESEARCH",
+  "procedures": [
+    {
+      "ikn": "2025/1335958",
+      "state": "CANCELLED",
+      "announcement_date": "2025-09-08",
+      "tender_date": "2025-10-07",
+      "service_period": "2026-01-01/2027-12-31",
+      "cancellation_reason": "document objections required specification changes and EKAP amendment was not possible at that stage",
+      "headline_meal_quantities": {
+        "breakfast_sahur": 380000,
+        "student_meal": 2500000,
+        "staff_meal": 250000
+      },
+      "public_schedule_visible_items": 3,
+      "source_urls": [
+        "https://ekapveri.com/ihale/ekap-2025-1335958/",
+        "https://www.ihaledetay.com/2025-1335958",
+        "https://www.ihaletakip.com.tr/ihale/2026-2027-yili-01-01-2026-31-12-2027-malzeme-dahil-kahvalti-yemek-hazirlama-ve-dagitim-hizmeti-alimi/4173515/cetvel/"
+      ]
+    },
+    {
+      "ikn": "2025/1727143",
+      "state": "SUCCESSFUL_CURRENT",
+      "announcement_date": "2025-10-17",
+      "tender_date": "2025-11-17",
+      "contract_date": "2025-12-25",
+      "service_period": "2026-01-01/2027-12-31",
+      "contractor": "TEMAS_GIDA_SANAYI_VE_TICARET_AS",
+      "contract_value_try": 759537563.59,
+      "headline_meal_quantities": {
+        "breakfast_sahur": 380000,
+        "student_meal": 2500000,
+        "staff_meal": 250000
+      },
+      "public_schedule_visible_items": 15,
+      "identified_meal_rows": 3,
+      "additional_rendered_month_rows": 12,
+      "additional_row_descriptions": "UNRESOLVED_PUBLIC_PARSER_DOES_NOT_RELIABLY_EXPOSE_DESCRIPTIONS",
+      "correction_notice": true,
+      "source_urls": [
+        "https://ekapveri.com/ihale/ekap-2025-1727143/",
+        "https://www.ihaledetay.com/2025-1727143",
+        "https://www.ihaletakip.com.tr/ihale/2026-2027-yili-01-01-2026-31-12-2027-malzeme-dahil-kahvalti-yemek-hazirlama-ve-dagitim-hizmeti-alimi/4374218/"
+      ]
+    }
+  ],
+  "stable_across_public_headline": {
+    "meal_quantities_unchanged": true,
+    "headline_total_meals": 3130000,
+    "campuses": ["North", "South", "Kilyos", "Kandilli", "Hisar", "Anadolu_Hisari"]
+  },
+  "material_public_delta": {
+    "cancelled_visible_schedule_items": 3,
+    "successful_visible_schedule_items": 15,
+    "successful_additional_rows": 12,
+    "safe_interpretation": "final successful procurement has a materially broader public schedule surface even though headline meal volumes stayed the same",
+    "unsafe_interpretations": [
+      "additional rows are labor",
+      "additional rows are management",
+      "additional rows represent 12 employees",
+      "specific row category without final schedule description"
+    ]
+  },
+  "evidence_hierarchy": [
+    "current_signed_contract_or_final_technical_specification",
+    "current_final_administrative_specification_and_bid_schedule",
+    "current_owner_confirmed_control_or_hakedis_records",
+    "current_successful_public_notice_and_result",
+    "cancelled_2025_predecessor_documents",
+    "older_Bogazici_procurements",
+    "other_university_precedents"
+  ],
+  "current_operator_baseline": {
+    "state": "UNKNOWN",
+    "not_publicly_established_as": [
+      "previous_same_weekday",
+      "moving_average",
+      "BUCard_forecast",
+      "reservation_count",
+      "fixed_quantity",
+      "other_explicit_formula"
+    ],
+    "required_evidence": "current operator incident walkthrough"
+  },
+  "artifact_request": [
+    "final_successful_line_item_number",
+    "final_successful_line_item_description",
+    "unit",
+    "planned_quantity",
+    "winning_unit_price",
+    "quantity_or_time_link_classification_after_verification",
+    "one_real_month_hakedis_quantity_per_meal_line",
+    "source_record"
+  ],
+  "forbidden_inferences": [
+    "cancelled_tender_clause_is_current_contract_fact",
+    "additional_month_rows_are_a_specific_cost_category_without_description",
+    "contract_total_divided_by_3_13M_is_verified_meal_unit_cost",
+    "cancellation_was_caused_by_demand_forecasting",
+    "current_quantity_planning_heuristic_is_known"
+  ],
+  "research_stop_rule": "P0-05 current operator baseline requires current operator evidence; do not fill it from cancelled or historical tender documents"
+}
