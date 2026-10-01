@@ -233,7 +233,7 @@ export default function FoodWastePage() {
                   label={advisoryOnly ? t('Planlama adayı', 'Planning candidate') : t('Önerilen', 'Recommended')}
                   value={band ? band.recommendedTarget.toLocaleString(numberLocale) : '—'}
                   unit={t('öğün', 'meals')}
-                  footer={band ? (advisoryOnly ? t('ADVISORY · mutfak emri değil', 'ADVISORY · not a kitchen order') : t('MODEL_ESTIMATE · ölçüm değil', 'MODEL_ESTIMATE · not measured')) : t('Karar bağlamı bekleniyor', 'Waiting for decision context')}
+                  footer={band ? (advisoryOnly ? t('MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL · mutfak emri değil', 'MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL · not a kitchen order') : t('MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL', 'MODEL_ESTIMATE → POLICY_HEURISTIC · NOT_CALIBRATED · PLANNING_RANGE_NOT_CALIBRATED_INTERVAL')) : t('Karar bağlamı bekleniyor', 'Waiting for decision context')}
                 />
                 <MetricCard
                   icon={BarChart3}
