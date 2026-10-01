@@ -43,6 +43,7 @@ def build(benchmark, *, model_version: str | None):
         actual_column="served",
         model_column="model",
         model_version=model_version,
+        model_feature_ids=("schedule", "menu"),
         operator_column=None,
         rolling_window=2,
         seasonal_lag=2,
@@ -65,6 +66,7 @@ def test_complete_manifest_exposes_reproducibility_contract() -> None:
     assert manifest["decision_time_cutoff_rule"].startswith("all features frozen")
     assert manifest["split_definition"] == "PAST_ONLY_COMMON_SUPPORT_SEQUENCE"
     assert manifest["method_versions"]["model"] == "fixture-model-v1"
+    assert manifest["feature_ids_by_method"]["model"] == ["schedule", "menu"]
     assert manifest["eligibility_conclusion"] == "OFFLINE_EVALUATION_ONLY"
 
 
