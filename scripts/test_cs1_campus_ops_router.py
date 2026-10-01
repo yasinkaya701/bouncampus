@@ -91,6 +91,23 @@ def request_payload():
             "low_utilization_threshold": 0.25,
             "medium_utilization_threshold": 0.60,
         },
+        "space_activation": {
+            "occupancy_scenarios": [
+                {"demand": 60, "weight": 0.25},
+                {"demand": 80, "weight": 0.50},
+                {"demand": 100, "weight": 0.25},
+            ],
+            "zones": [
+                {"zone_id": "L1", "capacity": 60, "activation_weight": 2.0},
+                {"zone_id": "L2", "capacity": 50, "activation_weight": 1.0},
+                {"zone_id": "L3", "capacity": 40, "activation_weight": 0.5},
+            ],
+            "idle_capacity_weight": 0.5,
+            "shortage_weight": 4.0,
+            "min_point_service_ratio": 0.9,
+            "zone_inventory_provenance": "OFFICIAL_SNAPSHOT",
+            "occupancy_provenance": "MODEL_ESTIMATE",
+        },
         "shared_capacity": {
             "total_capacity": 10,
             "requests": [
@@ -111,6 +128,7 @@ def test_router_registers_domain_and_combined_endpoints() -> None:
     assert "/api/v1/campus-ops/classrooms/allocate" in paths
     assert "/api/v1/campus-ops/food/plan" in paths
     assert "/api/v1/campus-ops/energy/plan" in paths
+    assert "/api/v1/campus-ops/space-activation/plan" in paths
     assert "/api/v1/campus-ops/shared-capacity/allocate" in paths
     assert "/api/v1/campus-ops/portfolio" in paths
     assert "/api/v1/campus-ops/plan" in paths
@@ -127,6 +145,7 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
         "classroom",
         "food",
         "energy",
+        "space_activation",
         "shared_capacity",
         "portfolio",
     }
@@ -138,12 +157,15 @@ def test_combined_plan_runs_all_domains_with_one_decision_cutoff() -> None:
     assert result["classroom"]["attendance_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["food"]["recommended_production"] == 100
     assert result["energy"]["zones"][0]["recommended_mode"] == "NORMAL_SERVICE_REVIEW"
+    assert result["space_activation"]["selected_zone_ids"] == ["L1", "L3"]
+    assert result["space_activation"]["energy_savings_claim_allowed"] is False
     allocations = {row["request_id"]: row["allocated"] for row in result["shared_capacity"]["allocations"]}
     assert allocations == {"study": 7, "charging": 3}
     assert result["portfolio"]["automatic_execution_allowed"] is False
     assert result["portfolio"]["operator_approval_required"] is True
     assert result["portfolio"]["domain_status"]["food"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["energy"] == "REVIEW_REQUIRED"
+    assert result["portfolio"]["domain_status"]["space_activation"] == "REVIEW_REQUIRED"
     assert result["portfolio"]["domain_status"]["shared_capacity"] == "REVIEW_REQUIRED"
 
 
@@ -154,12 +176,15 @@ def test_unverified_capacity_inputs_fail_closed_through_combined_api() -> None:
     raw["shuttle_routes"][0]["capacity_provenance"] = "MODEL_ESTIMATE"
     raw["room_inventory_provenance"] = "MODEL_ESTIMATE"
     raw["attendance_provenance"] = "MODEL_ESTIMATE"
+    raw["space_activation"]["zone_inventory_provenance"] = "MODEL_ESTIMATE"
     payload = campus_ops.CampusOpsPlanRequest(**raw)
     result = campus_ops.plan_campus_operations(payload)
     assert result["shuttle"]["decision_readiness"] == "WITHHOLD"
     assert result["shuttle"]["routes"] == []
     assert result["classroom"]["decision_readiness"] == "WITHHOLD"
     assert result["classroom"]["assignments"] == []
+    assert result["space_activation"]["decision_readiness"] == "WITHHOLD"
+    assert result["space_activation"]["selected_zone_ids"] == []
 
 
 def test_optional_domains_can_be_omitted_without_fabricated_outputs() -> None:
@@ -168,14 +193,17 @@ def test_optional_domains_can_be_omitted_without_fabricated_outputs() -> None:
     raw = request_payload()
     raw.pop("food")
     raw.pop("energy")
+    raw.pop("space_activation")
     raw.pop("shared_capacity")
     payload = campus_ops.CampusOpsPlanRequest(**raw)
     result = campus_ops.plan_campus_operations(payload)
     assert result["food"] is None
     assert result["energy"] is None
+    assert result["space_activation"] is None
     assert result["shared_capacity"] is None
     assert "food" not in result["portfolio"]["domain_status"]
     assert "energy" not in result["portfolio"]["domain_status"]
+    assert "space_activation" not in result["portfolio"]["domain_status"]
     assert "shared_capacity" not in result["portfolio"]["domain_status"]
 
 
@@ -194,6 +222,7 @@ def test_contract_and_main_preserve_truth_boundary() -> None:
         "classroom",
         "food",
         "energy",
+        "space_activation",
         "shared_capacity",
         "portfolio",
     }
