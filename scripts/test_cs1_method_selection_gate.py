@@ -142,6 +142,47 @@ def test_insufficient_common_support_withholds_selection() -> None:
     assert "INSUFFICIENT_COMMON_SUPPORT" in result["reason_codes"]
 
 
+def test_malformed_baseline_metric_fails_closed() -> None:
+    gate = load_gate()
+    data = comparison()
+    data["metrics"]["baseline"]["mae"] = "not-a-number"
+    result = gate.select_method(
+        data,
+        baseline_id="baseline",
+        method_eligibility={
+            "baseline": "PILOT_ELIGIBLE",
+            "model": "EVALUATED_OFFLINE",
+        },
+        stage="OFFLINE_EVALUATION",
+        primary_metric="mae",
+        min_common_support_n=10,
+        min_relative_improvement_pct=0.0,
+    )
+    assert result["selection_status"] == "WITHHOLD"
+    assert result["selected_method"] is None
+    assert "DESIGNATED_BASELINE_METRIC_UNAVAILABLE" in result["reason_codes"]
+
+
+def test_malformed_candidate_metric_cannot_crash_or_promote() -> None:
+    gate = load_gate()
+    data = comparison()
+    data["metrics"]["model"]["mae"] = "bad"
+    result = gate.select_method(
+        data,
+        baseline_id="baseline",
+        method_eligibility={
+            "baseline": "PILOT_ELIGIBLE",
+            "model": "EVALUATED_OFFLINE",
+        },
+        stage="OFFLINE_EVALUATION",
+        primary_metric="mae",
+        min_common_support_n=10,
+        min_relative_improvement_pct=0.0,
+    )
+    assert result["selected_method"] == "baseline"
+    assert "METRIC_UNAVAILABLE" in result["candidate_assessments"]["model"]["reason_codes"]
+
+
 def test_decision_loss_can_be_registered_as_primary_metric() -> None:
     gate = load_gate()
     result = gate.select_method(
@@ -174,6 +215,8 @@ def main() -> int:
         test_sandbox_candidate_fails_closed_even_if_metric_is_best,
         test_pilot_stage_excludes_offline_only_candidate,
         test_insufficient_common_support_withholds_selection,
+        test_malformed_baseline_metric_fails_closed,
+        test_malformed_candidate_metric_cannot_crash_or_promote,
         test_decision_loss_can_be_registered_as_primary_metric,
     ]
     for test in tests:
