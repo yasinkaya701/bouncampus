@@ -32,6 +32,7 @@ class CampusOperationsApiTests(unittest.TestCase):
         self.assertIn("food", payload["domains"])
         self.assertIn("shuttle", payload["domains"])
         self.assertIn("classroom", payload["domains"])
+        self.assertIn("space", payload["domains"])
 
     def test_shuttle_plan(self):
         response = self.client.post(
@@ -45,6 +46,27 @@ class CampusOperationsApiTests(unittest.TestCase):
         payload = response.json()
         self.assertEqual(payload["domain"], "SHUTTLE")
         self.assertEqual(payload["plan"][0]["recommended_vehicles"], 2)
+
+    def test_space_plan(self):
+        response = self.client.post(
+            "/api/v1/decision/spaces/plan",
+            json={
+                "predicted_demand": 50,
+                "spaces": [
+                    {
+                        "space_id": "LIB-A",
+                        "capacity": 80,
+                        "relative_energy_cost": 5,
+                        "available": True,
+                    }
+                ],
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["domain"], "SPACE")
+        self.assertEqual(payload["active_space_ids"], ["LIB-A"])
+        self.assertFalse(payload["automatic_building_control"])
 
     def test_snapshot_fails_closed(self):
         response = self.client.post(
