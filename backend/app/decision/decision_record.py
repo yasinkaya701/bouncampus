@@ -104,8 +104,11 @@ def validate_decision_record(record: Mapping[str, Any]) -> dict[str, Any]:
         reasons.append("VALID_DECISION_FREEZE_REQUIRED")
     if cutoff is not None and created is not None and cutoff > created:
         reasons.append("INFORMATION_CUTOFF_AFTER_DECISION_CREATED")
-    if created is not None and freeze is not None and created > freeze:
-        reasons.append("DECISION_CREATED_AFTER_FREEZE")
+    if created is not None and freeze is not None:
+        if created > freeze:
+            reasons.append("DECISION_CREATED_AFTER_FREEZE")
+        elif created == freeze:
+            reasons.append("DECISION_CREATED_AT_FREEZE")
 
     snapshots = record.get("input_snapshot_ids")
     if not isinstance(snapshots, Sequence) or isinstance(snapshots, (str, bytes)):
