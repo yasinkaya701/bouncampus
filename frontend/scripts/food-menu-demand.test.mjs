@@ -9,6 +9,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const frontendRoot = resolve(here, '..');
+const repoRoot = resolve(frontendRoot, '..');
 
 const popular = buildMenuDemandAdjustment(
   {
@@ -44,6 +45,14 @@ assert.ok(applyMenuDemandAdjustment(1000, lowerAppeal.factor) < applyMenuDemandA
 assert.ok(popular.matchedItems.includes('Köfte'));
 assert.ok(popular.matchedItems.includes('Mercimek Çorbası'));
 
+const backendCatalog = JSON.parse(
+  readFileSync(resolve(repoRoot, 'backend/app/data/menu_popularity.json'), 'utf8'),
+);
+const frontendCatalog = JSON.parse(
+  readFileSync(resolve(frontendRoot, 'src/data/menu_popularity.json'), 'utf8'),
+);
+assert.deepEqual(frontendCatalog, backendCatalog, 'frontend menu popularity catalog must stay in sync with backend policy data');
+
 const dashboardRoute = readFileSync(resolve(frontendRoot, 'src/app/api/v1/dashboard/route.ts'), 'utf8');
 assert.match(dashboardRoute, /buildMenuDemandAdjustment/);
 assert.match(dashboardRoute, /food_demand_baseline_meals/);
@@ -51,10 +60,12 @@ assert.match(dashboardRoute, /food_menu_adjustment/);
 
 const foodRoute = readFileSync(resolve(frontendRoot, 'src/app/api/v1/food/route.ts'), 'utf8');
 assert.match(foodRoute, /planningCandidate/);
+assert.match(foodRoute, /diagnosticProductionBand/);
+assert.match(foodRoute, /recommendedTarget:\s*sourceAssessment\.predictedMeals/);
 assert.match(foodRoute, /ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER/);
 
 const page = readFileSync(resolve(frontendRoot, 'src/app/food-waste/page.tsx'), 'utf8');
-assert.match(page, /planningCandidate/);
-assert.match(page, /Planlama adayı/);
+assert.match(page, /Operatör başlangıcı/);
+assert.match(page, /decisionReadiness/);
 
 console.log('food menu-demand product wiring tests passed');
