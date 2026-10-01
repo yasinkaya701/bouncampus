@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "research_pack_id": "BOGAZICI_DINING_AGGREGATE_DATA_FEASIBILITY",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "p0_03_state": {
+    "technical_aggregate_export_feasibility": "STRONGLY_PLAUSIBLE_PARTIALLY_ESTABLISHED",
+    "decision_usefulness": "UNKNOWN",
+    "team_access": "NOT_ESTABLISHED"
+  },
+  "public_observability_evidence": [
+    {
+      "id": "DATA-FEAS-01",
+      "source": "BIDB_2025_ACTIVITY_REPORT",
+      "facts": [
+        "BUCard dining real-time report page exists",
+        "package meal counts were added to the real-time dining report",
+        "daily passage reports were updated to include package meal information",
+        "staff meal report received a breakfast field"
+      ]
+    },
+    {
+      "id": "DATA-FEAS-02",
+      "source": "BIDB_2025_ACTIVITY_REPORT",
+      "facts": [
+        "BUCard MOBILE deployed at dining halls and package distribution points",
+        "mobile meal sales readers updated",
+        "QR passage retry behavior improved"
+      ]
+    },
+    {
+      "id": "DATA-FEAS-03",
+      "source": "PERSONNEL_MEAL_PAYROLL_ANNOUNCEMENT",
+      "facts": [
+        "authorized personnel can inspect detailed meal usage via BUCard and BUCampus"
+      ]
+    },
+    {
+      "id": "DATA-FEAS-04",
+      "source": "DINING_FAQ",
+      "facts": [
+        "overcharge troubleshooting asks for date time campus and turnstile",
+        "BUCampus QR can be used for dining turnstile passage"
+      ]
+    },
+    {
+      "id": "DATA-FEAS-05",
+      "source": "BIDB_2024_ACTIVITY_REPORT",
+      "facts": [
+        "central BUCard system covers dining passage",
+        "BUCampus QR passage tracking implemented",
+        "dining turnstiles maintained",
+        "duplicate meal fee corrections handled"
+      ]
+    },
+    {
+      "id": "DATA-FEAS-06",
+      "source": "HISTORICAL_BIDB_REPORT",
+      "facts": [
+        "meal tracking screen referenced",
+        "manual meal passage records referenced",
+        "reporting improvements referenced"
+      ],
+      "usage_boundary": "historical architecture context only"
+    }
+  ],
+  "not_established": [
+    "exact current report schema",
+    "campus granularity",
+    "meal window granularity",
+    "historical retention",
+    "student staff separation quality",
+    "QR and physical card deduplication semantics",
+    "refund reversal semantics",
+    "package sale versus pickup semantics",
+    "availability before production freeze",
+    "pilot export permission",
+    "BUCard report as current contract hakedis source"
+  ],
+  "candidate_service_channels": [
+    "DINING_HALL_TURNSTILE",
+    "PACKAGE_MEAL_SALE_OR_DISTRIBUTION",
+    "QR_PASSAGE",
+    "PHYSICAL_BUCARD_PASSAGE",
+    "STAFF_MEAL_USAGE",
+    "OTHER_OR_MANUAL_FALLBACK"
+  ],
+  "minimum_export_request": [
+    "service_date",
+    "campus_code",
+    "meal_window",
+    "service_channel",
+    "validated_entry_count",
+    "package_count_if_separate",
+    "staff_count_if_separate",
+    "student_count_if_separate",
+    "manual_or_offline_count_if_available",
+    "reversal_or_correction_count_if_available",
+    "source_report_name",
+    "extracted_at"
+  ],
+  "data_dictionary_fields": [
+    "field_name",
+    "business_definition",
+    "source_system",
+    "unit",
+    "aggregation_rule",
+    "included_event_types",
+    "excluded_event_types",
+    "correction_rule",
+    "timezone",
+    "retention_start",
+    "known_missing_periods",
+    "owner"
+  ],
+  "reconciliation_questions": [
+    "does QR retry create duplicate raw events",
+    "are failed or declined passages excluded",
+    "are refunds or reversals represented",
+    "does one successful event equal one meal received",
+    "can a valid user enter without consuming the meal",
+    "can a meal be distributed without a turnstile event",
+    "how are package meals counted",
+    "how are manual or offline passages reconciled"
+  ],
+  "demand_label_hierarchy": [
+    "RAW_PASSAGE_EVENTS",
+    "RECONCILED_VALID_PASSAGES",
+    "VALIDATED_SERVED_COUNT",
+    "OBSERVED_SALES_OR_DISTRIBUTION_COUNT",
+    "CENSORED_DEMAND_LOWER_BOUND_IF_SELLOUT",
+    "TRUE_UNCONSTRAINED_DEMAND_GENERALLY_UNOBSERVED"
+  ],
+  "regime_metadata": [
+    "date_range",
+    "service_point",
+    "service_regime",
+    "reporting_version",
+    "package_channel_active",
+    "BUBizden_active",
+    "price_regime",
+    "reservation_required",
+    "known_system_change"
+  ],
+  "desired_p0_artifact": [
+    "one schema or report walkthrough without personal rows",
+    "one small aggregate sample",
+    "one page data dictionary"
+  ],
+  "falsifiers": [
+    "no reliable aggregate history exists",
+    "campus or meal grain unavailable and cannot be derived internally",
+    "event semantics cannot be reconciled",
+    "turnstile count is not meaningfully related to meals served",
+    "manual fallback measurement is prohibitively burdensome"
+  ],
+  "forbidden_inferences": [
+    "we_have_access_to_BUCard_data",
+    "BUCard_is_clean_actual_demand",
+    "every_turnstile_scan_equals_meal_consumed",
+    "current_model_trains_on_university_transaction_history",
+    "BUCard_is_current_hakedis_source"
+  ],
+  "sources": [
+    "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+    "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/540-bilgi-islem-ve-yayim-daire-baskanligi-20260109-142044.pdf",
+    "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0",
+    "https://yemekhane.bogazici.edu.tr/node/225",
+    "https://bucard.bogazici.edu.tr/tr/pages/bucard-kullanim-alanlari/5942",
+    "https://yemekhane.bogazici.edu.tr/bubizden-uygulamasi",
+    "https://sgdb.bogazici.edu.tr/sites/sgdb.boun.edu.tr/files/sgdbfiles/faaliyet_raporu/2016/2016_B%C4%B0DB_FAAL%C4%B0YET_RAPORU.pdf"
+  ]
+}
