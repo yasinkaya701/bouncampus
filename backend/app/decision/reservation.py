@@ -13,7 +13,10 @@ from typing import Mapping, Sequence
 def _to_optional_non_negative_float(value):
     if value is None:
         return None
-    numeric = float(value)
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
     if not math.isfinite(numeric) or numeric < 0:
         return None
     return numeric
