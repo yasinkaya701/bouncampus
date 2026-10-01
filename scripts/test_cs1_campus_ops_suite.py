@@ -88,6 +88,44 @@ def test_shuttle_withholds_if_even_full_fleet_misses_service_floor() -> None:
     assert "FLEET_CAPACITY_BELOW_REGISTERED_SERVICE_FLOOR" in result["reason_codes"]
 
 
+def test_space_plan_selects_low_loss_zone_bundle() -> None:
+    ops = load_ops()
+    result = ops.optimize_space_plan(
+        occupancy_scenarios=[
+            {"demand": 60, "weight": 0.25},
+            {"demand": 80, "weight": 0.50},
+            {"demand": 100, "weight": 0.25},
+        ],
+        zones=[
+            {"zone_id": "L1", "capacity": 60, "activation_weight": 2.0},
+            {"zone_id": "L2", "capacity": 50, "activation_weight": 1.0},
+            {"zone_id": "L3", "capacity": 40, "activation_weight": 0.5},
+        ],
+        idle_capacity_weight=0.5,
+        shortage_weight=4.0,
+        min_point_service_ratio=0.9,
+    )
+    assert result["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["selected_zone_ids"] == ["L1", "L3"]
+    assert result["selected_capacity"] == 100
+    assert result["automatic_actuation"] is False
+    assert result["energy_savings_claim_allowed"] is False
+
+
+def test_space_plan_withholds_when_full_capacity_cannot_meet_floor() -> None:
+    ops = load_ops()
+    result = ops.optimize_space_plan(
+        occupancy_scenarios=[{"demand": 120, "weight": 1.0}],
+        zones=[{"zone_id": "L1", "capacity": 80, "activation_weight": 1.0}],
+        idle_capacity_weight=1.0,
+        shortage_weight=4.0,
+        min_point_service_ratio=0.9,
+    )
+    assert result["decision_readiness"] == "WITHHOLD"
+    assert result["selected_zone_ids"] == []
+    assert "SPACE_CAPACITY_BELOW_REGISTERED_SERVICE_FLOOR" in result["reason_codes"]
+
+
 def test_class_scheduler_assigns_rooms_and_slots_without_collisions() -> None:
     ops = load_ops()
     result = ops.optimize_class_schedule(
@@ -210,6 +248,8 @@ def main() -> int:
         test_food_withholds_on_unusable_scenarios,
         test_shuttle_selects_capacity_bundle_with_lowest_registered_loss,
         test_shuttle_withholds_if_even_full_fleet_misses_service_floor,
+        test_space_plan_selects_low_loss_zone_bundle,
+        test_space_plan_withholds_when_full_capacity_cannot_meet_floor,
         test_class_scheduler_assigns_rooms_and_slots_without_collisions,
         test_class_scheduler_withholds_if_feature_constraints_are_infeasible,
         test_shared_capacity_respects_minimums_and_priority,
