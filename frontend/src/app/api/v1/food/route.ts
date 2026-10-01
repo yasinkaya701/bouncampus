@@ -14,6 +14,8 @@ import {
 } from '@/lib/food-waste';
 import { applyMethodEligibility } from '@/lib/food-decision-eligibility';
 
+const PLANNING_CANDIDATE_SEMANTICS = 'ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER' as const;
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const dashboardUrl = new URL('/api/v1/dashboard', request.url);
@@ -21,7 +23,9 @@ export async function GET(request: Request) {
   if (dateVal) dashboardUrl.searchParams.set('date_val', dateVal);
 
   let predictedMeals = 0;
+  let baselinePredictedMeals = 0;
   let dashboardAvailable = false;
+  let menuAdjustment: Record<string, unknown> | null = null;
   let signalAvailability: Partial<Record<DemandSignalId, boolean>> = {};
 
   try {
@@ -29,6 +33,10 @@ export async function GET(request: Request) {
     if (response.ok) {
       const dashboard = await response.json();
       predictedMeals = Number(dashboard.food_demand_meals ?? 0);
+      baselinePredictedMeals = Number(dashboard.food_demand_baseline_meals ?? predictedMeals);
+      menuAdjustment = dashboard.food_menu_adjustment && typeof dashboard.food_menu_adjustment === 'object'
+        ? dashboard.food_menu_adjustment
+        : null;
       dashboardAvailable = true;
 
       const sources = Array.isArray(dashboard.sources) ? dashboard.sources : [];
@@ -53,9 +61,24 @@ export async function GET(request: Request) {
     methodEligibility: 'SANDBOX_ONLY',
   });
   const productionBand = decisionAssessment.abstained ? null : decisionAssessment;
+  const planningCandidate = dashboardAvailable && sourceAssessment.predictedMeals > 0
+    ? {
+        portions: sourceAssessment.predictedMeals,
+        baselinePortions: Math.max(0, Math.round(baselinePredictedMeals)),
+        lowerBound: sourceAssessment.lowerBound,
+        upperBound: sourceAssessment.upperBound,
+        signalCoveragePct: sourceAssessment.signalCoveragePct,
+        sourceReadiness: sourceAssessment.decisionReadiness,
+        methodEligibility: decisionAssessment.methodEligibility,
+        menuAdjustment,
+        semantics: PLANNING_CANDIDATE_SEMANTICS,
+        operatorApprovalRequired: true,
+        automaticKitchenDispatch: false,
+      }
+    : null;
 
   return NextResponse.json({
-    contractVersion: 'food-intelligence-v1.1',
+    contractVersion: 'food-intelligence-v1.2',
     baseline: {
       ...FOOD_WASTE_BASELINE,
       currentRecoveryRatePct: Number(CURRENT_RECOVERY_RATE_PCT.toFixed(1)),
@@ -67,11 +90,12 @@ export async function GET(request: Request) {
     demandContext: {
       available: dashboardAvailable && decisionAssessment.predictedMeals > 0,
       actionable: dashboardAvailable && !decisionAssessment.abstained,
+      planningCandidate,
       productionBand,
       decisionAssessment,
       provenance: FOOD_DECISION_POLICY.forecastProvenance,
       methodEligibility: decisionAssessment.methodEligibility,
-      note: 'Schedule/weather/menu/calendar-derived planning context; not cafeteria POS, production, or served-meal telemetry. The current dashboard estimator is SANDBOX_ONLY, so it cannot emit an actionable production target.',
+      note: 'The planningCandidate is a menu-adjusted advisory model estimate and remains visible for diagnosis even when method eligibility withholds an actionable production recommendation. It is not cafeteria POS, production, served-meal telemetry, or an authorized kitchen order.',
     },
     decisionPolicy: {
       version: FOOD_DECISION_POLICY.version,
@@ -119,6 +143,7 @@ export async function GET(request: Request) {
         'official historical food-waste baseline',
         'source health and provenance',
         'sandbox model-estimated next-service demand for diagnostic use',
+        'menu-adjusted advisory planning candidate explicitly marked as non-actionable',
         'POLICY_HEURISTIC planning range for diagnostic use',
         'decision readiness, method eligibility, and abstention state',
         'offline baseline/model evaluation explicitly labeled TECH_TEST',
@@ -143,8 +168,10 @@ export async function GET(request: Request) {
       ],
       modeled: [
         'next-service meal demand',
+        'menu-adjusted advisory planning candidate',
       ],
       policyHeuristic: [
+        'menu popularity adjustment',
         'signal weights',
         'planning range width',
         'decision readiness thresholds',
