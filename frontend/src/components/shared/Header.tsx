@@ -19,6 +19,7 @@ import { useLocale, type Locale } from '@/lib/i18n';
 
 const primaryNav = [
   { href: '/', tr: 'Kontrol merkezi', en: 'Command center', icon: LayoutDashboard },
+  { href: '/campus-ops', tr: 'Operasyon', en: 'Operations', icon: Compass },
   { href: '/food-waste', tr: 'Yemek atığı', en: 'Food waste', icon: Utensils },
   { href: '/decisions', tr: 'Kararlar', en: 'Decisions', icon: CheckSquare2 },
   { href: '/data', tr: 'Kanıt', en: 'Evidence', icon: Database },
