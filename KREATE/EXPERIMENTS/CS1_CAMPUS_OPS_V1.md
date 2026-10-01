@@ -6,20 +6,23 @@ Contract: `campus-ops-v1.0`
 
 ## Purpose
 
-Extend the existing food-focused CS1 decision-intelligence work into a reusable campus-operations core without fabricating live university telemetry or measured impact.
+Build one aggregate, fail-closed campus decision-support core for cafeteria production, shuttle capacity, classroom allocation, building-energy operating modes, and shared resource capacity without fabricating live university telemetry or measured impact.
 
 The v1 flow is:
 
 ```text
-aggregate sources
+aggregate sources + decision cutoff
   -> campus state snapshot
-  -> shuttle capacity plan
+  -> shuttle capacity/headway plan
   -> classroom allocation
+  -> cafeteria production target
+  -> building-energy operating-mode review
+  -> shared-capacity allocation
   -> cross-domain portfolio
   -> human review
 ```
 
-This package is decision support. It does not auto-dispatch shuttles, change classrooms, control buildings, alter cafeteria production, or execute any irreversible university operation.
+This package never auto-dispatches shuttles, changes classrooms, controls BMS/HVAC/lighting, alters cafeteria production, or allocates physical resources without operator approval.
 
 ## Modules
 
@@ -27,81 +30,64 @@ This package is decision support. It does not auto-dispatch shuttles, change cla
 
 `backend/app/decision/campus_state.py`
 
-Inputs:
-- aggregate zone capacity;
-- aggregate occupancy estimate;
-- aggregate scheduled load;
-- aggregate event load;
-- source availability/provenance;
-- source publication time;
-- decision cutoff time.
-
-Hard boundaries:
-- `schedule` and `occupancy_model` are required sources;
-- source information published after the decision cutoff is not accepted;
-- person-level identifiers are rejected;
-- invalid/negative capacity or load values fail closed;
-- occupancy estimates above physical capacity are bounded and surfaced as a review reason.
-
-Current readiness semantics:
-- insufficient required evidence -> `WITHHOLD`;
-- otherwise -> `REVIEW_REQUIRED`;
-- v1 does not promote model-only context to autonomous execution.
+Inputs include aggregate zone capacity/occupancy/scheduled/event load plus source provenance, publication timestamps, and the decision cutoff. `schedule` and `occupancy_model` are required; future information is rejected; person-level identifiers are rejected. Missing required evidence fails closed to `WITHHOLD`; otherwise the pre-pilot state remains `REVIEW_REQUIRED`.
 
 ### 2. Shuttle capacity planner
 
 `backend/app/decision/shuttle_policy.py`
 
-Inputs per route:
-- aggregate forecast demand;
-- vehicle capacity;
-- available vehicles;
-- service window;
-- round-trip duration;
-- min/max planning headway;
-- explicit reserve ratio.
-
-Outputs:
-- required seats;
-- required trips;
-- maximum supported trips;
-- capacity feasibility;
-- estimated unserved seat demand when oversubscribed;
-- planning headway target.
-
-Important: headway is a planning target, not live dispatch. No shuttle GPS integration is claimed.
+Uses aggregate demand, vehicle capacity/count, service-window/round-trip timing, min/max headway, and an explicit reserve ratio. It returns seat/trip requirements, feasibility, estimated shortfall, and a planning headway target. This is not live GPS dispatch.
 
 ### 3. Classroom allocator
 
 `backend/app/decision/classroom_policy.py`
 
-Hard constraints:
-- room capacity;
-- campus match;
-- accessibility requirement;
-- equipment requirement;
-- room time conflicts.
+Hard constraints: campus, capacity, accessibility, equipment, and time collision. Among feasible rooms the transparent v1 heuristic prefers lower spare-seat and declared energy-cost penalties. Infeasible sessions are surfaced rather than force-assigned.
 
-Soft selection objective among feasible rooms:
-- lower spare-seat penalty;
-- lower declared room energy-cost score.
+### 4. Cafeteria production policy
 
-The allocator is intentionally transparent and greedy in v1. It does not claim global optimality. Sessions that cannot be assigned are surfaced for operator review rather than forcing an infeasible assignment.
+`backend/app/decision/food_ops_policy.py`
 
-Outputs also include aggregate building attendance targets so building/energy logic can consume the same classroom decision without student-level traces.
+Uses caller-supplied demand scenarios and registered asymmetric surplus/shortage sensitivity weights to choose an integer production target within max capacity. Only `PILOT_ELIGIBLE` / `PILOT_EVALUATED` method evidence can produce a reviewable target. Sandbox evidence and upstream `WITHHOLD` states fail closed.
 
-### 4. Cross-domain portfolio
+Truth markers:
+- reservation remains `INTENT_SIGNAL_NOT_SERVED_DEMAND`;
+- objective units are `REGISTERED_RELATIVE_SENSITIVITY_UNITS`;
+- weights are not observed TRY/economic costs;
+- no automatic kitchen dispatch is allowed.
+
+### 5. Building-energy policy
+
+`backend/app/decision/building_energy_policy.py`
+
+Consumes aggregate zone capacity/occupancy and caller-registered utilization thresholds. It emits operator-review modes only:
+- `SETBACK_REVIEW`;
+- `PARTIAL_LOAD_REVIEW`;
+- `NORMAL_SERVICE_REVIEW`.
+
+Occupancy above declared capacity fails closed. No live BMS access, calibrated kWh model, or achieved energy/cost/carbon saving is claimed.
+
+### 6. Shared-capacity allocator
+
+`backend/app/decision/shared_capacity_policy.py`
+
+Allocates discrete aggregate capacity across named requests using registered minimums, desired levels, and priority weights. Minimums are satisfied first; remaining units are assigned deterministically by registered priority. If minimums exceed available capacity, the allocator returns `WITHHOLD`. Person-level allocation and automatic actuation are outside scope.
+
+### 7. Cross-domain portfolio
 
 `backend/app/decision/campus_portfolio.py`
 
-The portfolio deliberately avoids inventing a single global sustainability score. It exposes shared decision context:
-- campus demand context for dining;
-- campus occupancy context for energy;
-- shuttle routes with capacity shortfalls;
+The portfolio does not invent a global sustainability score. It exposes one operator-reviewed view containing:
+- campus demand context;
+- cafeteria recommended production when available;
+- building energy review modes;
+- shared-capacity allocations;
+- shuttle capacity-shortfall routes;
 - unassigned classroom sessions;
-- aggregate building attendance targets.
+- building attendance targets;
+- per-domain readiness status.
 
-Existing food and energy decisions can be attached as domain status inputs, but v1 does not rewrite their independent policies.
+A withheld core campus state withholds the entire portfolio. Optional withheld domains produce no fabricated recommendation and remain explicitly marked in `domain_status` / reason codes.
 
 ## FastAPI surface
 
@@ -112,54 +98,44 @@ Endpoints:
 - `POST /api/v1/campus-ops/state`
 - `POST /api/v1/campus-ops/shuttle/plan`
 - `POST /api/v1/campus-ops/classrooms/allocate`
+- `POST /api/v1/campus-ops/food/plan`
+- `POST /api/v1/campus-ops/energy/plan`
+- `POST /api/v1/campus-ops/shared-capacity/allocate`
 - `POST /api/v1/campus-ops/portfolio`
 - `POST /api/v1/campus-ops/plan`
 
-`/plan` executes one decision-cutoff-consistent advisory pass through state -> shuttle -> classroom -> portfolio.
+`/plan` executes one decision-cutoff-consistent advisory pass and returns state, shuttle, classroom, optional food, optional energy, optional shared-capacity, and the combined portfolio.
 
 ## Evidence and truth boundary
 
-This implementation establishes **repository capability**, not university deployment evidence.
+This implementation establishes **repository capability**, not deployment evidence. It does not establish live BMS, Wi-Fi/turnstile occupancy, shuttle GPS, cafeteria POS, registrar integration, achieved savings, or autonomous pilot readiness.
 
-It does **not** establish:
-- access to live BMS data;
-- access to Wi-Fi/turnstile occupancy;
-- access to shuttle GPS;
-- access to cafeteria POS;
-- access to registrar scheduling systems;
-- achieved energy, carbon, water, food-waste, time, or cost savings;
-- pilot readiness for autonomous execution.
-
-Allowed provenance labels remain explicit:
-- `PUBLIC_SOURCE`
-- `MODEL_ESTIMATE`
-- `POLICY_HEURISTIC`
-- `MEASURED_PILOT`
-
-Impact claims remain unmeasured until real pilot evidence exists.
+Allowed provenance labels remain explicit: `PUBLIC_SOURCE`, `MODEL_ESTIMATE`, `POLICY_HEURISTIC`, `MEASURED_PILOT`. Impact claims remain unmeasured until real pilot evidence exists.
 
 ## Privacy boundary
 
-The aggregate CS1 campus-operations contract rejects person-level fields such as student IDs, BUCard IDs, user/person IDs, emails, phone numbers, scholarship status, and national identifiers.
+The aggregate campus-operations contract rejects person-level identifiers including student IDs, BUCard IDs, user/person IDs, emails, phones, scholarship status, and national identifiers. The supported decisions do not require individual movement profiling.
 
-The supported decisions do not require individual movement profiling.
-
-## Focused validation
+## Focused validation commands
 
 ```bash
 python scripts/test_cs1_campus_state.py
 python scripts/test_cs1_shuttle_policy.py
 python scripts/test_cs1_classroom_policy.py
+python scripts/test_cs1_food_ops_policy.py
+python scripts/test_cs1_building_energy_policy.py
+python scripts/test_cs1_shared_capacity_policy.py
 python scripts/test_cs1_campus_portfolio.py
 python scripts/test_cs1_campus_ops_router.py
+python scripts/test_cs1_source_health.py
 python -m compileall -q backend/app scripts
 python scripts/kreate_check.py
 ```
 
-CI remains authoritative before integration.
+These commands are the intended focused validation suite; repository CI remains authoritative before integration.
 
 ## Integration state
 
-The implementation is isolated on `agent/api-product/cs1-campus-ops-core` from `role/cs1-decision-intelligence`.
+The implementation remains isolated on `agent/api-product/cs1-campus-ops-core` from `role/cs1-decision-intelligence`.
 
-At task claim time the CS1 role already had three open feature PRs (#68, #69, #70), which is the repository concurrency limit. Do not open a fourth feature PR until a CS1 slot is freed. The branch may continue to be implemented and audited in the meantime.
+The CS1 role currently has three open feature PR slots occupied by #68, #69, and #83. Do not open a fourth role-targeting PR until a slot is freed. When a slot opens, promote this existing branch rather than creating a duplicate campus-ops branch. Exact-head CI must be green before merge.
