@@ -29,6 +29,7 @@ ACTIONABLE_METHOD_STATES = frozenset({"PILOT_ELIGIBLE", "PILOT_EVALUATED"})
 
 LIMITATIONS = (
     "NO_LIVE_CAFETERIA_POS_CLAIM",
+    "NO_UNVERIFIED_KITCHEN_CAPACITY_CLAIM",
     "RESERVATION_IS_INTENT_NOT_SERVED_DEMAND",
     "REGISTERED_WEIGHTS_NOT_OBSERVED_ECONOMICS",
     "NO_AUTOMATIC_KITCHEN_DISPATCH",
@@ -72,13 +73,14 @@ def _normalize_scenarios(
     return [(demand, weight / total_weight) for demand, weight in rows]
 
 
-def _withhold(reason: str) -> dict[str, Any]:
+def _withhold(reason: str, *, capacity_provenance: str) -> dict[str, Any]:
     return {
         "contract_version": CONTRACT_VERSION,
         "decision_provenance": "POLICY_HEURISTIC",
         "decision_readiness": "WITHHOLD",
         "abstained": True,
         "recommended_production": None,
+        "capacity_provenance": capacity_provenance,
         "operator_approval_required": True,
         "automatic_execution_allowed": False,
         "objective_units": OBJECTIVE_UNITS,
@@ -93,6 +95,7 @@ def plan_food_production(
     *,
     demand_scenarios: Sequence[Mapping[str, Any]],
     max_capacity: Any,
+    capacity_provenance: str = "UNAVAILABLE",
     waste_weight: Any,
     shortage_weight: Any,
     method_eligibility: str,
@@ -103,33 +106,60 @@ def plan_food_production(
     Scenario probabilities/weights and surplus/shortage weights are explicit policy
     inputs. They are not learned economic costs. Reservation-derived scenarios may
     be supplied, but reservation remains an intent signal rather than served demand.
+    Production-capacity-sensitive output requires verified operational provenance.
     """
 
     CONTRACT.validate_no_person_level_data(demand_scenarios, path="demand_scenarios")
+    normalized_capacity_provenance = CONTRACT.normalize_provenance(
+        capacity_provenance, field="capacity_provenance"
+    )
 
     upstream = str(upstream_readiness or "").strip().upper()
     if upstream not in CONTRACT.READINESS_STATES:
-        return _withhold("INVALID_UPSTREAM_READINESS")
+        return _withhold(
+            "INVALID_UPSTREAM_READINESS",
+            capacity_provenance=normalized_capacity_provenance,
+        )
     if upstream == "WITHHOLD":
-        return _withhold("UPSTREAM_CAMPUS_STATE_WITHHELD")
+        return _withhold(
+            "UPSTREAM_CAMPUS_STATE_WITHHELD",
+            capacity_provenance=normalized_capacity_provenance,
+        )
 
     scenarios = _normalize_scenarios(demand_scenarios)
     if scenarios is None:
-        return _withhold("INVALID_OR_UNUSABLE_DEMAND_SCENARIOS")
+        return _withhold(
+            "INVALID_OR_UNUSABLE_DEMAND_SCENARIOS",
+            capacity_provenance=normalized_capacity_provenance,
+        )
 
     capacity = _finite_nonnegative(max_capacity)
     waste = _finite_nonnegative(waste_weight)
     shortage = _finite_nonnegative(shortage_weight)
     if capacity is None or waste is None or shortage is None:
-        return _withhold("INVALID_FOOD_POLICY_INPUTS")
+        return _withhold(
+            "INVALID_FOOD_POLICY_INPUTS",
+            capacity_provenance=normalized_capacity_provenance,
+        )
+    if normalized_capacity_provenance not in CONTRACT.VERIFIED_CAPACITY_PROVENANCE:
+        return _withhold(
+            "UNVERIFIED_FOOD_CAPACITY",
+            capacity_provenance=normalized_capacity_provenance,
+        )
     if waste + shortage <= 0:
-        return _withhold("NON_IDENTIFYING_FOOD_OBJECTIVE")
+        return _withhold(
+            "NON_IDENTIFYING_FOOD_OBJECTIVE",
+            capacity_provenance=normalized_capacity_provenance,
+        )
 
     max_units = int(math.floor(capacity))
 
     eligibility = str(method_eligibility or "").strip().upper()
     if eligibility not in ACTIONABLE_METHOD_STATES:
-        return _withhold("METHOD_NOT_ACTIONABLE")
+        return _withhold(
+            "METHOD_NOT_ACTIONABLE",
+            capacity_provenance=normalized_capacity_provenance,
+        )
 
     def expected_loss(quantity: int) -> float:
         return sum(
@@ -151,6 +181,7 @@ def plan_food_production(
         "abstained": False,
         "recommended_production": target,
         "max_capacity": max_units,
+        "capacity_provenance": normalized_capacity_provenance,
         "scenario_count": len(scenarios),
         "expected_registered_loss": objective,
         "objective_units": OBJECTIVE_UNITS,
