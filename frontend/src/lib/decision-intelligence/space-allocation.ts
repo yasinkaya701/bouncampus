@@ -40,6 +40,7 @@ export type SpaceAllocationRecommendation = {
   durationHours: number;
   occupiedHours: number[];
   capacityStatus: 'NOT_REQUIRED' | 'VERIFIED_SUFFICIENT' | 'UNVERIFIED';
+  capacitySource: 'NOT_REQUIRED' | 'USER_SUPPLIED' | 'UNAVAILABLE';
   verifiedCapacity: number | null;
 };
 
@@ -187,6 +188,7 @@ type RankedRoom = {
   scheduledLoad: number;
   adjacentOccupied: number;
   capacityStatus: 'NOT_REQUIRED' | 'VERIFIED_SUFFICIENT' | 'UNVERIFIED';
+  capacitySource: 'NOT_REQUIRED' | 'USER_SUPPLIED' | 'UNAVAILABLE';
   verifiedCapacity: number | null;
 };
 
@@ -209,16 +211,19 @@ function rankRoom(
   context: SpaceAllocationContext,
 ): RankedRoom | null {
   let capacityStatus: RankedRoom['capacityStatus'] = 'NOT_REQUIRED';
+  let capacitySource: RankedRoom['capacitySource'] = 'NOT_REQUIRED';
   let verifiedCapacity: number | null = null;
 
   if (request.requiredCapacity !== undefined) {
     const suppliedCapacity = context.roomCapacities?.[roomId];
     if (typeof suppliedCapacity === 'number' && Number.isFinite(suppliedCapacity)) {
       verifiedCapacity = suppliedCapacity;
+      capacitySource = 'USER_SUPPLIED';
       if (suppliedCapacity < request.requiredCapacity) return null;
       capacityStatus = 'VERIFIED_SUFFICIENT';
     } else {
       capacityStatus = 'UNVERIFIED';
+      capacitySource = 'UNAVAILABLE';
     }
   }
 
@@ -233,6 +238,7 @@ function rankRoom(
     scheduledLoad: context.scheduleIndex.scheduledLoadByRoomDay.get(key) ?? 0,
     adjacentOccupied,
     capacityStatus,
+    capacitySource,
     verifiedCapacity,
   };
 }
@@ -356,6 +362,7 @@ export function allocateRooms(
         durationHours: request.durationHours,
         occupiedHours: hours,
         capacityStatus: selected.capacityStatus,
+        capacitySource: selected.capacitySource,
         verifiedCapacity: selected.verifiedCapacity,
       },
     });
