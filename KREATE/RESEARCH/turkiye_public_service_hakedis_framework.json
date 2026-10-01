@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "research_pack_id": "TURKIYE_PUBLIC_SERVICE_HAKEDIS_FRAMEWORK",
+  "status": "SECONDARY_LEGAL_PROCUREMENT_RESEARCH_NOT_LEGAL_ADVICE",
+  "general_framework": {
+    "unit_price_payment_chain": [
+      "service_performed",
+      "control_records_or_contract_evidence",
+      "performed_quantity_established",
+      "performed_quantity_multiplied_by_offered_unit_price",
+      "progress_payment_report",
+      "contract_deductions_penalties_payment"
+    ],
+    "progress_payment_frequency_default": "generally monthly unless contract or annexes provide otherwise",
+    "quantity_establishment": "control organization together with contractor or representative calculates performed work quantities under the contract",
+    "continuous_service_records": "period records may be used in progress payments and acceptance"
+  },
+  "bogazici_unresolved_core": {
+    "question": "which dining event or record is contractually recognized as performed quantity for each current meal line item",
+    "candidate_quantities_not_facts": [
+      "requested_or_called_off_meals",
+      "produced_meals",
+      "delivered_meals",
+      "validated_turnstile_or_QR_meals",
+      "served_or_eaten_meals",
+      "control_organization_accepted_meals",
+      "another_specification_defined_quantity"
+    ]
+  },
+  "current_artifact_request": [
+    {
+      "artifact_id": "A",
+      "name": "current_payment_clause",
+      "resolves": ["payment_frequency", "quantity_calculation_basis", "certifier_role"]
+    },
+    {
+      "artifact_id": "B",
+      "name": "current_meal_count_acceptance_clause",
+      "resolves": ["payable_student_meal", "payable_breakfast_sahur", "payable_staff_meal"]
+    },
+    {
+      "artifact_id": "C",
+      "name": "one_redacted_hakedis_quantity_page",
+      "resolves": ["actual_quantity_column", "line_item_mapping", "monthly_source_record"]
+    },
+    {
+      "artifact_id": "D",
+      "name": "one_service_control_record",
+      "resolves": ["operations_to_accepted_quantity_bridge", "signoff_roles", "source_system"]
+    },
+    {
+      "artifact_id": "E",
+      "name": "penalty_deduction_excerpt",
+      "resolves": ["shortage_penalty", "late_service", "wrong_menu_or_substitution", "quality_failure"]
+    },
+    {
+      "artifact_id": "F",
+      "name": "winning_unit_price_line_item_schedule",
+      "resolves": ["current_verified_line_item_unit_prices", "fixed_or_time_based_items"]
+    }
+  ],
+  "p0_questions": [
+    "for last month's progress payment what exact number was multiplied by the student meal unit price",
+    "which operational source produced that number",
+    "who certified or signed it",
+    "if 1000 meals were planned and 950 served what quantity enters progress payment",
+    "if 1000 were planned and 1050 needed how are the extra 50 handled",
+    "which one document can verify the answer for a real month"
+  ],
+  "economic_archetypes_hypotheses_only": [
+    {
+      "id": "A",
+      "name": "actual_validated_consumption_payment",
+      "shape": "Q_HAKEDIS approximately validated served count"
+    },
+    {
+      "id": "B",
+      "name": "requested_or_accepted_quantity_payment",
+      "shape": "Q_HAKEDIS approximately university call-off or accepted delivered quantity"
+    },
+    {
+      "id": "C",
+      "name": "mixed_contract_economics",
+      "shape": "meal quantity line items plus fixed/monthly line items plus price adjustment minus penalties"
+    },
+    {
+      "id": "D",
+      "name": "minimum_or_fixed_commitments",
+      "shape": "operational reduction may not reduce university payment within commitment band"
+    }
+  ],
+  "economic_verification_fields": [
+    "service_id",
+    "contract_line_item_id",
+    "contract_line_item_class",
+    "q_operator_plan",
+    "q_final_approved",
+    "q_produced",
+    "q_delivered",
+    "q_validated_served",
+    "q_hakedis",
+    "q_hakedis_source_record",
+    "q_hakedis_certifier_role",
+    "shortage_event",
+    "penalty_event",
+    "deduction_event",
+    "unit_price_verification_status",
+    "settlement_rule_version"
+  ],
+  "forbidden_inferences": [
+    "bogazici_pays_temas_for_every_turnstile_scan",
+    "temas_is_paid_only_for_meals_eaten",
+    "bogazici_pays_for_production_quantity",
+    "every_avoided_meal_reduces_university_spend_by_meal_unit_price",
+    "current_hakedis_is_definitely_BUCard_derived"
+  ],
+  "p0_02_split": [
+    "P0-02A what is Q_HAKEDIS for each meal line item",
+    "P0-02B which record or source system establishes Q_HAKEDIS",
+    "P0-02C who certifies it and what penalties or deductions alter payment"
+  ],
+  "research_stop_rule": "do not collect more generic public-procurement commentary; next useful evidence must be a current Bogazici clause, current redacted progress-payment/control record, current owner confirmation, or current winning unit-price schedule",
+  "sources": [
+    "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=d591bdf81890b2a85b173153899f9675a7fc653f7fbe53b784e5703dfd1053c7",
+    "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=bfd148ff026799d21824d969497d951abff3c09a0c82c7a6866b3ee94506a6d8&KararMetni=92365fd3e7c8668776184277665d7fbb487eda0e362b33c7217090b1c1871c92",
+    "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=2af3873758eef6e870b62ce95f2917c2e0371df26152abee0897c360ebf68e71",
+    "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=96777df753c767a2638740f44e945daad76eb31ac4c79551c41613d75fcf3935",
+    "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=25e0f77d116e7ee1dfd8897439f6c47079fbaeab24029f9dad7f8ddd6fa8a9a1&KararMetni=c7f1972c513ff324a59060cadbbf750e71f51531e512fc3c4671a494b2553589",
+    "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=a583bffcd454759389079584b79d72e1187522bb006e2cfdf8b8c56a45a76849&KararMetni=a764237d8d5b30dffbaa85925b7422af6b4bef5d4846dcf3945cf3a0ecb89a94"
+  ]
+}
