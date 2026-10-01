@@ -1,0 +1,5 @@
+effective_from,student_breakfast_try,student_lunch_try,student_dinner_try,announcement_date,source_url,truth_class
+2025-02-01,30,40,40,2025-01-30,https://yemekhane.bogazici.edu.tr/ogrenci-yemek-ucretlerinin-guncellenmesi,OFFICIAL_PUBLIC
+2025-09-05,40,50,50,2025-09-02,https://yemekhane.bogazici.edu.tr/ogrenci-yemek-ucretlerinin-guncellenmesi-0,OFFICIAL_PUBLIC
+2026-02-01,50,60,60,2026-01-28,https://yemekhane.bogazici.edu.tr/ogrenci-yemek-ucretlerinin-guncellenmesi-1,OFFICIAL_PUBLIC
+2026-07-01,65,75,75,2026-06-30,https://yemekhane.bogazici.edu.tr/ogrenci-yemek-ucretlerinin-guncellenmesi-2,OFFICIAL_PUBLIC
