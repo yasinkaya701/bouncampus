@@ -92,6 +92,7 @@ def build_campus_state(
 
     normalized_zones: list[dict[str, Any]] = []
     seen: set[str] = set()
+    zone_integrity_ok = True
     for raw in zones:
         if not isinstance(raw, Mapping):
             raise ValueError("zones must contain mappings")
@@ -113,9 +114,10 @@ def build_campus_state(
         ):
             raise ValueError("invalid aggregate zone input")
         seen.add(zone_id)
-        bounded_occupancy = min(occupancy, capacity)
         if occupancy > capacity:
+            zone_integrity_ok = False
             reasons.append(f"OCCUPANCY_ESTIMATE_EXCEEDS_CAPACITY_{zone_id.upper()}")
+        bounded_occupancy = min(occupancy, capacity)
         normalized_zones.append(
             {
                 "zone_id": zone_id,
@@ -130,12 +132,17 @@ def build_campus_state(
 
     if not normalized_zones:
         reasons.append("NO_CAMPUS_ZONES")
+        zone_integrity_ok = False
 
     required_ok = all(
         source_status.get(source, {}).get("accepted_at_decision_time", False)
         for source in REQUIRED_SOURCES
     )
-    readiness = "REVIEW_REQUIRED" if required_ok and normalized_zones else "WITHHOLD"
+    readiness = (
+        "REVIEW_REQUIRED"
+        if required_ok and normalized_zones and zone_integrity_ok
+        else "WITHHOLD"
+    )
     envelope = decision_envelope(
         readiness=readiness,
         reason_codes=reasons or ["PRE_PILOT_OPERATOR_REVIEW_REQUIRED"],
