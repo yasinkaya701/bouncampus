@@ -6,10 +6,28 @@ from typing import Any
 CONTRACT_VERSION = "campus-ops-v1.0"
 READINESS_STATES = ("PILOT_READY", "REVIEW_REQUIRED", "WITHHOLD")
 PROVENANCE_STATES = (
-    "PUBLIC_SOURCE",
+    "OFFICIAL_PUBLIC",
+    "OFFICIAL_LIVE",
+    "OFFICIAL_SNAPSHOT",
+    "EXTERNAL_LIVE",
     "MODEL_ESTIMATE",
+    "OPERATOR_MEASUREMENT",
     "POLICY_HEURISTIC",
-    "MEASURED_PILOT",
+    "SCENARIO",
+    "GENERATED_SANDBOX",
+    "UNAVAILABLE",
+)
+PROVENANCE_ALIASES = {
+    "PUBLIC_SOURCE": "OFFICIAL_PUBLIC",
+    "MEASURED_PILOT": "OPERATOR_MEASUREMENT",
+}
+VERIFIED_CAPACITY_PROVENANCE = frozenset(
+    {
+        "OFFICIAL_PUBLIC",
+        "OFFICIAL_LIVE",
+        "OFFICIAL_SNAPSHOT",
+        "OPERATOR_MEASUREMENT",
+    }
 )
 
 FORBIDDEN_PERSON_LEVEL_KEYS = {
@@ -27,6 +45,10 @@ FORBIDDEN_PERSON_LEVEL_KEYS = {
     "scholarship_status",
     "national_id",
     "tc_kimlik",
+    "device_id",
+    "deviceid",
+    "wifi_client_id",
+    "wifi_clientid",
 }
 
 TRUTH_BOUNDARY_LIMITATIONS = (
@@ -39,17 +61,29 @@ TRUTH_BOUNDARY_LIMITATIONS = (
 )
 
 
-def validate_no_person_level_data(value: Any, *, path: str = "root") -> None:
-    """Reject person-level identifiers anywhere in an aggregate CS1 payload.
+def normalize_provenance(value: Any, *, field: str = "provenance") -> str:
+    """Return the canonical provenance label, accepting only documented aliases."""
 
-    CS1 campus operations is intentionally an aggregate decision-support surface.
-    Individual student traces are not required for the supported decisions and are
-    therefore rejected instead of silently accepted.
-    """
+    candidate = str(value or "").strip().upper()
+    candidate = PROVENANCE_ALIASES.get(candidate, candidate)
+    if candidate not in PROVENANCE_STATES:
+        raise ValueError(f"unsupported {field}: {value}")
+    return candidate
+
+
+def is_verified_capacity_provenance(value: Any) -> bool:
+    try:
+        return normalize_provenance(value) in VERIFIED_CAPACITY_PROVENANCE
+    except ValueError:
+        return False
+
+
+def validate_no_person_level_data(value: Any, *, path: str = "root") -> None:
+    """Reject person-level identifiers anywhere in an aggregate CS1 payload."""
 
     if isinstance(value, Mapping):
         for key, child in value.items():
-            normalized = str(key).strip().lower().replace("-", "_")
+            normalized = str(key).strip().lower().replace("-", "_").replace(" ", "_")
             if normalized in FORBIDDEN_PERSON_LEVEL_KEYS:
                 raise ValueError(
                     f"person-level data is not accepted by campus operations: {path}.{key}"
@@ -72,11 +106,9 @@ def build_decision_envelope(
     provenance: str = "POLICY_HEURISTIC",
 ) -> dict[str, Any]:
     readiness_value = str(readiness).upper()
-    provenance_value = str(provenance).upper()
     if readiness_value not in READINESS_STATES:
         raise ValueError(f"unsupported readiness: {readiness}")
-    if provenance_value not in PROVENANCE_STATES:
-        raise ValueError(f"unsupported provenance: {provenance}")
+    provenance_value = normalize_provenance(provenance)
 
     abstained = readiness_value == "WITHHOLD"
     return {
