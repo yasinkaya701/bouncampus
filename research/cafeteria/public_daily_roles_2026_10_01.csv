@@ -1,0 +1,26 @@
+service_date,service_type,official_role,raw_name,source_url,truth_class
+2026-10-01,OGLE,SOUP,Kremalı Domates Çorba,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,MAIN_ANIMAL,Etli Patlıcan kebabı,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,VEGETARIAN_VEGAN,Patlıcan Tava,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,SIDE,Pirinç Pilavı,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,SIDE,Bulgur Pilavı,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,SELECTABLE,Cacık,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,SELECTABLE,Kola,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,OGLE,SELECTABLE,Sarı Burma,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,SOUP,Tarhana Çorba,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,MAIN_ANIMAL,Balkan Köfte,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,VEGETARIAN_VEGAN,Vegan Misket Köfte,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,SIDE,Mısırlı Pirinç Pilavı,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,SIDE,Kekik Soslu Makarna,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,SELECTABLE,Portakallı Gazoz,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,SELECTABLE,Meyve,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,AKSAM,SELECTABLE,Mor Lahana Salatası,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_OGLE,MAIN_ANIMAL,Hamburger,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_OGLE,SIDE,Portakallı Gazoz,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_OGLE,SIDE,Meyveli Yoğurt,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_OGLE,SELECTABLE,Grissini,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_AKSAM,MAIN_ANIMAL,Körili Tavuk,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_AKSAM,SIDE,Mısırlı Pirinç Pilavı,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_AKSAM,SIDE,Ayran,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_AKSAM,SELECTABLE,Magnolia Karamel,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
+2026-10-01,PAKET_AKSAM,SELECTABLE,Meyve,https://yemekhane.bogazici.edu.tr/,OFFICIAL_PUBLIC
