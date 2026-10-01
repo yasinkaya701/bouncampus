@@ -10,6 +10,7 @@ from app.decision.campus_operations import (
     plan_food_service,
     plan_shuttle_service,
 )
+from app.decision.space_operations import plan_space_service
 
 router = APIRouter(prefix="/api/v1/decision", tags=["decision-operations"])
 
@@ -34,6 +35,11 @@ def get_decision_capabilities() -> dict[str, Any]:
                 "decision": "capacity/conflict/energy-aware room assignment",
                 "hard_boundary": "no automatic timetable commit",
             },
+            "space": {
+                "endpoint": "POST /api/v1/decision/spaces/plan",
+                "decision": "capacity-safe flexible-space consolidation",
+                "hard_boundary": "no automatic building/HVAC control",
+            },
             "snapshot": {
                 "endpoint": "POST /api/v1/decision/snapshot",
                 "decision": "fail-closed cross-domain readiness view",
@@ -57,6 +63,11 @@ def post_shuttle_plan(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
 @router.post("/classrooms/allocate")
 def post_classroom_allocation(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return allocate_classrooms(payload)
+
+
+@router.post("/spaces/plan")
+def post_space_plan(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return plan_space_service(payload)
 
 
 @router.post("/snapshot")
