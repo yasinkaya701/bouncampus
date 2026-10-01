@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-10-01",
+  "research_pack_id": "BOGAZICI_CURRENT_CONTROL_HAKEDIS_DATA_BRIDGE",
+  "status": "SECONDARY_PUBLIC_SOURCE_RESEARCH",
+  "claim_boundary": [
+    "not_current_meal_payment_formula",
+    "not_legal_advice",
+    "not_proof_BUCard_equals_hakedis_quantity"
+  ],
+  "current_role_chain": [
+    "BUCard_BID_digital_reports",
+    "Food_Services_and_Yemek_Hizmeti_Yurutme_Kurulu",
+    "period_contract_control_records",
+    "Yemekhane_Yemek_Pisirme_Yemek_Dagitim_Kontrol_Teskilati",
+    "Muayene_Kabul_and_hakedis_process",
+    "payment_order_and_accrual"
+  ],
+  "strong_current_public_facts": [
+    "Yemek Hizmeti Yurutme Kurulu participates with Muayene Kabul Komisyonu in food-service hakedis payment/accrual workflow",
+    "BUCard Office has formal reporting duties to food-service governance and stores digital data",
+    "dining turnstile and BUCampus QR infrastructure exists",
+    "BIDB publicly reports BUCard dining real-time and daily passage reports",
+    "a catering-specific current Control Organisation is appointed",
+    "continuous food services are accepted using records maintained by the Control Organisation during service",
+    "KIK56_0_H is an acceptance proposal/readiness form and does not contain a standard meal quantity table"
+  ],
+  "record_classes": [
+    {
+      "id": "A",
+      "name": "source_system_operational_digital_event",
+      "candidate_owner": "BUCard_BID",
+      "examples": ["BUCard_passage", "BUCampus_QR_passage", "package_event", "manual_fallback"],
+      "purpose": ["observed_service_activity", "reporting", "candidate_demand_label"]
+    },
+    {
+      "id": "B",
+      "name": "contract_control_period_record",
+      "candidate_owner": "Control_Organisation_Food_Services",
+      "examples_to_request_not_assume": ["daily_weekly_monthly_control_record", "meal_count_reconciliation", "service_deviation_record", "contractor_control_signoff"],
+      "purpose": ["accepted_operational_truth", "compliance_exception_evidence", "bridge_to_hakedis"]
+    },
+    {
+      "id": "C",
+      "name": "formal_acceptance_payment_artifact",
+      "candidate_owner": "YHYK_Muayene_Kabul_payment_chain",
+      "examples": ["KIK56_0_H", "Kabul_Tutanagi", "hakedis_report", "payment_order_accrual"],
+      "purpose": ["formal_acceptance", "formal_payment_workflow"]
+    }
+  ],
+  "kik56_correction": {
+    "is_meal_quantity_ledger": false,
+    "standard_fields": [
+      "work_name",
+      "contractor",
+      "contract_date",
+      "contract_value",
+      "contract_duration",
+      "completion_dates",
+      "acceptance_readiness",
+      "signatures_titles"
+    ],
+    "research_implication": "request period control record or hakedis attachment for Q_HAKEDIS rather than treating KIK56_0_H as monthly meal count source"
+  },
+  "truth_graph_unknowns": [
+    "does_BUCard_reconciled_count_feed_control_record",
+    "what_is_Q_CONTROL_ACCEPTED",
+    "is_Q_CONTROL_ACCEPTED_equal_to_Q_HAKEDIS",
+    "how_package_turnstile_manual_counts_reconcile",
+    "what_are_current_line_item_unit_prices",
+    "how_excess_shortage_economic_risk_is_allocated"
+  ],
+  "minimum_same_period_artifacts": [
+    {
+      "artifact": "BUCard_dining_aggregate_or_report_extract",
+      "purpose": "identify_digital_observed_service_count"
+    },
+    {
+      "artifact": "one_period_control_record",
+      "purpose": "identify_accepted_operational_truth"
+    },
+    {
+      "artifact": "one_hakedis_quantity_page_or_attachment",
+      "purpose": "identify_Q_HAKEDIS"
+    },
+    {
+      "artifact": "payment_acceptance_signoff_page",
+      "purpose": "identify_certification_and_approval_roles"
+    }
+  ],
+  "same_period_reconciliation": [
+    "Q_BUCARD",
+    "Q_CONTROL",
+    "Q_HAKEDIS"
+  ],
+  "exact_owner_questions": [
+    "what is the name of the period record the Control Organisation keeps for catering",
+    "which meal counts appear in it",
+    "does the Control Organisation receive a BUCard dining report and how is it reconciled",
+    "which quantity from the period record is copied into the current TEMAS hakedis meal line",
+    "who signs the period record and who approves the hakedis payment order",
+    "can one redacted month show BUCard report control record and hakedis side by side"
+  ],
+  "canonical_quantity_fields": [
+    "Q_DIGITAL_EVENTS_RAW",
+    "Q_DIGITAL_EVENTS_RECONCILED",
+    "Q_OPERATOR_PLAN",
+    "Q_PRODUCED",
+    "Q_DELIVERED",
+    "Q_SERVE_OBSERVED",
+    "Q_CONTROL_ACCEPTED",
+    "Q_HAKEDIS"
+  ],
+  "provenance_fields": [
+    "SOURCE_RECORD_ID",
+    "SOURCE_SYSTEM",
+    "RECONCILIATION_RULE_VERSION",
+    "CONTROL_SIGNOFF_ROLE",
+    "HAKEDIS_CERTIFIER_ROLE",
+    "EXCEPTION_CODE"
+  ],
+  "forbidden_inferences": [
+    "BUCard_is_current_hakedis_source",
+    "every_QR_or_turnstile_entry_is_paid_to_TEMAS",
+    "KIK56_0_H_contains_monthly_meal_quantities",
+    "Control_Organisation_decides_daily_production_quantity",
+    "digital_accepted_and_paid_counts_are_identical"
+  ],
+  "sources": [
+    "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf",
+    "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+    "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/564-genel-sekreterlik-20260112-095525.pdf",
+    "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0",
+    "https://www.lexpera.com.tr/mevzuat/yonetmelikler/yr801y2002n24968p4/2",
+    "https://arsiv.kikkararlari.com/index.php?Itemid=9&id=59818&option=com_content&task=view",
+    "https://www.hakedis.org/wp-content/uploads/2016/10/hizmet_muayene-kabul.pdf"
+  ]
+}
