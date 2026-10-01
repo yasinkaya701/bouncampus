@@ -27,6 +27,8 @@ CONTRACT_VERSION = CONTRACT.CONTRACT_VERSION
 
 LIMITATIONS = (
     "NO_LIVE_SHUTTLE_GPS_CLAIM",
+    "NO_LIVE_SHUTTLE_OCCUPANCY_CLAIM",
+    "NO_UNVERIFIED_VEHICLE_CAPACITY_CLAIM",
     "NO_PASSENGER_LEVEL_TRACKING",
     "POLICY_HEURISTIC_CAPACITY_PLAN",
     "UNMEASURED_IMPACT_NO_SAVINGS_CLAIM",
@@ -34,6 +36,8 @@ LIMITATIONS = (
 
 
 def _finite(value: Any, *, field: str, minimum: float | None = None) -> float:
+    if isinstance(value, bool):
+        raise ValueError(f"{field} must be numeric")
     try:
         numeric = float(value)
     except (TypeError, ValueError) as exc:
@@ -52,6 +56,20 @@ def _positive(value: Any, *, field: str) -> float:
     return numeric
 
 
+def _withhold(reason_code: str) -> dict[str, Any]:
+    return {
+        "contract_version": CONTRACT_VERSION,
+        "decision_provenance": "POLICY_HEURISTIC",
+        "decision_readiness": "WITHHOLD",
+        "abstained": True,
+        "operator_approval_required": True,
+        "automatic_execution_allowed": False,
+        "routes": [],
+        "reason_codes": [reason_code],
+        "limitations": list(LIMITATIONS),
+    }
+
+
 def _normalize_route(route: Mapping[str, Any], reserve_ratio: float) -> dict[str, Any]:
     route_id = str(route.get("route_id", "")).strip()
     origin = str(route.get("origin", "")).strip().lower()
@@ -60,6 +78,13 @@ def _normalize_route(route: Mapping[str, Any], reserve_ratio: float) -> dict[str
         raise ValueError("route_id is required")
     if not origin or not destination or origin == destination:
         raise ValueError(f"route {route_id} must have distinct origin/destination")
+
+    capacity_provenance = CONTRACT.normalize_provenance(
+        route.get("capacity_provenance", "UNAVAILABLE"),
+        field=f"route {route_id} capacity_provenance",
+    )
+    if capacity_provenance not in CONTRACT.VERIFIED_CAPACITY_PROVENANCE:
+        raise ValueError(f"route {route_id} capacity provenance is not verified")
 
     demand = _finite(
         route.get("forecast_demand"), field=f"route {route_id} forecast_demand", minimum=0.0
@@ -120,6 +145,8 @@ def _normalize_route(route: Mapping[str, Any], reserve_ratio: float) -> dict[str
         "required_seats": required_seats,
         "vehicle_capacity": int(round(vehicle_capacity)),
         "available_vehicles": available_vehicles,
+        "capacity_provenance": capacity_provenance,
+        "capacity_verified": True,
         "trips_required": trips_required,
         "max_supported_trips": max_supported_trips,
         "capacity_feasible": feasible,
@@ -135,11 +162,11 @@ def plan_shuttle_capacity(
     reserve_ratio: float = 0.10,
     upstream_readiness: str = "REVIEW_REQUIRED",
 ) -> dict[str, Any]:
-    """Build an aggregate shuttle capacity/headway plan.
+    """Build an aggregate, human-reviewed shuttle capacity/headway plan.
 
-    This is a planning recommendation, not a live dispatch controller. Demand is
-    aggregate and may come from campus-state forecasts; no passenger trace or GPS
-    feed is required or implied.
+    Capacity-sensitive output is emitted only when the supplied vehicle capacity
+    snapshot has verified provenance. This function never implies live GPS,
+    passenger occupancy, or autonomous dispatch.
     """
 
     CONTRACT.validate_no_person_level_data(routes, path="routes")
@@ -152,30 +179,17 @@ def plan_shuttle_capacity(
         raise ValueError(f"unsupported upstream_readiness: {upstream_readiness}")
 
     if normalized_upstream == "WITHHOLD":
-        return {
-            "contract_version": CONTRACT_VERSION,
-            "decision_provenance": "POLICY_HEURISTIC",
-            "decision_readiness": "WITHHOLD",
-            "abstained": True,
-            "operator_approval_required": True,
-            "automatic_execution_allowed": False,
-            "routes": [],
-            "reason_codes": ["UPSTREAM_CAMPUS_STATE_WITHHELD"],
-            "limitations": list(LIMITATIONS),
-        }
-
+        return _withhold("UPSTREAM_CAMPUS_STATE_WITHHELD")
     if not routes:
-        return {
-            "contract_version": CONTRACT_VERSION,
-            "decision_provenance": "POLICY_HEURISTIC",
-            "decision_readiness": "WITHHOLD",
-            "abstained": True,
-            "operator_approval_required": True,
-            "automatic_execution_allowed": False,
-            "routes": [],
-            "reason_codes": ["NO_SHUTTLE_ROUTES_SUPPLIED"],
-            "limitations": list(LIMITATIONS),
-        }
+        return _withhold("NO_SHUTTLE_ROUTES_SUPPLIED")
+
+    for raw_route in routes:
+        if not isinstance(raw_route, Mapping):
+            raise ValueError("each shuttle route must be a mapping")
+        if not CONTRACT.is_verified_capacity_provenance(
+            raw_route.get("capacity_provenance", "UNAVAILABLE")
+        ):
+            return _withhold("UNVERIFIED_SHUTTLE_CAPACITY")
 
     normalized_routes: list[dict[str, Any]] = []
     seen_route_ids: set[str] = set()
