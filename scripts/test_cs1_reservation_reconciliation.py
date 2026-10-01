@@ -105,6 +105,23 @@ def test_served_demand_decomposition_mismatch_is_excluded_from_history() -> None
     assert math.isclose(report["corrected_reservation"][3], 100.0)
 
 
+def test_boolean_counts_are_rejected_instead_of_coerced_to_zero_or_one() -> None:
+    reservation = load_reservation_module()
+    report = reservation.generate_reservation_baselines(
+        [100, True, 100],
+        [80, 1, 90],
+        [20, 0, False],
+        actual_demand=[100, True, 100],
+        min_history=1,
+    )
+    assert report["reconciliation_status"] == ["RECONCILED", "EXCLUDED", "EXCLUDED"]
+    assert "MISSING_OR_INVALID_ACTIVE_RESERVATIONS" in report["reconciliation_reason_codes"][1]
+    assert "MISSING_OR_INVALID_ACTUAL_DEMAND" in report["reconciliation_reason_codes"][1]
+    assert "MISSING_OR_INVALID_UNRESERVED_DEMAND" in report["reconciliation_reason_codes"][2]
+    assert report["raw_reservation"][1] is None
+    assert report["history_n"] == [0, 1, 1]
+
+
 def test_asymmetric_decision_loss_is_explicit_sensitivity_not_money() -> None:
     reservation = load_reservation_module()
     result = reservation.evaluate_decision_loss(
@@ -189,6 +206,7 @@ def main() -> int:
         test_invalid_reconciliation_rows_are_not_learned_from,
         test_reconciliation_diagnostics_explain_withhold_and_exclusions,
         test_served_demand_decomposition_mismatch_is_excluded_from_history,
+        test_boolean_counts_are_rejected_instead_of_coerced_to_zero_or_one,
         test_asymmetric_decision_loss_is_explicit_sensitivity_not_money,
         test_policy_comparison_uses_common_support_and_asymmetric_loss,
         test_validation_rejects_bad_alignment_and_costs,
