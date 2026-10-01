@@ -74,13 +74,21 @@ def sessions():
     ]
 
 
+def allocate(policy, *, session_rows=None, room_rows=None, **overrides):
+    kwargs = {
+        "sessions": sessions() if session_rows is None else session_rows,
+        "rooms": rooms() if room_rows is None else room_rows,
+        "upstream_readiness": "REVIEW_REQUIRED",
+        "room_inventory_provenance": "OFFICIAL_SNAPSHOT",
+        "attendance_provenance": "OFFICIAL_SNAPSHOT",
+    }
+    kwargs.update(overrides)
+    return policy.allocate_classrooms(**kwargs)
+
+
 def test_assigns_only_hard_constraint_feasible_rooms() -> None:
     policy = load_module("classroom_policy", "backend/app/decision/classroom_policy.py")
-    result = policy.allocate_classrooms(
-        sessions=sessions(),
-        rooms=rooms(),
-        upstream_readiness="REVIEW_REQUIRED",
-    )
+    result = allocate(policy)
     assignments = {item["session_id"]: item for item in result["assignments"]}
     assert assignments["CMPE150-1"]["room_id"] == "M101"
     assert assignments["EC101-1"]["room_id"] == "TB201"
@@ -88,6 +96,8 @@ def test_assigns_only_hard_constraint_feasible_rooms() -> None:
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
     assert result["automatic_execution_allowed"] is False
     assert result["operator_approval_required"] is True
+    assert result["room_inventory_provenance"] == "OFFICIAL_SNAPSHOT"
+    assert result["attendance_provenance"] == "OFFICIAL_SNAPSHOT"
     assert result["building_loads"]["B-SOUTH-M"]["assigned_attendance"] == 70
     assert result["building_loads"]["B-SOUTH-TB"]["assigned_attendance"] == 45
 
@@ -105,15 +115,24 @@ def test_accessibility_equipment_capacity_and_campus_are_hard_constraints() -> N
             "equipment_required": ["lab-bench"],
         }
     ]
-    result = policy.allocate_classrooms(
-        sessions=blocked,
-        rooms=rooms(),
-        upstream_readiness="REVIEW_REQUIRED",
-    )
+    result = allocate(policy, session_rows=blocked)
     assert result["assignments"] == []
     assert result["unassigned"][0]["session_id"] == "SPECIAL"
     assert "NO_FEASIBLE_ROOM_SPECIAL" in result["reason_codes"]
     assert result["decision_readiness"] == "REVIEW_REQUIRED"
+
+
+def test_unverified_capacity_or_attendance_withholds_assignment() -> None:
+    policy = load_module("classroom_policy_provenance", "backend/app/decision/classroom_policy.py")
+    bad_inventory = allocate(policy, room_inventory_provenance="MODEL_ESTIMATE")
+    assert bad_inventory["decision_readiness"] == "WITHHOLD"
+    assert bad_inventory["assignments"] == []
+    assert "UNVERIFIED_ROOM_INVENTORY" in bad_inventory["reason_codes"]
+
+    bad_attendance = allocate(policy, attendance_provenance="MODEL_ESTIMATE")
+    assert bad_attendance["decision_readiness"] == "WITHHOLD"
+    assert bad_attendance["assignments"] == []
+    assert "UNVERIFIED_ATTENDANCE_INPUT" in bad_attendance["reason_codes"]
 
 
 def test_room_time_conflicts_are_never_double_booked() -> None:
@@ -126,6 +145,7 @@ def test_room_time_conflicts_are_never_double_booked() -> None:
             "start_minute": 540,
             "end_minute": 600,
             "expected_attendance": 60,
+            "accessibility_required": False,
             "equipment_required": ["projector"],
         },
         {
@@ -134,26 +154,40 @@ def test_room_time_conflicts_are_never_double_booked() -> None:
             "start_minute": 570,
             "end_minute": 630,
             "expected_attendance": 50,
+            "accessibility_required": False,
             "equipment_required": ["projector"],
         },
     ]
-    result = policy.allocate_classrooms(
-        sessions=overlapping,
-        rooms=single_room,
-        upstream_readiness="REVIEW_REQUIRED",
-    )
+    result = allocate(policy, session_rows=overlapping, room_rows=single_room)
     assert len(result["assignments"]) == 1
     assert len(result["unassigned"]) == 1
     assert len({item["room_id"] for item in result["assignments"]}) == 1
 
 
+def test_boolean_fields_are_strict_not_python_truthiness() -> None:
+    policy = load_module("classroom_policy_boolean", "backend/app/decision/classroom_policy.py")
+    bad_room = rooms()[0].copy()
+    bad_room["accessible"] = "false"
+    try:
+        allocate(policy, room_rows=[bad_room])
+    except ValueError as exc:
+        assert "accessible" in str(exc).lower()
+    else:
+        raise AssertionError("string room accessibility must be rejected")
+
+    bad_session = sessions()[0].copy()
+    bad_session["accessibility_required"] = "false"
+    try:
+        allocate(policy, session_rows=[bad_session])
+    except ValueError as exc:
+        assert "accessibility_required" in str(exc).lower()
+    else:
+        raise AssertionError("string accessibility requirement must be rejected")
+
+
 def test_withholds_on_upstream_withhold_and_rejects_malformed_sessions() -> None:
     policy = load_module("classroom_policy_invalid", "backend/app/decision/classroom_policy.py")
-    withheld = policy.allocate_classrooms(
-        sessions=sessions(),
-        rooms=rooms(),
-        upstream_readiness="WITHHOLD",
-    )
+    withheld = allocate(policy, upstream_readiness="WITHHOLD")
     assert withheld["decision_readiness"] == "WITHHOLD"
     assert withheld["assignments"] == []
     assert withheld["abstained"] is True
@@ -161,11 +195,7 @@ def test_withholds_on_upstream_withhold_and_rejects_malformed_sessions() -> None
     bad = sessions()[0].copy()
     bad["end_minute"] = bad["start_minute"]
     try:
-        policy.allocate_classrooms(
-            sessions=[bad],
-            rooms=rooms(),
-            upstream_readiness="REVIEW_REQUIRED",
-        )
+        allocate(policy, session_rows=[bad])
     except ValueError as exc:
         assert "time" in str(exc).lower()
     else:
