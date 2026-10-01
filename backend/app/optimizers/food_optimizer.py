@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Mapping
+from typing import Any, Mapping
 
 from app.decision.food_policy import build_food_decision
 
@@ -17,6 +17,7 @@ class FoodOptimizer:
         signal_availability: Mapping[str, bool] | None = None,
         *,
         method_eligibility: str = "SANDBOX_ONLY",
+        decision_reachability: Mapping[str, Any] | None = None,
     ):
         del date, cafeteria_id, menu
         result = build_food_decision(
@@ -24,6 +25,7 @@ class FoodOptimizer:
             signal_availability,
             model_id="food-demand-xgboost",
             method_eligibility=method_eligibility,
+            decision_reachability=decision_reachability,
         )
 
         # Preserve the old adapter keys for internal callers while the API contract
