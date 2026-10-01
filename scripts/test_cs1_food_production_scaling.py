@@ -148,6 +148,14 @@ def test_zero_objective_weights_are_not_actionable() -> None:
     assert result["decision_readiness"] == "WITHHOLD"
 
 
+def test_api_router_keeps_scalable_optimizer_and_sandbox_default() -> None:
+    source = (ROOT / "backend/app/routers/campus_ops.py").read_text(encoding="utf-8")
+    assert "from app.decision.food_production import optimize_food_production" in source
+    food_block = source.split('@router.post("/food")', 1)[1].split('@router.post("/shuttle")', 1)[0]
+    assert '"SANDBOX_ONLY"' in food_block
+    assert '"EVALUATED_OFFLINE"' not in food_block
+
+
 def main() -> int:
     tests = [
         test_breakpoint_search_matches_integer_bruteforce,
@@ -155,6 +163,7 @@ def main() -> int:
         test_unknown_method_fails_closed_but_keeps_analysis_candidate,
         test_offline_method_cannot_emit_operator_recommendation,
         test_zero_objective_weights_are_not_actionable,
+        test_api_router_keeps_scalable_optimizer_and_sandbox_default,
     ]
     for test in tests:
         test()
