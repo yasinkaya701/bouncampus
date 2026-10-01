@@ -213,7 +213,7 @@ function rankRoom(
 
   if (request.requiredCapacity !== undefined) {
     const suppliedCapacity = context.roomCapacities?.[roomId];
-    if (Number.isFinite(suppliedCapacity)) {
+    if (typeof suppliedCapacity === 'number' && Number.isFinite(suppliedCapacity)) {
       verifiedCapacity = suppliedCapacity;
       if (suppliedCapacity < request.requiredCapacity) return null;
       capacityStatus = 'VERIFIED_SUFFICIENT';
