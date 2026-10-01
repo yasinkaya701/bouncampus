@@ -5,38 +5,44 @@
 
 ## Shared strategic conclusion
 
-Current research makes one direction substantially more defensible than the generic alternatives:
+Current research supports one execution hierarchy:
 
-> **BOUNCAMPUS should be tested as a campus resource decision-and-verification layer, with dining production as the first beachhead.**
+> **Test BOUNCAMPUS as a campus resource decision-and-verification layer, with dining production as the first beachhead; treat classroom allocation and shuttle scheduling as P1 adjacency hypotheses, not parallel pivots.**
 
 Why:
 
-- Boğaziçi already publishes sustainability metrics and has established water/energy governance; "first dashboard" is not a strong novelty claim.
+- Boğaziçi already publishes sustainability metrics and has established water/energy governance; “first dashboard” is not a strong novelty claim.
 - Public food-waste scale is measurable and non-zero.
 - Dining has a short action/outcome feedback cycle.
-- Academic literature supports demand forecasting and structural food-waste interventions as legitimate problem classes.
-- The central causal claim — demand mismatch materially drives avoidable Boğaziçi waste — is still unvalidated and must remain a hypothesis.
+- Classroom scheduling now has a publicly identified owner and a 161-room general-use capacity inventory.
+- Shuttle operations expose public route/timetable structure, but departure-level pain remains unverified.
 - Türkiye's policy/ranking landscape increasingly rewards measurement, digitalization, governance and operational efficiency.
 
-The strongest product loop to test is:
+Read first:
+
+1. `CAMPUS_DECISION_SURFACE_ATLAS.md`
+2. `BOGAZICI_DATA_SYSTEM_OWNERSHIP_MAP.md`
+3. the domain pack for your task
+
+The common loop is:
 
 ```text
-Observe -> Reconcile -> Predict -> Diagnose -> Recommend -> Human Act -> Verify
+Observe -> Reconcile -> Decision Context -> Predict/Optimize -> Recommend -> Human Act -> Verify
 ```
 
 ---
 
 # IE — Customer Discovery & Market Lead
 
-## P0 task: reconstruct the real dining production decision
+## P0: reconstruct the real dining production decision
 
 Target stakeholders:
 
-1. SKS / Food Services decision owner;
-2. North Campus central kitchen production lead;
-3. food engineer/dietitian involved in menu/portion planning;
-4. contractor-side operations manager if contractor participates in quantity planning;
-5. institutional procurement/contract owner for economic incentive questions.
+1. Food Services Branch manager + one Food Engineer;
+2. dining control organization owner/member for unresolved acceptance/hakediş semantics;
+3. TEMAŞ local project/production operator;
+4. BİD data owner after the business fields are known;
+5. waste/measurement owner.
 
 Ask for a **recent concrete service**, not opinions.
 
@@ -54,35 +60,69 @@ what was measured afterward
 who bore operational/economic consequences
 ```
 
-## Kill/modify conditions
+### Dining kill/modify conditions
 
-Modify or kill the current wedge if repeated evidence shows:
+Modify or kill the wedge if repeated evidence shows:
 
-- production quantity is contractually/factually fixed outside the reachable workflow;
-- excess production is not a material component of the measured waste stream;
+- production quantity is fixed outside the reachable workflow;
+- excess production is not a material component of measured waste;
 - decisions cannot be changed at a useful time;
 - the decision owner has no actionable discretion;
-- required data cannot be captured at acceptable cost/effort;
-- shortage/service-level risk makes the suggested control point unacceptable.
+- required data cannot be captured at acceptable effort;
+- shortage/service-level risk makes the proposed control point unacceptable.
 
-## National buyer questions
+## P1a probe: classroom allocation — ONE owner interview first
 
-Use `TURKIYE_POLICY_RANKING_PULL.md` only as context. Test whether external pressure actually changes work:
+Read `BOGAZICI_CLASSROOM_ALLOCATION_AND_OCCUPANCY.md`.
 
-- Which rankings/YÖK/ISO/internal targets create recurring evidence workload?
-- Who consolidates sustainability data?
-- Does reporting influence budgets or only create administrative work?
-- Which intervention was hardest to prove after implementation?
+Public route: **Kayıt İşleri Şube Müdürlüğü** is responsible for general-use classroom scheduling.
+
+The goal is not to pitch optimization. Determine whether a material problem exists.
+
+Ask:
+
+```text
+Walk me through the latest semester room-assignment cycle.
+What was the hardest exception?
+Which part is still manual?
+What caused the most rework after the first schedule?
+What constraints cannot be violated?
+Which trade-off do you make most often?
+When does the assignment become expensive to change?
+```
+
+Continue deeper only if manual burden, mismatch, late changes or movement cost are recurring and consequential.
+
+## P1b probe: shuttle scheduling — ONE operator interview first
+
+Read `BOGAZICI_SHUTTLE_OPERATIONS_AND_DEMAND.md`.
+
+Ask for the last overloaded/empty/unreliable departure and how the timetable was changed afterward.
+
+Discover:
+
+```text
+operator
+approver
+ridership measurement
+timetable change cadence
+vehicle/driver constraint
+left-behind/queue failure
+reliability failure
+contract constraint
+```
+
+Do not ask generic students “would you like a smarter shuttle app?” before the operator workflow is known.
 
 ---
 
 # EE — Physical Systems & Measurement Lead
 
-## P0 task: validate measurement feasibility for one dining service
+## P0: validate measurement feasibility for one dining service
 
-Do not design new hardware until current measurement is known.
+Do not design hardware until current measurement is known.
 
-For one service, determine whether the following can be measured or exported:
+For one service, determine whether these can be measured/exported:
 
 - planned portions;
 - produced portions;
@@ -92,11 +132,9 @@ For one service, determine whether the following can be measured or exported:
 - plate/post-consumer waste kg;
 - early sell-out/substitution;
 - service start/end;
-- scale or measurement method.
+- scale/measurement method.
 
-## Required output
-
-Create a field-by-field table:
+Required table:
 
 ```text
 field | current source | owner | granularity | retention | quality | access | effort | blocker
@@ -104,60 +142,128 @@ field | current source | owner | granularity | retention | quality | access | ef
 
 If waste streams cannot be separated safely, document the smallest feasible distinction rather than inventing precision.
 
+## Classroom measurement rule
+
+Before proposing occupancy sensors, test whether enrollment/assignment/change data already solve the decision. If occupancy sensing is actually required:
+
+- ground-truth a sample physically/manual first;
+- do not equate raw Wi-Fi client count with occupancy;
+- record estimation uncertainty;
+- aggregate for privacy;
+- label inferred values `ESTIMATED_OCCUPANCY`.
+
+## Shuttle measurement rule
+
+Before new counters, audit existing:
+
+- manual ridership counts;
+- vehicle logs;
+- driver/operations records;
+- any card/access telemetry;
+- actual departure/arrival history.
+
+Hardware is justified only by a verified measurement gap.
+
 ## Water/energy later-stage discovery
 
-Research already indicates:
+Water already has formal quarterly measurement/reporting responsibility. Energy already has ISO 50001 measurement/governance. Therefore future interviews should ask **what action remains hard despite measurement**, not whether measurement exists.
 
-- Water Management Commission + periodic unit reporting exists publicly;
-- ISO 50001 Energy Management System + Energy Management Team exists publicly.
+---
 
-Therefore future interviews should ask **what decision remains hard**, not whether measurement exists.
+# EHB — Embedded Hardware, Communications & Integration Lead
+
+Read `BOGAZICI_DATA_SYSTEM_OWNERSHIP_MAP.md` before proposing any sensing stack.
+
+## Rule: close an evidence gap, do not create a hardware project
+
+A new device is justified only when all are true:
+
+```text
+real decision validated
++ required physical variable identified
++ existing system cannot provide acceptable signal
++ measurement accuracy/latency requirement known
++ installation/privacy/safety boundary acceptable
+```
+
+Candidate future gaps only after validation:
+
+- dining weight/count measurement where current records fail;
+- shuttle aggregate passenger counting where no usable logs exist;
+- room occupancy ground truth for calibration;
+- water/energy submeter gap if an actionable decision requires it.
+
+Do not build display/kiosk hardware as a substitute for PMR.
 
 ---
 
 # CS1 — Decision Intelligence Lead
 
-## P0 task: make the food decision model baseline-first
+## P0: dining baseline-first
 
-Before complex ML, implement/evaluate simple comparators when actual historical data becomes available:
+Before complex ML, implement/evaluate simple comparators when real historical data arrive:
 
 1. same weekday + meal historical mean;
 2. trailing comparable-service mean/median;
 3. calendar-aware linear/tree baseline;
 4. only then richer models using menu/weather/mobility/event context.
 
-Evaluate decision utility, not just RMSE/MAE.
+Evaluate decision utility, not only RMSE/MAE.
 
 Candidate loss:
 
 ```text
 loss = overproduction_cost * surplus_portions
      + shortage_cost * unmet_demand_or_early_sellout
-     + override/friction penalty where relevant
+     + override/friction penalty
 ```
 
-The coefficients are workflow/policy parameters until evidence supports them.
+Coefficients are workflow/policy parameters until evidence supports them.
 
-## Required safety behavior
+Required behavior:
 
-- expose `WITHHOLD` when input quality is insufficient;
-- retain operator approval;
-- record overrides and reasons;
-- label planning band semantics honestly;
-- keep source-reported data separate from model estimates;
-- never infer live occupancy from schedule data.
+- `WITHHOLD` when source quality is insufficient;
+- operator approval;
+- overrides + reasons;
+- honest uncertainty semantics;
+- source-reported vs derived/model-estimated separation.
 
-## Key research falsifier
+## P1 classroom model family
 
-A high-accuracy forecast has no product value if it arrives after the production decision or the operator cannot act on it.
+Only after the one-owner PMR probe validates pain:
+
+```text
+current assignment replay
+-> feasibility validator
+-> greedy best-fit
+-> transparent ILP
+-> multiobjective recommendation
+```
+
+Candidate objectives: capacity slack, room-type mismatch, room changes, transition distance/time. Preserve accessibility/equipment as constraints, not afterthoughts.
+
+## P1 shuttle model family
+
+Only after operator pain + departure-level measurement exist:
+
+```text
+current timetable
+-> historical departure-load baseline
+-> class-transition demand prior
+-> simple threshold recommendation
+-> constrained schedule optimization
+-> richer prediction only if incremental value exists
+```
+
+Never use course schedule as a substitute for actual ridership.
 
 ---
 
 # CS2 — Product Strategy, Evidence Synthesis & Application
 
-## P0 task: rewrite narrative around observed facts + explicit unknowns
+## P0: keep narrative around observed facts + explicit unknowns
 
-Safe problem context:
+Safe context:
 
 - Boğaziçi publicly reports 48,251 kg food waste for 2025.
 - Boğaziçi already has sustainability monitoring/governance across multiple domains.
@@ -169,11 +275,24 @@ Still hypothesis:
 - production planning is the best intervention point;
 - operator persona will use recommendations;
 - universities will pay for a cross-domain platform;
-- reporting burden/provenance pain is commercially meaningful.
+- reporting/provenance pain is commercially meaningful.
 
-## Stronger category language
+## Expansion narrative
 
-Preferred:
+Classroom and shuttle work may demonstrate that the reusable platform unit is not “food AI” but:
+
+```text
+owned decision
++ trusted inputs
++ constraints
++ recommendation
++ human override
++ outcome verification
+```
+
+Do not present these adjacency modules as validated customer demand until owner interviews confirm recurring pain.
+
+Preferred category language:
 
 - campus resource intelligence;
 - operational sustainability decision support;
@@ -185,83 +304,95 @@ Avoid until validated:
 - autonomous campus optimization;
 - real-time digital twin;
 - AI operating system for all campus functions;
-- guaranteed GreenMetric improvement;
-- guaranteed X% food-waste reduction.
-
-## Ranking narrative
-
-UI GreenMetric 2026 gives a useful **why-now** hook because Governance & Digitalization now explicitly includes ICT-based sustainability monitoring/evaluation and advanced digital technologies supporting decisions/operational efficiency.
-
-Use it to contextualize the market, not as proof of buyer demand.
+- guaranteed ranking improvement;
+- guaranteed waste/energy reduction.
 
 ---
 
 # Frontend / UX agents
 
-Research should change the primary screen hierarchy.
+Research should drive a common **decision card** primitive.
 
-Prefer:
-
-## Today / Tomorrow decision card
+Show:
 
 - action required;
-- target quantity/range;
-- why the system recommends it;
-- missing data / readiness;
-- risk guardrails;
-- human approve/override;
+- target/ranked option;
+- why;
+- missing data/readiness;
+- hard constraints and risks;
+- confidence/uncertainty;
+- approve/override/reject;
 - later actual outcome.
 
-De-prioritize:
+Domain examples:
 
-- generic KPI wall;
-- eco-score gamification;
-- heavy 3D campus map as the main product;
-- decorative AI chat;
-- unsupported live sensor animations.
+- Dining: recommended production/allocation band.
+- Classroom: ranked feasible room alternatives + constraint trade-offs.
+- Shuttle: departure/frequency change + crowding/reliability trade-off.
 
-The proof-of-value interaction is **decision -> action -> measured result**.
+De-prioritize generic KPI walls, decorative AI chat, unsupported live sensor animations and 3D-first navigation.
 
 ---
 
 # Backend / data agents
 
-Read `METRIC_PROVENANCE_AND_VERIFICATION.md` before defining durable schemas.
+Read `METRIC_PROVENANCE_AND_VERIFICATION.md` and `BOGAZICI_DATA_SYSTEM_OWNERSHIP_MAP.md` before durable schemas.
 
 Minimum rules:
 
 - event timestamp != reporting period;
-- measurement stage is first-class;
-- source owner/provenance is first-class;
-- transformation versions are retained;
-- source-reported vs derived vs model-estimated states cannot collapse;
-- an unresolved source conflict must be representable as `RECONCILIATION_REQUIRED`;
-- operator decision and outcome need stable IDs for later verification.
+- scheduled != observed;
+- capacity != demand;
+- estimated != measured;
+- recommendation != approved action != executed action;
+- business owner != technical owner != access authority;
+- unresolved source conflict must be representable as `RECONCILIATION_REQUIRED`;
+- operator decision and outcome need stable IDs.
+
+Recommended ownership/provenance fields:
+
+```text
+source_system
+business_owner
+technical_owner
+semantic_validator
+access_authority
+observed_at
+available_at
+privacy_class
+transformation_version
+```
 
 ---
 
 # Research backlog ranked by expected decision value
 
-## P0 — primary research, not more web browsing
+## P0 — primary research, not more generic web browsing
 
-1. Who owns daily production quantity and when is it frozen?
-2. What portion of food waste is pre-consumer surplus vs plate/preparation waste?
-3. What operational data are actually retained per service?
+1. Who owns daily dining production quantity and when is it frozen?
+2. What share of food waste is pre-consumer surplus vs plate/preparation waste?
+3. Which operational data are retained per service?
 4. What happens when the kitchen under-produces?
 5. What does the contractor get paid for: produced, delivered, accepted or served quantities?
 6. Can the team access historical menu/served/waste data for a pilot?
 
-## P1 — institutional expansion discovery
+## P1 — bounded adjacency probes
 
-7. Which water decisions are currently made from the Water Management Commission's quarterly data?
-8. Which energy anomalies/actions are already automated or manually reviewed under ISO 50001?
-9. Who prepares THE/YÖK/GreenMetric evidence and where is reconciliation painful?
-10. Does verification of savings affect capital budgets or procurement decisions?
+7. Registrar: is classroom allocation a repeated costly/manual decision, and what is the constraint hierarchy?
+8. Shuttle operator: are there repeatable departure-level load/reliability imbalances, and can schedules be changed?
+9. If either passes, request only the minimum field-level dataset defined in its research pack.
 
-## P2 — external market research
+## P2 — water/energy action-gap discovery
 
-11. Repeat the workflow interviews at 2–3 Turkish public universities with materially different dining procurement structures.
-12. Benchmark commercial campus/BMS/ESG/foodservice systems only after the decision gap is validated; otherwise competitor research will be too generic.
+10. Which water decisions are currently made from quarterly data, and which are delayed/manual?
+11. Which energy anomalies/actions are already automated or manually reviewed under ISO 50001?
+12. Who prepares sustainability evidence and where is reconciliation painful?
+13. Does verification of savings affect capital budgets or procurement decisions?
+
+## P3 — external market research
+
+14. Repeat validated workflow interviews at 2–3 Turkish public universities.
+15. Benchmark commercial systems only after the specific decision gap is validated; generic competitor research is lower value.
 
 ---
 
@@ -269,20 +400,21 @@ Minimum rules:
 
 ```text
 PUBLIC SOURCE:
-Boğaziçi has measurable sustainability operations and 48,251 kg reported 2025 food waste.
+Boğaziçi has measurable sustainability operations, 48,251 kg reported 2025 food waste,
+a named classroom-scheduling owner and a public multi-campus shuttle system.
 
 UNKNOWN:
-How much is avoidable by better production decisions?
+Which operational decisions are materially painful, actionable and data-accessible?
 
 PMR:
-Find the owner, timing, constraints, data, consequences and current workaround.
+Find owner, timing, constraints, data, consequences and workaround.
 
 TECH TEST:
-Can a baseline model improve a real decision without increasing shortage risk?
+Can a transparent baseline improve the decision without violating service constraints?
 
 PILOT:
-Measure normalized waste and service-level guardrails.
+Human-reviewed recommendation + measured outcome + guardrails.
 
 ONLY THEN:
-Claim measured impact and consider broader campus expansion.
+Claim measured impact and deepen/expand the module.
 ```
