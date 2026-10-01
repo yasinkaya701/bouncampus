@@ -90,6 +90,10 @@ export function summarizeMatchedPilotEffects(
   }
 
   const pairs: MatchedPairWasteEffect[] = [];
+  const rawControlValues: number[] = [];
+  const rawInterventionValues: number[] = [];
+  const rawDeltas: number[] = [];
+
   for (const pairId of [...pairsById.keys()].sort()) {
     const pair = pairsById.get(pairId)!;
     const control = pair.CONTROL;
@@ -101,6 +105,10 @@ export function summarizeMatchedPilotEffects(
     const controlWaste = wasteKgPer100Served(control);
     const interventionWaste = wasteKgPer100Served(intervention);
     const delta = controlWaste - interventionWaste;
+    rawControlValues.push(controlWaste);
+    rawInterventionValues.push(interventionWaste);
+    rawDeltas.push(delta);
+
     const wasteDirection = delta > 0 ? 'IMPROVED' : delta < 0 ? 'WORSENED' : 'UNCHANGED';
     const earlySelloutDirection =
       control.earlySellout === intervention.earlySellout
@@ -119,13 +127,10 @@ export function summarizeMatchedPilotEffects(
     });
   }
 
-  const controlValues = pairs.map(pair => pair.controlWasteKgPer100Served);
-  const interventionValues = pairs.map(pair => pair.interventionWasteKgPer100Served);
-  const deltas = pairs.map(pair => pair.wasteDeltaKgPer100Served);
-  const controlMean = mean(controlValues);
-  const interventionMean = mean(interventionValues);
-  const deltaMean = mean(deltas);
-  const deltaMedian = median(deltas);
+  const controlMean = mean(rawControlValues);
+  const interventionMean = mean(rawInterventionValues);
+  const deltaMean = mean(rawDeltas);
+  const deltaMedian = median(rawDeltas);
   const normalizedReduction =
     controlMean != null && controlMean > 0 && interventionMean != null
       ? ((controlMean - interventionMean) / controlMean) * 100
