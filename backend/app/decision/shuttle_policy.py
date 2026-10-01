@@ -122,7 +122,7 @@ def _normalize_route(route: Mapping[str, Any], reserve_ratio: float) -> dict[str
         if required_seats > 0
         else 0
     )
-    trips_per_vehicle = max(1, int(math.floor(service_window / round_trip)))
+    trips_per_vehicle = int(math.floor(service_window / round_trip))
     max_supported_trips = available_vehicles * trips_per_vehicle
     supported_seats = int(round(max_supported_trips * vehicle_capacity))
     shortage = max(0, required_seats - supported_seats)
