@@ -6,7 +6,6 @@ from fastapi import APIRouter, HTTPException
 
 from app.decision.campus_contract import validate_no_person_level_data
 from app.decision.campus_ops import (
-    allocate_shared_capacity,
     build_campus_ops_bundle,
     optimize_shuttle_plan,
     optimize_space_plan,
@@ -15,6 +14,7 @@ from app.decision.campus_orchestrator import build_integrated_campus_plan
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
 from app.decision.food_production import optimize_food_production
+from app.decision.resource_allocation import allocate_shared_capacity
 
 router = APIRouter(prefix="/api/v1/ops", tags=["campus-operations"])
 
