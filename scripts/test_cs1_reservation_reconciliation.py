@@ -140,6 +140,19 @@ def test_validation_rejects_bad_alignment_and_costs() -> None:
             raise AssertionError("invalid decision-loss cost must be rejected")
 
 
+def test_malformed_observation_is_excluded_instead_of_crashing() -> None:
+    reservation = load_reservation_module()
+    report = reservation.generate_reservation_baselines(
+        [100, "bad", 100],
+        [80, 90, 95],
+        [20, 30, 25],
+        min_history=1,
+    )
+    assert report["reconciliation_status"] == ["RECONCILED", "EXCLUDED", "RECONCILED"]
+    assert "MISSING_OR_INVALID_ACTIVE_RESERVATIONS" in report["reconciliation_reason_codes"][1]
+    assert report["raw_reservation"][1] is None
+
+
 def main() -> int:
     tests = [
         test_reservation_first_baseline_is_past_only,
@@ -148,6 +161,7 @@ def main() -> int:
         test_asymmetric_decision_loss_is_explicit_sensitivity_not_money,
         test_policy_comparison_uses_common_support_and_asymmetric_loss,
         test_validation_rejects_bad_alignment_and_costs,
+        test_malformed_observation_is_excluded_instead_of_crashing,
     ]
     for test in tests:
         test()
