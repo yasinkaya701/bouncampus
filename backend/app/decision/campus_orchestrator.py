@@ -11,10 +11,11 @@ from app.decision.campus_ops import (
 )
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
+from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
 
-ALLOWED_MODULES = frozenset({"food", "shuttle", "spaces", "classes", "resources"})
+ALLOWED_MODULES = frozenset({"food", "shuttle", "spaces", "classes", "resources", "energy"})
 
 
 def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
@@ -79,6 +80,13 @@ def build_integrated_campus_plan(payload: Mapping[str, Any]) -> dict[str, Any]:
             results["resources"] = allocate_shared_capacity(
                 total_capacity=config.get("total_capacity"),
                 requests=config.get("requests", []),
+            )
+        if "energy" in requested:
+            config = _mapping(requested["energy"], name="modules.energy")
+            results["energy"] = plan_energy_advisory(
+                zones=state.get("zones", []),
+                low_utilization_threshold=config.get("low_utilization_threshold"),
+                medium_utilization_threshold=config.get("medium_utilization_threshold"),
             )
 
     bundle_inputs: dict[str, Mapping[str, Any]] = {"campus_state": state, **results}
