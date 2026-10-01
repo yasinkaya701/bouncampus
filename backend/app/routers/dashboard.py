@@ -10,6 +10,7 @@ from app.config import settings
 from app.models.energy import EnergyModel
 from app.models.food_demand import FoodDemandPredictor
 from app.models.occupancy import OccupancyPredictor
+from app.optimizers.action_engine import ActionEngine
 from app.optimizers.food_optimizer import FoodOptimizer
 from app.schemas import (
     ActionItem,
@@ -28,6 +29,7 @@ o_pred = OccupancyPredictor()
 e_model = EnergyModel()
 f_pred = FoodDemandPredictor()
 f_opt = FoodOptimizer()
+action_engine = ActionEngine()
 real_service = RealDataService()
 
 
@@ -168,36 +170,15 @@ def get_dashboard(date_val: Optional[str] = None):
             provenance="MODEL_ESTIMATE",
         )
 
-    actions = [
-        ActionItem(
-            id=str(uuid.uuid4()),
-            priority="HIGH",
-            type="energy",
-            title="Consolidate Kare Blok (KB) Evening Load",
-            time="18:00 - 22:00",
-            location="Kare Blok",
-            description=(
-                f"Timetable-derived estimate shows low evening instructional load. Review consolidation of study "
-                f"groups before any HVAC change (outdoor temperature: {temp}°C)."
-            ),
-            impact_value=165.0,
-            impact_unit="kWh model potential",
-            provenance="MODEL_ESTIMATE",
-        ),
-        food_action,
-        ActionItem(
-            id=str(uuid.uuid4()),
-            priority="MEDIUM",
-            type="energy",
-            title="New Hall (NH) Lecture Halls Idle Mode",
-            time="12:00 - 13:00",
-            location="Yeni Bina (NH)",
-            description="Timetable-derived lunch transition suggests low lecture-hall use; field verification is required before HVAC action.",
-            impact_value=85.0,
-            impact_unit="kWh model potential",
-            provenance="MODEL_ESTIMATE",
-        ),
-    ]
+    # Keep dashboard actions evidence-gated. Non-food recommendations must come
+    # from a domain policy with explicit readiness/provenance instead of static
+    # pseudo-operational numbers embedded in the route.
+    non_food_actions = action_engine.generate_actions(
+        target_date,
+        energy_recs=[],
+        food_recs=[],
+    )
+    actions = [food_action, *non_food_actions]
 
     wind_data = real_service.fetch_kilyos_wind_generation()
     wind_info = LiveWindTurbineInfo(**wind_data)
