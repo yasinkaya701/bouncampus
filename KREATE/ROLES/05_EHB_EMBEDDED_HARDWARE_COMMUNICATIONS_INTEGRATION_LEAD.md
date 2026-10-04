@@ -55,7 +55,7 @@ EHB must not redefine CS1 readiness, confidence, classification, segmentation, e
 
 ## Evidence and safety
 
-Evidence labels remain explicit: `ASSUMPTION`, `DATASHEET`, `SIMULATION`, `UNIT_TEST`, `BENCH_TEST`, `FIELD_TEST`, `PRODUCTION_EVIDENCE`.
+Evidence labels remain explicit: `ASSUMPTION`, `DATASHEET`, `CALCULATION`, `SIMULATION`, `BENCH_TEST`, `FIELD_TEST`, `PRODUCTION_EVIDENCE`.
 
 A software/configuration artifact is not physical evidence. Hardware safety decisions remain subject to the repository `PHYSICAL_SAFETY` gate. No production-readiness or measured-performance claim may be inferred from design completion alone.
 
