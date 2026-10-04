@@ -54,6 +54,36 @@ SOURCE_CONTRACT_ENTRY_FIELDS = (
     "source_system",
     "availability_semantics",
 )
+PRIVACY_FIELD_NAMES = frozenset(
+    {
+        "studentid",
+        "studentnumber",
+        "studentno",
+        "studentname",
+        "personid",
+        "personname",
+        "passengerid",
+        "passengername",
+        "userid",
+        "username",
+        "fullname",
+        "cardid",
+        "carduid",
+        "bucardid",
+        "campuscardid",
+        "nationalid",
+        "identitynumber",
+        "tckn",
+        "tcidentitynumber",
+        "email",
+        "emailaddress",
+        "phone",
+        "phonenumber",
+        "faceid",
+        "faceembedding",
+        "biometricid",
+    }
+)
 
 
 def _text(value: Any) -> str | None:
@@ -61,6 +91,50 @@ def _text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _normalized_field_name(value: Any) -> str:
+    return "".join(character for character in str(value).casefold() if character.isalnum())
+
+
+def _privacy_reason_codes(value: Any, *, _seen: set[int] | None = None) -> list[str]:
+    """Return explicit reason codes for identity-bearing keys in JSON-like data.
+
+    The guard is key-based rather than value-based so ordinary operational text,
+    source labels, snapshot identifiers, and audit notes are not misclassified as
+    personal data. Device/source/business metadata remains allowed unless its key
+    explicitly represents a person, account, card/contact, or biometric identity.
+    """
+
+    seen = _seen if _seen is not None else set()
+    reasons: list[str] = []
+
+    if isinstance(value, Mapping):
+        object_id = id(value)
+        if object_id in seen:
+            return reasons
+        seen.add(object_id)
+        for key, nested in value.items():
+            normalized = _normalized_field_name(key)
+            if normalized in PRIVACY_FIELD_NAMES:
+                _append_unique(
+                    reasons,
+                    f"PRIVACY_FIELD_NOT_ALLOWED_{normalized.upper()}",
+                )
+            for reason in _privacy_reason_codes(nested, _seen=seen):
+                _append_unique(reasons, reason)
+        return reasons
+
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        object_id = id(value)
+        if object_id in seen:
+            return reasons
+        seen.add(object_id)
+        for item in value:
+            for reason in _privacy_reason_codes(item, _seen=seen):
+                _append_unique(reasons, reason)
+
+    return reasons
 
 
 def _aware_timestamp(value: Any) -> datetime | None:
@@ -227,6 +301,9 @@ def validate_service_truth_dataset(
             for code in errors:
                 _append_unique(reasons, code)
             continue
+
+        for privacy_reason in _privacy_reason_codes(raw_row):
+            _append_unique(errors, privacy_reason)
 
         service_id = _text(raw_row.get("service_id"))
         if service_id is None:
