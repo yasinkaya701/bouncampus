@@ -51,6 +51,43 @@ def _canonical_field_name(value: Any) -> str:
     return "".join(character for character in str(value).lower() if character.isalnum())
 
 
+def _privacy_reason_codes(value: Any) -> list[str]:
+    """Return deterministic identity-field violations from a JSON-like payload.
+
+    TrayGate payloads may grow optional metadata without changing the anonymous
+    product boundary. Scan mappings and nested sequences recursively so identity
+    keys cannot bypass admission merely by moving under metadata or item fields.
+    Container IDs are tracked defensively to avoid loops on non-JSON Python input.
+    """
+
+    violations: set[str] = set()
+    seen_containers: set[int] = set()
+    pending: list[Any] = [value]
+
+    while pending:
+        current = pending.pop()
+        if isinstance(current, Mapping):
+            container_id = id(current)
+            if container_id in seen_containers:
+                continue
+            seen_containers.add(container_id)
+            for raw_field, nested_value in current.items():
+                canonical_field = _canonical_field_name(raw_field)
+                if canonical_field in FORBIDDEN_CAPTURE_IDENTITY_FIELDS:
+                    violations.add(
+                        f"PRIVACY_FIELD_NOT_ALLOWED_{canonical_field.upper()}"
+                    )
+                pending.append(nested_value)
+        elif isinstance(current, Sequence) and not isinstance(current, (str, bytes)):
+            container_id = id(current)
+            if container_id in seen_containers:
+                continue
+            seen_containers.add(container_id)
+            pending.extend(current)
+
+    return sorted(violations)
+
+
 def _aware_timestamp(value: Any) -> datetime | None:
     text = _text(value)
     if text is None:
@@ -87,8 +124,9 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
     Structurally malformed payloads are rejected. Structurally valid captures
     that are not ``VALID`` quality, or do not contain a detected tray, are
     admitted only as explicit abstentions and require ``WITHHOLD`` downstream.
-    Person-identifying fields are rejected because TrayGate is an anonymous
-    tray-measurement boundary rather than a person-tracking surface.
+    Person-identifying fields are rejected anywhere in the payload because
+    TrayGate is an anonymous tray-measurement boundary rather than a
+    person-tracking surface.
     """
 
     if not isinstance(capture, Mapping):
@@ -119,13 +157,8 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
     if quality not in CAPTURE_QUALITIES:
         _append_unique(reasons, "UNKNOWN_CAPTURE_QUALITY")
 
-    for raw_field in capture:
-        canonical_field = _canonical_field_name(raw_field)
-        if canonical_field in FORBIDDEN_CAPTURE_IDENTITY_FIELDS:
-            _append_unique(
-                reasons,
-                f"PRIVACY_FIELD_NOT_ALLOWED_{canonical_field.upper()}",
-            )
+    for code in _privacy_reason_codes(capture):
+        _append_unique(reasons, code)
 
     structural_errors = bool(reasons)
     if structural_errors:
@@ -170,10 +203,11 @@ def validate_traygate_result(
 ) -> dict[str, object]:
     """Validate a CS1 TrayGate inference result before waste analytics.
 
-    Only structurally valid ``READY`` results are analytics-eligible. Review or
-    abstention states remain explicit and cannot silently enter downstream
-    aggregates. Percentages and confidences are contract values only; they are
-    not converted to mass without a separately validated calibration layer.
+    Only structurally valid anonymous ``READY`` results are analytics-eligible.
+    Review or abstention states remain explicit and cannot silently enter
+    downstream aggregates. Identity-bearing fields are rejected recursively.
+    Percentages and confidences are contract values only; they are not converted
+    to mass without a separately validated calibration layer.
     """
 
     if not isinstance(result, Mapping):
@@ -191,6 +225,9 @@ def validate_traygate_result(
     for field, code in required_text_fields:
         if _text(result.get(field)) is None:
             _append_unique(reasons, code)
+
+    for code in _privacy_reason_codes(result):
+        _append_unique(reasons, code)
 
     if expected_capture_id is not None:
         expected = _text(expected_capture_id)
@@ -248,9 +285,9 @@ def validate_traygate_result(
         "reason_codes": reasons,
         "result_scope": "TRAYGATE_RESULT_ADMISSION_ONLY",
         "claim_boundary": (
-            "Result admission validates bounded inference outputs and abstention semantics; "
-            "it does not establish model accuracy, gram-level calibration, field performance, "
-            "or achieved waste reduction."
+            "Result admission validates anonymous bounded inference outputs and abstention "
+            "semantics; it does not establish model accuracy, gram-level calibration, field "
+            "performance, or achieved waste reduction."
         ),
     }
 
