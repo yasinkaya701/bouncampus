@@ -13,6 +13,7 @@ from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
+from app.decision.roomnode_truth import summarize_roomnode_window, validate_roomnode_event
 from app.decision.solar_site_planning import analyze_room_solar_exposure, rank_new_building_orientations
 from app.decision.water_advisory import plan_water_advisory
 
@@ -45,16 +46,42 @@ def capabilities() -> dict[str, Any]:
             "shared_capacity",
             "energy_advisory",
             "water_advisory",
+            "roomnode_observations",
             "bundle",
             "integrated_plan",
         ],
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
-        "truth_boundary": "No live cafeteria POS, shuttle GPS, room-occupancy, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
-        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected.",
+        "truth_boundary": "RoomNode observation endpoints validate caller-supplied physical event payloads only and do not imply a live RoomNode device connection. No live cafeteria POS, shuttle GPS, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
+        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode event payloads use a dedicated fail-closed anonymous measurement contract.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
+
+
+@router.post("/roomnode/event")
+def roomnode_event(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate one caller-supplied RoomNode observation without promoting it to a decision."""
+
+    try:
+        return validate_roomnode_event(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/roomnode/window")
+def roomnode_window(payload: dict[str, Any]) -> dict[str, Any]:
+    """Expose retry-safe descriptive RoomNode aggregation for one station/time window."""
+
+    try:
+        return summarize_roomnode_window(
+            _payload_value(payload, "events", []),
+            station_id=str(_payload_value(payload, "station_id", "")),
+            window_start=str(_payload_value(payload, "window_start", "")),
+            window_end=str(_payload_value(payload, "window_end", "")),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.post("/state")
