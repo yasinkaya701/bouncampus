@@ -338,7 +338,6 @@ def aggregate_traygate_service(
                 if raw_result == previous_result:
                     idempotent_replay_count += 1
                     continue
-                _append_unique(hard_reasons, "DUPLICATE_CAPTURE_ID")
                 _append_unique(hard_reasons, "CAPTURE_ID_REPLAY_CONFLICT")
                 continue
             seen_capture_results[capture_id] = raw_result

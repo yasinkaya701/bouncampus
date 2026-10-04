@@ -72,7 +72,7 @@ def test_same_capture_id_with_changed_payload_rejects_service() -> None:
 
     assert aggregate["aggregation_status"] == "REJECTED"
     assert aggregate["descriptive_analytics_available"] is False
-    assert "CAPTURE_ID_REPLAY_CONFLICT" in aggregate["reason_codes"]
+    assert aggregate["reason_codes"] == ["CAPTURE_ID_REPLAY_CONFLICT"]
     assert aggregate["per_food"] == {}
 
 
