@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Validate the lightweight BOUNCAMPUS autonomous multi-agent control plane."""
+"""Validate the BOUNCAMPUS autonomous multi-agent control plane."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import re
-import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -14,6 +13,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ".agents/fabric.json"
 TEMPLATE_PATH = ".agents/TASK_TEMPLATE.json"
+PARENT_TEMPLATE_PATH = ".agents/PARENT_WORKSTREAM_TEMPLATE.json"
 
 REQUIRED_TASK_KEYS = {
     "schema_version",
@@ -31,6 +31,20 @@ REQUIRED_TASK_KEYS = {
     "human_gate",
     "lease",
     "blocker",
+    "integration",
+    "notes",
+}
+REQUIRED_PARENT_KEYS = {
+    "schema_version",
+    "id",
+    "workstream",
+    "human_owner",
+    "objective",
+    "priority",
+    "state",
+    "parent_branch",
+    "child_ids",
+    "human_gate",
     "integration",
     "notes",
 }
@@ -52,6 +66,7 @@ VALIDATION_REQUIRED_STATES = {
     "MERGED_VERIFIED",
 }
 TASK_ID_RE = re.compile(r"^TASK-[A-Z0-9][A-Z0-9-]{2,63}$")
+PARENT_ID_RE = re.compile(r"^HUMAN-(IE|EE|CS1|CS2)(?:-[A-Z0-9-]+)?$")
 
 
 def load_json(path: Path) -> Any:
@@ -113,10 +128,13 @@ def validate_config(config: dict[str, Any], errors: list[str]) -> None:
     if missing:
         errors.append(f"{CONFIG_PATH}: missing required keys {missing}")
         return
-    if config["schema_version"] != 1:
-        errors.append(f"{CONFIG_PATH}: schema_version must be 1")
-    if config["autonomy_default"] != "AUTONOMOUS":
+
+    schema = config.get("schema_version")
+    if schema not in {1, 2}:
+        errors.append(f"{CONFIG_PATH}: schema_version must be 1 or 2")
+    if config.get("autonomy_default") != "AUTONOMOUS":
         errors.append(f"{CONFIG_PATH}: autonomy_default must be AUTONOMOUS")
+
     states = set(config.get("states", []))
     active = set(config.get("active_states", []))
     terminal = set(config.get("terminal_states", []))
@@ -126,10 +144,13 @@ def validate_config(config: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{CONFIG_PATH}: terminal_states contains values not present in states")
     if active & terminal:
         errors.append(f"{CONFIG_PATH}: active_states and terminal_states must be disjoint")
-    if config.get("integration", {}).get("max_open_pull_requests") != 1:
+
+    integration = config.get("integration", {})
+    if integration.get("max_open_pull_requests") != 1:
         errors.append(f"{CONFIG_PATH}: max_open_pull_requests must remain 1")
-    if config.get("integration", {}).get("merge_method") != "merge":
+    if integration.get("merge_method") != "merge":
         errors.append(f"{CONFIG_PATH}: merge_method must remain 'merge'")
+
     ttl = config.get("lease", {}).get("default_ttl_minutes")
     if not isinstance(ttl, int) or ttl <= 0:
         errors.append(f"{CONFIG_PATH}: default_ttl_minutes must be a positive integer")
@@ -137,6 +158,52 @@ def validate_config(config: dict[str, Any], errors: list[str]) -> None:
         re.compile(config.get("branch_pattern", ""))
     except re.error as exc:
         errors.append(f"{CONFIG_PATH}: invalid branch_pattern: {exc}")
+
+    if schema != 2:
+        return
+
+    required_v2 = {
+        "coordination_parent_dir",
+        "parent_branch_pattern",
+        "parent_workstreams",
+        "child_agent_limit",
+        "role_branches",
+        "hardware",
+    }
+    missing_v2 = sorted(required_v2 - set(config))
+    if missing_v2:
+        errors.append(f"{CONFIG_PATH}: schema-v2 missing required keys {missing_v2}")
+        return
+
+    if config.get("parent_workstreams") != ["ie", "ee", "cs1", "cs2"]:
+        errors.append(f"{CONFIG_PATH}: parent_workstreams must be exactly ie, ee, cs1, cs2")
+    if config.get("child_agent_limit") is not None:
+        errors.append(f"{CONFIG_PATH}: child_agent_limit must be null; safety is contract-limited, not count-limited")
+    try:
+        re.compile(config.get("parent_branch_pattern", ""))
+    except re.error as exc:
+        errors.append(f"{CONFIG_PATH}: invalid parent_branch_pattern: {exc}")
+
+    role_branches = config.get("role_branches", {})
+    expected_roles = {"ie", "ee", "ehb", "cs1", "cs2"}
+    if set(role_branches) != expected_roles:
+        errors.append(f"{CONFIG_PATH}: role_branches must preserve ie, ee, ehb, cs1, cs2")
+    if role_branches.get("ehb") != "role/ehb-embedded-integration":
+        errors.append(f"{CONFIG_PATH}: EHB must remain first-class at role/ehb-embedded-integration")
+
+    hardware = config.get("hardware", {})
+    ownership = hardware.get("ownership", {}) if isinstance(hardware, dict) else {}
+    if isinstance(hardware, dict) and "primary_role" in hardware:
+        errors.append(f"{CONFIG_PATH}: hardware.primary_role is forbidden; EE and EHB ownership must stay split")
+    if not {"ee", "ehb", "shared"} <= set(ownership):
+        errors.append(f"{CONFIG_PATH}: hardware ownership must include ee, ehb, and shared")
+
+    if integration.get("max_integration_ready_pull_requests") != 1:
+        errors.append(f"{CONFIG_PATH}: max_integration_ready_pull_requests must remain 1")
+    if integration.get("require_latest_role_base") is not True:
+        errors.append(f"{CONFIG_PATH}: require_latest_role_base must remain true")
+    if integration.get("child_target_must_be_role_branch") is not True:
+        errors.append(f"{CONFIG_PATH}: child_target_must_be_role_branch must be true")
 
 
 def validate_task(
@@ -155,8 +222,12 @@ def validate_task(
         errors.append(f"{source}: missing required keys {missing}")
         return
 
-    if task.get("schema_version") != config.get("schema_version"):
-        errors.append(f"{source}: schema_version must match fabric schema")
+    task_schema = task.get("schema_version")
+    fabric_schema = config.get("schema_version")
+    if task_schema not in {1, 2}:
+        errors.append(f"{source}: schema_version must be 1 or 2")
+    elif fabric_schema == 1 and task_schema != 1:
+        errors.append(f"{source}: schema-v2 task requires fabric schema v2")
 
     task_id = task.get("id")
     if not isinstance(task_id, str):
@@ -205,6 +276,16 @@ def validate_task(
             errors.append(f"{source}: invalid touched path {owned!r}: {exc}")
     if state not in {"BACKLOG", "CANCELLED"} and not touched_paths:
         errors.append(f"{source}: {state} task must declare touched_paths")
+
+    if task.get("agent_kind") == "CHILD" or "parent_workstream" in task or "execution_role" in task:
+        parent = task.get("parent_workstream")
+        role = task.get("execution_role")
+        if parent not in config.get("parent_workstreams", []):
+            errors.append(f"{source}: invalid parent_workstream {parent!r}")
+        if role not in config.get("role_branches", {}):
+            errors.append(f"{source}: invalid execution_role {role!r}")
+        if task.get("agent_kind") != "CHILD":
+            errors.append(f"{source}: parent/role metadata requires agent_kind CHILD")
 
     owner = task.get("owner_agent")
     branch = task.get("branch")
@@ -318,6 +399,44 @@ def validate_task(
                     parse_timestamp(verified)
                 except ValueError as exc:
                     errors.append(f"{source}: invalid post_merge_verified_at: {exc}")
+
+
+def validate_parent_template(parent: dict[str, Any], config: dict[str, Any], errors: list[str]) -> None:
+    source = PARENT_TEMPLATE_PATH
+    missing = sorted(REQUIRED_PARENT_KEYS - set(parent))
+    if missing:
+        errors.append(f"{source}: missing required keys {missing}")
+        return
+    if parent.get("schema_version") != 2:
+        errors.append(f"{source}: schema_version must be 2")
+    parent_id = parent.get("id")
+    if not isinstance(parent_id, str) or not PARENT_ID_RE.fullmatch(parent_id):
+        errors.append(f"{source}: invalid parent id {parent_id!r}")
+    workstream = parent.get("workstream")
+    if workstream not in config.get("parent_workstreams", []):
+        errors.append(f"{source}: invalid workstream {workstream!r}")
+    human_owner = parent.get("human_owner")
+    if not isinstance(human_owner, str) or not human_owner.startswith("human:"):
+        errors.append(f"{source}: human_owner must use human:<identity>")
+    objective = parent.get("objective")
+    if not isinstance(objective, str) or not objective.strip():
+        errors.append(f"{source}: objective must be non-empty")
+    if parent.get("priority") not in config.get("priorities", []):
+        errors.append(f"{source}: invalid priority {parent.get('priority')!r}")
+    if parent.get("state") not in config.get("parent_states", []):
+        errors.append(f"{source}: invalid parent state {parent.get('state')!r}")
+    branch = parent.get("parent_branch")
+    if not isinstance(branch, str) or not re.fullmatch(config.get("parent_branch_pattern", ""), branch):
+        errors.append(f"{source}: invalid parent_branch {branch!r}")
+    if not isinstance(parent.get("child_ids"), list):
+        errors.append(f"{source}: child_ids must be a list")
+    if not isinstance(parent.get("notes"), list):
+        errors.append(f"{source}: notes must be a list")
+    integration = parent.get("integration")
+    if not isinstance(integration, dict):
+        errors.append(f"{source}: integration must be an object")
+    elif integration.get("pr_state") not in config.get("parent_pr_states", []):
+        errors.append(f"{source}: invalid integration.pr_state {integration.get('pr_state')!r}")
 
 
 def load_tasks(root: Path, config: dict[str, Any], errors: list[str]) -> dict[str, dict[str, Any]]:
@@ -446,6 +565,21 @@ def validate_repository(
     elif template is not None:
         errors.append(f"{TEMPLATE_PATH}: top-level value must be an object")
 
+    if config.get("schema_version") == 2:
+        parent_template_file = root / PARENT_TEMPLATE_PATH
+        if not parent_template_file.is_file():
+            errors.append(f"missing required file: {PARENT_TEMPLATE_PATH}")
+        else:
+            try:
+                parent_template = load_json(parent_template_file)
+            except (OSError, json.JSONDecodeError) as exc:
+                errors.append(f"{PARENT_TEMPLATE_PATH}: cannot read JSON: {exc}")
+                parent_template = None
+            if isinstance(parent_template, dict):
+                validate_parent_template(parent_template, config, errors)
+            elif parent_template is not None:
+                errors.append(f"{PARENT_TEMPLATE_PATH}: top-level value must be an object")
+
     tasks = load_tasks(root, config, errors)
     for task_id, task in tasks.items():
         source = f"{config.get('coordination_task_dir')}/{task_id}.json"
@@ -516,6 +650,8 @@ def main() -> int:
     print("AGENT FABRIC VALIDATION: PASS")
     print("- fabric configuration is valid")
     print("- task template is structurally valid")
+    if (ROOT / PARENT_TEMPLATE_PATH).is_file():
+        print("- parent workstream template is structurally valid")
     print(f"- coordination tasks validated: {len(tasks)}")
     print("- dependency graph and active path ownership are conflict-free")
     print("- lease, blocker, human-gate, and integration invariants hold")
