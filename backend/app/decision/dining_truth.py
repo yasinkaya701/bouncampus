@@ -97,17 +97,26 @@ def _validate_snapshot(
     snapshot_id = snapshot.get("snapshot_id")
     if not _text(snapshot_id):
         _append_once(contract_reasons, f"MISSING_SNAPSHOT_ID_{token}")
-    else:
-        known_snapshot_ids.add(snapshot_id.strip())
 
     available_at = _parse_timestamp(snapshot.get("available_at"))
+    cutoff_safe = False
     if available_at is None:
         _append_once(contract_reasons, f"INVALID_SNAPSHOT_TIMESTAMP_{token}")
-    elif cutoff is not None and available_at > cutoff:
+    elif cutoff is None:
+        cutoff_safe = False
+    elif available_at > cutoff:
         if label in REQUIRED_CONTEXT_SOURCES or label == "reservation":
             _append_once(contract_reasons, f"CONTEXT_AFTER_DECISION_CUTOFF_{token}")
         else:
             _append_once(contract_reasons, f"INPUT_AFTER_DECISION_CUTOFF_{token}")
+    else:
+        cutoff_safe = True
+
+    # Only evidence that is provably available by the decision cutoff may
+    # satisfy decision-audit provenance. A future snapshot can have a valid ID
+    # while still being hindsight information, so it must not enter this set.
+    if _text(snapshot_id) and cutoff_safe:
+        known_snapshot_ids.add(snapshot_id.strip())
 
     if require_value and not _nonnegative_number(snapshot.get("value")):
         _append_once(contract_reasons, f"MISSING_OR_INVALID_VALUE_{token}")
@@ -243,9 +252,10 @@ def assess_service_row(row: Mapping[str, Any]) -> dict[str, Any]:
     """Assess one service row without converting weak evidence into truth.
 
     ``contract_complete`` means the service-level fields and cutoff semantics are
-    structurally sufficient.  It does *not* mean the row is measured.  A row is
-    ``benchmark_eligible`` only when the contract is complete and its evidence
-    class is explicitly ``MEASURED_SERVICE_TRUTH``.
+    structurally sufficient, including a complete decision audit. It does *not*
+    mean the row is measured. A row is ``benchmark_eligible`` only when the
+    contract is complete and its evidence class is explicitly
+    ``MEASURED_SERVICE_TRUTH``.
     """
 
     if not isinstance(row, Mapping):
@@ -313,7 +323,7 @@ def assess_service_row(row: Mapping[str, Any]) -> dict[str, Any]:
 
     contract_reasons = list(dict.fromkeys(contract_reasons))
     reason_codes = list(dict.fromkeys(contract_reasons + evidence_reasons + audit_reasons))
-    contract_complete = not contract_reasons
+    contract_complete = not contract_reasons and not audit_reasons
     benchmark_eligible = contract_complete and evidence_class == MEASURED_EVIDENCE_CLASS
 
     return {
