@@ -225,6 +225,36 @@ def task(task_id: str, *, state: str = "READY", path: str = "scripts/example.py"
     return value
 
 
+def make_child(
+    task_id: str,
+    *,
+    state: str = "ACTIVE",
+    role: str = "cs1",
+    target_role_branch: str | None = None,
+    path: str = "scripts/child.py",
+) -> dict:
+    value = task(task_id, state=state, path=path)
+    config = fabric_v2_config()
+    value.update(
+        {
+            "schema_version": 2,
+            "agent_kind": "CHILD",
+            "parent_id": "HUMAN-CS1-TEST",
+            "parent_workstream": "cs1",
+            "execution_role": role,
+            "required_for_parent": True,
+            "child_integration": {
+                "target_role_branch": target_role_branch or config["role_branches"].get(role),
+                "pull_request": 99 if state == "INTEGRATING" else None,
+                "validated_head_sha": "c" * 40 if state == "INTEGRATING" else None,
+                "integrated_commit_sha": None,
+                "verified_at": None,
+            },
+        }
+    )
+    return value
+
+
 class RepoFixture:
     def __init__(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
@@ -310,14 +340,8 @@ class EHBRoleArchitectureTests(unittest.TestCase):
         self.config = json.loads((fabric.ROOT / fabric.CONFIG_PATH).read_text(encoding="utf-8"))
 
     def test_ehb_is_a_first_class_role_branch(self) -> None:
-        self.assertEqual(
-            self.config["role_branches"]["ehb"],
-            "role/ehb-embedded-integration",
-        )
-        self.assertEqual(
-            set(self.config["role_branches"]),
-            {"ie", "ee", "ehb", "cs1", "cs2"},
-        )
+        self.assertEqual(self.config["role_branches"]["ehb"], "role/ehb-embedded-integration")
+        self.assertEqual(set(self.config["role_branches"]), {"ie", "ee", "ehb", "cs1", "cs2"})
 
     def test_hardware_ownership_is_split_between_ee_and_ehb(self) -> None:
         ownership = self.config["hardware"]["ownership"]
@@ -332,12 +356,10 @@ class EHBRoleArchitectureTests(unittest.TestCase):
         self.assertIn("ee-ehb-interface-contract", ownership["shared"])
 
     def test_interface_template_uses_canonical_evidence_labels(self) -> None:
-        template = (
-            fabric.ROOT / "KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md"
-        ).read_text(encoding="utf-8")
-        evidence_line = next(
-            line for line in template.splitlines() if line.startswith("- Evidence class:")
+        template = (fabric.ROOT / "KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md").read_text(
+            encoding="utf-8"
         )
+        evidence_line = next(line for line in template.splitlines() if line.startswith("- Evidence class:"))
         declared = evidence_line.split("`", 2)[1].split(" | ")
         self.assertEqual(declared, self.config["hardware"]["evidence_labels"])
 
@@ -365,15 +387,50 @@ class FabricV2RecutTests(unittest.TestCase):
             template = template_task()
             template["schema_version"] = 2
             (repo.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template), encoding="utf-8")
-            child = task("TASK-CHILD", state="ACTIVE", path="scripts/child.py")
-            child["schema_version"] = 2
-            child["agent_kind"] = "CHILD"
+            child = make_child("TASK-CHILD")
             child["parent_workstream"] = "unknown"
             child["execution_role"] = "not-a-role"
+            child["child_integration"]["target_role_branch"] = "role/not-a-role"
             repo.add(child)
             errors, _, _ = fabric.validate_repository(repo.root, now=NOW)
             self.assertTrue(any("parent_workstream" in error for error in errors))
             self.assertTrue(any("execution_role" in error for error in errors))
+        finally:
+            repo.close()
+
+    def test_child_target_must_match_execution_role(self) -> None:
+        repo = RepoFixture()
+        try:
+            config = fabric_v2_config()
+            (repo.root / ".agents/fabric.json").write_text(json.dumps(config), encoding="utf-8")
+            template = template_task()
+            template["schema_version"] = 2
+            (repo.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template), encoding="utf-8")
+            child = make_child(
+                "TASK-EHB-TARGET",
+                role="ehb",
+                target_role_branch="role/ee-physical-systems",
+            )
+            repo.add(child)
+            errors, _, _ = fabric.validate_repository(repo.root, now=NOW)
+            self.assertTrue(any("target_role_branch" in error for error in errors))
+        finally:
+            repo.close()
+
+    def test_verified_role_fan_in_requires_complete_evidence(self) -> None:
+        repo = RepoFixture()
+        try:
+            config = fabric_v2_config()
+            (repo.root / ".agents/fabric.json").write_text(json.dumps(config), encoding="utf-8")
+            template = template_task()
+            template["schema_version"] = 2
+            (repo.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template), encoding="utf-8")
+            child = make_child("TASK-FANIN", state="INTEGRATING")
+            child["child_integration"]["verified_at"] = "2026-09-30T15:55:00Z"
+            child["child_integration"]["integrated_commit_sha"] = None
+            repo.add(child)
+            errors, _, _ = fabric.validate_repository(repo.root, now=NOW)
+            self.assertTrue(any("integrated_commit_sha" in error for error in errors))
         finally:
             repo.close()
 
@@ -386,13 +443,13 @@ class FabricV2RecutTests(unittest.TestCase):
             template["schema_version"] = 2
             (repo.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template), encoding="utf-8")
             for index in range(50):
-                child = task(f"TASK-C{index:02d}", state="ACTIVE", path=f"scratch/child-{index}")
-                child["schema_version"] = 2
+                child = make_child(
+                    f"TASK-C{index:02d}",
+                    role="cs1",
+                    path=f"scratch/child-{index}",
+                )
                 child["owner_agent"] = f"agent-child-{index}"
                 child["branch"] = f"agent/cs1/child-{index}"
-                child["agent_kind"] = "CHILD"
-                child["parent_workstream"] = "cs1"
-                child["execution_role"] = "cs1"
                 repo.add(child)
             errors, warnings, tasks = fabric.validate_repository(repo.root, now=NOW)
             self.assertEqual(errors, [])
