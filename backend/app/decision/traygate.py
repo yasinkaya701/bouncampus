@@ -226,3 +226,138 @@ def validate_traygate_result(
             "or achieved waste reduction."
         ),
     }
+
+
+def aggregate_traygate_service(
+    results: Sequence[Mapping[str, Any]],
+    *,
+    expected_meal_id: str,
+) -> dict[str, object]:
+    """Aggregate contract-admitted TrayGate results for one meal/service.
+
+    The aggregate is deliberately descriptive. Only valid ``READY`` results
+    contribute per-food leftover percentages. Review, withheld, and malformed
+    results are excluded and counted. Duplicate capture/tray identities or
+    cross-meal input reject the entire aggregate to prevent silent double
+    counting or service leakage.
+    """
+
+    if isinstance(results, (str, bytes)) or not isinstance(results, Sequence):
+        raise ValueError("results must be a sequence of mappings")
+    meal_id = _text(expected_meal_id)
+    if meal_id is None:
+        raise ValueError("expected_meal_id must be a non-empty string")
+
+    hard_reasons: list[str] = []
+    seen_capture_ids: set[str] = set()
+    seen_tray_ids: set[str] = set()
+    ready_rows: list[Mapping[str, Any]] = []
+    excluded_reason_counts: dict[str, int] = {}
+
+    for raw_result in results:
+        if not isinstance(raw_result, Mapping):
+            excluded_reason_counts["RESULT_MUST_BE_MAPPING"] = (
+                excluded_reason_counts.get("RESULT_MUST_BE_MAPPING", 0) + 1
+            )
+            continue
+
+        capture_id = _text(raw_result.get("captureId"))
+        tray_id = _text(raw_result.get("trayId"))
+        row_meal_id = _text(raw_result.get("mealId"))
+
+        if capture_id is not None:
+            if capture_id in seen_capture_ids:
+                _append_unique(hard_reasons, "DUPLICATE_CAPTURE_ID")
+            seen_capture_ids.add(capture_id)
+        if tray_id is not None:
+            if tray_id in seen_tray_ids:
+                _append_unique(hard_reasons, "DUPLICATE_TRAY_ID")
+            seen_tray_ids.add(tray_id)
+        if row_meal_id is not None and row_meal_id != meal_id:
+            _append_unique(hard_reasons, "MEAL_ID_MISMATCH")
+
+        validation = validate_traygate_result(raw_result)
+        if validation["validation_status"] == "ACCEPTED":
+            ready_rows.append(raw_result)
+            continue
+
+        for code in validation["reason_codes"]:
+            code_text = str(code)
+            excluded_reason_counts[code_text] = excluded_reason_counts.get(code_text, 0) + 1
+
+    total_count = len(results)
+
+    if hard_reasons:
+        return {
+            "aggregation_status": "REJECTED",
+            "descriptive_analytics_available": False,
+            "meal_id": meal_id,
+            "total_result_count": total_count,
+            "ready_result_count": 0,
+            "excluded_result_count": total_count,
+            "ready_fraction": 0.0,
+            "coverage_status": "NONE",
+            "per_food": {},
+            "excluded_reason_counts": dict(sorted(excluded_reason_counts.items())),
+            "reason_codes": hard_reasons,
+            "result_scope": "TRAYGATE_SERVICE_DESCRIPTIVE_PERCENTAGES_ONLY",
+            "claim_boundary": (
+                "A rejected service aggregate exposes no leftover statistics. "
+                "No mass, cost, climate, or savings estimate is produced."
+            ),
+        }
+
+    per_food_values: dict[str, list[float]] = {}
+    for row in ready_rows:
+        items = row.get("items", ())
+        for item in items:
+            food = _text(item.get("food"))
+            if food is None:
+                continue
+            per_food_values.setdefault(food, []).append(float(item["leftoverPercent"]))
+
+    per_food: dict[str, dict[str, float | int]] = {}
+    for food in sorted(per_food_values):
+        values = per_food_values[food]
+        per_food[food] = {
+            "sample_count": len(values),
+            "mean_leftover_percent": sum(values) / len(values),
+            "min_leftover_percent": min(values),
+            "max_leftover_percent": max(values),
+        }
+
+    ready_count = len(ready_rows)
+    excluded_count = total_count - ready_count
+    ready_fraction = ready_count / total_count if total_count else 0.0
+    if ready_count == 0:
+        coverage_status = "NONE"
+        aggregation_status = "NO_READY_RESULTS"
+        descriptive_available = False
+    elif ready_count == total_count:
+        coverage_status = "FULL"
+        aggregation_status = "AGGREGATED"
+        descriptive_available = True
+    else:
+        coverage_status = "PARTIAL"
+        aggregation_status = "AGGREGATED"
+        descriptive_available = True
+
+    return {
+        "aggregation_status": aggregation_status,
+        "descriptive_analytics_available": descriptive_available,
+        "meal_id": meal_id,
+        "total_result_count": total_count,
+        "ready_result_count": ready_count,
+        "excluded_result_count": excluded_count,
+        "ready_fraction": ready_fraction,
+        "coverage_status": coverage_status,
+        "per_food": per_food,
+        "excluded_reason_counts": dict(sorted(excluded_reason_counts.items())),
+        "reason_codes": [],
+        "result_scope": "TRAYGATE_SERVICE_DESCRIPTIVE_PERCENTAGES_ONLY",
+        "claim_boundary": (
+            "Service aggregation reports unweighted descriptive leftover percentages from "
+            "contract-admitted READY results only. It does not estimate grams, kilograms, "
+            "cost, carbon, water, causal impact, or achieved savings."
+        ),
+    }
