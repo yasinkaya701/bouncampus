@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "test:campus-operations": "node --experimental-strip-types scripts/campus-operations.test.mjs && node --experimental-strip-types scripts/food-menu-demand.test.mjs",
+    "typecheck": "npm run test:campus-operations && tsc --noEmit",
     "verify": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {

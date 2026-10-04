@@ -7,7 +7,8 @@ export type MethodEligibility =
   | 'PILOT_EVALUATED'
   | 'RETIRED';
 
-export type EligibilityAwareProductionDecision = ProductionDecisionBand & {
+export type EligibilityAwareProductionDecision = Omit<ProductionDecisionBand, 'recommendedTarget'> & {
+  recommendedTarget: number | null;
   methodEligibility: MethodEligibility;
 };
 

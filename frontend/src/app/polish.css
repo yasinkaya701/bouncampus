@@ -1,86 +1,52 @@
 :root {
-  --bc-shadow-soft: 0 22px 65px rgba(7, 17, 31, 0.06);
-  --bc-shadow-hover: 0 30px 82px rgba(7, 17, 31, 0.095);
+  --bc-shadow-soft: 0 1px 0 rgba(17, 23, 18, 0.02);
+  --bc-shadow-hover: 0 1px 0 rgba(17, 23, 18, 0.02);
 }
 
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(rgba(7, 28, 51, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(7, 28, 51, 0.018) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 68%);
+  content: none;
 }
 
 .bc-panel,
 .bc-panel-soft {
   position: relative;
   isolation: isolate;
-  transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+  transition: border-color 180ms ease, background-color 180ms ease;
 }
 
 .bc-panel::before,
 .bc-panel-soft::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(135deg, rgba(255,255,255,.72), transparent 34%, transparent 70%, rgba(184,228,103,.05));
-  opacity: .65;
+  content: none;
 }
 
 @media (hover: hover) {
   .bc-panel:hover,
   .bc-panel-soft:hover {
-    transform: translateY(-2px);
-    border-color: rgba(7, 28, 51, 0.14);
+    transform: none;
+    border-color: rgba(17, 23, 18, 0.16);
     box-shadow: var(--bc-shadow-hover);
   }
 }
 
 .bc-hero-shell {
-  border-color: rgba(255,255,255,.12);
+  border-color: rgba(17, 23, 18, 0.12);
 }
 
 .bc-hero-stage {
-  background:
-    radial-gradient(circle at 68% 16%, rgba(184,228,103,.09), transparent 24rem),
-    linear-gradient(160deg, #061625 0%, #071c33 58%, #09263d 100%);
+  background: #18372b;
 }
 
-.bc-hero-stage::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  background: linear-gradient(116deg, transparent 0 45%, rgba(255,255,255,.035) 49%, transparent 53% 100%);
-  transform: translateX(-45%);
-  animation: bc-hero-sheen 11s ease-in-out infinite;
-}
-
-@keyframes bc-hero-sheen {
-  0%, 62%, 100% { transform: translateX(-55%); opacity: 0; }
-  72% { opacity: .72; }
-  86% { transform: translateX(62%); opacity: .12; }
+.bc-hero-stage::after,
+.bc-hero-stage::before {
+  content: none;
 }
 
 .bc-hero-float-card {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.05),
-    0 28px 75px rgba(0,0,0,.30),
-    0 0 0 1px rgba(184,228,103,.025);
+  box-shadow: none;
 }
 
 .bc-focus-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(184,228,103,.34), 0 0 0 6px rgba(7,28,51,.24);
 }
 
 h1, h2, h3 {
@@ -89,26 +55,4 @@ h1, h2, h3 {
 
 p {
   text-wrap: pretty;
-}
-
-@media (max-width: 1023px) {
-  .bc-hero-stage {
-    min-height: 540px;
-  }
-}
-
-@media (max-width: 640px) {
-  body::before {
-    background-size: 52px 52px;
-  }
-
-  .bc-hero-stage {
-    min-height: 500px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bc-hero-stage::after {
-    animation: none;
-  }
 }
