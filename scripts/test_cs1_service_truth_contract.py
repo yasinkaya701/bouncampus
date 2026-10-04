@@ -210,6 +210,18 @@ def test_decision_audit_accepts_valid_quantity_band() -> None:
     assert result["eligible_for_benchmark"] is True
 
 
+def test_decision_audit_requires_exactly_one_recommendation_representation() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    rows[0]["decision_audit"]["recommended_quantity_band"] = {
+        "lower": 100,
+        "upper": 120,
+    }
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert "DECISION_AUDIT_AMBIGUOUS_RECOMMENDATION" in result["reason_codes"]
+
+
 def test_decision_audit_snapshots_must_resolve_to_known_inputs() -> None:
     contract = load_contract()
     rows = valid_rows()
