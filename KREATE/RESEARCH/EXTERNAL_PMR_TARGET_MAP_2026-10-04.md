@@ -7,18 +7,19 @@
 
 Boğaziçi-only interviews can validate a local workflow but cannot by themselves establish a Disciplined Entrepreneurship beachhead. Cross-site PMR should deliberately test whether the **same user job, product, purchasing route and operational pain** recur.
 
-Highest-value current external sampling set:
+Highest-information current sampling set:
 
-1. **Gebze Technical University (GTÜ)** — strong current public evidence of demand-based production planning and unexpected early sell-outs.
-2. **İstanbul Technical University (İTÜ)** — mature cafeteria/food-engineering governance plus electronic settlement and replenishment requirements in public procurement.
-3. **Bilkent University** — foundation-university comparison with dedicated Cafeterias Management and a different administrative/procurement structure.
-4. **Hacettepe University** — explicit cafeteria-manager + food-engineer roles under SKS, useful for persona-role repeatability.
+1. **Gebze Technical University (GTÜ)** — current demand-based production planning and unexpected early sell-outs.
+2. **İstanbul Technical University (İTÜ)** — mature in-house food-operations governance, named current manager, food-engineering process and electronic dining automation.
+3. **Amasya University** — reservation-first counter-archetype with an explicit institutional responsibility for determining meal counts.
+4. **Bilkent University** — foundation-university comparison with a dedicated Cafeterias Management directorate and different executive/procurement structure.
+5. **Hacettepe University** — cafeteria-manager + food-engineer role recurrence under SKS.
 
-The goal is not to maximize contact count. It is to sample **different operating mechanisms**.
+The goal is not to maximize contact count. It is to sample **different operating mechanisms that can falsify market homogeneity**.
 
 ---
 
-# 1. GTÜ — highest-value external workflow test
+# 1. GTÜ — highest-value same-pain workflow test
 
 Official GTÜ dining information, last updated **10 September 2026**, states that:
 
@@ -26,12 +27,13 @@ Official GTÜ dining information, last updated **10 September 2026**, states tha
 - **daily user counts** are considered;
 - food-waste prevention planning is considered;
 - some high-demand meals can still **run out early** when unexpected demand increases;
-- rapid replenishment is used to maintain service.
+- rapid replenishment is used to maintain service;
+- food quality/hygiene is monitored by a university-side team including a **Food Engineer, Dietitian and cooks**.
 
-Source:
+Official source:
 https://www.gtu.edu.tr/kategori/5904/0/display.aspx
 
-The page also publicly lists dining-service administrative contacts/roles for dining locations.
+The same page currently lists dining-location administrative roles including responsible branch-manager contacts and service-area responsible staff.
 
 ## Why GTÜ is unusually valuable
 
@@ -39,8 +41,8 @@ The public description already exposes the basic BOUNCAMPUS decision mechanism:
 
 ```text
 historical demand
-+ current user scale
-+ waste prevention objective
++ daily user scale
++ waste-prevention objective
 -> planned production
 -> unexpected demand shock
 -> early sellout risk
@@ -48,6 +50,16 @@ historical demand
 ```
 
 This does not validate BOUNCAMPUS, but it makes GTÜ a high-information PMR site for H-A/H-B/H-C.
+
+## Best discovery route
+
+Start with the current SKS / dining-service administrative route rather than assuming a named public contact owns quantity.
+
+General SKS contact page:
+https://www.gtu.edu.tr/kategori/1230/0/display.aspx
+
+Dining page:
+https://www.gtu.edu.tr/kategori/5904/0/display.aspx
 
 ## Questions
 
@@ -73,77 +85,153 @@ This does not validate BOUNCAMPUS, but it makes GTÜ a high-information PMR site
 
 ---
 
-# 2. İTÜ — mature operational/governance comparison
+# 2. İTÜ — mature in-house operating / incumbent-gap test
 
-Official İTÜ information says monthly menus are prepared under cafeteria-manager control by a team including:
+İTÜ's current administrative structure publicly lists:
 
-- food engineer;
-- food technician;
-- head cook.
+- **Dilek Demirkol — Yemek İşletmeleri Şube Müdürü**.
 
-Source:
-https://global.itu.edu.tr/tr/itu-de-ya%C5%9Fam/yeme-icme-ve-alisveris
+Official source:
+https://sks.itu.edu.tr/hakkimizda/i-dari-yap%C4%B1
 
-Separate 2026 procurement evidence (`2026/UH.II-740`) describes:
+Current Food Services information says:
 
-- cafeteria-automation / electronic records;
-- joint administration-contractor confirmation;
-- payment based on electronically recorded meal counts;
-- operational obligation to provide additional equivalent food when service is at risk of running out.
+- menus are prepared under the manager's control by a team including food engineer, food technician and head cook;
+- the operation uses electronic identity-card dining automation across dining halls;
+- roughly 14,000 people are served daily in the academic term;
+- food-safety and laboratory controls are routine;
+- purchasing/specification work involves Food Services, Procurement and food engineers.
 
-Source:
-https://herpoz.com/kamu-ihale-kararlari/2026UH.II-740-kamu-ihale-karari-kik
+Official source:
+https://www.sks.itu.edu.tr/hizmetlerimiz/beslenme-hizmetleri
+
+A current quality-governance page also lists Dilek Demirkol in the SKS unit-quality structure.
+
+Official source:
+https://kalite.itu.edu.tr/hakkimizda/kalite-birim-temsilcileri
 
 ## Why interview
 
-İTÜ can test whether a more digitally mature, formal operation already has sufficient decision support, making BOUNCAMPUS redundant, or whether a residual pre-service planning gap remains.
+İTÜ is useful because it can falsify the assumption that large universities need another generic forecasting layer.
+
+It tests whether a mature, internally operated system already has:
+
+- strong actual-demand records;
+- staff expertise;
+- purchasing/menu planning integration;
+- sufficiently good production guidance.
 
 ## Questions
 
-- Who owns quantity versus menu decisions?
-- Are electronic meal counts used prospectively or only after service?
-- What current forecast/baseline is used?
-- How are shortages forecast and replenished?
-- What specialist software already exists?
-- Is waste measured by stage?
-- What would a new decision layer have to do better than the incumbent process?
+- Who decides daily production quantity in the current in-house workflow?
+- Is it a separate decision from menu planning?
+- Are electronic meal counts used prospectively or only for historical reconciliation?
+- How is same-weekday / recent-history demand used?
+- How are shortages or late-demand changes handled?
+- What software/spreadsheets are already used?
+- What would a new decision layer have to do materially better?
+- Is unserved surplus measured distinctly from plate/prep waste?
 
 ### Critical falsifier
 
-If a mature operator already has accurate, integrated production guidance with low pain, this weakens the assumption that this archetype is an attractive early beachhead.
+If a mature operator already has integrated, low-pain production planning with no meaningful residual gap, this archetype should not be an early beachhead even if it has excellent data.
 
 ---
 
-# 3. Bilkent — foundation-university GTM comparison
+# 3. Amasya University — reservation-first counter-archetype and explicit meal-count responsibility
 
-Bilkent publicly operates a dedicated **Cafeterias Management** unit.
+Amasya University's current official reservation page states the reservation system is used **to prevent waste and determine total meal counts**, with campus/meal-specific reservations and operational kiosk/turnstile context.
 
-Official page:
-https://w3.bilkent.edu.tr/bilkent/cafeterias-management/
+Official source:
+https://sksdb.amasya.edu.tr/yemek-rezervasyon-sistemi-hakkinda
 
-Public governance sources list **Dilek Keskin Şahbaz — Director, Cafeterias Management** and dietitian/administrative involvement. The unit publicly provides a central feedback contact.
+The public SKS role description states that the relevant Social Services branch structure has duties including:
+
+- determining the number of academic staff, administrative staff and students who will eat;
+- preparing food-service specifications;
+- controlling material entry, cooking and distribution;
+- monitoring card/payment-related operations;
+- checking compliance with specification rules.
+
+Official source:
+https://sksdb.amasya.edu.tr/servisler/sosyal-hizmetler-sube-mudurlugu/gorev-ve-tanimlari
+
+Current public personnel information lists:
+
+- **Emrah Beşiktaşlı — SKS Department Head**;
+- **Emine Jülide Pehlivan — Food Engineer**;
+- a dietitian and operational staff within the structure.
+
+Official source:
+https://sksdb.amasya.edu.tr/personel
+
+A current Nutrition Services Management Board includes the Vice Rector, SKS head, branch manager, operational staff and Food Engineer.
+
+Official source:
+https://www.amasya.edu.tr/universitemiz/kurullar/beslenme-hizmetleri-yonetim-kurulu/
+
+The reservation page also gives a functional contact route for `Beslenme Hizmetleri / Yemek Rezerve ve KİOSK İşlemleri`.
+
+### Why Amasya is high information value
+
+Amasya directly tests whether BOUNCAMPUS's generic forecast thesis becomes redundant when the institution already has a strong pre-service commitment signal.
+
+The residual decision may instead be:
+
+```text
+reservation no-show correction
++ walk-in estimation
++ safety buffer
++ campus allocation
++ late exception handling
+```
+
+### Questions
+
+- What exact count is sent to production after reservations close?
+- How many reservations become no-shows?
+- Are walk-ins allowed and how are they estimated?
+- Who applies the final buffer on top of reservations?
+- Does the Food Engineer/board/branch manager participate in the quantity decision?
+- What is still difficult despite reservations?
+- Is actual turnstile usage reconciled against reservations automatically?
+- How does surplus/shortage compare with pre-reservation periods?
+
+### Beachhead consequence
+
+If the same product needs a fundamentally different decision object at reservation-first sites, they may be an adjacent segment rather than the same initial beachhead.
+
+---
+
+# 4. Bilkent — foundation-university GTM / buyer-path comparison
+
+Bilkent publicly operates a dedicated **Cafeterias Management Directorate**.
+
+Current governance pages list:
+
+- **Dilek Keskin Şahbaz — Director, Cafeterias Management**.
 
 Sources:
 
 - https://w3.bilkent.edu.tr/bilkent/university-governance-and-organization/standing-committees/
 - https://sustainable.bilkent.edu.tr/committees1-1/
 
-Bilkent's 2026 administrative restructuring places Cafeterias Management among units coordinated by the Secretary General alongside Procurement, Financial Affairs, Support/Transportation and other campus operations.
+A **15 September 2026** administrative restructuring announcement states that Cafeterias Management is coordinated by the Secretary General together with Procurement, Financial Affairs, Support/Transportation and other operations units.
 
 Source:
-https://bilkentnews.bilkent.edu.tr/?cat=4&paged=1
+https://bilkentnews.bilkent.edu.tr/?p=11176
 
 ## Why interview
 
-This is not merely another dining operator. It tests a different institutional structure:
+Bilkent tests a different institutional structure:
 
 ```text
 foundation university
 + dedicated cafeterias directorate
-+ different purchasing/approval structure
++ different executive/procurement route
 ```
 
-This helps test the DE `same sales process` requirement.
+This is especially useful for the DE `same sales process` criterion.
 
 ## Questions
 
@@ -153,21 +241,21 @@ This helps test the DE `same sales process` requirement.
 - What data are available before service?
 - How is waste/shortage monitored?
 - What is the approval path for a limited pilot?
-- Does the directorate control relevant budget, or would Procurement/Financial Affairs be the economic buyer/veto route?
+- Does the directorate control relevant budget, or would Secretary General / Procurement / Financial Affairs become buyer/veto actors?
 
 ### Beachhead implication
 
-If the product/user job is similar but purchasing and integration are radically different, public and foundation universities may need separate GTM segments.
+If the product/job is similar but purchasing and integration are radically different, public and foundation universities may need separate GTM segments.
 
 ---
 
-# 4. Hacettepe — persona-role repeatability test
+# 5. Hacettepe — persona-role repeatability test
 
 Hacettepe's 2026 administrative quality structure under SKS publicly lists:
 
 - Cafeteria Manager roles;
 - a Food Engineer;
-- SKS senior administration.
+- senior SKS administration.
 
 Source:
 https://kalite.hacettepe.edu.tr/tr/idari_birim_kalite_komisyonu_ibikak_2026-295
@@ -179,7 +267,7 @@ https://digihu.hacettepe.edu.tr/en/unit_representatives_committee-151
 
 ## Why interview
 
-This tests whether the recurring persona family found at Boğaziçi/İTÜ appears in another large public university:
+This tests whether the recurring persona family found at Boğaziçi/İTÜ/Amasya appears in another large public university:
 
 ```text
 cafeteria operations manager
@@ -191,26 +279,32 @@ But the interview must determine which role actually controls quantity.
 
 ---
 
-# 5. Suggested cross-site interview order
+# 6. Suggested cross-site interview order
 
 After the first Boğaziçi workflow is reconstructed:
 
 ```text
-GTÜ quantity-planning owner
+GTÜ quantity-planning route
     -> closest public evidence of same pain
-İTÜ cafeteria/production owner
-    -> digitally mature / incumbent-gap test
+
+Amasya quantity/reservation owner
+    -> strongest contrasting demand-signal architecture
+
+İTÜ Food Operations manager
+    -> mature in-house/incumbent-gap test
+
 Bilkent Cafeterias Management
     -> foundation-university sales-process test
+
 Hacettepe cafeteria/food-engineer route
-    -> public-university persona repeatability
+    -> additional public-university role repeatability
 ```
 
-This sequencing maximizes information diversity rather than sampling four nearly identical contacts.
+This sequencing maximizes information gain rather than collecting four confirming interviews.
 
 ---
 
-# 6. Cross-site comparison template
+# 7. Cross-site comparison template
 
 For each institution record:
 
@@ -218,6 +312,7 @@ For each institution record:
 institution_type
 production_architecture
 operator_model
+reservation_model
 quantity_owner
 quantity_influencers
 information_cutoff
@@ -225,6 +320,7 @@ freeze_time
 batch_adjustment
 current_forecast_method
 actual_served_measure
+reservation_to_actual_reconciliation
 waste_measurement
 shortage_response
 excess_consequence
@@ -248,11 +344,11 @@ Do not decide based only on institution prestige or size.
 
 ---
 
-# 7. What would strongly validate beachhead repeatability?
+# 8. What would strongly validate beachhead repeatability?
 
 At least two external institutions independently show:
 
-1. a similar pre-service quantity job;
+1. a similar reachable decision job;
 2. repeated surplus/shortage tradeoff;
 3. similar user role;
 4. a recommendation can arrive before a reachable freeze point;
@@ -264,7 +360,7 @@ If only the technical problem repeats while the product or sales process changes
 
 ---
 
-# 8. Evidence boundary
+# 9. Evidence boundary
 
 Public pages above are useful for:
 
@@ -276,7 +372,7 @@ They are **not** evidence of:
 
 - willingness to adopt;
 - willingness to pay;
-- daily decision authority;
+- daily decision authority unless the role description explicitly says so;
 - dissatisfaction with current tools;
 - pilot permission;
 - BOUNCAMPUS product-market fit.
