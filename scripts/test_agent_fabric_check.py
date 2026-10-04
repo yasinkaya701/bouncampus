@@ -242,6 +242,16 @@ class EHBRoleArchitectureTests(unittest.TestCase):
         self.assertIn("communications", ownership["ehb"])
         self.assertIn("ee-ehb-interface-contract", ownership["shared"])
 
+    def test_interface_template_uses_canonical_evidence_labels(self) -> None:
+        template = (
+            fabric.ROOT / "KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md"
+        ).read_text(encoding="utf-8")
+        evidence_line = next(
+            line for line in template.splitlines() if line.startswith("- Evidence class:")
+        )
+        declared = evidence_line.split("`", 2)[1].split(" | ")
+        self.assertEqual(declared, self.config["hardware"]["evidence_labels"])
+
 
 if __name__ == "__main__":
     unittest.main()
