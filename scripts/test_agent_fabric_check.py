@@ -69,6 +69,52 @@ def base_config() -> dict:
     }
 
 
+def fabric_v2_config() -> dict:
+    config = base_config()
+    config.update(
+        {
+            "schema_version": 2,
+            "coordination_parent_dir": ".agents/coordination/parents",
+            "parent_branch_pattern": "^work/(ie|ee|cs1|cs2)/[a-z0-9][a-z0-9-]*$",
+            "parent_workstreams": ["ie", "ee", "cs1", "cs2"],
+            "child_agent_limit": None,
+            "role_branches": {
+                "ie": "role/ie-customer-discovery",
+                "ee": "role/ee-physical-systems",
+                "ehb": "role/ehb-embedded-integration",
+                "cs1": "role/cs1-decision-intelligence",
+                "cs2": "role/cs2-product-strategy",
+            },
+            "hardware": {
+                "ownership": {
+                    "ee": ["calibration"],
+                    "ehb": ["pcb", "firmware", "communications"],
+                    "shared": ["ee-ehb-interface-contract"],
+                },
+                "evidence_labels": [
+                    "ASSUMPTION",
+                    "DATASHEET",
+                    "CALCULATION",
+                    "SIMULATION",
+                    "BENCH_TEST",
+                    "FIELD_TEST",
+                    "PRODUCTION_EVIDENCE",
+                ],
+            },
+        }
+    )
+    config["integration"].update(
+        {
+            "max_open_feature_pull_requests_per_role": 3,
+            "max_integration_ready_pull_requests": 1,
+            "require_latest_role_base": True,
+            "allow_parallel_parent_work": True,
+            "child_target_must_be_role_branch": True,
+        }
+    )
+    return config
+
+
 def template_task() -> dict:
     return {
         "schema_version": 1,
@@ -251,6 +297,66 @@ class EHBRoleArchitectureTests(unittest.TestCase):
         )
         declared = evidence_line.split("`", 2)[1].split(" | ")
         self.assertEqual(declared, self.config["hardware"]["evidence_labels"])
+
+
+class FabricV2RecutTests(unittest.TestCase):
+    def test_schema_v2_config_is_accepted(self) -> None:
+        errors: list[str] = []
+        fabric.validate_config(fabric_v2_config(), errors)
+        self.assertEqual(errors, [])
+
+    def test_repository_config_declares_four_human_parents_and_five_execution_roles(self) -> None:
+        config = json.loads((fabric.ROOT / fabric.CONFIG_PATH).read_text(encoding="utf-8"))
+        self.assertEqual(config["schema_version"], 2)
+        self.assertEqual(config["parent_workstreams"], ["ie", "ee", "cs1", "cs2"])
+        self.assertIsNone(config["child_agent_limit"])
+        self.assertEqual(set(config["role_branches"]), {"ie", "ee", "ehb", "cs1", "cs2"})
+        self.assertEqual(config["role_branches"]["ehb"], "role/ehb-embedded-integration")
+        self.assertNotIn("primary_role", config["hardware"])
+
+    def test_unknown_parent_or_execution_role_is_rejected_for_child_task(self) -> None:
+        repo = RepoFixture()
+        try:
+            config = fabric_v2_config()
+            (repo.root / ".agents/fabric.json").write_text(json.dumps(config), encoding="utf-8")
+            template = template_task()
+            template["schema_version"] = 2
+            (repo.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template), encoding="utf-8")
+            child = task("TASK-CHILD", state="ACTIVE", path="scripts/child.py")
+            child["schema_version"] = 2
+            child["agent_kind"] = "CHILD"
+            child["parent_workstream"] = "unknown"
+            child["execution_role"] = "not-a-role"
+            repo.add(child)
+            errors, _, _ = fabric.validate_repository(repo.root, now=NOW)
+            self.assertTrue(any("parent_workstream" in error for error in errors))
+            self.assertTrue(any("execution_role" in error for error in errors))
+        finally:
+            repo.close()
+
+    def test_fifty_independent_children_have_no_agent_count_cap(self) -> None:
+        repo = RepoFixture()
+        try:
+            config = fabric_v2_config()
+            (repo.root / ".agents/fabric.json").write_text(json.dumps(config), encoding="utf-8")
+            template = template_task()
+            template["schema_version"] = 2
+            (repo.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template), encoding="utf-8")
+            for index in range(50):
+                child = task(f"TASK-C{index:02d}", state="ACTIVE", path=f"scratch/child-{index}")
+                child["schema_version"] = 2
+                child["owner_agent"] = f"agent-child-{index}"
+                child["branch"] = f"agent/cs1/child-{index}"
+                child["agent_kind"] = "CHILD"
+                child["parent_workstream"] = "cs1"
+                child["execution_role"] = "cs1"
+                repo.add(child)
+            errors, warnings, tasks = fabric.validate_repository(repo.root, now=NOW)
+            self.assertEqual(errors, [])
+            self.assertEqual(warnings, [])
+            self.assertEqual(len(tasks), 50)
+        finally:
+            repo.close()
 
 
 if __name__ == "__main__":
