@@ -37,20 +37,41 @@ Canonical registries:
 1. [`DEEP_PMR_MARKET_SYNTHESIS_2026-10-04.md`](./DEEP_PMR_MARKET_SYNTHESIS_2026-10-04.md)  
    One-file strategic synthesis: problem, beachhead, hypotheses, procurement, competition, why-now, product implication and kill gates.
 
-2. [`../PMR/HYPOTHESIS_TEST_MATRIX.md`](../PMR/HYPOTHESIS_TEST_MATRIX.md)  
+2. [`DISCIPLINED_ENTREPRENEURSHIP_ALIGNMENT_2026-10-04.md`](./DISCIPLINED_ENTREPRENEURSHIP_ALIGNMENT_2026-10-04.md)  
+   Direct alignment with DE beachhead, Persona, DMU, PMR, Life Cycle Use Case and Key-Assumption requirements.
+
+3. [`COMPONENT_ASSUMPTIONS_AND_KILL_GATES_2026-10-04.md`](./COMPONENT_ASSUMPTIONS_AND_KILL_GATES_2026-10-04.md)  
+   Decomposes the three form hypotheses into 16 independently falsifiable assumptions plus market-homogeneity gates.
+
+4. [`../PMR/HYPOTHESIS_TEST_MATRIX.md`](../PMR/HYPOTHESIS_TEST_MATRIX.md)  
    Falsification-first PMR design for the three core application hypotheses.
 
-3. [`../PMR/TARGET_ROLE_MAP_2026-10-04.md`](../PMR/TARGET_ROLE_MAP_2026-10-04.md)  
+5. [`../PMR/TARGET_ROLE_MAP_2026-10-04.md`](../PMR/TARGET_ROLE_MAP_2026-10-04.md)  
    Role-owned Boğaziçi interview routing; public contacts are not interview evidence.
 
-4. [`TURKIYE_UNIVERSITY_DINING_PROCUREMENT_TAXONOMY_2026-10-04.md`](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_TAXONOMY_2026-10-04.md)  
+6. [`EXTERNAL_PMR_TARGET_MAP_2026-10-04.md`](./EXTERNAL_PMR_TARGET_MAP_2026-10-04.md)  
+   GTÜ, İTÜ, Bilkent and Hacettepe cross-site sampling plan to test repeatability and the DE same-product/same-sales-process conditions.
+
+7. [`TURKIYE_UNIVERSITY_DINING_PROCUREMENT_TAXONOMY_2026-10-04.md`](./TURKIYE_UNIVERSITY_DINING_PROCUREMENT_TAXONOMY_2026-10-04.md)  
    Cross-university quantity-owner/payment/risk structures; shows why `universities` is not one homogeneous workflow.
 
-5. [`BEACHHEAD_ICP_AND_PILOT_SELECTION_2026-10-04.md`](./BEACHHEAD_ICP_AND_PILOT_SELECTION_2026-10-04.md)  
+8. [`BUYER_ECONOMICS_AND_PROCUREMENT_ROUTE_2026-10-04.md`](./BUYER_ECONOMICS_AND_PROCUREMENT_ROUTE_2026-10-04.md)  
+   Separates end user, beneficiary and economic buyer and maps possible Boğaziçi contract-economics scenarios without inventing settlement terms.
+
+9. [`BEACHHEAD_ICP_AND_PILOT_SELECTION_2026-10-04.md`](./BEACHHEAD_ICP_AND_PILOT_SELECTION_2026-10-04.md)  
    Beachhead filters, pilot promotion gate, user/buyer/beneficiary separation and expansion logic.
 
-6. [`COMPETITOR_CAPABILITY_MATRIX_2026-10-04.md`](./COMPETITOR_CAPABILITY_MATRIX_2026-10-04.md)  
-   Winnow, Leanpath, Emissary and internal-status-quo overlap; defines forbidden novelty claims and remaining differentiation hypotheses.
+10. [`PERSONA_ROLE_PATTERN_RESEARCH_2026-10-04.md`](./PERSONA_ROLE_PATTERN_RESEARCH_2026-10-04.md)  
+    Cross-university role evidence for the operational persona family; role recurrence is not decision ownership.
+
+11. [`WHOLE_PRODUCT_AND_ADOPTION_BURDEN_2026-10-04.md`](./WHOLE_PRODUCT_AND_ADOPTION_BURDEN_2026-10-04.md)  
+    Full-life-cycle/whole-product burden, incumbent onboarding benchmark and minimum complete first-pilot package.
+
+12. [`COMPETITOR_CAPABILITY_MATRIX_2026-10-04.md`](./COMPETITOR_CAPABILITY_MATRIX_2026-10-04.md)  
+    Winnow, Leanpath, Emissary and internal-status-quo overlap; defines forbidden novelty claims and remaining differentiation hypotheses.
+
+13. [`APPLICATION_PACK_EVIDENCE_AUDIT_2026-10-04.md`](./APPLICATION_PACK_EVIDENCE_AUDIT_2026-10-04.md)  
+    Line-by-line risk audit of existing application narrative against current evidence.
 
 ---
 
@@ -69,14 +90,24 @@ Canonical registries:
 
 # Read order — measurement / EE / hardware
 
-1. [`TRAYGATE_AND_SMART_CAMPUS_ACADEMIC_EVIDENCE.md`](./TRAYGATE_AND_SMART_CAMPUS_ACADEMIC_EVIDENCE.md)  
+1. [`PILOT_MEASUREMENT_AND_EVIDENCE_STANDARD_2026-10-04.md`](./PILOT_MEASUREMENT_AND_EVIDENCE_STANDARD_2026-10-04.md)  
+   Separates hackathon promotion gates from causal/statistical claims and defines stage-specific waste measurement, service guardrails and evidence levels.
+
+2. [`TRAYGATE_AND_SMART_CAMPUS_ACADEMIC_EVIDENCE.md`](./TRAYGATE_AND_SMART_CAMPUS_ACADEMIC_EVIDENCE.md)  
    Academic evidence for constrained tray-leftover vision, RGB-D/volume/mass calibration and the decision-first smart-campus thesis.
 
-2. [`PRIVACY_AND_DATA_MINIMIZATION_BOUNDARIES_2026-10-04.md`](./PRIVACY_AND_DATA_MINIMIZATION_BOUNDARIES_2026-10-04.md)  
+3. [`PRIVACY_AND_DATA_MINIMIZATION_BOUNDARIES_2026-10-04.md`](./PRIVACY_AND_DATA_MINIMIZATION_BOUNDARIES_2026-10-04.md)  
    KVKK-informed data minimization: aggregate BUCard counts, tray-only camera FOV, no biometrics, bounded raw-image retention.
 
-3. [`../HARDWARE/TRAYGATE_EHB_CS1_INTERFACE.md`](../HARDWARE/TRAYGATE_EHB_CS1_INTERFACE.md)  
+4. [`../HARDWARE/TRAYGATE_EHB_CS1_INTERFACE.md`](../HARDWARE/TRAYGATE_EHB_CS1_INTERFACE.md)  
    Existing merged EHB↔CS1 physical-capture vs vision/intelligence ownership boundary.
+
+---
+
+# Read order — long-term campus expansion
+
+1. [`CAMPUS_EXPANSION_DECISION_MAP_2026-10-04.md`](./CAMPUS_EXPANSION_DECISION_MAP_2026-10-04.md)  
+   Food-to-space/mobility/energy/water expansion logic based on named decisions rather than generic sensing/dashboard features.
 
 ---
 
@@ -119,7 +150,10 @@ High-volume, centrally coordinated/institution-governed university dining where:
 - service-level private data access;
 - operator adoption;
 - willingness to pay;
-- cross-university repeatability.
+- cross-university repeatability;
+- same-product/same-sales-process beachhead homogeneity;
+- prioritized purchasing criteria of a real Persona;
+- primary economic buyer and veto path.
 
 ---
 
@@ -154,7 +188,10 @@ Secondary research now has diminishing marginal value versus the following prima
 7. settlement/payment quantity;
 8. who captures savings;
 9. service-level data availability/semantics;
-10. same workflow at a second/third institution.
+10. real Persona purchasing priorities;
+11. champion / economic buyer / veto path;
+12. same product + sales process at second/third institution;
+13. peer/word-of-mouth route.
 
 Further research is still useful when it resolves a concrete decision or prevents an unsupported claim; it should not become a substitute for interviews.
 
@@ -188,6 +225,12 @@ UI GreenMetric digital criterion
 
 camera leftover paper works
     -> TrayGate has validated gram accuracy
+
+real staff title exists
+    -> that person owns production quantity
+
+same technical pain at two universities
+    -> same beachhead sales process
 ```
 
 ---
