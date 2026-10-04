@@ -23,14 +23,17 @@ dining = _load(ROOT / "backend/app/decision/dining_truth.py", "cs1_dining_truth_
 contract = _load(ROOT / "scripts/test_cs1_dining_truth_contract.py", "cs1_dining_truth_contract_fixture")
 
 
-def test_reservation_snapshot_is_required_by_service_truth_contract() -> None:
+def test_service_without_reservation_workflow_can_omit_reservation_snapshot() -> None:
     row = contract.sandbox_row()
+    reservation_id = row["context"]["reservation"]["snapshot_id"]
     del row["context"]["reservation"]
+    row["decision_audit"]["input_snapshot_ids"].remove(reservation_id)
 
     result = dining.assess_service_row(row)
 
-    assert result["contract_complete"] is False
-    assert any("RESERVATION" in code for code in result["reason_codes"]), result
+    assert result["contract_complete"] is True, result
+    assert result["decision_audit_complete"] is True, result
+    assert result["benchmark_eligible"] is False
 
 
 def test_after_cutoff_snapshot_cannot_satisfy_decision_audit_provenance() -> None:
@@ -60,7 +63,7 @@ def test_incomplete_decision_audit_blocks_measured_row_benchmark_eligibility() -
 
 def main() -> int:
     tests = [
-        test_reservation_snapshot_is_required_by_service_truth_contract,
+        test_service_without_reservation_workflow_can_omit_reservation_snapshot,
         test_after_cutoff_snapshot_cannot_satisfy_decision_audit_provenance,
         test_incomplete_decision_audit_blocks_measured_row_benchmark_eligibility,
     ]
