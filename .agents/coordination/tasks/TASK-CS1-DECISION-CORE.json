@@ -4,7 +4,7 @@
   "title": "Build comprehensive CS1 decision intelligence v1",
   "priority": "P0",
   "lane": "api-product",
-  "state": "INTEGRATING",
+  "state": "MERGED_VERIFYING",
   "owner_agent": "cs1-decision-intelligence",
   "branch": "agent/api-product/cs1-decision-core",
   "depends_on": [],
@@ -84,16 +84,11 @@
     "heartbeat_at": "2026-10-01T12:04:30Z",
     "ttl_minutes": 360
   },
-  "blocker": {
-    "kind": "INFRASTRUCTURE",
-    "summary": "PR #67 exact-head CI is partially queued on the required self-hosted macOS/ARM64 runner.",
-    "evidence": "CI run 36833849451 is still queued on head b7099421bfe6ba75d66d2c92c7546926f52ba19f; feature-registry executed but the remaining required jobs have not completed.",
-    "next_action": "Keep PR #67 open and merge only after all required exact-head CI jobs execute successfully."
-  },
+  "blocker": null,
   "integration": {
     "pull_request": 67,
-    "validated_head_sha": null,
-    "merge_sha": null,
+    "validated_head_sha": "9a33f54c627286749bcec601d264d7b4fab6bcaf",
+    "merge_sha": "bc24d884df7465a5200e622e765375d5ca31fc44",
     "post_merge_verified_at": null
   },
   "notes": [
@@ -109,9 +104,7 @@
     "Temporary branch-only CS1 validation workflow was deleted before integration; PR #45 used the normal role-targeted CI and has been merged into role/cs1-decision-intelligence.",
     "Feature head 783ee20a8ede6fcab9be0e30b7991be7b2f6aaa4 triggered a successful Vercel preview deployment; d20d6165 only changes repository validation logic and does not alter deployable product code.",
     "Does not intentionally modify .github/workflows/ci.yml; that file is inherited unchanged from the synchronized role branch.",
-    "Role integration PR #67 is open from role/cs1-decision-intelligence to master at head b7099421bfe6ba75d66d2c92c7546926f52ba19f; master base remains 7fbb0ec45ab840ce316a12e21f82ab7ae1181309.",
-    "Audit correction: the earlier note claiming PRs #68, #69, and #70 were all non-overlapping was wrong. PR #68 edits pilot-score/pilot-template paths still owned by this INTEGRATING task, and PR #69 edits scripts/cs1_baseline_benchmark.py, also still owned here. Both PRs were converted to draft and must not merge or continue overlapping integration until this task reaches MERGED_VERIFIED.",
-    "PR #70 currently uses new method-selection/stability/context-signal paths that do not overlap this task's declared product paths, but it was also converted to draft because exact-head CI is queued, its scope is still growing, and the no-comparable-method fail-closed semantics remain unresolved.",
-    "Control-plane drift detected during audit: agent-coordination/.agents/fabric.json is behind master/.agents/fabric.json and does not yet contain the current role-branch parallel-feature policy. Avoid treating stale control metadata as authority for new active claims until governance synchronizes it."
+    "Historical overlap warnings for #68/#69/#70 are retained only as audit context; those feature streams have since converged through the role branch.",
+    "2026-10-04 convergence audit: PR #67 is merged. Its exact integration head 9a33f54c627286749bcec601d264d7b4fab6bcaf had green standard CI and Hosted Fallback before merge; normal merge commit bc24d884df7465a5200e622e765375d5ca31fc44 is an ancestor of current master with 0 commits behind. Task advanced from stale INTEGRATING metadata to MERGED_VERIFYING."
   ]
 }
