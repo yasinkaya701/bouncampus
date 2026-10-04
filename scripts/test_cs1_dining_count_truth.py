@@ -75,6 +75,27 @@ def test_nonphysical_or_nonvalid_event_is_withheld_not_promoted() -> None:
     assert "MEASUREMENT_QUALITY_NOT_VALID" in result["reason_codes"]
 
 
+def test_identity_bearing_event_is_rejected_and_never_aggregated() -> None:
+    contract = load_contract()
+    identity_bearing = count_event(10)
+    identity_bearing["metadata"] = {"studentId": "should-never-enter-count-contract"}
+
+    result = contract.validate_dining_count_event(identity_bearing)
+    assert result["validation_status"] == "REJECTED"
+    assert result["aggregation_eligible"] is False
+    assert "PRIVACY_FIELD_NOT_ALLOWED_STUDENTID" in result["reason_codes"]
+
+    aggregate = contract.aggregate_dining_count_events(
+        [identity_bearing],
+        expected_station_id=STATION_ID,
+        window_start=WINDOW_START,
+        window_end=WINDOW_END,
+    )
+    assert aggregate["descriptive_counts_available"] is False
+    assert aggregate["admitted_event_count"] == 0
+    assert aggregate["served_portions_observed"] == 0
+
+
 def test_aggregate_deduplicates_identical_retry_and_sums_only_unique_counts() -> None:
     contract = load_contract()
     produced = count_event(
