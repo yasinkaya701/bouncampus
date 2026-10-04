@@ -420,6 +420,63 @@ class ParentChildOperationTests(unittest.TestCase):
             "role/ehb-embedded-integration",
         )
 
+    def test_parent_fanout_spawns_multiple_role_preserving_children(self) -> None:
+        spawned = agent_task.fanout_parent_tasks(
+            self.fx.root,
+            self.parent["id"],
+            [
+                {
+                    "task_id": "TASK-FANOUT-EE",
+                    "title": "Measurement slice",
+                    "execution_role": "ee",
+                    "lane": "hw-measurement",
+                    "touched_paths": ["KREATE/HARDWARE/measurement-slice"],
+                },
+                {
+                    "task_id": "TASK-FANOUT-EHB",
+                    "title": "Embedded slice",
+                    "execution_role": "ehb",
+                    "lane": "ehb-integration",
+                    "touched_paths": ["KREATE/HARDWARE/embedded-slice"],
+                },
+            ],
+        )
+        self.assertEqual([item["id"] for item in spawned], ["TASK-FANOUT-EE", "TASK-FANOUT-EHB"])
+        self.assertEqual(spawned[1]["execution_role"], "ehb")
+        self.assertEqual(
+            spawned[1]["child_integration"]["target_role_branch"],
+            "role/ehb-embedded-integration",
+        )
+        self.assertEqual(
+            self.fx.read_parent(self.parent["id"])["child_ids"],
+            ["TASK-FANOUT-EE", "TASK-FANOUT-EHB"],
+        )
+
+    def test_integration_queue_allows_parallel_active_parents_but_one_ready_slot(self) -> None:
+        parents = [
+            make_parent("HUMAN-IE-OPS", workstream="ie"),
+            make_parent("HUMAN-EE-OPS", workstream="ee"),
+            make_parent("HUMAN-CS1-OPS", workstream="cs1"),
+            make_parent("HUMAN-CS2-OPS", workstream="cs2"),
+        ]
+        for parent in parents:
+            self.fx.add_parent(parent)
+        queue = agent_task.parent_integration_queue(self.fx.root)
+        self.assertIsNone(queue["active_slot"])
+        self.assertEqual(len(queue["parents"]), 5)
+
+        first = self.fx.read_parent("HUMAN-CS1-OPS")
+        first["state"] = "READY_FOR_INTEGRATION"
+        self.fx.add_parent(first)
+        queue = agent_task.parent_integration_queue(self.fx.root)
+        self.assertEqual(queue["active_slot"], "HUMAN-CS1-OPS")
+
+        second = self.fx.read_parent("HUMAN-EE-OPS")
+        second["state"] = "INTEGRATING"
+        self.fx.add_parent(second)
+        with self.assertRaises(agent_task.TaskOperationError):
+            agent_task.parent_integration_queue(self.fx.root)
+
 
 if __name__ == "__main__":
     unittest.main()
