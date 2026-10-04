@@ -137,6 +137,38 @@ def test_reservation_count_is_required_only_when_workflow_is_active() -> None:
     assert "ACTIVE_RESERVATIONS_REQUIRED_FOR_ACTIVE_WORKFLOW" in result["reason_codes"]
 
 
+def test_served_reservation_decomposition_must_reconcile_when_present() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    rows[0]["reservation_served"] = 80
+    rows[0]["unreserved_served"] = rows[0]["actual_served"] - 81
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert result["eligible_for_benchmark"] is False
+    assert "SERVED_DEMAND_DECOMPOSITION_MISMATCH" in result["reason_codes"]
+
+    rows = valid_rows()
+    rows[0]["reservation_served"] = 80
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert "SERVED_DEMAND_DECOMPOSITION_INCOMPLETE" in result["reason_codes"]
+
+
+def test_decision_audit_snapshots_must_resolve_to_known_inputs() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    rows[0]["decision_audit"] = {
+        "input_snapshot_ids": [
+            rows[0]["decision_inputs"][0]["snapshot_id"],
+            "unknown:future-or-untracked-snapshot",
+        ]
+    }
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert result["eligible_for_benchmark"] is False
+    assert "DECISION_AUDIT_UNKNOWN_INPUT_SNAPSHOT" in result["reason_codes"]
+
+
 def test_generated_sandbox_never_becomes_benchmark_truth() -> None:
     contract = load_contract()
     rows = valid_rows(evidence_class="GENERATED_SANDBOX")
