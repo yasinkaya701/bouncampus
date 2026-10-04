@@ -365,22 +365,57 @@ def validate_service_truth_dataset(
             _append_unique(errors, "RESERVATION_DECISION_INPUT_REQUIRED")
 
         decision_audit = raw_row.get("decision_audit")
-        if decision_audit is not None:
-            if not isinstance(decision_audit, Mapping):
-                _append_unique(errors, "DECISION_AUDIT_MUST_BE_MAPPING")
-            else:
-                audit_snapshot_ids = decision_audit.get("input_snapshot_ids")
-                if not isinstance(audit_snapshot_ids, Sequence) or isinstance(
-                    audit_snapshot_ids, (str, bytes)
-                ) or not audit_snapshot_ids:
-                    _append_unique(errors, "DECISION_AUDIT_INPUT_SNAPSHOTS_REQUIRED")
+        if decision_audit is None:
+            _append_unique(errors, "DECISION_AUDIT_REQUIRED")
+        elif not isinstance(decision_audit, Mapping):
+            _append_unique(errors, "DECISION_AUDIT_MUST_BE_MAPPING")
+        else:
+            if _text(decision_audit.get("method_version")) is None:
+                _append_unique(errors, "DECISION_AUDIT_METHOD_VERSION_REQUIRED")
+
+            has_quantity = "recommended_quantity" in decision_audit
+            has_band = "recommended_quantity_band" in decision_audit
+            if has_quantity and has_band:
+                _append_unique(errors, "DECISION_AUDIT_AMBIGUOUS_RECOMMENDATION")
+            elif not has_quantity and not has_band:
+                _append_unique(errors, "DECISION_AUDIT_RECOMMENDATION_REQUIRED")
+            if has_quantity and _nonnegative_number(
+                decision_audit.get("recommended_quantity")
+            ) is None:
+                _append_unique(errors, "DECISION_AUDIT_INVALID_RECOMMENDED_QUANTITY")
+            if has_band:
+                band = decision_audit.get("recommended_quantity_band")
+                if not isinstance(band, Mapping):
+                    _append_unique(errors, "DECISION_AUDIT_INVALID_RECOMMENDED_QUANTITY_BAND")
                 else:
-                    for raw_snapshot_id in audit_snapshot_ids:
-                        audit_snapshot_id = _text(raw_snapshot_id)
-                        if audit_snapshot_id is None:
-                            _append_unique(errors, "DECISION_AUDIT_INVALID_INPUT_SNAPSHOT_ID")
-                        elif audit_snapshot_id not in cutoff_safe_snapshot_ids:
-                            _append_unique(errors, "DECISION_AUDIT_UNKNOWN_INPUT_SNAPSHOT")
+                    lower = _nonnegative_number(band.get("lower"))
+                    upper = _nonnegative_number(band.get("upper"))
+                    if lower is None or upper is None or lower > upper:
+                        _append_unique(
+                            errors,
+                            "DECISION_AUDIT_INVALID_RECOMMENDED_QUANTITY_BAND",
+                        )
+
+            operator_action = _text(decision_audit.get("operator_action"))
+            if operator_action is None:
+                _append_unique(errors, "DECISION_AUDIT_OPERATOR_ACTION_REQUIRED")
+            elif operator_action.upper() == "OVERRIDE" and _text(
+                decision_audit.get("override_reason")
+            ) is None:
+                _append_unique(errors, "DECISION_AUDIT_OVERRIDE_REASON_REQUIRED")
+
+            audit_snapshot_ids = decision_audit.get("input_snapshot_ids")
+            if not isinstance(audit_snapshot_ids, Sequence) or isinstance(
+                audit_snapshot_ids, (str, bytes)
+            ) or not audit_snapshot_ids:
+                _append_unique(errors, "DECISION_AUDIT_INPUT_SNAPSHOTS_REQUIRED")
+            else:
+                for raw_snapshot_id in audit_snapshot_ids:
+                    audit_snapshot_id = _text(raw_snapshot_id)
+                    if audit_snapshot_id is None:
+                        _append_unique(errors, "DECISION_AUDIT_INVALID_INPUT_SNAPSHOT_ID")
+                    elif audit_snapshot_id not in cutoff_safe_snapshot_ids:
+                        _append_unique(errors, "DECISION_AUDIT_UNKNOWN_INPUT_SNAPSHOT")
 
         if parsed_date is not None and cutoff is not None and service_id is not None:
             parsed_rows.append((parsed_date, cutoff, service_id))
