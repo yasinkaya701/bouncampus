@@ -61,7 +61,7 @@ jobs:
               echo "PRs to master must come from a configured role branch or agent/quality-release/*."
               exit 1
             fi
-          elif is_role_branch "$BASE_REF" ]; then
+          elif is_role_branch "$BASE_REF"; then
             if [[ "$HEAD_REF" != agent/* ]]; then
               echo "Feature PRs into role branches must use agent/<lane>/<task> heads."
               exit 1
