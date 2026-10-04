@@ -101,7 +101,7 @@ EHB must not silently redefine CS1 model/readiness/confidence/decision semantics
 
 ## 8. Evidence and safety gate
 
-- Evidence class: `ASSUMPTION | DATASHEET | SIMULATION | UNIT_TEST | BENCH_TEST | FIELD_TEST | PRODUCTION_EVIDENCE`
+- Evidence class: `ASSUMPTION | DATASHEET | CALCULATION | SIMULATION | BENCH_TEST | FIELD_TEST | PRODUCTION_EVIDENCE`
 - Physical safety gate required: `YES | NO`
 - Safety reviewer / evidence, when required:
 - Known blockers:
