@@ -27,9 +27,9 @@ def load_contract():
 def count_event(
     index: int,
     *,
-    measurement_type: str = "SERVED_PORTION_DELTA",
+    measurement_type: str = "SERVED_TRAY_DELTA",
     value: int = 1,
-    unit: str = "PORTIONS",
+    unit: str = "TRAYS",
 ) -> dict:
     return {
         "eventId": f"dining-count-2026-10-04-{index:06d}",
@@ -52,7 +52,7 @@ def test_valid_physical_count_event_is_admitted_without_truth_promotion() -> Non
 
     assert result["validation_status"] == "ACCEPTED_MEASURED"
     assert result["aggregation_eligible"] is True
-    assert result["measurement_type"] == "SERVED_PORTION_DELTA"
+    assert result["measurement_type"] == "SERVED_TRAY_DELTA"
     assert result["count_delta"] == 1
     assert result["event_fingerprint_sha256"]
     assert result["reason_codes"] == []
@@ -93,7 +93,22 @@ def test_identity_bearing_event_is_rejected_and_never_aggregated() -> None:
     )
     assert aggregate["descriptive_counts_available"] is False
     assert aggregate["admitted_event_count"] == 0
-    assert aggregate["served_portions_observed"] == 0
+    assert aggregate["served_trays_observed"] == 0
+
+
+def test_serving_counter_does_not_promote_trays_to_portions() -> None:
+    contract = load_contract()
+    unsupported = count_event(
+        11,
+        measurement_type="SERVED_PORTION_DELTA",
+        value=1,
+        unit="PORTIONS",
+    )
+
+    result = contract.validate_dining_count_event(unsupported)
+    assert result["validation_status"] == "REJECTED"
+    assert result["aggregation_eligible"] is False
+    assert "UNKNOWN_MEASUREMENT_TYPE" in result["reason_codes"]
 
 
 def test_aggregate_deduplicates_identical_retry_and_sums_only_unique_counts() -> None:
@@ -126,9 +141,10 @@ def test_aggregate_deduplicates_identical_retry_and_sums_only_unique_counts() ->
     assert aggregate["idempotent_replay_count"] == 1
     assert aggregate["admitted_event_count"] == 3
     assert aggregate["produced_portions_observed"] == 120
-    assert aggregate["served_portions_observed"] == 73
+    assert aggregate["served_trays_observed"] == 73
     assert aggregate["returned_trays_observed"] == 65
     assert aggregate["reconciled_service_truth"] is False
+    assert "served_portions_observed" not in aggregate
     assert "actual_served" not in aggregate
     assert "waste_kg" not in aggregate
     assert "actual_surplus_portions" not in aggregate
@@ -151,7 +167,7 @@ def test_changed_payload_reusing_event_id_rejects_whole_window() -> None:
     assert aggregate["descriptive_counts_available"] is False
     assert "EVENT_ID_REPLAY_CONFLICT" in aggregate["reason_codes"]
     assert aggregate["produced_portions_observed"] is None
-    assert aggregate["served_portions_observed"] is None
+    assert aggregate["served_trays_observed"] is None
     assert aggregate["returned_trays_observed"] is None
 
 
