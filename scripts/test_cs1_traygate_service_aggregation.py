@@ -111,7 +111,7 @@ def test_duplicate_capture_or_tray_rejects_whole_aggregate() -> None:
     )
     assert aggregate["aggregation_status"] == "REJECTED"
     assert aggregate["descriptive_analytics_available"] is False
-    assert "DUPLICATE_CAPTURE_ID" in aggregate["reason_codes"]
+    assert aggregate["reason_codes"] == ["CAPTURE_ID_REPLAY_CONFLICT"]
     assert aggregate["per_food"] == {}
 
     duplicate_tray = ready_result(2)
