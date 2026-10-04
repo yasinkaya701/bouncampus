@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - 'role/**'
+      - 'agent/quality-release/**'
 
 permissions:
   contents: read
