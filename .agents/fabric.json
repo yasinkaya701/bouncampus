@@ -6,22 +6,52 @@
   "role_branches": {
     "ie": "role/ie-customer-discovery",
     "ee": "role/ee-physical-systems",
+    "ehb": "role/ehb-embedded-integration",
     "cs1": "role/cs1-decision-intelligence",
     "cs2": "role/cs2-product-strategy"
   },
   "hardware": {
-    "primary_role": "ee",
+    "ownership": {
+      "ee": [
+        "measurement-architecture",
+        "sensor-measurement-selection",
+        "calibration",
+        "uncertainty",
+        "field-verification"
+      ],
+      "ehb": [
+        "embedded-electronics",
+        "pcb",
+        "firmware",
+        "communications",
+        "power-interface-implementation",
+        "bring-up",
+        "hw-sw-integration"
+      ],
+      "shared": [
+        "system-verification",
+        "ee-ehb-interface-contract"
+      ]
+    },
     "playbook": "KREATE/HARDWARE/HARDWARE_AGENT_PLAYBOOK.md",
-    "recommended_lanes": [
-      "hw-measurement",
-      "hw-sensors",
-      "hw-power",
-      "hw-firmware",
-      "hw-pcb",
-      "hw-mechanical",
-      "hw-calibration",
-      "hw-verification"
-    ],
+    "recommended_lanes": {
+      "ee": [
+        "hw-measurement",
+        "hw-sensors",
+        "hw-calibration",
+        "hw-field-verification"
+      ],
+      "ehb": [
+        "ehb-hardware",
+        "ehb-firmware",
+        "ehb-comms",
+        "ehb-integration",
+        "ehb-verification"
+      ],
+      "shared": [
+        "hw-system-verification"
+      ]
+    },
     "evidence_labels": [
       "ASSUMPTION",
       "DATASHEET",
@@ -31,6 +61,7 @@
       "FIELD_TEST",
       "PRODUCTION_EVIDENCE"
     ],
+    "interface_contract_required": true,
     "physical_safety_gate_required": true
   },
   "capabilities": {

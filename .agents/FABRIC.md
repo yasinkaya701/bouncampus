@@ -14,13 +14,25 @@ Implementation and review can happen concurrently. Final product truth remains s
 - Role integration branches:
   - `role/ie-customer-discovery`
   - `role/ee-physical-systems`
+  - `role/ehb-embedded-integration`
   - `role/cs1-decision-intelligence`
   - `role/cs2-product-strategy`
 - Short-lived implementation branches: `agent/<lane>/<task>`
 - Coordination metadata branch: `agent-coordination`
 - Task store: `.agents/coordination/tasks/`
 
+Execution-role count is independent of human-team count. KREATE remains a four-human team while the control plane exposes five execution roles.
+
 Task JSON remains the authority for ownership, dependencies, path claims, leases, human gates, and final integration evidence.
+
+## Hardware ownership boundary
+
+- **EE:** measurement architecture, sensor/measurement selection, calibration, uncertainty and field verification.
+- **EHB:** embedded electronics, PCB, firmware, communications, device-side power/interface implementation, bring-up, buffering/recovery and HW↔SW integration.
+- **Shared:** EE↔EHB interface contract and system-level verification.
+- **CS1:** downstream data/model/decision semantics; CS1 consumer review is required when a device/data-contract change can alter inference or decision behavior.
+
+The canonical EE↔EHB handoff template is `KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md`. Cross-boundary changes must not silently redefine ownership or evidence semantics.
 
 ## Parallel PR model
 
