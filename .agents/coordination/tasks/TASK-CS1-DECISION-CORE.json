@@ -4,7 +4,7 @@
   "title": "Build comprehensive CS1 decision intelligence v1",
   "priority": "P0",
   "lane": "api-product",
-  "state": "MERGED_VERIFYING",
+  "state": "MERGED_VERIFIED",
   "owner_agent": "cs1-decision-intelligence",
   "branch": "agent/api-product/cs1-decision-core",
   "depends_on": [],
@@ -89,7 +89,7 @@
     "pull_request": 67,
     "validated_head_sha": "9a33f54c627286749bcec601d264d7b4fab6bcaf",
     "merge_sha": "bc24d884df7465a5200e622e765375d5ca31fc44",
-    "post_merge_verified_at": null
+    "post_merge_verified_at": "2026-10-04T18:27:19Z"
   },
   "notes": [
     "Scope expanded by user request from minimal core to the broad CS1 Decision Intelligence v1 workstream.",
@@ -105,6 +105,6 @@
     "Feature head 783ee20a8ede6fcab9be0e30b7991be7b2f6aaa4 triggered a successful Vercel preview deployment; d20d6165 only changes repository validation logic and does not alter deployable product code.",
     "Does not intentionally modify .github/workflows/ci.yml; that file is inherited unchanged from the synchronized role branch.",
     "Historical overlap warnings for #68/#69/#70 are retained only as audit context; those feature streams have since converged through the role branch.",
-    "2026-10-04 convergence audit: PR #67 is merged. Its exact integration head 9a33f54c627286749bcec601d264d7b4fab6bcaf had green standard CI and Hosted Fallback before merge; normal merge commit bc24d884df7465a5200e622e765375d5ca31fc44 is an ancestor of current master with 0 commits behind. Task advanced from stale INTEGRATING metadata to MERGED_VERIFYING."
+    "2026-10-04 convergence audit: PR #67 is merged. Its exact integration head 9a33f54c627286749bcec601d264d7b4fab6bcaf had green standard CI and Hosted Fallback before merge; normal merge commit bc24d884df7465a5200e622e765375d5ca31fc44 is an ancestor of current master with 0 commits behind. Current master 9b0435ecdb7e9a86ce0c17376e2c061cdf01d000 also includes the later CS1 role integration from PR #143, so the delivered CS1 decision core remains present after subsequent evolution."
   ]
 }
