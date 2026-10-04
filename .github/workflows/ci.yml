@@ -191,3 +191,23 @@ jobs:
           python -m json.tool backend/app/data/campus_config.json >/dev/null
           python -m json.tool frontend/src/data/campus_config.json >/dev/null
           python -m json.tool frontend/src/data/real_boun_courses.json >/dev/null
+
+  backend-cs1-regressions:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: python -m pip install -r backend/requirements.txt
+      - run: npm ci --prefix frontend --no-audit --no-fund
+      - run: python -m compileall -q backend/app scripts
+      - name: Run deterministic CS1 regression registry
+        run: python scripts/run_cs1_regressions.py
