@@ -277,15 +277,53 @@ def validate_task(
     if state not in {"BACKLOG", "CANCELLED"} and not touched_paths:
         errors.append(f"{source}: {state} task must declare touched_paths")
 
-    if task.get("agent_kind") == "CHILD" or "parent_workstream" in task or "execution_role" in task:
+    child_metadata_present = task.get("agent_kind") == "CHILD" or any(
+        key in task for key in ("parent_id", "parent_workstream", "execution_role", "child_integration")
+    )
+    if child_metadata_present:
+        parent_id = task.get("parent_id")
         parent = task.get("parent_workstream")
         role = task.get("execution_role")
-        if parent not in config.get("parent_workstreams", []):
-            errors.append(f"{source}: invalid parent_workstream {parent!r}")
-        if role not in config.get("role_branches", {}):
-            errors.append(f"{source}: invalid execution_role {role!r}")
         if task.get("agent_kind") != "CHILD":
             errors.append(f"{source}: parent/role metadata requires agent_kind CHILD")
+        if not isinstance(parent_id, str) or not parent_id.strip():
+            errors.append(f"{source}: CHILD requires parent_id")
+        if parent not in config.get("parent_workstreams", []):
+            errors.append(f"{source}: invalid parent_workstream {parent!r}")
+        role_branches = config.get("role_branches", {})
+        if role not in role_branches:
+            errors.append(f"{source}: invalid execution_role {role!r}")
+        if not isinstance(task.get("required_for_parent"), bool):
+            errors.append(f"{source}: CHILD requires boolean required_for_parent")
+        child_integration = task.get("child_integration")
+        if not isinstance(child_integration, dict):
+            errors.append(f"{source}: CHILD requires child_integration object")
+        else:
+            expected_target = role_branches.get(role)
+            target = child_integration.get("target_role_branch")
+            if expected_target is not None and target != expected_target:
+                errors.append(
+                    f"{source}: child_integration.target_role_branch {target!r} must match "
+                    f"execution_role {role!r} target {expected_target!r}"
+                )
+            verified_at = child_integration.get("verified_at")
+            integrated_sha = child_integration.get("integrated_commit_sha")
+            evidence_present = verified_at is not None or integrated_sha is not None
+            if evidence_present:
+                if not isinstance(child_integration.get("pull_request"), int):
+                    errors.append(f"{source}: verified child role fan-in requires child_integration.pull_request")
+                validated_head = child_integration.get("validated_head_sha")
+                if not isinstance(validated_head, str) or not validated_head.strip():
+                    errors.append(f"{source}: verified child role fan-in requires child_integration.validated_head_sha")
+                if not isinstance(integrated_sha, str) or not integrated_sha.strip():
+                    errors.append(f"{source}: verified child role fan-in requires child_integration.integrated_commit_sha")
+                if not isinstance(verified_at, str) or not verified_at.strip():
+                    errors.append(f"{source}: verified child role fan-in requires child_integration.verified_at")
+                else:
+                    try:
+                        parse_timestamp(verified_at)
+                    except ValueError as exc:
+                        errors.append(f"{source}: invalid child_integration.verified_at: {exc}")
 
     owner = task.get("owner_agent")
     branch = task.get("branch")
@@ -581,10 +619,10 @@ def validate_repository(
                 errors.append(f"{PARENT_TEMPLATE_PATH}: top-level value must be an object")
 
     tasks = load_tasks(root, config, errors)
-    for task_id, task in tasks.items():
+    for task_id, task_value in tasks.items():
         source = f"{config.get('coordination_task_dir')}/{task_id}.json"
         validate_task(
-            task,
+            task_value,
             source,
             config,
             errors,
@@ -601,12 +639,12 @@ def validate_repository(
 
 def ready_task_ids(tasks: dict[str, dict[str, Any]]) -> list[str]:
     result: list[str] = []
-    for task_id, task in tasks.items():
-        if task.get("state") != "READY":
+    for task_id, task_value in tasks.items():
+        if task_value.get("state") != "READY":
             continue
-        deps = task.get("depends_on", [])
+        deps = task_value.get("depends_on", [])
         if all(tasks.get(dep, {}).get("state") == "MERGED_VERIFIED" for dep in deps):
-            gate = task.get("human_gate", {})
+            gate = task_value.get("human_gate", {})
             if gate.get("status") not in {"PENDING", "REJECTED"}:
                 result.append(task_id)
     return sorted(result)
@@ -615,8 +653,8 @@ def ready_task_ids(tasks: dict[str, dict[str, Any]]) -> list[str]:
 def print_summary(tasks: dict[str, dict[str, Any]]) -> None:
     counts: dict[str, int] = {}
     human_waiting: list[str] = []
-    for task_id, task in tasks.items():
-        state = str(task.get("state"))
+    for task_id, task_value in tasks.items():
+        state = str(task_value.get("state"))
         counts[state] = counts.get(state, 0) + 1
         if state == "WAITING_HUMAN":
             human_waiting.append(task_id)
