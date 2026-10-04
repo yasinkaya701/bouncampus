@@ -31,11 +31,28 @@ def make_task(task_id: str, *, state: str = "READY", path: str = "scripts/exampl
     return template
 
 
+def make_parent(parent_id: str = "HUMAN-EE-HARDWARE", *, workstream: str = "ee") -> dict:
+    template = json.loads((REPO / ".agents/PARENT_WORKSTREAM_TEMPLATE.json").read_text(encoding="utf-8"))
+    template.update(
+        {
+            "id": parent_id,
+            "workstream": workstream,
+            "human_owner": "human:owner",
+            "objective": "Coordinate child work safely.",
+            "parent_branch": f"work/{workstream}/hardware",
+            "child_ids": [],
+            "notes": [],
+        }
+    )
+    return template
+
+
 class Fixture:
     def __init__(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
         (self.root / ".agents/coordination/tasks").mkdir(parents=True)
+        (self.root / ".agents/coordination/parents").mkdir(parents=True)
         (self.root / ".agents/fabric.json").write_text(
             (REPO / ".agents/fabric.json").read_text(encoding="utf-8"), encoding="utf-8"
         )
@@ -52,9 +69,19 @@ class Fixture:
             json.dumps(value, indent=2) + "\n", encoding="utf-8"
         )
 
+    def add_parent(self, value: dict) -> None:
+        (self.root / ".agents/coordination/parents" / f"{value['id']}.json").write_text(
+            json.dumps(value, indent=2) + "\n", encoding="utf-8"
+        )
+
     def read(self, task_id: str) -> dict:
         return json.loads(
             (self.root / ".agents/coordination/tasks" / f"{task_id}.json").read_text(encoding="utf-8")
+        )
+
+    def read_parent(self, parent_id: str) -> dict:
+        return json.loads(
+            (self.root / ".agents/coordination/parents" / f"{parent_id}.json").read_text(encoding="utf-8")
         )
 
     def close(self) -> None:
@@ -219,6 +246,172 @@ class AgentTaskTests(unittest.TestCase):
         )
         self.assertEqual(resumed["state"], "ACTIVE")
         self.assertEqual(resumed["human_gate"]["status"], "APPROVED")
+
+
+class ParentChildOperationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.fx = Fixture()
+        self.parent = make_parent()
+        self.fx.add_parent(self.parent)
+
+    def tearDown(self) -> None:
+        self.fx.close()
+
+    def test_spawn_child_records_parent_and_preserves_ehb_as_execution_role(self) -> None:
+        child = agent_task.spawn_child_task(
+            self.fx.root,
+            parent_id=self.parent["id"],
+            task_id="TASK-EHB-CHILD",
+            title="Implement EHB integration slice",
+            execution_role="ehb",
+            lane="ehb-integration",
+            touched_paths=["KREATE/HARDWARE/child-slice"],
+        )
+        self.assertEqual(child["schema_version"], 2)
+        self.assertEqual(child["agent_kind"], "CHILD")
+        self.assertEqual(child["parent_id"], self.parent["id"])
+        self.assertEqual(child["parent_workstream"], "ee")
+        self.assertEqual(child["execution_role"], "ehb")
+        self.assertEqual(
+            child["child_integration"]["target_role_branch"],
+            "role/ehb-embedded-integration",
+        )
+        self.assertIn("TASK-EHB-CHILD", self.fx.read_parent(self.parent["id"])["child_ids"])
+
+    def test_spawn_child_rejects_unknown_parent_or_execution_role(self) -> None:
+        with self.assertRaises(agent_task.TaskOperationError):
+            agent_task.spawn_child_task(
+                self.fx.root,
+                parent_id="HUMAN-CS1-MISSING",
+                task_id="TASK-BAD-PARENT",
+                title="Bad parent",
+                execution_role="cs1",
+                lane="cs1",
+                touched_paths=["scripts/bad-parent"],
+            )
+        with self.assertRaises(agent_task.TaskOperationError):
+            agent_task.spawn_child_task(
+                self.fx.root,
+                parent_id=self.parent["id"],
+                task_id="TASK-BAD-ROLE",
+                title="Bad role",
+                execution_role="unknown",
+                lane="cs1",
+                touched_paths=["scripts/bad-role"],
+            )
+
+    def test_spawn_child_rejects_active_path_overlap_without_mutating_parent(self) -> None:
+        active = make_task("TASK-ACTIVE", state="ACTIVE", path="backend/app/decision")
+        active["owner_agent"] = "agent-existing"
+        active["branch"] = "agent/cs1/existing"
+        active["lease"] = {
+            "claimed_at": "2026-09-30T16:00:00Z",
+            "heartbeat_at": "2026-09-30T16:55:00Z",
+            "ttl_minutes": 360,
+        }
+        self.fx.add(active)
+        with self.assertRaises(agent_task.TaskOperationError):
+            agent_task.spawn_child_task(
+                self.fx.root,
+                parent_id=self.parent["id"],
+                task_id="TASK-CONFLICT",
+                title="Conflicting child",
+                execution_role="cs1",
+                lane="cs1",
+                touched_paths=["backend/app/decision/new.py"],
+            )
+        self.assertEqual(self.fx.read_parent(self.parent["id"])["child_ids"], [])
+        self.assertFalse((self.fx.root / ".agents/coordination/tasks/TASK-CONFLICT.json").exists())
+
+    def test_parent_status_requires_all_required_children_to_be_verified(self) -> None:
+        first = make_task("TASK-ONE", state="MERGED_VERIFIED", path="scripts/one.py")
+        first["schema_version"] = 2
+        first["agent_kind"] = "CHILD"
+        first["parent_id"] = self.parent["id"]
+        first["parent_workstream"] = "ee"
+        first["execution_role"] = "ehb"
+        first["required_for_parent"] = True
+        second = make_task("TASK-TWO", state="READY", path="scripts/two.py")
+        second["schema_version"] = 2
+        second["agent_kind"] = "CHILD"
+        second["parent_id"] = self.parent["id"]
+        second["parent_workstream"] = "ee"
+        second["execution_role"] = "ee"
+        second["required_for_parent"] = True
+        self.fx.add(first)
+        self.fx.add(second)
+        parent = self.fx.read_parent(self.parent["id"])
+        parent["child_ids"] = ["TASK-ONE", "TASK-TWO"]
+        self.fx.add_parent(parent)
+
+        status = agent_task.parent_status(self.fx.root, self.parent["id"])
+        self.assertFalse(status["ready_for_integration"])
+        self.assertEqual(status["required_remaining"], ["TASK-TWO"])
+
+        second = self.fx.read("TASK-TWO")
+        second.update(
+            {
+                "state": "MERGED_VERIFIED",
+                "owner_agent": "agent-two",
+                "branch": "agent/ee/task-two",
+                "lease": {
+                    "claimed_at": "2026-09-30T15:00:00Z",
+                    "heartbeat_at": "2026-09-30T15:30:00Z",
+                    "ttl_minutes": 360,
+                },
+                "integration": {
+                    "pull_request": 100,
+                    "validated_head_sha": "b" * 40,
+                    "merge_sha": "c" * 40,
+                    "post_merge_verified_at": "2026-09-30T15:55:00Z",
+                },
+            }
+        )
+        self.fx.add(second)
+        status = agent_task.parent_status(self.fx.root, self.parent["id"])
+        self.assertTrue(status["ready_for_integration"])
+        self.assertEqual(status["required_remaining"], [])
+
+    def test_integrate_child_requires_configured_role_branch(self) -> None:
+        child = make_task("TASK-INTEGRATE", state="READY_FOR_INTEGRATION", path="scripts/integrate.py")
+        child["schema_version"] = 2
+        child["agent_kind"] = "CHILD"
+        child["parent_id"] = self.parent["id"]
+        child["parent_workstream"] = "ee"
+        child["execution_role"] = "ehb"
+        child["required_for_parent"] = True
+        child["owner_agent"] = "agent-child"
+        child["branch"] = "agent/ehb/integrate-child"
+        child["lease"] = {
+            "claimed_at": "2026-09-30T15:00:00Z",
+            "heartbeat_at": "2026-09-30T15:30:00Z",
+            "ttl_minutes": 360,
+        }
+        self.fx.add(child)
+        with self.assertRaises(agent_task.TaskOperationError):
+            agent_task.integrate_child_task(
+                self.fx.root,
+                "TASK-INTEGRATE",
+                owner="agent-child",
+                pull_request=123,
+                validated_head_sha="a" * 40,
+                target_role_branch="role/ee-physical-systems",
+            )
+        result = agent_task.integrate_child_task(
+            self.fx.root,
+            "TASK-INTEGRATE",
+            owner="agent-child",
+            pull_request=123,
+            validated_head_sha="a" * 40,
+            target_role_branch="role/ehb-embedded-integration",
+        )
+        self.assertEqual(result["state"], "INTEGRATING")
+        self.assertEqual(result["integration"]["pull_request"], 123)
+        self.assertEqual(result["child_integration"]["validated_head_sha"], "a" * 40)
+        self.assertEqual(
+            result["child_integration"]["target_role_branch"],
+            "role/ehb-embedded-integration",
+        )
 
 
 if __name__ == "__main__":
