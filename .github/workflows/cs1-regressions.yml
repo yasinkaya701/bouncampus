@@ -1,0 +1,26 @@
+name: CS1 Regression Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'role/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cs1-regressions-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  runner-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify deterministic CS1 regression runner contract
+        run: python scripts/test_cs1_regression_runner.py
