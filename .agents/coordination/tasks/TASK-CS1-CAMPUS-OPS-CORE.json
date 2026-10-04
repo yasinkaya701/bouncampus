@@ -4,7 +4,7 @@
   "title": "Build CS1 campus operations decision core",
   "priority": "P0",
   "lane": "api-product",
-  "state": "CLAIMED",
+  "state": "CANCELLED",
   "owner_agent": "cs1-campus-ops-core",
   "branch": "agent/api-product/cs1-campus-ops-core",
   "depends_on": [],
@@ -68,12 +68,7 @@
     "heartbeat_at": "2026-10-01T12:37:00Z",
     "ttl_minutes": 360
   },
-  "blocker": {
-    "kind": "INTEGRATION_CAPACITY",
-    "summary": "CS1 role branch already has three open feature PRs, so implementation may proceed on the task branch but must not open a fourth role-targeted PR until a slot is freed.",
-    "evidence": "Open CS1 feature PRs #68, #69, and #70 target role/cs1-decision-intelligence; repository policy caps open feature PRs per role at three. Existing exact-head CI is also queued on the required self-hosted macOS/ARM64 runner.",
-    "next_action": "Keep the implementation isolated and audited on agent/api-product/cs1-campus-ops-core; open the feature PR only after a CS1 slot is freed, then require exact-head CI before merge."
-  },
+  "blocker": null,
   "integration": {
     "pull_request": null,
     "validated_head_sha": null,
@@ -86,6 +81,7 @@
     "The combined API supports campus state, shuttle, classroom, food operations, building energy, shared-capacity allocation, and a cross-domain portfolio under one decision-time-aware contract.",
     "Capacity-sensitive shuttle and classroom decisions now require verified provenance rather than treating model estimates as physical truth.",
     "The task deliberately avoids fabricating PMR, pilot outcomes, live telemetry, or achieved sustainability impact.",
-    "Campus operations are advisory decision support; irreversible operational execution remains outside this package."
+    "Campus operations are advisory decision support; irreversible operational execution remains outside this package.",
+    "2026-10-04 convergence audit: legacy branch agent/api-product/cs1-campus-ops-core and PR #89 were superseded and PR #89 closed unmerged. Canonical campus-operations delivery is PR #84, which merged into role/cs1-decision-intelligence; PR #67 subsequently integrated the CS1 decision core into master. Current master retains the evolved campus-ops router and later solar/site-planning work. Do not resurrect or merge the stale #89 branch."
   ]
 }
