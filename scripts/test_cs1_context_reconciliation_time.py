@@ -101,12 +101,34 @@ def test_reconciled_outcome_without_timestamp_fails_closed() -> None:
         raise AssertionError("timestamp-less reconciled truth must fail closed")
 
 
+def test_reconciliation_cannot_predate_its_own_decision_cutoff() -> None:
+    context_signal = load_context_signal()
+    try:
+        context_signal.generate_context_residual_forecasts(
+            base_forecasts=[100],
+            actual_demand=[110],
+            context_keys=["menu:A"],
+            signal_available_at=[ts(1, 8)],
+            decision_cutoff_at=[ts(1, 10)],
+            outcome_reconciled=[True],
+            outcome_reconciled_at=[ts(1, 9)],
+            min_history=1,
+            min_context_history=1,
+            shrinkage_strength=0.0,
+        )
+    except ValueError as exc:
+        assert "outcome_reconciled_at must be after its own decision cutoff" in str(exc)
+    else:
+        raise AssertionError("pre-cutoff outcome truth must fail closed")
+
+
 def main() -> int:
     tests = [
         test_api_requires_reconciliation_timestamp_semantics,
         test_outcome_enters_history_only_after_reconciliation_time,
         test_out_of_order_decision_cutoffs_fail_closed,
         test_reconciled_outcome_without_timestamp_fails_closed,
+        test_reconciliation_cannot_predate_its_own_decision_cutoff,
     ]
     for test in tests:
         test()
