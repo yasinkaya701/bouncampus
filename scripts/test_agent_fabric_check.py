@@ -216,5 +216,42 @@ class AgentFabricTests(unittest.TestCase):
         self.assertTrue(any("validated_head_sha" in error for error in errors))
 
 
+class EHBRoleArchitectureTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.config = json.loads((fabric.ROOT / fabric.CONFIG_PATH).read_text(encoding="utf-8"))
+
+    def test_ehb_is_a_first_class_role_branch(self) -> None:
+        self.assertEqual(
+            self.config["role_branches"]["ehb"],
+            "role/ehb-embedded-integration",
+        )
+        self.assertEqual(
+            set(self.config["role_branches"]),
+            {"ie", "ee", "ehb", "cs1", "cs2"},
+        )
+
+    def test_hardware_ownership_is_split_between_ee_and_ehb(self) -> None:
+        ownership = self.config["hardware"]["ownership"]
+        self.assertIn("ee", ownership)
+        self.assertIn("ehb", ownership)
+        self.assertIn("shared", ownership)
+        self.assertNotIn("primary_role", self.config["hardware"])
+        self.assertIn("calibration", ownership["ee"])
+        self.assertIn("pcb", ownership["ehb"])
+        self.assertIn("firmware", ownership["ehb"])
+        self.assertIn("communications", ownership["ehb"])
+        self.assertIn("ee-ehb-interface-contract", ownership["shared"])
+
+    def test_interface_template_uses_canonical_evidence_labels(self) -> None:
+        template = (
+            fabric.ROOT / "KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md"
+        ).read_text(encoding="utf-8")
+        evidence_line = next(
+            line for line in template.splitlines() if line.startswith("- Evidence class:")
+        )
+        declared = evidence_line.split("`", 2)[1].split(" | ")
+        self.assertEqual(declared, self.config["hardware"]["evidence_labels"])
+
+
 if __name__ == "__main__":
     unittest.main()

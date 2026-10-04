@@ -22,7 +22,8 @@ Valid states:
 ## Parallel integration rules
 
 - There is no repository-wide single-PR lock.
-- Each KREATE role has a long-lived `role/*` integration branch.
+- Each execution role has a long-lived `role/*` integration branch.
+- The execution-role count is independent of the four-human KREATE team count.
 - Short-lived `agent/<lane>/<task>` branches normally PR into the owning role branch.
 - Up to 3 feature PRs may be open against one role branch.
 - Each role may have at most one open role-to-`master` integration PR.
@@ -30,6 +31,7 @@ Valid states:
 - Any `master` PR that becomes stale after another merge must sync current `master` and rerun required validation before merge.
 - Active task path ownership remains exclusive.
 - A role-branch merge is staging; only verified `master` is final delivery.
+- EE↔EHB cross-boundary hardware changes use the interface contract; device/data-contract changes affecting downstream inference require CS1 consumer review.
 
 ## Role branches
 
@@ -37,6 +39,7 @@ Valid states:
 | --- | --- |
 | IE | `role/ie-customer-discovery` |
 | EE | `role/ee-physical-systems` |
+| EHB | `role/ehb-embedded-integration` |
 | CS1 | `role/cs1-decision-intelligence` |
 | CS2 | `role/cs2-product-strategy` |
 

@@ -6,14 +6,15 @@ These role files define **ownership, not confinement**.
 
 Each role owns a critical question for the KREATE application and product thesis, but no role is restricted to a fixed task list. Team members and agents are expected to cross boundaries whenever doing so can materially improve evidence, product quality, technical credibility, or Top-15 selection probability.
 
-The four core questions are:
+The five execution-role questions are:
 
 1. **IE — Customer Discovery & Market Lead:** What is actually happening in the market and operation?
-2. **EE — Physical Systems & Measurement Lead:** What can we reliably measure and deploy in the physical world?
-3. **CS1 — Decision Intelligence Lead:** Can we help the operator make a better decision and prove it?
-4. **CS2 — Product Strategy, Evidence Synthesis & Application Lead:** Given the evidence, what should we build and how do we defend the thesis?
+2. **EE — Physical Systems & Measurement Lead:** What can we reliably measure and validate in the physical world?
+3. **EHB — Embedded Hardware, Communications & Integration Lead:** Can we implement the approved measurement requirements as reliable electronics, firmware, communications and device interfaces?
+4. **CS1 — Decision Intelligence Lead:** Can we help the operator make a better decision and prove it?
+5. **CS2 — Product Strategy, Evidence Synthesis & Application Lead:** Given the evidence, what should we build and how do we defend the thesis?
 
-These questions overlap by design.
+These questions overlap by design. Execution-role count is separate from human-team count; the KREATE team remains four humans.
 
 ## Autonomy Principle
 
@@ -96,13 +97,25 @@ Customer workflow and error costs should define decision objectives; model limit
 
 Raw evidence should change product strategy; product contradictions should generate new customer-discovery work.
 
+### EE ↔ EHB
+
+EE owns measurement architecture, sensor/measurement choice, calibration, uncertainty and field validity. EHB owns the embedded implementation: electronics, PCB, firmware, communications, device-side power/interfaces, bring-up, buffering/recovery and HW↔SW integration. Cross-boundary changes use `KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md`.
+
 ### EE ↔ CS1
 
 Physical data quality should inform model confidence; model evaluation should define which measurements actually matter.
 
+### EHB ↔ CS1
+
+EHB owns the physical/embedded source of device payloads; CS1 owns downstream data/model/decision semantics. Device/data-contract changes that can alter inference behavior require CS1 consumer review. Neither role may silently redefine the other's semantics.
+
 ### EE ↔ CS2
 
 Hardware should exist only where it creates product value; product strategy should reflect real deployment constraints.
+
+### EHB ↔ CS2
+
+Embedded implementation should remain justified by product value and deployment needs; product claims must reflect actual hardware evidence rather than design intent.
 
 ### CS1 ↔ CS2
 
@@ -112,9 +125,9 @@ Technical evidence should constrain product claims; product priorities should de
 
 PMR is a team responsibility, not an IE-only activity.
 
-Working target: **16 distinct high-quality interviews**, approximately four lead interviews per person, adjusted as needed by access and relevance.
+Working target: **16 distinct high-quality interviews**, approximately four lead interviews per human teammate, adjusted as needed by access and relevance.
 
-Any role may conduct interviews. The best interviewer for a specific stakeholder is the person most capable of understanding the domain and following useful technical or operational threads.
+Any human team member may conduct interviews. Autonomous execution roles do not create additional human/interview quotas.
 
 IE owns research quality and coverage, not all execution.
 
@@ -200,7 +213,7 @@ Preferred behavior:
 - simplify when complexity adds no value,
 - escalate only genuinely ambiguous or irreversible decisions.
 
-The operating objective is not to keep four agents busy. It is to make the **best possible startup and application decisions before the deadline**.
+The operating objective is not to keep agents busy. It is to make the **best possible startup and application decisions before the deadline**.
 
 ## Human Decision Checkpoints
 
