@@ -52,12 +52,33 @@ A section is not complete because prose exists. It is complete when the required
 
 | Field | Current state |
 | --- | --- |
-| Evidence required | 16 distinct target interviews (hard minimum 12), documented with concrete incidents, current workflow, decision owner, data, risks, workarounds, exact quotes where useful, objections, referrals, and explicit changes to assumptions/product. |
-| Owner | Shared: IE 4, EE 4, CS1 4, CS2 4; CS2 owns final synthesis. |
+| Official form minimum | The application form instructs the team to conduct **at least 3 customer interviews** with people who fit the Persona. This is the submission minimum, not a claim that three interviews are sufficient to validate the market. |
+| Internal evidence target | Aim for **16 distinct interviews**, with **12 as the team's internal minimum-quality target** if feasible before submission. This is an internal research standard, not an official KREATE requirement. |
+| Evidence quality required | Concrete incidents, current workflow, decision owner, data, risks, workarounds, exact quotes where useful, objections, referrals, and explicit changes to assumptions/product. Depth and falsification matter more than raw count. |
+| Owner | Shared: IE 4, EE 4, CS1 4, CS2 4 as an internal allocation; CS2 owns final synthesis. |
 | Current evidence IDs | — |
-| Gap | At bootstrap, no completed interview evidence is registered in the repository tracker; any conversations outside the repo remain `UNKNOWN` until documented. |
-| Next action | Schedule, conduct, document, and evidence-link interviews. Prioritize depth and decision-relevant stories over raw count. |
+| Gap | No completed interview evidence is currently registered in the repository tracker; any conversations outside the repo remain `UNKNOWN` until documented. |
+| Next action | First satisfy the official 3-interview minimum with high-information Persona-fit conversations; continue toward the internal cross-role/cross-site target where time/access allow. Prioritize Food Services decision ownership, contractor production workflow and second-site repeatability. |
 | Red-team question | Which three beliefs changed because of PMR, and can every claimed change be traced to actual interview artifacts rather than team intuition? |
+
+### Interview-count interpretation
+
+Do not optimize for interview count at the expense of evidence quality.
+
+Three high-information interviews can satisfy the form minimum but still leave the beachhead weak if all three come from one organization or cannot speak to the actual quantity decision. Conversely, a larger count of generic sustainability/student interviews does not validate the operational Persona.
+
+Priority sequence:
+
+```text
+1. actual university dining governance/decision route
+2. contractor/local production operator
+3. food engineer / daily operational decision actor
+4. data/measurement owner
+5. same Persona at a second institution
+6. same Persona at a third institution / contrasting procurement model
+```
+
+For the final application, report only interviews that actually occurred and accurately describe what each changed.
 
 ## Evidence admissibility
 
