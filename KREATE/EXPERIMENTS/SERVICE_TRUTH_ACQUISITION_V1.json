@@ -1,0 +1,86 @@
+{
+  "contract_version": "SERVICE_TRUTH_V1",
+  "artifact_status": "ACQUISITION_TEMPLATE_UNVERIFIED",
+  "measured_rows": [],
+  "benchmark_eligible": false,
+  "pilot_evidence_eligible": false,
+  "claim_boundary": "This artifact is an acquisition handoff only. It contains no real measured campus × meal-period × service rows, proves no source access, and is not benchmark, pilot-evidence, savings, or operational-readiness evidence until real measured records and source ownership are verified.",
+  "field_provenance": {
+    "actual_served": {
+      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "source_system": "UNCONFIRMED_EXISTING_EXPORT_OR_SERVING_LINE_MEASUREMENT",
+      "availability_semantics": "Must be measured or reconciled after the service and must never be treated as known at the decision cutoff.",
+      "verification_status": "UNVERIFIED"
+    },
+    "produced_portions": {
+      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "source_system": "UNCONFIRMED_KITCHEN_RECORD_OR_PRODUCTION_COUNT_MEASUREMENT",
+      "availability_semantics": "Must represent actual produced portions for the same campus × meal period × service date and may become available only after production is recorded.",
+      "verification_status": "UNVERIFIED"
+    },
+    "surplus_or_waste": {
+      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "source_system": "UNCONFIRMED_WASTE_RECORD_OR_TRAYGATE_MEASUREMENT",
+      "availability_semantics": "Must be an accepted measured surplus/waste outcome tied to the same service; TrayGate percentage outputs are not mass or gram truth without separate measured calibration.",
+      "verification_status": "UNVERIFIED"
+    },
+    "shortage_or_early_sellout": {
+      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "source_system": "UNCONFIRMED_SERVICE_INCIDENT_OR_OPERATOR_RECORD",
+      "availability_semantics": "Must be a post-service reconciled outcome or timestamped incident record; absence of a record cannot be silently interpreted as no shortage.",
+      "verification_status": "UNVERIFIED"
+    },
+    "operator_status_quo_quantity": {
+      "owner": "UNCONFIRMED_DECISION_OWNER",
+      "source_system": "UNCONFIRMED_PRE_SERVICE_PRODUCTION_PLAN_OR_OPERATOR_RECORD",
+      "availability_semantics": "Must be the quantity estimate or plan actually available before the registered decision_cutoff_at, preserved with an immutable timestamp/snapshot.",
+      "verification_status": "UNVERIFIED"
+    },
+    "menu": {
+      "owner": "UNCONFIRMED_MENU_DATA_OWNER",
+      "source_system": "OFFICIAL_DINING_MENU_OR_TIMESTAMPED_OPERATIONAL_EXPORT_TO_VERIFY",
+      "availability_semantics": "Only a menu snapshot demonstrably published or available no later than decision_cutoff_at may enter historical decision inputs.",
+      "verification_status": "UNVERIFIED"
+    },
+    "academic_calendar": {
+      "owner": "UNCONFIRMED_CALENDAR_DATA_OWNER",
+      "source_system": "OFFICIAL_ACADEMIC_CALENDAR_SNAPSHOT_TO_VERIFY",
+      "availability_semantics": "Use only the calendar/version known by decision_cutoff_at; later corrections must not leak backward into historical features.",
+      "verification_status": "UNVERIFIED"
+    }
+  },
+  "acquisition_questions": {
+    "actual_served": "Which operational owner and source can export or measure actual served portions per campus × meal period × service date, with a stable source record ID?",
+    "produced_portions": "Which kitchen record, counter, or operator-owned source provides actual produced portions at the same service granularity, and when does that value become available?",
+    "surplus_or_waste": "Which accepted measurement process provides surplus portions or waste mass for the same service, and what reconciliation/calibration rules define an accepted outcome?",
+    "shortage_or_early_sellout": "Where are shortage or early-sellout events recorded, who reconciles them, and how can absence versus missing data be distinguished?",
+    "operator_status_quo_quantity": "What quantity did the operator or existing process plan before each service, where is that plan recorded, and can its pre-cutoff timestamp be preserved?",
+    "menu": "Can the official or operational menu history be exported as immutable snapshots with publication/availability timestamps proving what was known by each decision cutoff?",
+    "academic_calendar": "Which official calendar snapshot/version was available before each historical decision cutoff, including later correction/version history where relevant?"
+  },
+  "candidate_measurement_paths": {
+    "produced_portions": {
+      "source": "Production Count Node or an existing deterministic kitchen production record/export",
+      "status": "CANDIDATE_UNVERIFIED",
+      "evidence_boundary": "Architecture candidate only; not accepted operational truth until ownership, measurement procedure, identity mapping, timestamps, and reconciliation are verified."
+    },
+    "actual_served": {
+      "source": "Serving Line Counter or an existing aggregate serving/POS export",
+      "status": "CANDIDATE_UNVERIFIED",
+      "evidence_boundary": "Candidate measurement path only; no assumed access, accuracy, or campus deployment."
+    },
+    "surplus_or_waste": {
+      "source": "TrayGate plus an accepted surplus/waste reconciliation process",
+      "status": "CANDIDATE_UNVERIFIED",
+      "evidence_boundary": "TrayGate admission/inference contracts do not prove field accuracy or convert leftover percentage to mass without measured calibration."
+    }
+  },
+  "required_next_evidence": [
+    "Confirm the operational owner/source for every required field.",
+    "Obtain several chronological real measured campus × meal-period × service rows with immutable source IDs/snapshots.",
+    "Verify field availability timestamps relative to decision_cutoff_at and reject future leakage.",
+    "Determine whether reservation data exists outside the documented Kilyos holiday workflow before using reservation features elsewhere.",
+    "Determine whether timestamped BUCampus/menu rating history can be exported.",
+    "Verify served, produced, shortage/sellout, and surplus/waste reconciliation at service granularity before enabling benchmark or pilot eligibility."
+  ]
+}
