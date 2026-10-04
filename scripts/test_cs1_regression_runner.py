@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 
 from run_cs1_regressions import command_for_test, discover_tests
@@ -65,12 +67,44 @@ def test_both_ci_workflows_use_the_central_runner() -> None:
         assert "python scripts/run_cs1_regressions.py" in text, workflow
 
 
+def test_list_mode_does_not_execute_regressions() -> None:
+    runner_source = (REPO_ROOT / "scripts/run_cs1_regressions.py").read_text(
+        encoding="utf-8"
+    )
+    with tempfile.TemporaryDirectory() as raw:
+        root = Path(raw)
+        scripts = root / "scripts"
+        scripts.mkdir()
+        (scripts / "run_cs1_regressions.py").write_text(
+            runner_source, encoding="utf-8"
+        )
+        (scripts / "test_cs1_probe.py").write_text(
+            "from pathlib import Path\nPath('executed.txt').write_text('ran', encoding='utf-8')\n",
+            encoding="utf-8",
+        )
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/run_cs1_regressions.py", "--list"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        assert completed.returncode == 0, completed.stderr
+        assert "scripts/test_cs1_probe.py" in completed.stdout, completed.stdout
+        assert not (root / "executed.txt").exists(), (
+            "--list must enumerate regressions without executing them"
+        )
+
+
 if __name__ == "__main__":
     tests = [
         test_discovers_python_and_typescript_in_stable_order,
         test_fails_closed_on_unsupported_cs1_test_type,
         test_commands_are_runtime_explicit,
         test_both_ci_workflows_use_the_central_runner,
+        test_list_mode_does_not_execute_regressions,
     ]
     for test in tests:
         test()
