@@ -7,7 +7,8 @@ supplied event contract and produces descriptive count totals.
 
 Raw device counts are deliberately not promoted to reconciled service truth:
 this module never emits ``actual_served``, surplus/waste, shortage, model
-accuracy, or operational-impact claims.
+accuracy, or operational-impact claims. A serving-line tray count also remains
+a tray count; CS1 does not assume one tray equals one produced/served portion.
 """
 
 from __future__ import annotations
@@ -22,9 +23,30 @@ PHYSICAL_SOURCE = "PHYSICAL_MEASUREMENT"
 VALID_QUALITY = "VALID"
 MEASUREMENT_UNITS = {
     "PRODUCED_PORTION_DELTA": "PORTIONS",
-    "SERVED_PORTION_DELTA": "PORTIONS",
+    "SERVED_TRAY_DELTA": "TRAYS",
     "RETURNED_TRAY_DELTA": "TRAYS",
 }
+
+# The physical count contract is intentionally anonymous. These direct or
+# account-linked identifiers are forbidden even when nested in metadata.
+FORBIDDEN_PRIVACY_FIELDS = frozenset(
+    {
+        "studentid",
+        "userid",
+        "personid",
+        "employeeid",
+        "staffid",
+        "reservationid",
+        "email",
+        "phone",
+        "phonenumber",
+        "fullname",
+        "nationalid",
+        "tckimlikno",
+        "cardid",
+        "carduid",
+    }
+)
 
 
 def _text(value: Any) -> str | None:
@@ -58,6 +80,26 @@ def _positive_integer(value: Any) -> int | None:
 def _append_unique(target: list[str], code: str) -> None:
     if code not in target:
         target.append(code)
+
+
+def _normalized_key(value: Any) -> str:
+    return "".join(character for character in str(value).lower() if character.isalnum())
+
+
+def _forbidden_privacy_fields(value: Any) -> set[str]:
+    """Return forbidden identity-bearing keys found anywhere in JSON-like data."""
+
+    found: set[str] = set()
+    if isinstance(value, Mapping):
+        for raw_key, nested in value.items():
+            key = _normalized_key(raw_key)
+            if key in FORBIDDEN_PRIVACY_FIELDS:
+                found.add(key)
+            found.update(_forbidden_privacy_fields(nested))
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        for nested in value:
+            found.update(_forbidden_privacy_fields(nested))
+    return found
 
 
 def _event_fingerprint(
@@ -103,7 +145,8 @@ def validate_dining_count_event(event: Mapping[str, Any]) -> dict[str, object]:
     A stable anonymous ``eventId`` is mandatory so offline retries can be
     distinguished from new physical events. Structurally valid events with
     non-VALID quality or non-physical provenance remain explicit WITHHOLD
-    observations rather than being silently counted.
+    observations rather than being silently counted. Identity-bearing fields
+    are structural contract violations and are rejected even when nested.
     """
 
     if not isinstance(event, Mapping):
@@ -149,6 +192,12 @@ def validate_dining_count_event(event: Mapping[str, Any]) -> dict[str, object]:
         _append_unique(structural_reasons, "UNKNOWN_MEASUREMENT_TYPE")
     elif expected_unit is not None and unit is not None and unit != expected_unit:
         _append_unique(structural_reasons, "MEASUREMENT_UNIT_MISMATCH")
+
+    for privacy_field in sorted(_forbidden_privacy_fields(event)):
+        _append_unique(
+            structural_reasons,
+            f"PRIVACY_FIELD_NOT_ALLOWED_{privacy_field.upper()}",
+        )
 
     if quality is not None and quality != VALID_QUALITY:
         _append_unique(withholding_reasons, "MEASUREMENT_QUALITY_NOT_VALID")
@@ -212,9 +261,9 @@ def validate_dining_count_event(event: Mapping[str, Any]) -> dict[str, object]:
         "reconciled_service_truth": False,
         "result_scope": "DINING_PHYSICAL_COUNT_EVENT_ADMISSION_ONLY",
         "claim_boundary": (
-            "Admission validates supplied anonymous physical count events only. It does not "
-            "establish sensor field accuracy, reconciled actual served demand, surplus/waste, "
-            "shortage, production effectiveness, or achieved savings."
+            "Admission validates anonymous physical count events only. It does not establish "
+            "sensor field accuracy, tray-to-portion equivalence, reconciled actual served "
+            "demand, surplus/waste, shortage, production effectiveness, or achieved savings."
         ),
     }
 
@@ -307,7 +356,7 @@ def aggregate_dining_count_events(
             "admitted_event_count": 0,
             "excluded_event_count": total_count,
             "produced_portions_observed": None,
-            "served_portions_observed": None,
+            "served_trays_observed": None,
             "returned_trays_observed": None,
             "excluded_reason_counts": dict(sorted(excluded_reason_counts.items())),
             "reason_codes": hard_reasons,
@@ -321,7 +370,7 @@ def aggregate_dining_count_events(
 
     totals = {
         "PRODUCED_PORTION_DELTA": 0,
-        "SERVED_PORTION_DELTA": 0,
+        "SERVED_TRAY_DELTA": 0,
         "RETURNED_TRAY_DELTA": 0,
     }
     for event in admitted:
@@ -349,15 +398,16 @@ def aggregate_dining_count_events(
         "admitted_event_count": admitted_count,
         "excluded_event_count": excluded_count,
         "produced_portions_observed": totals["PRODUCED_PORTION_DELTA"],
-        "served_portions_observed": totals["SERVED_PORTION_DELTA"],
+        "served_trays_observed": totals["SERVED_TRAY_DELTA"],
         "returned_trays_observed": totals["RETURNED_TRAY_DELTA"],
         "excluded_reason_counts": dict(sorted(excluded_reason_counts.items())),
         "reason_codes": [],
         "reconciled_service_truth": False,
         "result_scope": "DINING_PHYSICAL_COUNT_WINDOW_ONLY",
         "claim_boundary": (
-            "The aggregate reports descriptive device-observed count deltas only. It does not "
-            "establish reconciled actual_served, surplus/waste, shortage, physical field "
-            "accuracy, causal impact, or achieved savings."
+            "The aggregate reports descriptive device-observed count deltas only. Serving-line "
+            "tray counts remain trays and are not converted into portions or actual_served. It "
+            "does not establish reconciled surplus/waste, shortage, physical field accuracy, "
+            "causal impact, or achieved savings."
         ),
     }
