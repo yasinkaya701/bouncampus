@@ -19,6 +19,36 @@ from typing import Any
 PHYSICAL_EVIDENCE_CLASS = "PHYSICAL_MEASUREMENT"
 VALID_QUALITY = "VALID"
 VALID_DIRECTIONS = frozenset({"IN", "OUT"})
+_IDENTITY_FIELD_NAMES = frozenset(
+    {
+        "studentid",
+        "studentnumber",
+        "studentno",
+        "studentname",
+        "personid",
+        "personname",
+        "passengerid",
+        "passengername",
+        "userid",
+        "username",
+        "fullname",
+        "cardid",
+        "carduid",
+        "bucardid",
+        "campuscardid",
+        "nationalid",
+        "identitynumber",
+        "tckn",
+        "tcidentitynumber",
+        "email",
+        "emailaddress",
+        "phone",
+        "phonenumber",
+        "faceid",
+        "faceembedding",
+        "biometricid",
+    }
+)
 
 
 def _text(value: Any) -> str | None:
@@ -26,6 +56,39 @@ def _text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _normalized_field_name(value: Any) -> str:
+    return "".join(character for character in str(value).casefold() if character.isalnum())
+
+
+def _contains_identity_field(value: Any, *, _seen: set[int] | None = None) -> bool:
+    """Return whether a JSON-like payload contains person/card identity fields.
+
+    Device, vehicle, station, door and firmware identifiers are operational
+    identifiers and remain allowed. The guard is intentionally key-based so
+    ordinary free-form sensor-health values are not misclassified as identity.
+    """
+
+    seen = _seen if _seen is not None else set()
+    if isinstance(value, Mapping):
+        object_id = id(value)
+        if object_id in seen:
+            return False
+        seen.add(object_id)
+        for key, nested in value.items():
+            if _normalized_field_name(key) in _IDENTITY_FIELD_NAMES:
+                return True
+            if _contains_identity_field(nested, _seen=seen):
+                return True
+        return False
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        object_id = id(value)
+        if object_id in seen:
+            return False
+        seen.add(object_id)
+        return any(_contains_identity_field(item, _seen=seen) for item in value)
+    return False
 
 
 def _aware_timestamp(value: Any) -> datetime | None:
@@ -109,6 +172,8 @@ def validate_shuttle_count_event(
     measurement owner. CS1 deliberately does not define that threshold.
     Structurally valid events with non-VALID quality, insufficient confidence,
     or non-physical provenance are retained as explicit WITHHOLD observations.
+    Identity-bearing payload fields are structural privacy failures and are
+    rejected before an event fingerprint can be emitted.
     """
 
     if not isinstance(event, Mapping):
@@ -150,6 +215,8 @@ def validate_shuttle_count_event(
         _append_unique(reasons, "INVALID_MEASUREMENT_CONFIDENCE")
     if evidence_class is None:
         _append_unique(reasons, "EVIDENCE_CLASS_REQUIRED")
+    if _contains_identity_field(event):
+        _append_unique(reasons, "IDENTITY_BEARING_PAYLOAD_FORBIDDEN")
 
     structural_error = bool(reasons)
     fingerprint: str | None = None
