@@ -12,7 +12,9 @@ Comparable procurement evidence already shows that in some university dining con
 - faces shortage/service penalties;
 - is paid according to realized consumption or another service measure.
 
-Current Boğaziçi contractor TEMAŞ publicly describes a large multi-site operating footprint. If production-planning technology can transfer across those projects, a contractor-led beachhead could offer stronger multi-site leverage than institution-by-institution sales.
+Current Boğaziçi contractor TEMAŞ publicly describes a large multi-site operating footprint and, in very recent company communication around food-loss/waste awareness, explicitly frames **correct need determination and demand-based production planning** as waste-prevention practices. This materially strengthens the plausibility of contractor-side problem awareness, but it is still not PMR or evidence that TEMAŞ wants BOUNCAMPUS.
+
+If production-planning technology can transfer across TEMAŞ projects, a contractor-led beachhead could offer stronger multi-site leverage than institution-by-institution sales.
 
 However, four critical facts remain unknown:
 
@@ -68,6 +70,61 @@ https://www.temasgida.com/uretim
 The site's `500+ Taşıma Yemek` and `200+ Yerinde Üretim` labels are not sufficiently defined to treat as customer/site counts without clarification.
 
 Use only the clearly stated `65 different points` as a public footprint claim.
+
+---
+
+# 2A. TEMAŞ publicly identifies demand-based planning as a waste-prevention lever
+
+A very recent TEMAŞ company LinkedIn post for the International Day of Awareness of Food Loss and Waste states that seemingly small excess quantities become material when repeated across many kitchens. The post uses a hypothetical example across **55 kitchens** and explicitly highlights:
+
+- determining need correctly;
+- controlling delivery quantities;
+- supplier coordination;
+- **planning production according to demand**
+
+as complementary steps in preventing food loss/waste.
+
+Source:
+https://tr.linkedin.com/posts/temasgida_tema%C5%9Fg%C4%B1da-g%C4%B1dakayb%C4%B1veisraf%C4%B1-s%C3%BCrd%C3%BCr%C3%BClebilirlik-activity-7510697620009353216-qq72
+
+### What this supports
+
+- TEMAŞ publicly recognizes excess quantity as a resource-loss issue;
+- demand-based production planning is part of the company's public waste-prevention framing;
+- multi-kitchen accumulation is operationally salient enough to appear in current company communication.
+
+### What it does not support
+
+- that the hypothetical 55-kitchen example is a measured company loss;
+- that TEMAŞ's current planning is inaccurate;
+- that BOUNCAMPUS would improve it;
+- that TEMAŞ would buy external decision software;
+- that the Boğaziçi project follows a company-standard forecasting process.
+
+This is **problem-awareness evidence**, not customer validation.
+
+---
+
+# 2B. Public role evidence suggests project-level operating responsibility exists
+
+A current 22 September 2026 TEMAŞ job listing for a Food Engineer/Food Technician includes responsibility for:
+
+- personnel coordination;
+- ensuring production-process quality;
+- food-safety/hygiene control;
+- following order and purchasing processes.
+
+Source:
+https://www.yenibiris.com/is-ilani/gida-muhendisi-gida-teknikeri/1221442
+
+An older public TEMAŞ project-manager recruitment post described project managers as responsible for customer needs, personnel organization, project budget/cost control and knowledge of procurement/production.
+
+Source:
+https://tr.linkedin.com/posts/yemek-v-gida-sekt%C3%B6r%C3%BC-i%CC%87k-bi%CC%87lgi%CC%87-ve-i%CC%87%C5%9F-platformu_catering-proje-m%C3%BCd%C3%BCr%C3%BC-activity-6908454895238922240-OjNx
+
+### Boundary
+
+The older role description is historical and should not be used to assert TEMAŞ's current Boğaziçi org chart. It only reinforces that catering project operations commonly have local cost/production responsibility worth testing in PMR.
 
 ---
 
@@ -153,6 +210,8 @@ Questions:
 - What data are available at Boğaziçi?
 - Who bears excess and shortage consequences?
 - Which part can the project team change without central approval?
+- What current ERP/planning software receives the daily quantity?
+- Does that software choose the quantity or only operationalize a number chosen by staff?
 
 ## Then regional/central operations if referral exists
 
@@ -163,6 +222,7 @@ Questions:
 - What is the process for piloting operational software at one client site?
 - Can an internally successful tool be rolled out to other contracts?
 - Which client/contracts have the largest quantity uncertainty?
+- The company publicly emphasizes demand-based production planning for waste prevention; how is that implemented operationally today?
 
 ## Finance/commercial route
 
@@ -266,4 +326,6 @@ Then BOUNCAMPUS may be a **shared decision/evidence layer** rather than a single
 
 Contractor-led beachhead is now a serious alternative hypothesis and should be explicitly tested in the first TEMAŞ interview.
 
-It is too early to redefine the application beachhead around contractors, but it would be a mistake to treat the contractor as merely an implementation detail.
+The fresh company communication strengthens one narrow point: **TEMAŞ itself publicly treats correct demand determination and demand-based production as relevant to food-waste prevention.**
+
+It is still too early to redefine the application beachhead around contractors, but it would be a mistake to treat the contractor as merely an implementation detail.
