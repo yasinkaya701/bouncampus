@@ -1,9 +1,10 @@
 """Fail-closed intake contract for CS1 dining service-level truth.
 
-This module does not provide measured campus data.  It only decides whether an
-incoming service row is structurally suitable for offline benchmarking and
-freezes deterministic intake manifests.  Generated/sandbox evidence is never
-promoted to benchmark truth.
+This module does not provide measured campus data and is not the canonical
+benchmark-admission authority. It decides whether an incoming service row is a
+structurally valid *intake candidate* and freezes deterministic intake manifests.
+Generated/sandbox evidence is never promoted to measured evidence, and even a
+complete measured intake must pass ``SERVICE_TRUTH_V1`` before benchmark use.
 """
 
 from __future__ import annotations
@@ -18,6 +19,11 @@ from typing import Any
 MEASURED_EVIDENCE_CLASS = "MEASURED_SERVICE_TRUTH"
 SANDBOX_EVIDENCE_CLASS = "GENERATED_SANDBOX"
 ALLOWED_EVIDENCE_CLASSES = frozenset({MEASURED_EVIDENCE_CLASS, SANDBOX_EVIDENCE_CLASS})
+
+# Canonical downstream authority lives in backend/app/decision/service_truth.py.
+# Keep this dependency explicit in intake results: this module may nominate a
+# candidate, but it never grants benchmark eligibility itself.
+CANONICAL_ADMISSION_CONTRACT = "SERVICE_TRUTH_V1"
 
 REQUIRED_CONTEXT_SOURCES = ("menu", "academic_calendar", "weather_forecast")
 REQUIRED_SOURCE_CONTRACT_FIELDS = (
@@ -112,9 +118,8 @@ def _validate_snapshot(
     else:
         cutoff_safe = True
 
-    # Only evidence that is provably available by the decision cutoff may
-    # satisfy decision-audit provenance. A future snapshot can have a valid ID
-    # while still being hindsight information, so it must not enter this set.
+    # A valid snapshot id is not enough: hindsight evidence may not satisfy the
+    # decision audit. Only inputs provably available by the cutoff become known.
     if _text(snapshot_id) and cutoff_safe:
         known_snapshot_ids.add(snapshot_id.strip())
 
@@ -249,13 +254,12 @@ def _validate_decision_audit(
 
 
 def assess_service_row(row: Mapping[str, Any]) -> dict[str, Any]:
-    """Assess one service row without converting weak evidence into truth.
+    """Assess one service row without converting intake evidence into truth.
 
-    ``contract_complete`` means the service-level fields and cutoff semantics are
-    structurally sufficient, including a complete decision audit. It does *not*
-    mean the row is measured. A row is ``benchmark_eligible`` only when the
-    contract is complete and its evidence class is explicitly
-    ``MEASURED_SERVICE_TRUTH``.
+    ``contract_complete`` means the intake fields, cutoff semantics and decision
+    audit are structurally sufficient. A complete measured row becomes an
+    ``intake_candidate`` only. Benchmark eligibility is intentionally always
+    false here; canonical admission belongs to ``SERVICE_TRUTH_V1``.
     """
 
     if not isinstance(row, Mapping):
@@ -322,14 +326,24 @@ def assess_service_row(row: Mapping[str, Any]) -> dict[str, Any]:
     )
 
     contract_reasons = list(dict.fromkeys(contract_reasons))
-    reason_codes = list(dict.fromkeys(contract_reasons + evidence_reasons + audit_reasons))
     contract_complete = not contract_reasons and not audit_reasons
-    benchmark_eligible = contract_complete and evidence_class == MEASURED_EVIDENCE_CLASS
+    intake_candidate = contract_complete and evidence_class == MEASURED_EVIDENCE_CLASS
+
+    admission_reasons: list[str] = []
+    if intake_candidate:
+        admission_reasons.append("CANONICAL_SERVICE_TRUTH_ADMISSION_REQUIRED")
+
+    reason_codes = list(
+        dict.fromkeys(contract_reasons + evidence_reasons + audit_reasons + admission_reasons)
+    )
 
     return {
         "service_id": service_id.strip() if _text(service_id) else None,
         "contract_complete": contract_complete,
-        "benchmark_eligible": benchmark_eligible,
+        "intake_candidate": intake_candidate,
+        "benchmark_eligible": False,
+        "canonical_admission_required": intake_candidate,
+        "canonical_admission_contract": CANONICAL_ADMISSION_CONTRACT,
         "decision_audit_complete": not audit_reasons,
         "evidence_class": evidence_class,
         "reason_codes": reason_codes,
@@ -383,8 +397,8 @@ def freeze_dataset(
     """Freeze a deterministic intake manifest without asserting pilot readiness.
 
     Row order is canonicalized by ``service_id`` so the same row set yields the
-    same data hash.  The manifest reports evidence/readiness counts; it never
-    invents a minimum sample size or upgrades sandbox rows to real truth.
+    same data hash. The manifest reports intake/readiness counts; canonical
+    benchmark admission remains the responsibility of ``SERVICE_TRUTH_V1``.
     """
 
     if not _text(dataset_id):
@@ -421,9 +435,10 @@ def freeze_dataset(
         "contract_complete_row_count": sum(
             1 for item in assessments if item["contract_complete"]
         ),
-        "benchmark_eligible_row_count": sum(
-            1 for item in assessments if item["benchmark_eligible"]
+        "intake_candidate_row_count": sum(
+            1 for item in assessments if item["intake_candidate"]
         ),
+        "benchmark_eligible_row_count": 0,
         "generated_sandbox_row_count": sum(
             1 for item in assessments if item["evidence_class"] == SANDBOX_EVIDENCE_CLASS
         ),
@@ -433,6 +448,7 @@ def freeze_dataset(
         "source_contract_verified": source_contract_verified,
         "missing_source_contract_fields": missing_contract_fields,
         "unverified_source_contract_fields": unverified_contract_fields,
+        "canonical_admission_contract": CANONICAL_ADMISSION_CONTRACT,
         "row_assessments": assessments,
         "truth_boundary": TRUTH_BOUNDARY,
         "promotion_scope": PROMOTION_SCOPE,
