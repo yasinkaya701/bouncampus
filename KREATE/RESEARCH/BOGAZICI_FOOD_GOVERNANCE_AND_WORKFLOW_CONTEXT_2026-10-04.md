@@ -259,6 +259,38 @@ It supports operational scale/capacity context only.
 
 ---
 
+# 9A. Active tender uses a 10,000-meal/day capacity-reference need
+
+The public EKAP-derived notice for active procurement `2025/1727143` states under production/manufacturing capacity that bidders must submit a valid capacity report able to cover **5,000 meals/day**, explicitly described as **one half (1/2) of the administration's daily meal need**.
+
+Source:
+https://ekapveri.com/ihale/ekap-2025-1727143/
+
+This implies the tender's **capacity-qualification reference daily need is 10,000 meals/day**.
+
+### What this supports
+
+- the procurement is designed around high daily production capacity;
+- the operation is large enough that daily quantity planning is operationally consequential;
+- a 5,000-meal/day production capacity is only half the tender's stated daily-need reference.
+
+### What this does NOT support
+
+Do **not** relabel `10,000` as:
+
+- actual daily meals served;
+- average attendance;
+- the production target for every service/day;
+- the quantity communicated to TEMAŞ each day;
+- a BUCard/turnstile count;
+- the hakediş/payment quantity.
+
+It is a **procurement qualification/planning-capacity reference** only.
+
+This also should not be silently reconciled with the separate SKS `6,000 daily meals` indicator; they may use different scopes/definitions/time periods.
+
+---
+
 # 10. Governance-to-PMR map
 
 ## Food Services Branch
@@ -323,7 +355,7 @@ Further public web research is unlikely to answer this as reliably as a direct w
 
 Safe:
 
-> Boğaziçi has a formal Food Services governance structure overseeing contractor service, menus and contract compliance across a multi-campus dining operation.
+> Boğaziçi has a formal Food Services governance structure overseeing contractor service, menus and contract compliance across a multi-campus dining operation, and its current procurement references a high daily production-capacity requirement.
 
 Still hypothesis:
 
