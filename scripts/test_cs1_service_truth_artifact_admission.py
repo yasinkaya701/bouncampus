@@ -55,6 +55,12 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
         ],
+        "decision_audit": {
+            "method_version": "operator-status-quo-v1",
+            "recommended_quantity": 108 + index,
+            "operator_action": "ACCEPT_RECOMMENDATION",
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+        },
     }
 
 
