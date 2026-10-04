@@ -169,7 +169,8 @@ def validate_service_truth_dataset(
         if cutoff is None:
             _append_unique(errors, "DECISION_CUTOFF_MUST_BE_TIMEZONE_AWARE")
 
-        if _nonnegative_number(raw_row.get("actual_served")) is None:
+        actual_served = _nonnegative_number(raw_row.get("actual_served"))
+        if actual_served is None:
             _append_unique(errors, "INVALID_ACTUAL_SERVED")
         if _nonnegative_number(raw_row.get("produced_portions")) is None:
             _append_unique(errors, "INVALID_PRODUCED_PORTIONS")
@@ -194,6 +195,24 @@ def validate_service_truth_dataset(
         if _text(raw_row.get("outcome_source_record_id")) is None:
             _append_unique(errors, "OUTCOME_SOURCE_RECORD_ID_REQUIRED")
 
+        reservation_served_present = "reservation_served" in raw_row
+        unreserved_served_present = "unreserved_served" in raw_row
+        if reservation_served_present or unreserved_served_present:
+            if not (reservation_served_present and unreserved_served_present):
+                _append_unique(errors, "SERVED_DEMAND_DECOMPOSITION_INCOMPLETE")
+            else:
+                reservation_served = _nonnegative_number(raw_row.get("reservation_served"))
+                unreserved_served = _nonnegative_number(raw_row.get("unreserved_served"))
+                if reservation_served is None or unreserved_served is None:
+                    _append_unique(errors, "INVALID_SERVED_DEMAND_DECOMPOSITION")
+                elif actual_served is not None and not math.isclose(
+                    reservation_served + unreserved_served,
+                    actual_served,
+                    rel_tol=0.0,
+                    abs_tol=1e-9,
+                ):
+                    _append_unique(errors, "SERVED_DEMAND_DECOMPOSITION_MISMATCH")
+
         if _nonnegative_number(raw_row.get("operator_status_quo_quantity")) is None:
             _append_unique(errors, "OPERATOR_STATUS_QUO_QUANTITY_REQUIRED")
 
@@ -217,6 +236,7 @@ def validate_service_truth_dataset(
 
         decision_inputs = raw_row.get("decision_inputs")
         observed_fields: set[str] = set()
+        cutoff_safe_snapshot_ids: set[str] = set()
         if not isinstance(decision_inputs, Sequence) or isinstance(
             decision_inputs, (str, bytes)
         ):
@@ -231,7 +251,8 @@ def validate_service_truth_dataset(
                     _append_unique(errors, "DECISION_INPUT_FIELD_REQUIRED")
                 else:
                     observed_fields.add(field)
-                if _text(source.get("snapshot_id")) is None:
+                snapshot_id = _text(source.get("snapshot_id"))
+                if snapshot_id is None:
                     _append_unique(errors, "DECISION_INPUT_SNAPSHOT_ID_REQUIRED")
                 available_at = _aware_timestamp(source.get("available_at"))
                 if available_at is None:
@@ -241,6 +262,14 @@ def validate_service_truth_dataset(
                 input_evidence = _text(source.get("evidence_class"))
                 if input_evidence not in ALLOWED_INPUT_EVIDENCE_CLASSES:
                     _append_unique(errors, "UNKNOWN_DECISION_INPUT_EVIDENCE_CLASS")
+                if (
+                    snapshot_id is not None
+                    and available_at is not None
+                    and cutoff is not None
+                    and available_at <= cutoff
+                    and input_evidence in ALLOWED_INPUT_EVIDENCE_CLASSES
+                ):
+                    cutoff_safe_snapshot_ids.add(snapshot_id)
 
         for required_field in sorted(REQUIRED_DECISION_INPUTS - observed_fields):
             _append_unique(
@@ -250,6 +279,24 @@ def validate_service_truth_dataset(
 
         if workflow_active is True and "reservation" not in observed_fields:
             _append_unique(errors, "RESERVATION_DECISION_INPUT_REQUIRED")
+
+        decision_audit = raw_row.get("decision_audit")
+        if decision_audit is not None:
+            if not isinstance(decision_audit, Mapping):
+                _append_unique(errors, "DECISION_AUDIT_MUST_BE_MAPPING")
+            else:
+                audit_snapshot_ids = decision_audit.get("input_snapshot_ids")
+                if not isinstance(audit_snapshot_ids, Sequence) or isinstance(
+                    audit_snapshot_ids, (str, bytes)
+                ) or not audit_snapshot_ids:
+                    _append_unique(errors, "DECISION_AUDIT_INPUT_SNAPSHOTS_REQUIRED")
+                else:
+                    for raw_snapshot_id in audit_snapshot_ids:
+                        audit_snapshot_id = _text(raw_snapshot_id)
+                        if audit_snapshot_id is None:
+                            _append_unique(errors, "DECISION_AUDIT_INVALID_INPUT_SNAPSHOT_ID")
+                        elif audit_snapshot_id not in cutoff_safe_snapshot_ids:
+                            _append_unique(errors, "DECISION_AUDIT_UNKNOWN_INPUT_SNAPSHOT")
 
         if parsed_date is not None and cutoff is not None and service_id is not None:
             parsed_rows.append((parsed_date, cutoff, service_id))
