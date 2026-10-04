@@ -301,9 +301,9 @@ def aggregate_traygate_service(
 
     The aggregate is deliberately descriptive. Only valid ``READY`` results
     contribute per-food leftover percentages. Review, withheld, and malformed
-    results are excluded and counted. Duplicate capture/tray identities or
-    cross-meal input reject the entire aggregate to prevent silent double
-    counting or service leakage.
+    results are excluded and counted. Identical same-capture transport retries
+    are deduplicated idempotently; conflicting capture reuse, duplicate tray
+    identities, or cross-meal input reject the aggregate.
     """
 
     if isinstance(results, (str, bytes)) or not isinstance(results, Sequence):
@@ -313,13 +313,16 @@ def aggregate_traygate_service(
         raise ValueError("expected_meal_id must be a non-empty string")
 
     hard_reasons: list[str] = []
-    seen_capture_ids: set[str] = set()
+    seen_capture_results: dict[str, Mapping[str, Any]] = {}
     seen_tray_ids: set[str] = set()
     ready_rows: list[Mapping[str, Any]] = []
     excluded_reason_counts: dict[str, int] = {}
+    unique_result_count = 0
+    idempotent_replay_count = 0
 
     for raw_result in results:
         if not isinstance(raw_result, Mapping):
+            unique_result_count += 1
             excluded_reason_counts["RESULT_MUST_BE_MAPPING"] = (
                 excluded_reason_counts.get("RESULT_MUST_BE_MAPPING", 0) + 1
             )
@@ -330,9 +333,18 @@ def aggregate_traygate_service(
         row_meal_id = _text(raw_result.get("mealId"))
 
         if capture_id is not None:
-            if capture_id in seen_capture_ids:
+            previous_result = seen_capture_results.get(capture_id)
+            if previous_result is not None:
+                if raw_result == previous_result:
+                    idempotent_replay_count += 1
+                    continue
                 _append_unique(hard_reasons, "DUPLICATE_CAPTURE_ID")
-            seen_capture_ids.add(capture_id)
+                _append_unique(hard_reasons, "CAPTURE_ID_REPLAY_CONFLICT")
+                continue
+            seen_capture_results[capture_id] = raw_result
+
+        unique_result_count += 1
+
         if tray_id is not None:
             if tray_id in seen_tray_ids:
                 _append_unique(hard_reasons, "DUPLICATE_TRAY_ID")
@@ -357,6 +369,8 @@ def aggregate_traygate_service(
             "descriptive_analytics_available": False,
             "meal_id": meal_id,
             "total_result_count": total_count,
+            "unique_result_count": unique_result_count,
+            "idempotent_replay_count": idempotent_replay_count,
             "ready_result_count": 0,
             "excluded_result_count": total_count,
             "ready_fraction": 0.0,
@@ -391,13 +405,13 @@ def aggregate_traygate_service(
         }
 
     ready_count = len(ready_rows)
-    excluded_count = total_count - ready_count
-    ready_fraction = ready_count / total_count if total_count else 0.0
+    excluded_count = unique_result_count - ready_count
+    ready_fraction = ready_count / unique_result_count if unique_result_count else 0.0
     if ready_count == 0:
         coverage_status = "NONE"
         aggregation_status = "NO_READY_RESULTS"
         descriptive_available = False
-    elif ready_count == total_count:
+    elif ready_count == unique_result_count:
         coverage_status = "FULL"
         aggregation_status = "AGGREGATED"
         descriptive_available = True
@@ -411,6 +425,8 @@ def aggregate_traygate_service(
         "descriptive_analytics_available": descriptive_available,
         "meal_id": meal_id,
         "total_result_count": total_count,
+        "unique_result_count": unique_result_count,
+        "idempotent_replay_count": idempotent_replay_count,
         "ready_result_count": ready_count,
         "excluded_result_count": excluded_count,
         "ready_fraction": ready_fraction,
@@ -421,7 +437,8 @@ def aggregate_traygate_service(
         "result_scope": "TRAYGATE_SERVICE_DESCRIPTIVE_PERCENTAGES_ONLY",
         "claim_boundary": (
             "Service aggregation reports unweighted descriptive leftover percentages from "
-            "contract-admitted READY results only. It does not estimate grams, kilograms, "
-            "cost, carbon, water, causal impact, or achieved savings."
+            "unique contract-admitted READY results only; identical same-capture transport "
+            "retries are deduplicated. It does not estimate grams, kilograms, cost, carbon, "
+            "water, causal impact, or achieved savings."
         ),
     }
