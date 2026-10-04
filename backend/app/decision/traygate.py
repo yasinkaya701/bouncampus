@@ -9,6 +9,7 @@ mass/gram calibration, field readiness, or achieved waste reduction.
 
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 import math
@@ -27,12 +28,29 @@ CAPTURE_QUALITIES = frozenset(
 )
 RESULT_READINESS = frozenset({"READY", "REVIEW_REQUIRED", "WITHHOLD"})
 
+_FORBIDDEN_PRIVACY_FIELDS = frozenset(
+    {
+        "studentid",
+        "personid",
+        "userid",
+        "bucardid",
+        "faceembedding",
+        "biometricid",
+        "studentidentity",
+        "personidentity",
+    }
+)
+
 
 def _text(value: Any) -> str | None:
     if value is None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _canonical_field(value: Any) -> str:
+    return "".join(character for character in str(value).lower() if character.isalnum())
 
 
 def _aware_timestamp(value: Any) -> datetime | None:
@@ -71,6 +89,8 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
     Structurally malformed payloads are rejected. Structurally valid captures
     that are not ``VALID`` quality, or do not contain a detected tray, are
     admitted only as explicit abstentions and require ``WITHHOLD`` downstream.
+    Person-identifying fields fail closed because the TrayGate boundary is
+    intentionally anonymous.
     """
 
     if not isinstance(capture, Mapping):
@@ -101,6 +121,14 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
     if quality not in CAPTURE_QUALITIES:
         _append_unique(reasons, "UNKNOWN_CAPTURE_QUALITY")
 
+    for raw_field in capture:
+        canonical_field = _canonical_field(raw_field)
+        if canonical_field in _FORBIDDEN_PRIVACY_FIELDS:
+            _append_unique(
+                reasons,
+                f"PRIVACY_FIELD_NOT_ALLOWED_{canonical_field.upper()}",
+            )
+
     structural_errors = bool(reasons)
     if structural_errors:
         status = "REJECTED"
@@ -130,8 +158,9 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
         "reason_codes": reasons,
         "result_scope": "TRAYGATE_CAPTURE_ADMISSION_ONLY",
         "claim_boundary": (
-            "Capture admission validates payload structure and conservative quality semantics; "
-            "it does not prove hardware reliability, model accuracy, or production readiness."
+            "Capture admission validates payload structure, anonymous-boundary semantics, "
+            "and conservative quality handling; it does not prove hardware reliability, "
+            "model accuracy, or production readiness."
         ),
     }
 
@@ -224,5 +253,96 @@ def validate_traygate_result(
             "Result admission validates bounded inference outputs and abstention semantics; "
             "it does not establish model accuracy, gram-level calibration, field performance, "
             "or achieved waste reduction."
+        ),
+    }
+
+
+def aggregate_traygate_service_results(
+    results: Sequence[Mapping[str, Any]],
+    *,
+    meal_id: str,
+) -> dict[str, object]:
+    """Aggregate analytics-eligible TrayGate percentages for one meal/service.
+
+    Every result is first checked by the canonical result validator. Invalid
+    results fail the aggregate closed. ``REVIEW_REQUIRED`` and ``WITHHOLD``
+    results remain visible in coverage counts but never contribute to food
+    leftover statistics. No percentage-to-mass conversion occurs here.
+    """
+
+    target_meal_id = _text(meal_id)
+    if target_meal_id is None:
+        raise ValueError("meal_id must be a non-empty string")
+    if isinstance(results, (str, bytes)) or not isinstance(results, Sequence):
+        raise ValueError("results must be a sequence of mappings")
+
+    seen_capture_ids: set[str] = set()
+    readiness_counts = {readiness: 0 for readiness in RESULT_READINESS}
+    leftover_by_food: dict[str, list[float]] = defaultdict(list)
+    model_versions: set[str] = set()
+
+    for index, result in enumerate(results):
+        if not isinstance(result, Mapping):
+            raise ValueError(f"invalid TrayGate result at index {index}: RESULT_MUST_BE_MAPPING")
+
+        validation = validate_traygate_result(result)
+        status = validation["validation_status"]
+        if status == "REJECTED":
+            reason_codes = ",".join(str(code) for code in validation["reason_codes"])
+            raise ValueError(f"invalid TrayGate result at index {index}: {reason_codes}")
+
+        capture_id = _text(result.get("captureId"))
+        assert capture_id is not None
+        if capture_id in seen_capture_ids:
+            raise ValueError(f"duplicate captureId: {capture_id}")
+        seen_capture_ids.add(capture_id)
+
+        result_meal_id = _text(result.get("mealId"))
+        if result_meal_id != target_meal_id:
+            raise ValueError(
+                f"mealId mismatch: expected {target_meal_id}, got {result_meal_id}"
+            )
+
+        readiness = _text(result.get("readiness"))
+        assert readiness in RESULT_READINESS
+        readiness_counts[readiness] += 1
+
+        model_version = _text(result.get("modelVersion"))
+        if model_version is not None:
+            model_versions.add(model_version)
+
+        if not validation["analytics_eligible"]:
+            continue
+
+        for item in result.get("items", ()):
+            food = _text(item.get("food"))
+            leftover_percent = float(item.get("leftoverPercent"))
+            assert food is not None
+            leftover_by_food[food].append(leftover_percent)
+
+    capture_count = len(results)
+    ready_count = readiness_counts["READY"]
+    food_leftover_percent: dict[str, dict[str, float | int]] = {}
+    for food in sorted(leftover_by_food):
+        values = leftover_by_food[food]
+        food_leftover_percent[food] = {
+            "mean": round(sum(values) / len(values), 6),
+            "sample_count": len(values),
+        }
+
+    return {
+        "meal_id": target_meal_id,
+        "capture_count": capture_count,
+        "ready_capture_count": ready_count,
+        "review_required_capture_count": readiness_counts["REVIEW_REQUIRED"],
+        "withheld_capture_count": readiness_counts["WITHHOLD"],
+        "ready_coverage": ready_count / capture_count if capture_count else 0.0,
+        "food_leftover_percent": food_leftover_percent,
+        "model_versions": sorted(model_versions),
+        "result_scope": "TRAYGATE_PERCENT_ONLY_NO_MASS_CALIBRATION",
+        "claim_boundary": (
+            "Only analytics-eligible READY percentage estimates are aggregated. "
+            "No physical quantity, energy, cost, or savings claim is derivable without "
+            "separate measured calibration and operational evidence."
         ),
     }
