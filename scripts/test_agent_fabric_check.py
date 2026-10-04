@@ -78,6 +78,16 @@ def fabric_v2_config() -> dict:
             "parent_branch_pattern": "^work/(ie|ee|cs1|cs2)/[a-z0-9][a-z0-9-]*$",
             "parent_workstreams": ["ie", "ee", "cs1", "cs2"],
             "child_agent_limit": None,
+            "parent_states": [
+                "ACTIVE",
+                "BLOCKED",
+                "WAITING_HUMAN",
+                "READY_FOR_INTEGRATION",
+                "INTEGRATING",
+                "MERGED_VERIFYING",
+                "COMPLETE",
+            ],
+            "parent_pr_states": ["DRAFT", "READY", "MERGED"],
             "role_branches": {
                 "ie": "role/ie-customer-discovery",
                 "ee": "role/ee-physical-systems",
@@ -149,6 +159,36 @@ def template_task() -> dict:
     }
 
 
+def parent_template() -> dict:
+    return {
+        "schema_version": 2,
+        "id": "HUMAN-CS1-TODO",
+        "workstream": "cs1",
+        "human_owner": "human:TODO",
+        "objective": "TODO",
+        "priority": "P1",
+        "state": "ACTIVE",
+        "parent_branch": "work/cs1/todo",
+        "child_ids": [],
+        "human_gate": {
+            "kind": "NONE",
+            "status": "NOT_REQUIRED",
+            "question": None,
+            "decision": None,
+            "decided_by": None,
+            "decided_at": None,
+        },
+        "integration": {
+            "pr_state": "DRAFT",
+            "pull_request": None,
+            "validated_head_sha": None,
+            "merge_sha": None,
+            "post_merge_verified_at": None,
+        },
+        "notes": [],
+    }
+
+
 def task(task_id: str, *, state: str = "READY", path: str = "scripts/example.py") -> dict:
     value = template_task()
     value.update(
@@ -192,6 +232,9 @@ class RepoFixture:
         (self.root / ".agents/coordination/tasks").mkdir(parents=True)
         (self.root / ".agents/fabric.json").write_text(json.dumps(base_config()), encoding="utf-8")
         (self.root / ".agents/TASK_TEMPLATE.json").write_text(json.dumps(template_task()), encoding="utf-8")
+        (self.root / ".agents/PARENT_WORKSTREAM_TEMPLATE.json").write_text(
+            json.dumps(parent_template()), encoding="utf-8"
+        )
 
     def add(self, value: dict) -> None:
         path = self.root / ".agents/coordination/tasks" / f"{value['id']}.json"
