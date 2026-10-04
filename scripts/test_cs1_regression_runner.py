@@ -8,7 +8,12 @@ import subprocess
 import sys
 import tempfile
 
-from run_cs1_regressions import command_for_test, discover_tests
+from run_cs1_regressions import (
+    command_for_test,
+    discover_test_files,
+    discover_tests,
+    regression_files,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -25,12 +30,13 @@ def test_discovers_python_and_typescript_in_stable_order() -> None:
         ):
             (scripts / name).write_text("", encoding="utf-8")
 
-        discovered = [path.name for path in discover_tests(scripts)]
-        assert discovered == [
+        expected = [
             "test_cs1_alpha.py",
             "test_cs1_beta.ts",
             "test_cs1_zeta.ts",
-        ], discovered
+        ]
+        assert [path.name for path in discover_tests(scripts)] == expected
+        assert [path.name for path in discover_test_files(scripts)] == expected
 
 
 def test_fails_closed_on_unsupported_cs1_test_type() -> None:
@@ -58,13 +64,22 @@ def test_commands_are_runtime_explicit() -> None:
     ], ts_command
 
 
-def test_both_ci_workflows_use_the_central_runner() -> None:
-    for workflow in (
-        REPO_ROOT / ".github/workflows/ci.yml",
-        REPO_ROOT / ".github/workflows/ci-hosted-fallback.yml",
-    ):
-        text = workflow.read_text(encoding="utf-8")
-        assert "python scripts/run_cs1_regressions.py" in text, workflow
+def test_legacy_regression_is_retained() -> None:
+    with tempfile.TemporaryDirectory() as raw:
+        scripts = Path(raw)
+        (scripts / "test_cs1_alpha.py").write_text("", encoding="utf-8")
+        (scripts / "test_food_decision_policy.py").write_text("", encoding="utf-8")
+        assert [path.name for path in regression_files(scripts)] == [
+            "test_cs1_alpha.py",
+            "test_food_decision_policy.py",
+        ]
+
+
+def test_dedicated_gate_calls_list_and_execute_modes() -> None:
+    workflow = REPO_ROOT / ".github/workflows/cs1-regressions.yml"
+    text = workflow.read_text(encoding="utf-8")
+    assert "python scripts/run_cs1_regressions.py --list" in text
+    assert "python scripts/run_cs1_regressions.py" in text
 
 
 def test_list_mode_does_not_execute_regressions() -> None:
@@ -103,7 +118,8 @@ if __name__ == "__main__":
         test_discovers_python_and_typescript_in_stable_order,
         test_fails_closed_on_unsupported_cs1_test_type,
         test_commands_are_runtime_explicit,
-        test_both_ci_workflows_use_the_central_runner,
+        test_legacy_regression_is_retained,
+        test_dedicated_gate_calls_list_and_execute_modes,
         test_list_mode_does_not_execute_regressions,
     ]
     for test in tests:
