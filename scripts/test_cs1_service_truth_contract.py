@@ -22,6 +22,8 @@ def load_contract():
 
 def measured_row(day: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT") -> dict:
     date = f"2026-09-{day:02d}"
+    menu_snapshot = f"menu:{date}"
+    calendar_snapshot = "calendar:2026-fall-v1"
     return {
         "service_id": f"NORTH-LUNCH-{date}",
         "granularity": "CAMPUS_MEAL_SERVICE",
@@ -43,17 +45,23 @@ def measured_row(day: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT
         "decision_inputs": [
             {
                 "field": "menu",
-                "snapshot_id": f"menu:{date}",
+                "snapshot_id": menu_snapshot,
                 "available_at": f"2026-09-{day - 1:02d}T12:00:00+03:00",
                 "evidence_class": "OFFICIAL_PUBLIC",
             },
             {
                 "field": "academic_calendar",
-                "snapshot_id": "calendar:2026-fall-v1",
+                "snapshot_id": calendar_snapshot,
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_PUBLIC",
             },
         ],
+        "decision_audit": {
+            "method_version": "operator-status-quo-v1",
+            "recommended_quantity": 108 + day,
+            "operator_action": "ACCEPT_RECOMMENDATION",
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+        },
     }
 
 
@@ -154,15 +162,61 @@ def test_served_reservation_decomposition_must_reconcile_when_present() -> None:
     assert "SERVED_DEMAND_DECOMPOSITION_INCOMPLETE" in result["reason_codes"]
 
 
-def test_decision_audit_snapshots_must_resolve_to_known_inputs() -> None:
+def test_decision_audit_is_required_for_benchmark_truth() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    del rows[0]["decision_audit"]
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert result["eligible_for_benchmark"] is False
+    assert "DECISION_AUDIT_REQUIRED" in result["reason_codes"]
+
+
+def test_decision_audit_requires_method_recommendation_and_operator_action() -> None:
     contract = load_contract()
     rows = valid_rows()
     rows[0]["decision_audit"] = {
         "input_snapshot_ids": [
             rows[0]["decision_inputs"][0]["snapshot_id"],
-            "unknown:future-or-untracked-snapshot",
+            rows[0]["decision_inputs"][1]["snapshot_id"],
         ]
     }
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert "DECISION_AUDIT_METHOD_VERSION_REQUIRED" in result["reason_codes"]
+    assert "DECISION_AUDIT_RECOMMENDATION_REQUIRED" in result["reason_codes"]
+    assert "DECISION_AUDIT_OPERATOR_ACTION_REQUIRED" in result["reason_codes"]
+
+
+def test_decision_audit_override_requires_reason() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    rows[0]["decision_audit"]["operator_action"] = "OVERRIDE"
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "REJECTED"
+    assert "DECISION_AUDIT_OVERRIDE_REASON_REQUIRED" in result["reason_codes"]
+
+
+def test_decision_audit_accepts_valid_quantity_band() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    del rows[0]["decision_audit"]["recommended_quantity"]
+    rows[0]["decision_audit"]["recommended_quantity_band"] = {
+        "lower": 100,
+        "upper": 120,
+    }
+    result = contract.validate_service_truth_dataset(rows)
+    assert result["validation_status"] == "ACCEPTED_MEASURED"
+    assert result["eligible_for_benchmark"] is True
+
+
+def test_decision_audit_snapshots_must_resolve_to_known_inputs() -> None:
+    contract = load_contract()
+    rows = valid_rows()
+    rows[0]["decision_audit"]["input_snapshot_ids"] = [
+        rows[0]["decision_inputs"][0]["snapshot_id"],
+        "unknown:future-or-untracked-snapshot",
+    ]
     result = contract.validate_service_truth_dataset(rows)
     assert result["validation_status"] == "REJECTED"
     assert result["eligible_for_benchmark"] is False
