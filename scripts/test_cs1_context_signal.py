@@ -30,6 +30,10 @@ def reconciled(n: int = 4) -> list[bool]:
     return [True] * n
 
 
+def reconciled_times(n: int = 4) -> list[str]:
+    return [ts(day, 18) for day in range(1, n + 1)]
+
+
 def test_context_correction_is_strictly_past_only() -> None:
     context_signal = load_context_signal()
     kwargs = dict(
@@ -38,6 +42,7 @@ def test_context_correction_is_strictly_past_only() -> None:
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
         outcome_reconciled=reconciled(),
+        outcome_reconciled_at=reconciled_times(),
         min_history=2,
         min_context_history=2,
         shrinkage_strength=2.0,
@@ -57,8 +62,11 @@ def test_context_correction_is_strictly_past_only() -> None:
     assert first["context_applied"] == [False, False, False, True]
     assert math.isclose(first["baseline_forecast"][3], 106.66666666666667)
     assert math.isclose(first["context_forecast"][3], 110.83333333333334)
-    assert first["leakage_policy"] == "PAST_RECONCILED_ROWS_ONLY"
+    assert first["leakage_policy"] == "PAST_RECONCILED_ROWS_VISIBLE_BY_CUTOFF_ONLY"
     assert first["reconciliation_policy"] == "EXPLICIT_CALLER_ACCEPTED_OUTCOME_REQUIRED"
+    assert first["reconciliation_time_policy"] == (
+        "OUTCOME_MUST_BE_RECONCILED_AND_AVAILABLE_BY_CURRENT_DECISION_CUTOFF"
+    )
 
 
 def test_signal_published_after_cutoff_cannot_change_decision() -> None:
@@ -66,10 +74,16 @@ def test_signal_published_after_cutoff_cannot_change_decision() -> None:
     report = context_signal.generate_context_residual_forecasts(
         base_forecasts=[100, 100, 100, 100],
         actual_demand=[110, 120, 130, 140],
-        context_keys=["calendar:teaching", "calendar:teaching", "calendar:teaching", "calendar:teaching"],
+        context_keys=[
+            "calendar:teaching",
+            "calendar:teaching",
+            "calendar:teaching",
+            "calendar:teaching",
+        ],
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 12)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
         outcome_reconciled=reconciled(),
+        outcome_reconciled_at=reconciled_times(),
         min_history=2,
         min_context_history=2,
         shrinkage_strength=1.0,
@@ -89,6 +103,7 @@ def test_sparse_context_falls_back_to_history_only_baseline() -> None:
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
         outcome_reconciled=reconciled(),
+        outcome_reconciled_at=reconciled_times(),
         min_history=2,
         min_context_history=2,
         shrinkage_strength=2.0,
@@ -109,6 +124,7 @@ def test_unreconciled_historical_outlier_cannot_influence_later_forecast() -> No
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
         outcome_reconciled=[True, False, True, True],
+        outcome_reconciled_at=[ts(1, 18), None, ts(3, 18), ts(4, 18)],
         min_history=2,
         min_context_history=2,
         shrinkage_strength=0.0,
@@ -152,6 +168,7 @@ def test_median_residual_estimator_resists_single_historical_outlier() -> None:
         signal_available_at=[ts(1, 8), ts(2, 8), ts(3, 8), ts(4, 8)],
         decision_cutoff_at=[ts(1, 10), ts(2, 10), ts(3, 10), ts(4, 10)],
         outcome_reconciled=reconciled(),
+        outcome_reconciled_at=reconciled_times(),
         min_history=3,
         min_context_history=3,
         shrinkage_strength=0.0,
