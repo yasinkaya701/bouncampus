@@ -6,6 +6,7 @@ from typing import List, Optional
 from fastapi import APIRouter
 
 from app.config import settings
+from app.decision.menu_demand import apply_menu_adjustment, build_menu_demand_adjustment
 from app.models.food_demand import FoodDemandPredictor
 from app.optimizers.food_optimizer import FoodOptimizer
 from app.schemas import FoodDemandForecast, MenuPopularity
@@ -36,6 +37,17 @@ def _decision_signals(live_menu: dict, live_weather: dict) -> dict[str, bool]:
         # No verified academic-calendar source is wired into this Python route yet.
         "calendar": False,
     }
+
+
+def _load_menu_popularity_catalog() -> list[dict]:
+    path = os.path.join(settings.DATA_DIR, "menu_popularity.json")
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return []
+    dishes = payload.get("dishes", []) if isinstance(payload, dict) else []
+    return [dish for dish in dishes if isinstance(dish, dict)]
 
 
 def _menu_items(live_menu: dict) -> List[MenuPopularity]:
@@ -75,21 +87,30 @@ def get_food_forecast(date_val: Optional[str] = None):
     live_weather = real_service.fetch_live_weather()
     signal_availability = _decision_signals(live_menu, live_weather)
     menu_items = _menu_items(live_menu)
+    menu_adjustment = build_menu_demand_adjustment(
+        live_menu,
+        _load_menu_popularity_catalog(),
+        official_menu=signal_availability["menu"],
+    )
     model_metadata = f_pred.metadata()
     method_eligibility = str(model_metadata.get("method_eligibility", "SANDBOX_ONLY"))
 
     forecasts: List[FoodDemandForecast] = []
     for cafeteria_id in ["B-SOUTH-GY", "B-NORTH-KY"]:
         for meal_type in ["lunch", "dinner"]:
-            point_forecast, _legacy_compat = f_pred.predict(
+            baseline_point_forecast, _legacy_compat = f_pred.predict(
                 target_date,
                 cafeteria_id,
                 meal_type=meal_type,
             )
+            menu_adjusted_forecast = apply_menu_adjustment(
+                baseline_point_forecast,
+                menu_adjustment["factor"],
+            )
             decision = f_opt.optimize(
                 target_date,
                 cafeteria_id,
-                point_forecast,
+                menu_adjusted_forecast,
                 menu_items,
                 signal_availability=signal_availability,
                 method_eligibility=method_eligibility,
@@ -101,6 +122,8 @@ def get_food_forecast(date_val: Optional[str] = None):
                     meal_type=meal_type,
                     predicted_demand=decision["predicted_demand"],
                     planning_lower=decision["planning_lower"],
+                    planning_candidate_production=menu_adjusted_forecast,
+                    planning_candidate_semantics="ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER",
                     recommended_production=decision["recommended_production"],
                     planning_upper=decision["planning_upper"],
                     menu_items=menu_items,
@@ -123,6 +146,10 @@ def get_food_forecast(date_val: Optional[str] = None):
                         **model_metadata,
                         "meal_type": meal_type,
                         "decision_inputs": signal_availability,
+                        "baseline_predicted_demand": baseline_point_forecast,
+                        "menu_adjusted_predicted_demand": menu_adjusted_forecast,
+                        "menu_adjustment": menu_adjustment,
+                        "menu_adjustment_semantics": "BOUNDED_POLICY_HEURISTIC_NOT_MEASURED_ELASTICITY",
                     },
                 )
             )

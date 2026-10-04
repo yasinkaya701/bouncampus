@@ -238,9 +238,7 @@ def validate_task(
             errors.append(f"{source}: non-NONE human gate cannot use NOT_REQUIRED")
         if state == "WAITING_HUMAN":
             if gate_kind == "NONE" or gate_status not in {"PENDING", "APPROVED", "REJECTED"}:
-                errors.append(
-                    f"{source}: WAITING_HUMAN requires a non-NONE human gate that is pending or has a recorded decision"
-                )
+                errors.append(f"{source}: WAITING_HUMAN requires a non-NONE pending or resolved human gate")
             if not isinstance(gate.get("question"), str) or not gate.get("question", "").strip():
                 errors.append(f"{source}: WAITING_HUMAN requires one concrete human_gate.question")
         if gate_status in {"APPROVED", "REJECTED"}:
