@@ -3,7 +3,8 @@
 This module does not assume that menu, academic-calendar, weather, or any other
 context signal is useful. A signal may alter a forecast only when it was
 available by the decision cutoff and sufficient prior reconciled rows exist for
-the same context. Incremental value is then evaluated on identical support.
+the same context. Reconciled outcomes enter history only after their explicit
+reconciliation timestamp is visible to the current decision cutoff.
 """
 
 from __future__ import annotations
@@ -61,6 +62,50 @@ def _aggregate_residual(values: Sequence[float], statistic: str) -> float:
     raise ValueError(f"unsupported residual statistic {statistic!r}")
 
 
+def _validated_decision_cutoffs(values: Sequence[Any]) -> list[datetime]:
+    cutoffs: list[datetime] = []
+    for raw in values:
+        cutoff = _aware_timestamp(raw)
+        if cutoff is None:
+            raise ValueError(
+                "decision_cutoff_at must contain timezone-aware timestamps"
+            )
+        if cutoffs and cutoff < cutoffs[-1]:
+            raise ValueError("decision_cutoff_at must be chronological")
+        cutoffs.append(cutoff)
+    return cutoffs
+
+
+def _validated_reconciliation_times(
+    *,
+    outcome_reconciled: Sequence[bool],
+    outcome_reconciled_at: Sequence[Any],
+    decision_cutoffs: Sequence[datetime],
+) -> list[datetime | None]:
+    reconciled_times: list[datetime | None] = []
+    for reconciled, raw_time, own_cutoff in zip(
+        outcome_reconciled,
+        outcome_reconciled_at,
+        decision_cutoffs,
+    ):
+        reconciled_at = _aware_timestamp(raw_time)
+        if reconciled:
+            if reconciled_at is None:
+                raise ValueError(
+                    "reconciled outcome requires outcome_reconciled_at"
+                )
+            if reconciled_at <= own_cutoff:
+                raise ValueError(
+                    "outcome_reconciled_at must be after its own decision cutoff"
+                )
+        elif raw_time is not None and str(raw_time).strip():
+            raise ValueError(
+                "unreconciled outcome must not provide outcome_reconciled_at"
+            )
+        reconciled_times.append(reconciled_at if reconciled else None)
+    return reconciled_times
+
+
 def generate_context_residual_forecasts(
     *,
     base_forecasts: Sequence[float | int | None],
@@ -69,6 +114,7 @@ def generate_context_residual_forecasts(
     signal_available_at: Sequence[Any],
     decision_cutoff_at: Sequence[Any],
     outcome_reconciled: Sequence[bool],
+    outcome_reconciled_at: Sequence[Any],
     min_history: int,
     min_context_history: int,
     shrinkage_strength: float,
@@ -77,7 +123,10 @@ def generate_context_residual_forecasts(
     """Generate transparent context-corrected forecasts without truth leakage.
 
     For each row, the base forecast may be corrected from residual history built
-    only from earlier rows explicitly marked as reconciled/accepted by the caller.
+    only from earlier rows whose accepted outcome was already reconciled by the
+    current row's decision cutoff. A reconciled flag without an availability
+    timestamp is rejected because it cannot prove historical observability.
+
     If the current context was known by decision cutoff and has enough accepted
     prior observations, its residual statistic is partially pooled toward the
     corresponding global residual statistic::
@@ -85,9 +134,8 @@ def generate_context_residual_forecasts(
         weight = n_context / (n_context + shrinkage_strength)
         correction = weight * context_stat + (1 - weight) * global_stat
 
-    `MEAN` preserves ordinary residual correction; `MEDIAN` is a transparent robust
-    option for isolated event/outlier services. The current row is learned only
-    after its forecast is produced, so it cannot leak into its own recommendation.
+    ``decision_cutoff_at`` must be chronological. The current row is never learned
+    before its own forecast, and its outcome timestamp must be after its own cutoff.
     """
 
     lengths = {
@@ -97,6 +145,7 @@ def generate_context_residual_forecasts(
         len(signal_available_at),
         len(decision_cutoff_at),
         len(outcome_reconciled),
+        len(outcome_reconciled_at),
     }
     if len(lengths) != 1:
         raise ValueError("context-signal inputs must have the same length")
@@ -115,8 +164,16 @@ def generate_context_residual_forecasts(
     if any(not isinstance(value, bool) for value in outcome_reconciled):
         raise ValueError("outcome_reconciled must contain explicit booleans")
 
+    decision_cutoffs = _validated_decision_cutoffs(decision_cutoff_at)
+    reconciliation_times = _validated_reconciliation_times(
+        outcome_reconciled=outcome_reconciled,
+        outcome_reconciled_at=outcome_reconciled_at,
+        decision_cutoffs=decision_cutoffs,
+    )
+
     global_residuals: list[float] = []
     context_residuals: dict[str, list[float]] = defaultdict(list)
+    pending_residuals: list[tuple[datetime, float, str | None, bool]] = []
 
     baseline_forecast: list[float | None] = []
     context_forecast: list[float | None] = []
@@ -126,16 +183,36 @@ def generate_context_residual_forecasts(
     reason_codes: list[list[str]] = []
 
     for index in range(len(base_forecasts)):
+        cutoff = decision_cutoffs[index]
+
+        # Promote only previously produced outcomes that were actually reconciled
+        # by this decision cutoff. Later-reconciled truth remains pending.
+        still_pending: list[tuple[datetime, float, str | None, bool]] = []
+        for reconciled_at, residual, historical_key, historical_signal_usable in pending_residuals:
+            if reconciled_at <= cutoff:
+                global_residuals.append(residual)
+                if historical_signal_usable and historical_key is not None:
+                    context_residuals[historical_key].append(residual)
+            else:
+                still_pending.append(
+                    (
+                        reconciled_at,
+                        residual,
+                        historical_key,
+                        historical_signal_usable,
+                    )
+                )
+        pending_residuals = still_pending
+
         base = _non_negative_number(base_forecasts[index])
         actual = _non_negative_number(actual_demand[index])
         key = _context_key(context_keys[index])
         available = _aware_timestamp(signal_available_at[index])
-        cutoff = _aware_timestamp(decision_cutoff_at[index])
         reconciled = outcome_reconciled[index]
+        reconciled_at = reconciliation_times[index]
         signal_usable = (
             key is not None
             and available is not None
-            and cutoff is not None
             and available <= cutoff
         )
 
@@ -162,7 +239,7 @@ def generate_context_residual_forecasts(
             applied = False
             if key is None:
                 reasons.append("CONTEXT_KEY_UNAVAILABLE")
-            elif available is None or cutoff is None:
+            elif available is None:
                 reasons.append("INVALID_SIGNAL_TIMING")
             elif available > cutoff:
                 reasons.append("SIGNAL_NOT_AVAILABLE_AT_DECISION_TIME")
@@ -186,16 +263,18 @@ def generate_context_residual_forecasts(
         context_forecast.append(contextual)
         context_applied.append(applied)
 
-        # Learn only after prediction and only from explicitly reconciled truth.
+        # Current-row truth is queued only after prediction. It can influence a
+        # later row only when its reconciliation timestamp is visible by that row.
         if not reconciled:
             reasons.append("OUTCOME_NOT_RECONCILED_NOT_LEARNED")
         elif base is None or actual is None:
             reasons.append("INVALID_RECONCILED_OUTCOME_NOT_LEARNED")
         else:
-            residual = actual - base
-            global_residuals.append(residual)
-            if signal_usable and key is not None:
-                context_residuals[key].append(residual)
+            assert reconciled_at is not None  # validated above
+            pending_residuals.append(
+                (reconciled_at, actual - base, key, signal_usable)
+            )
+            reasons.append("OUTCOME_RECONCILED_PENDING_AVAILABILITY")
 
         reason_codes.append(reasons)
 
@@ -210,8 +289,11 @@ def generate_context_residual_forecasts(
         "min_context_history": min_context_history,
         "shrinkage_strength": shrinkage,
         "residual_statistic": statistic,
-        "leakage_policy": "PAST_RECONCILED_ROWS_ONLY",
+        "leakage_policy": "PAST_RECONCILED_ROWS_VISIBLE_BY_CUTOFF_ONLY",
         "reconciliation_policy": "EXPLICIT_CALLER_ACCEPTED_OUTCOME_REQUIRED",
+        "reconciliation_time_policy": (
+            "OUTCOME_MUST_BE_RECONCILED_AND_AVAILABLE_BY_CURRENT_DECISION_CUTOFF"
+        ),
         "availability_policy": "SIGNAL_MUST_BE_PUBLISHED_BY_DECISION_CUTOFF",
         "result_scope": "OFFLINE_CONTEXT_CORRECTION_ONLY",
         "claim_boundary": (
@@ -229,7 +311,10 @@ def _forecast_metrics(
 ) -> dict[str, float | int | None]:
     if not actual:
         return {"n": 0, "mae": None, "mean_loss": None}
-    absolute_errors = [abs(predicted - observed) for observed, predicted in zip(actual, forecast)]
+    absolute_errors = [
+        abs(predicted - observed)
+        for observed, predicted in zip(actual, forecast)
+    ]
     losses = [
         excess_cost * max(predicted - observed, 0.0)
         + shortage_cost * max(observed - predicted, 0.0)
