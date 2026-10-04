@@ -47,6 +47,28 @@ def make_parent(parent_id: str = "HUMAN-EE-HARDWARE", *, workstream: str = "ee")
     return template
 
 
+def mark_verified(value: dict, *, owner: str, branch: str, pull_request: int) -> dict:
+    value.update(
+        {
+            "state": "MERGED_VERIFIED",
+            "owner_agent": owner,
+            "branch": branch,
+            "lease": {
+                "claimed_at": "2026-09-30T15:00:00Z",
+                "heartbeat_at": "2026-09-30T15:30:00Z",
+                "ttl_minutes": 360,
+            },
+            "integration": {
+                "pull_request": pull_request,
+                "validated_head_sha": "b" * 40,
+                "merge_sha": "c" * 40,
+                "post_merge_verified_at": "2026-09-30T15:55:00Z",
+            },
+        }
+    )
+    return value
+
+
 class Fixture:
     def __init__(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
@@ -331,6 +353,8 @@ class ParentChildOperationTests(unittest.TestCase):
         first["parent_workstream"] = "ee"
         first["execution_role"] = "ehb"
         first["required_for_parent"] = True
+        mark_verified(first, owner="agent-one", branch="agent/ehb/task-one", pull_request=99)
+
         second = make_task("TASK-TWO", state="READY", path="scripts/two.py")
         second["schema_version"] = 2
         second["agent_kind"] = "CHILD"
@@ -349,24 +373,7 @@ class ParentChildOperationTests(unittest.TestCase):
         self.assertEqual(status["required_remaining"], ["TASK-TWO"])
 
         second = self.fx.read("TASK-TWO")
-        second.update(
-            {
-                "state": "MERGED_VERIFIED",
-                "owner_agent": "agent-two",
-                "branch": "agent/ee/task-two",
-                "lease": {
-                    "claimed_at": "2026-09-30T15:00:00Z",
-                    "heartbeat_at": "2026-09-30T15:30:00Z",
-                    "ttl_minutes": 360,
-                },
-                "integration": {
-                    "pull_request": 100,
-                    "validated_head_sha": "b" * 40,
-                    "merge_sha": "c" * 40,
-                    "post_merge_verified_at": "2026-09-30T15:55:00Z",
-                },
-            }
-        )
+        mark_verified(second, owner="agent-two", branch="agent/ee/task-two", pull_request=100)
         self.fx.add(second)
         status = agent_task.parent_status(self.fx.root, self.parent["id"])
         self.assertTrue(status["ready_for_integration"])
