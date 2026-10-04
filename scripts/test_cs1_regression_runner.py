@@ -1,48 +1,127 @@
 #!/usr/bin/env python3
-"""Contract tests for deterministic CS1 regression discovery/execution."""
+"""Contract tests for the centralized CS1 regression runner."""
 
 from __future__ import annotations
 
-import importlib.util
+from pathlib import Path
+import subprocess
 import sys
 import tempfile
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-RUNNER_PATH = ROOT / "scripts" / "run_cs1_regressions.py"
+from run_cs1_regressions import (
+    command_for_test,
+    discover_test_files,
+    discover_tests,
+    regression_files,
+)
 
-if not RUNNER_PATH.exists():
-    raise AssertionError("scripts/run_cs1_regressions.py must exist")
 
-spec = importlib.util.spec_from_file_location("run_cs1_regressions", RUNNER_PATH)
-assert spec is not None and spec.loader is not None
-runner = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = runner
-spec.loader.exec_module(runner)
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
-with tempfile.TemporaryDirectory() as tmp:
-    scripts_dir = Path(tmp)
-    (scripts_dir / "test_cs1_zeta.py").write_text("print('py')\n", encoding="utf-8")
-    (scripts_dir / "test_cs1_alpha.ts").write_text("console.log('ts');\n", encoding="utf-8")
-    (scripts_dir / "test_cs1_notes.txt").write_text("ignore\n", encoding="utf-8")
-    (scripts_dir / "other_test.py").write_text("ignore\n", encoding="utf-8")
 
-    discovered = runner.discover_test_files(scripts_dir)
-    assert [path.name for path in discovered] == ["test_cs1_alpha.ts", "test_cs1_zeta.py"]
+def test_discovers_python_and_typescript_in_stable_order() -> None:
+    with tempfile.TemporaryDirectory() as raw:
+        scripts = Path(raw)
+        for name in (
+            "test_cs1_zeta.ts",
+            "test_cs1_alpha.py",
+            "test_cs1_beta.ts",
+            "not_cs1.py",
+        ):
+            (scripts / name).write_text("", encoding="utf-8")
 
-python_command = runner.command_for_test(Path("scripts/test_cs1_example.py"))
-assert python_command[0] == sys.executable
-assert python_command[-1].endswith("test_cs1_example.py")
+        expected = [
+            "test_cs1_alpha.py",
+            "test_cs1_beta.ts",
+            "test_cs1_zeta.ts",
+        ]
+        assert [path.name for path in discover_tests(scripts)] == expected
+        assert [path.name for path in discover_test_files(scripts)] == expected
 
-node_command = runner.command_for_test(Path("scripts/test_cs1_example.ts"))
-assert node_command[0] == "node"
-assert node_command[-1].endswith("test_cs1_example.ts")
 
-try:
-    runner.command_for_test(Path("scripts/test_cs1_example.txt"))
-except ValueError as exc:
-    assert "unsupported CS1 regression suffix" in str(exc)
-else:
-    raise AssertionError("unsupported suffix must fail closed")
+def test_fails_closed_on_unsupported_cs1_test_type() -> None:
+    with tempfile.TemporaryDirectory() as raw:
+        scripts = Path(raw)
+        (scripts / "test_cs1_valid.py").write_text("", encoding="utf-8")
+        (scripts / "test_cs1_unregistered.sh").write_text("", encoding="utf-8")
+        try:
+            discover_tests(scripts)
+        except ValueError as exc:
+            assert "unsupported CS1 regression" in str(exc)
+        else:
+            raise AssertionError("unsupported test type must fail closed")
 
-print("PASS CS1 regression runner contract")
+
+def test_commands_are_runtime_explicit() -> None:
+    py_command = command_for_test(Path("scripts/test_cs1_example.py"))
+    ts_command = command_for_test(Path("scripts/test_cs1_example.ts"))
+    assert py_command[1:] == ["scripts/test_cs1_example.py"], py_command
+    assert Path(py_command[0]).name.startswith("python"), py_command
+    assert ts_command == [
+        "node",
+        "--experimental-strip-types",
+        "scripts/test_cs1_example.ts",
+    ], ts_command
+
+
+def test_legacy_regression_is_retained() -> None:
+    with tempfile.TemporaryDirectory() as raw:
+        scripts = Path(raw)
+        (scripts / "test_cs1_alpha.py").write_text("", encoding="utf-8")
+        (scripts / "test_food_decision_policy.py").write_text("", encoding="utf-8")
+        assert [path.name for path in regression_files(scripts)] == [
+            "test_cs1_alpha.py",
+            "test_food_decision_policy.py",
+        ]
+
+
+def test_dedicated_gate_calls_list_and_execute_modes() -> None:
+    workflow = REPO_ROOT / ".github/workflows/cs1-regressions.yml"
+    text = workflow.read_text(encoding="utf-8")
+    assert "python scripts/run_cs1_regressions.py --list" in text
+    assert "python scripts/run_cs1_regressions.py" in text
+
+
+def test_list_mode_does_not_execute_regressions() -> None:
+    runner_source = (REPO_ROOT / "scripts/run_cs1_regressions.py").read_text(
+        encoding="utf-8"
+    )
+    with tempfile.TemporaryDirectory() as raw:
+        root = Path(raw)
+        scripts = root / "scripts"
+        scripts.mkdir()
+        (scripts / "run_cs1_regressions.py").write_text(
+            runner_source, encoding="utf-8"
+        )
+        (scripts / "test_cs1_probe.py").write_text(
+            "from pathlib import Path\nPath('executed.txt').write_text('ran', encoding='utf-8')\n",
+            encoding="utf-8",
+        )
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/run_cs1_regressions.py", "--list"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        assert completed.returncode == 0, completed.stderr
+        assert "scripts/test_cs1_probe.py" in completed.stdout, completed.stdout
+        assert not (root / "executed.txt").exists(), (
+            "--list must enumerate regressions without executing them"
+        )
+
+
+if __name__ == "__main__":
+    tests = [
+        test_discovers_python_and_typescript_in_stable_order,
+        test_fails_closed_on_unsupported_cs1_test_type,
+        test_commands_are_runtime_explicit,
+        test_legacy_regression_is_retained,
+        test_dedicated_gate_calls_list_and_execute_modes,
+        test_list_mode_does_not_execute_regressions,
+    ]
+    for test in tests:
+        test()
+    print(f"ok: {len(tests)} CS1 regression-runner tests")
