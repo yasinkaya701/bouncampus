@@ -158,11 +158,14 @@ Do not submit as fact before measured/PMR evidence:
 | --- | --- | --- |
 | D-001 | KEEP | October 8 is an evidence/application gate; PMR outranks extra demo polish. |
 | D-002 | KEEP | Keep institutional dining as a **beachhead hypothesis**, not validated market. |
-| D-003 | KEEP | Use existing institutional systems first; add sensing only for decision-critical missing measurements. |
-| D-004 | MODIFY | Do not position differentiation as `AI forecasting` or `waste vision`; mature competitors already offer these categories. Test decision timing + institutional context + provenance + uncertainty + human action + verification instead. |
-| D-005 | MODIFY | Define beachhead by quantity-decision/payment/measurement/reservation workflow, not merely `large Turkish universities`. |
-| D-006 | KILL | Unsupported savings, first/only claims, fake live-data language, and external-study performance transfer are not allowed. |
-| D-007 | MODIFY | Treat reservation/digital maturity as a segmentation variable: at mature sites the product may be no-show/walk-in correction, allocation or exception planning rather than generic forecasting. |
-| D-008 | KEEP | Climate value must be derived only after measured physical food prevention; food/category-specific factor provenance is required for CO2e/water estimates. |
+| D-003 | KILL | Exclude unsupported savings, model-performance, live-data and validation claims. |
+| D-004 | MODIFY | Do not position differentiation as `AI forecasting`, `food-waste vision` or generic sustainability dashboard. |
+| D-005 | MODIFY | Define beachhead by quantity-decision/payment/measurement/operating workflow, not merely `large Turkish universities`. |
+| D-006 | KEEP | Use existing institutional systems first; add sensing only for decision-critical missing measurements. |
+| D-007 | MODIFY | Keep TrayGate as an optional measurement-gap closer, not the company thesis. |
+| D-008 | KEEP | Treat conflicting source semantics as `RECONCILIATION_REQUIRED`. |
+| D-009 | KILL | Exclude unsupported first/only, guaranteed ranking, competitor-absence and external-paper-transfer claims. |
+| D-010 | MODIFY | Treat reservation/digital maturity as a segmentation variable; mature sites may need no-show/walk-in, allocation or exception planning rather than generic forecasting. |
+| D-011 | KEEP | Derive climate value only after measured physical food prevention with documented food/category/recipe factor provenance. |
 
 See [DECISIONS.md](./DECISIONS.md) for durable decision records.
