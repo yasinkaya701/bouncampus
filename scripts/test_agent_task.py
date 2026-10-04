@@ -406,6 +406,13 @@ class ParentChildOperationTests(unittest.TestCase):
                 "parent_workstream": "ee",
                 "execution_role": "ehb",
                 "required_for_parent": True,
+                "child_integration": {
+                    "target_role_branch": "role/ehb-embedded-integration",
+                    "pull_request": None,
+                    "validated_head_sha": None,
+                    "integrated_commit_sha": None,
+                    "verified_at": None,
+                },
             }
         )
         make_owned(child, owner="agent-child", branch="agent/ehb/integrate-child")
