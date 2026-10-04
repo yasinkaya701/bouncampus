@@ -35,6 +35,20 @@ class OccupancyForecast(BaseModel):
     building_id: str
     total_hourly: List[OccupancyByHour]
     by_floor: Optional[List[OccupancyByFloor]] = None
+    forecast_provenance: Literal["MODEL_ESTIMATE"] = "MODEL_ESTIMATE"
+    input_basis: Literal[
+        "GENERATED_DATA_MODEL_PLUS_SCHEDULE_HEURISTICS"
+    ] = "GENERATED_DATA_MODEL_PLUS_SCHEDULE_HEURISTICS"
+    calibration_status: Literal["NOT_CALIBRATED"] = "NOT_CALIBRATED"
+    measurement_status: Literal[
+        "NO_LIVE_OCCUPANCY_MEASUREMENT"
+    ] = "NO_LIVE_OCCUPANCY_MEASUREMENT"
+    decision_eligible: bool = False
+    method_eligibility: Literal["SANDBOX_ONLY"] = "SANDBOX_ONLY"
+    limitations: List[str] = [
+        "Occupancy values are model estimates trained on generated data and combined with schedule-informed heuristics; they are not measured room occupancy.",
+        "RoomNode observations remain a separate descriptive measurement boundary until EE-owned calibration, uncertainty, and field-validation evidence supports decision use.",
+    ]
 
 
 class FloorEnergyDetail(BaseModel):
