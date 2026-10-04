@@ -177,6 +177,31 @@ def _assert_spawn_paths_available(
                     )
 
 
+def _assert_fanout_specs_nonoverlapping(specs: list[dict[str, Any]]) -> None:
+    normalized: list[tuple[str, list[str]]] = []
+    for spec in specs:
+        if not isinstance(spec, dict):
+            raise TaskOperationError("each fanout child specification must be an object")
+        task_id = str(spec.get("task_id", ""))
+        touched = list(spec.get("touched_paths") or [])
+        if not touched:
+            raise TaskOperationError(f"fanout child {task_id!r} requires touched_paths")
+        normalized.append((task_id, touched))
+    for index, (left_id, left_paths) in enumerate(normalized):
+        for right_id, right_paths in normalized[index + 1 :]:
+            for left in left_paths:
+                for right in right_paths:
+                    try:
+                        overlaps = fabric.paths_overlap(str(left), str(right))
+                    except ValueError as exc:
+                        raise TaskOperationError(f"invalid fanout path: {exc}") from exc
+                    if overlaps:
+                        raise TaskOperationError(
+                            f"fanout sibling path conflict: {left_id} owns {left!r} and "
+                            f"{right_id} owns {right!r}"
+                        )
+
+
 def list_ready(root: Path) -> list[str]:
     tasks = _validate_repo_or_raise(root)
     return fabric.ready_task_ids(tasks)
@@ -297,13 +322,12 @@ def fanout_parent_tasks(
 ) -> list[dict[str, Any]]:
     if not isinstance(specs, list) or not specs:
         raise TaskOperationError("parent fanout requires at least one child specification")
+    _assert_fanout_specs_nonoverlapping(specs)
     parent_before = deepcopy(load_parent(root, parent_id))
     created_ids: list[str] = []
     spawned: list[dict[str, Any]] = []
     try:
         for spec in specs:
-            if not isinstance(spec, dict):
-                raise TaskOperationError("each fanout child specification must be an object")
             child = spawn_child_task(
                 root,
                 parent_id=parent_id,
@@ -319,14 +343,28 @@ def fanout_parent_tasks(
             created_ids.append(child["id"])
             spawned.append(child)
     except Exception:
-        for task_id in created_ids:
+        for created_id in created_ids:
             try:
-                task_path(root, task_id).unlink()
+                task_path(root, created_id).unlink()
             except FileNotFoundError:
                 pass
         _atomic_write(parent_path(root, parent_id), parent_before)
         raise
     return spawned
+
+
+def _child_role_fan_in_verified(child: dict[str, Any]) -> bool:
+    integration = child.get("child_integration")
+    if not isinstance(integration, dict):
+        return False
+    return all(
+        [
+            isinstance(integration.get("pull_request"), int),
+            isinstance(integration.get("validated_head_sha"), str) and bool(integration.get("validated_head_sha", "").strip()),
+            isinstance(integration.get("integrated_commit_sha"), str) and bool(integration.get("integrated_commit_sha", "").strip()),
+            isinstance(integration.get("verified_at"), str) and bool(integration.get("verified_at", "").strip()),
+        ]
+    )
 
 
 def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
@@ -347,7 +385,7 @@ def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
             continue
         state = str(child.get("state"))
         states[state] = states.get(state, 0) + 1
-        if child.get("required_for_parent", True) and state != "MERGED_VERIFIED":
+        if child.get("required_for_parent", True) and not _child_role_fan_in_verified(child):
             required_remaining.append(str(child_id))
 
     return {
@@ -582,8 +620,53 @@ def integrate_child_task(
         "target_role_branch": target_role_branch,
         "pull_request": pull_request,
         "validated_head_sha": validated_head_sha,
+        "integrated_commit_sha": None,
+        "verified_at": None,
     }
     _write_validated(root, task_id, integrated, candidate)
+    return candidate
+
+
+def verify_child_role_integration(
+    root: Path,
+    task_id: str,
+    *,
+    owner: str,
+    integrated_commit_sha: str,
+    at: str | None = None,
+) -> dict[str, Any]:
+    previous = load_task(root, task_id)
+    if previous.get("agent_kind") != "CHILD":
+        raise TaskOperationError("verify-child-role requires a CHILD task")
+    _require_owner(previous, owner)
+    if previous.get("state") != "INTEGRATING":
+        raise TaskOperationError(
+            f"verify-child-role requires INTEGRATING, found {previous.get('state')}"
+        )
+    child_integration = previous.get("child_integration")
+    if not isinstance(child_integration, dict):
+        raise TaskOperationError("child integration metadata is missing")
+    execution_role = previous.get("execution_role")
+    configured_target = load_config(root).get("role_branches", {}).get(execution_role)
+    if child_integration.get("target_role_branch") != configured_target:
+        raise TaskOperationError("child integration target no longer matches configured execution role")
+    if not isinstance(child_integration.get("pull_request"), int):
+        raise TaskOperationError("child role verification requires the feature pull request")
+    if not isinstance(child_integration.get("validated_head_sha"), str) or not child_integration.get("validated_head_sha", "").strip():
+        raise TaskOperationError("child role verification requires validated head SHA")
+    if not isinstance(integrated_commit_sha, str) or not integrated_commit_sha.strip():
+        raise TaskOperationError("child role verification requires integrated commit SHA")
+
+    candidate = deepcopy(previous)
+    stamp = at or iso_now()
+    candidate["child_integration"]["integrated_commit_sha"] = integrated_commit_sha
+    candidate["child_integration"]["verified_at"] = stamp
+    candidate.setdefault("lease", {})["heartbeat_at"] = stamp
+    _append_note(
+        candidate,
+        f"Role-branch fan-in verified at {integrated_commit_sha} on {stamp}; task remains non-terminal until master verification.",
+    )
+    _write_validated(root, task_id, previous, candidate)
     return candidate
 
 
@@ -686,6 +769,12 @@ def parse_args() -> argparse.Namespace:
     integrate.add_argument("--target-role-branch", required=True)
     integrate.add_argument("--at")
 
+    verify_child = sub.add_parser("verify-child-role")
+    verify_child.add_argument("task_id")
+    verify_child.add_argument("--owner", required=True)
+    verify_child.add_argument("--integrated-commit-sha", required=True)
+    verify_child.add_argument("--at")
+
     decision = sub.add_parser("human-decision")
     decision.add_argument("task_id")
     decision.add_argument("--status", choices=["APPROVED", "REJECTED"], required=True)
@@ -758,6 +847,16 @@ def main() -> int:
                     pull_request=args.pull_request,
                     validated_head_sha=args.validated_head_sha,
                     target_role_branch=args.target_role_branch,
+                    at=args.at,
+                )
+            )
+        elif args.command == "verify-child-role":
+            _print(
+                verify_child_role_integration(
+                    args.root,
+                    args.task_id,
+                    owner=args.owner,
+                    integrated_commit_sha=args.integrated_commit_sha,
                     at=args.at,
                 )
             )
