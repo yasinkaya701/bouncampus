@@ -26,6 +26,18 @@ CAPTURE_QUALITIES = frozenset(
     }
 )
 RESULT_READINESS = frozenset({"READY", "REVIEW_REQUIRED", "WITHHOLD"})
+FORBIDDEN_CAPTURE_IDENTITY_FIELDS = frozenset(
+    {
+        "studentid",
+        "personid",
+        "userid",
+        "bucardid",
+        "faceembedding",
+        "biometricid",
+        "studentidentity",
+        "personidentity",
+    }
+)
 
 
 def _text(value: Any) -> str | None:
@@ -33,6 +45,10 @@ def _text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _canonical_field_name(value: Any) -> str:
+    return "".join(character for character in str(value).lower() if character.isalnum())
 
 
 def _aware_timestamp(value: Any) -> datetime | None:
@@ -71,6 +87,8 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
     Structurally malformed payloads are rejected. Structurally valid captures
     that are not ``VALID`` quality, or do not contain a detected tray, are
     admitted only as explicit abstentions and require ``WITHHOLD`` downstream.
+    Person-identifying fields are rejected because TrayGate is an anonymous
+    tray-measurement boundary rather than a person-tracking surface.
     """
 
     if not isinstance(capture, Mapping):
@@ -101,6 +119,14 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
     if quality not in CAPTURE_QUALITIES:
         _append_unique(reasons, "UNKNOWN_CAPTURE_QUALITY")
 
+    for raw_field in capture:
+        canonical_field = _canonical_field_name(raw_field)
+        if canonical_field in FORBIDDEN_CAPTURE_IDENTITY_FIELDS:
+            _append_unique(
+                reasons,
+                f"PRIVACY_FIELD_NOT_ALLOWED_{canonical_field.upper()}",
+            )
+
     structural_errors = bool(reasons)
     if structural_errors:
         status = "REJECTED"
@@ -130,8 +156,9 @@ def validate_traygate_capture(capture: Mapping[str, Any]) -> dict[str, object]:
         "reason_codes": reasons,
         "result_scope": "TRAYGATE_CAPTURE_ADMISSION_ONLY",
         "claim_boundary": (
-            "Capture admission validates payload structure and conservative quality semantics; "
-            "it does not prove hardware reliability, model accuracy, or production readiness."
+            "Capture admission validates payload structure, anonymous-boundary semantics, "
+            "and conservative quality handling; it does not prove hardware reliability, "
+            "model accuracy, or production readiness."
         ),
     }
 
