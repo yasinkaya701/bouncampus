@@ -375,7 +375,9 @@ def validate_service_truth_dataset(
 
             has_quantity = "recommended_quantity" in decision_audit
             has_band = "recommended_quantity_band" in decision_audit
-            if not has_quantity and not has_band:
+            if has_quantity and has_band:
+                _append_unique(errors, "DECISION_AUDIT_AMBIGUOUS_RECOMMENDATION")
+            elif not has_quantity and not has_band:
                 _append_unique(errors, "DECISION_AUDIT_RECOMMENDATION_REQUIRED")
             if has_quantity and _nonnegative_number(
                 decision_audit.get("recommended_quantity")
