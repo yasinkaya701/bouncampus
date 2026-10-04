@@ -42,6 +42,10 @@ class Fixture:
         (self.root / ".agents/TASK_TEMPLATE.json").write_text(
             (REPO / ".agents/TASK_TEMPLATE.json").read_text(encoding="utf-8"), encoding="utf-8"
         )
+        (self.root / ".agents/PARENT_WORKSTREAM_TEMPLATE.json").write_text(
+            (REPO / ".agents/PARENT_WORKSTREAM_TEMPLATE.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
 
     def add(self, value: dict) -> None:
         (self.root / ".agents/coordination/tasks" / f"{value['id']}.json").write_text(
