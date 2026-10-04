@@ -63,6 +63,7 @@ def optimize_conflict_aware_class_schedule(
     classes: Sequence[Mapping[str, Any]],
     rooms: Sequence[Mapping[str, Any]],
     building_mismatch_weight: Any = 0.0,
+    solar_exposure_weight: Any = 0.0,
 ) -> dict[str, Any]:
     """Optimize room/slot assignments while enforcing caller-declared conflicts.
 
@@ -81,6 +82,7 @@ def optimize_conflict_aware_class_schedule(
             classes=classes,
             rooms=rooms,
             building_mismatch_weight=building_mismatch_weight,
+            solar_exposure_weight=solar_exposure_weight,
         )
 
     parsed: list[dict[str, Any]] = []
@@ -91,6 +93,7 @@ def optimize_conflict_aware_class_schedule(
                 classes=classes,
                 rooms=rooms,
                 building_mismatch_weight=building_mismatch_weight,
+                solar_exposure_weight=solar_exposure_weight,
             )
 
         keys = _conflict_keys(item.get("conflict_keys"))
@@ -107,6 +110,7 @@ def optimize_conflict_aware_class_schedule(
                 classes=classes,
                 rooms=rooms,
                 building_mismatch_weight=building_mismatch_weight,
+                solar_exposure_weight=solar_exposure_weight,
             )
         allowed_slots = sorted({str(slot).strip() for slot in slots if str(slot).strip()})
         if not allowed_slots:
@@ -114,6 +118,7 @@ def optimize_conflict_aware_class_schedule(
                 classes=classes,
                 rooms=rooms,
                 building_mismatch_weight=building_mismatch_weight,
+                solar_exposure_weight=solar_exposure_weight,
             )
         parsed.append(
             {
@@ -129,6 +134,7 @@ def optimize_conflict_aware_class_schedule(
             classes=classes,
             rooms=rooms,
             building_mismatch_weight=building_mismatch_weight,
+            solar_exposure_weight=solar_exposure_weight,
         )
         return {
             **result,
@@ -165,6 +171,7 @@ def optimize_conflict_aware_class_schedule(
             classes=locked_classes,
             rooms=rooms,
             building_mismatch_weight=building_mismatch_weight,
+            solar_exposure_weight=solar_exposure_weight,
         )
         if candidate.get("decision_readiness") == "WITHHOLD":
             return

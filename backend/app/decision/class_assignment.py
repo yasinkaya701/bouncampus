@@ -189,11 +189,14 @@ def optimize_class_schedule(
     classes: Sequence[Mapping[str, Any]],
     rooms: Sequence[Mapping[str, Any]],
     building_mismatch_weight: Any = 0.0,
+    solar_exposure_weight: Any = 0.0,
 ) -> dict[str, Any]:
     result = _base("CLASS_ROOM_SLOT_RECOMMENDATION")
     mismatch = _number(building_mismatch_weight, minimum=0.0)
+    solar_weight = _number(solar_exposure_weight, minimum=0.0)
     if (
         mismatch is None
+        or solar_weight is None
         or not isinstance(classes, Sequence)
         or isinstance(classes, (str, bytes))
         or not isinstance(rooms, Sequence)
@@ -231,6 +234,29 @@ def optimize_class_schedule(
                 "assignments": [],
                 "reason_codes": ["INVALID_CLASS_OR_ROOM_INPUTS"],
             }
+
+        solar_by_slot: dict[str, float] = {}
+        if solar_weight > 0.0:
+            raw_solar = room.get("solar_load_by_slot", {}) if isinstance(room, Mapping) else {}
+            if not isinstance(raw_solar, Mapping):
+                return {
+                    **result,
+                    "decision_readiness": "WITHHOLD",
+                    "assignments": [],
+                    "reason_codes": ["INVALID_ROOM_SOLAR_LOAD"],
+                }
+            for raw_slot, raw_value in raw_solar.items():
+                slot = str(raw_slot).strip()
+                value = _number(raw_value, minimum=0.0)
+                if not slot or value is None or value > 1.0:
+                    return {
+                        **result,
+                        "decision_readiness": "WITHHOLD",
+                        "assignments": [],
+                        "reason_codes": ["INVALID_ROOM_SOLAR_LOAD"],
+                    }
+                solar_by_slot[slot] = value
+
         room_ids.add(room_id)
         normalized_rooms.append(
             {
@@ -242,9 +268,11 @@ def optimize_class_schedule(
                     if str(feature).strip()
                 },
                 "building": _text(room.get("building")),
+                "solar_load_by_slot": solar_by_slot,
             }
         )
 
+    room_by_id = {room["room_id"]: room for room in normalized_rooms}
     candidates_by_class: dict[str, list[tuple[float, str, str]]] = {}
     seen_classes: set[str] = set()
     for item in classes:
@@ -293,6 +321,8 @@ def optimize_class_schedule(
                 score = room["capacity"] - attendance
                 if preferred_building and room["building"] != preferred_building:
                     score += mismatch
+                if solar_weight > 0.0:
+                    score += solar_weight * room["solar_load_by_slot"].get(slot, 0.0)
                 candidates.append((score, slot, room["room_id"]))
         if not candidates:
             return {
@@ -312,11 +342,21 @@ def optimize_class_schedule(
             "reason_codes": ["NO_COLLISION_FREE_CLASS_SCHEDULE"],
         }
     total_loss, assignments = solved
+    if solar_weight > 0.0:
+        for assignment in assignments:
+            room = room_by_id[assignment["room_id"]]
+            exposure = room["solar_load_by_slot"].get(assignment["slot"], 0.0)
+            assignment["solar_exposure_index"] = exposure
+            assignment["solar_loss_component"] = solar_weight * exposure
+
+    reason_codes = ["OPERATOR_REVIEW_REQUIRED"]
+    if solar_weight > 0.0:
+        reason_codes.append("SOLAR_EXPOSURE_LOSS_ACTIVE")
     return {
         **result,
         "decision_readiness": "REVIEW_REQUIRED",
         "assignments": assignments,
         "total_registered_loss": total_loss,
         "solver_semantics": "MIN_COST_BIPARTITE_ROOM_SLOT_ASSIGNMENT",
-        "reason_codes": ["OPERATOR_REVIEW_REQUIRED"],
+        "reason_codes": reason_codes,
     }
