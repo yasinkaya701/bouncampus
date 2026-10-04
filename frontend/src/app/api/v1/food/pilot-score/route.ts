@@ -1,19 +1,25 @@
 import { NextResponse } from 'next/server';
 import {
   FOOD_DECISION_POLICY,
-  FOOD_WASTE_PILOT_PROTOCOL,
   scoreFoodWastePilot,
-  validatePilotMeasurement,
-  type PilotServiceMeasurement,
 } from '@/lib/food-waste';
+import { summarizeMatchedPilotEffects } from '@/lib/food-pilot-pair-effects';
+import {
+  MATCHED_FOOD_WASTE_PILOT_PROTOCOL,
+  analyzeMatchedPilotDesign,
+  normalizeMatchedPilotMeasurement,
+  validateMatchedPilotMeasurement,
+  type MatchedPilotServiceMeasurement,
+} from '@/lib/food-pilot-matching';
 
 export async function GET() {
   return NextResponse.json({
     endpoint: 'POST /api/v1/food/pilot-score',
-    protocol: FOOD_WASTE_PILOT_PROTOCOL,
+    protocol: MATCHED_FOOD_WASTE_PILOT_PROTOCOL,
     decisionPolicyVersion: FOOD_DECISION_POLICY.version,
     requestShape: {
-      measurements: FOOD_WASTE_PILOT_PROTOCOL.measurementFields,
+      measurements: MATCHED_FOOD_WASTE_PILOT_PROTOCOL.measurementFields,
+      acceptedNaming: ['snake_case', 'camelCase'],
     },
     evidencePromotion: {
       inputEvidenceClass: 'MEASURED_PILOT_DATA',
@@ -21,8 +27,12 @@ export async function GET() {
       generalizedImpactClaimAllowed: false,
       requiredChecks: [
         'row-level measurement validity',
+        'pair_id present on every row',
+        'exactly one CONTROL and one INTERVENTION service per pair_id',
+        'no duplicate pair_id + arm combinations',
+        'minimum matched pairs',
+        'matched-pair normalized-waste effect summary',
         'duplicate service detection',
-        'minimum services per arm',
         '100% intervention forecast retention',
         'normalized waste-reduction target',
         'early-sellout guardrail',
@@ -53,11 +63,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const validationErrors = measurements.flatMap((candidate, index) => {
+  const normalizedMeasurements = measurements.map(candidate => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return candidate;
+    return normalizeMatchedPilotMeasurement(candidate as Record<string, unknown>);
+  });
+
+  const validationErrors = normalizedMeasurements.flatMap((candidate, index) => {
     if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
       return [{ index, message: 'measurement must be an object' }];
     }
-    return validatePilotMeasurement(candidate as PilotServiceMeasurement)
+    return validateMatchedPilotMeasurement(candidate as MatchedPilotServiceMeasurement)
       .map(message => ({ index, message }));
   });
 
@@ -72,18 +87,50 @@ export async function POST(request: Request) {
     );
   }
 
-  const typed = measurements as PilotServiceMeasurement[];
+  const typed = normalizedMeasurements as MatchedPilotServiceMeasurement[];
+  const matching = analyzeMatchedPilotDesign(typed);
+  if (!matching.structurePassed) {
+    return NextResponse.json(
+      {
+        error: 'INVALID_MATCHED_DESIGN',
+        matching,
+        detail: MATCHED_FOOD_WASTE_PILOT_PROTOCOL.matchingRule,
+        evidencePromotionBlocked: true,
+      },
+      { status: 400 },
+    );
+  }
+
   const scorecard = scoreFoodWastePilot(typed);
+  const pairedEffects = summarizeMatchedPilotEffects(typed);
+  const minimumMatchedPairs = MATCHED_FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMatchedPairs;
+  const enoughMatchedPairs = matching.matchedPairCount >= minimumMatchedPairs;
+  const pairEffectsComplete = pairedEffects.matchedPairCount === matching.matchedPairCount;
+  const promotableAsPilotResult =
+    enoughMatchedPairs
+    && pairEffectsComplete
+    && scorecard.gates.dataQualityPassed
+    && scorecard.gates.enoughEvidence
+    && scorecard.status !== 'INSUFFICIENT_EVIDENCE';
+
   return NextResponse.json({
     scorecard,
-    protocolVersion: FOOD_WASTE_PILOT_PROTOCOL.version,
+    pairedEffects,
+    matching: {
+      ...matching,
+      minimumMatchedPairs,
+      enoughMatchedPairs,
+      pairEffectsComplete,
+    },
+    protocolVersion: MATCHED_FOOD_WASTE_PILOT_PROTOCOL.version,
     decisionPolicyVersion: FOOD_DECISION_POLICY.version,
     evidencePromotion: {
-      dataQualityPassed: scorecard.gates.dataQualityPassed,
-      enoughEvidence: scorecard.gates.enoughEvidence,
-      promotableAsPilotResult: scorecard.status !== 'INSUFFICIENT_EVIDENCE',
+      dataQualityPassed:
+        scorecard.gates.dataQualityPassed && matching.structurePassed && pairEffectsComplete,
+      enoughEvidence: scorecard.gates.enoughEvidence && enoughMatchedPairs,
+      promotableAsPilotResult,
       promotableAsGeneralizedClimateImpact: false,
     },
-    claimBoundary: FOOD_WASTE_PILOT_PROTOCOL.evidenceBoundary,
+    claimBoundary: MATCHED_FOOD_WASTE_PILOT_PROTOCOL.evidenceBoundary,
   });
 }
