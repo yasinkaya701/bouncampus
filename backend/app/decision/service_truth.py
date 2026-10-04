@@ -432,3 +432,78 @@ def validate_service_truth_dataset(
             "it does not prove forecast value, operational impact, or savings."
         ),
     }
+
+
+def validate_service_truth_artifact(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    field_provenance: Mapping[str, Any],
+    require_measured: bool = True,
+    min_services: int = 3,
+) -> dict[str, object]:
+    """Bind dataset admission and source ownership into one fail-closed decision.
+
+    This function composes the canonical dataset and source-contract validators.
+    It adds no new evidence semantics: benchmark eligibility requires both an
+    ``ACCEPTED_MEASURED`` dataset and a fully verified source contract.
+    """
+
+    dataset_validation = validate_service_truth_dataset(
+        rows,
+        require_measured=require_measured,
+        min_services=min_services,
+    )
+    source_contract_validation = validate_service_truth_source_contract(field_provenance)
+
+    fingerprint_payload = {
+        "contract_version": CONTRACT_VERSION,
+        "dataset_checksum_sha256": dataset_validation["artifact_checksum_sha256"],
+        "source_contract_checksum_sha256": source_contract_validation[
+            "source_contract_sha256"
+        ],
+    }
+    fingerprint = _canonical_json_sha256(fingerprint_payload)
+
+    dataset_status = dataset_validation["validation_status"]
+    source_complete = bool(source_contract_validation["source_contract_complete"])
+    source_verified = bool(source_contract_validation["source_contract_verified"])
+    reasons: list[str] = []
+
+    if dataset_status == "SANDBOX_ONLY":
+        status = "SANDBOX_ONLY"
+        eligible = False
+        for code in dataset_validation.get("reason_codes", []):
+            _append_unique(reasons, str(code))
+    elif dataset_status != "ACCEPTED_MEASURED":
+        status = "DATASET_REJECTED"
+        eligible = False
+        _append_unique(reasons, "DATASET_NOT_ACCEPTED_MEASURED")
+        for code in dataset_validation.get("reason_codes", []):
+            _append_unique(reasons, str(code))
+    elif not source_complete:
+        status = "SOURCE_CONTRACT_INCOMPLETE"
+        eligible = False
+        _append_unique(reasons, "SOURCE_CONTRACT_INCOMPLETE")
+    elif not source_verified:
+        status = "SOURCE_CONTRACT_UNVERIFIED"
+        eligible = False
+        _append_unique(reasons, "SOURCE_CONTRACT_UNVERIFIED")
+    else:
+        status = "ACCEPTED_FOR_OFFLINE_BENCHMARK"
+        eligible = True
+
+    return {
+        "validation_status": status,
+        "eligible_for_benchmark": eligible,
+        "contract_version": CONTRACT_VERSION,
+        "dataset_validation": dataset_validation,
+        "source_contract_validation": source_contract_validation,
+        "artifact_admission_fingerprint_sha256": fingerprint,
+        "reason_codes": reasons,
+        "result_scope": "SERVICE_TRUTH_ARTIFACT_ADMISSION_ONLY",
+        "claim_boundary": (
+            "Artifact admission proves only structural and declared-source provenance "
+            "eligibility for offline benchmark input; it does not prove data accuracy, "
+            "model value, pilot readiness, operational impact, or savings."
+        ),
+    }
