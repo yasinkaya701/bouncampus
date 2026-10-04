@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import campusConfig from '@/data/campus_config.json';
+import menuPopularityCatalog from '@/data/menu_popularity.json';
 import realCourses from '@/data/real_boun_courses.json';
 import type { ActionItem } from '@/lib/types';
+import {
+  applyMenuDemandAdjustment,
+  buildMenuDemandAdjustment,
+  MENU_DEMAND_POLICY,
+} from '@/lib/decision-intelligence/food-menu-demand';
 import {
   courseScheduleSnapshotSource,
   fetchBounCalendar,
@@ -146,7 +152,21 @@ export async function GET(request: Request) {
     return sum + (hours?.[11] ?? 0) + (hours?.[12] ?? 0) + (hours?.[13] ?? 0);
   }, 0) / 3;
   const rainFactor = weather.rain ? 1.08 : 1;
-  const foodDemandMeals = Math.round(lunchClassFlow * 0.72 * rainFactor);
+  const baselineFoodDemandMeals = Math.round(lunchClassFlow * 0.72 * rainFactor);
+  const verifiedOfficialMenu = menu.source.ok && menu.source.provenance === 'OFFICIAL_LIVE';
+  const menuAdjustment = buildMenuDemandAdjustment(
+    {
+      mainDish: menu.main_dish,
+      soup: menu.soup,
+      veganDish: menu.vegan_dish,
+    },
+    verifiedOfficialMenu,
+    menuPopularityCatalog.dishes,
+  );
+  const foodDemandMeals = applyMenuDemandAdjustment(
+    baselineFoodDemandMeals,
+    menuAdjustment.factor,
+  );
 
   const energyModelSource = modelSource(
     'campus-energy-model',
@@ -161,7 +181,7 @@ export async function GET(request: Request) {
   const foodModelSource = modelSource(
     'cafeteria-demand-model',
     'BOUNCAMPUS cafeteria demand model',
-    'POS verisi olmadığı için öğle ders akışı + hava koşulundan talep tahmini üretir.',
+    `POS verisi olmadığı için öğle ders akışı + hava koşulu baz tahmini üretir; doğrulanmış canlı menü varsa ${MENU_DEMAND_POLICY.semantics} ile sınırlı menü düzeltmesi uygulanır.`,
   );
 
   const candidates = [...buildingEnergy]
@@ -191,9 +211,9 @@ export async function GET(request: Request) {
       title: menu.main_dish ? `${menu.main_dish}: üretim planını talep tahminiyle doğrula` : 'Yemekhane üretim planını talep tahminiyle doğrula',
       time: '10:30 - 13:30',
       location: 'Kuzey + Güney Yemekhaneleri',
-      description: `Ders çıkış akışı ve hava koşuluna göre öğle talebi yaklaşık ${foodDemandMeals.toLocaleString('tr-TR')} porsiyon. Bu sayı POS verisi değildir; mutfak üretim kararı için gerçek satış verisiyle kalibre edilmelidir.`,
+      description: `Ders çıkış akışı + hava baz tahmini ${baselineFoodDemandMeals.toLocaleString('tr-TR')} porsiyon; doğrulanmış menü bağlamı sonrası planlama adayı ${foodDemandMeals.toLocaleString('tr-TR')} porsiyon (çarpan ×${menuAdjustment.factor.toFixed(3)}). Bu sayı POS verisi veya yetkili mutfak emri değildir.`,
       impact_value: foodDemandMeals,
-      impact_unit: 'porsiyon talep tahmini',
+      impact_unit: 'porsiyon planlama adayı',
       icon: 'Utensils',
       provenance: 'MODEL_ESTIMATE',
     });
@@ -208,7 +228,13 @@ export async function GET(request: Request) {
     date: dateVal,
     campus_occupancy: totalCurrent / Math.max(1, totalCapacity),
     predicted_energy_mwh: Math.round((baselineEnergyKwh / 1000) * 10) / 10,
+    food_demand_baseline_meals: baselineFoodDemandMeals,
     food_demand_meals: foodDemandMeals,
+    food_menu_adjustment: {
+      ...menuAdjustment,
+      semantics: MENU_DEMAND_POLICY.semantics,
+      officialMenuVerified: verifiedOfficialMenu,
+    },
     potential_saving_tl: Math.round(savedKwh * 2.8),
     co2_avoided_kg: Math.round(savedKwh * 0.47),
     buildings,
@@ -230,7 +256,7 @@ export async function GET(request: Request) {
       vegan_dish: menu.vegan_dish,
       sides: [],
       options: [],
-      popularity_multiplier: 1,
+      popularity_multiplier: menuAdjustment.factor,
       provenance: menu.source,
     },
     live_shuttle: {
