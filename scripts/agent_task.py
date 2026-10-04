@@ -37,6 +37,12 @@ TRANSITIONS: dict[str, set[str]] = {
     "CANCELLED": set(),
 }
 
+PARENT_INTEGRATION_SLOT_STATES = {
+    "READY_FOR_INTEGRATION",
+    "INTEGRATING",
+    "MERGED_VERIFYING",
+}
+
 
 class TaskOperationError(RuntimeError):
     pass
@@ -284,6 +290,45 @@ def spawn_child_task(
     return candidate
 
 
+def fanout_parent_tasks(
+    root: Path,
+    parent_id: str,
+    specs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if not isinstance(specs, list) or not specs:
+        raise TaskOperationError("parent fanout requires at least one child specification")
+    parent_before = deepcopy(load_parent(root, parent_id))
+    created_ids: list[str] = []
+    spawned: list[dict[str, Any]] = []
+    try:
+        for spec in specs:
+            if not isinstance(spec, dict):
+                raise TaskOperationError("each fanout child specification must be an object")
+            child = spawn_child_task(
+                root,
+                parent_id=parent_id,
+                task_id=str(spec.get("task_id", "")),
+                title=str(spec.get("title", "")),
+                execution_role=str(spec.get("execution_role", "")),
+                lane=str(spec.get("lane", "")),
+                touched_paths=list(spec.get("touched_paths") or []),
+                priority=str(spec.get("priority", "P1")),
+                depends_on=list(spec.get("depends_on") or []),
+                required_for_parent=bool(spec.get("required_for_parent", True)),
+            )
+            created_ids.append(child["id"])
+            spawned.append(child)
+    except Exception:
+        for task_id in created_ids:
+            try:
+                task_path(root, task_id).unlink()
+            except FileNotFoundError:
+                pass
+        _atomic_write(parent_path(root, parent_id), parent_before)
+        raise
+    return spawned
+
+
 def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
     parent = load_parent(root, parent_id)
     tasks = _validate_repo_or_raise(root)
@@ -313,6 +358,52 @@ def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
         "missing_children": sorted(missing),
         "required_remaining": sorted(required_remaining),
         "ready_for_integration": bool(child_ids) and not required_remaining,
+    }
+
+
+def parent_integration_queue(root: Path) -> dict[str, Any]:
+    config = load_config(root)
+    parent_dir_value = config.get("coordination_parent_dir")
+    if not isinstance(parent_dir_value, str) or not parent_dir_value:
+        raise TaskOperationError("fabric schema does not configure parent workstreams")
+    parent_dir = root / parent_dir_value
+    parents: list[dict[str, Any]] = []
+    slot_holders: list[str] = []
+    if parent_dir.is_dir():
+        for path in sorted(parent_dir.glob("*.json")):
+            try:
+                parent = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as exc:
+                raise TaskOperationError(f"invalid parent JSON {path.name}: {exc}") from exc
+            if not isinstance(parent, dict):
+                raise TaskOperationError(f"parent file {path.name} must contain an object")
+            parent_id = str(parent.get("id", ""))
+            state = str(parent.get("state", ""))
+            parents.append(
+                {
+                    "id": parent_id,
+                    "workstream": parent.get("workstream"),
+                    "state": state,
+                    "pr_state": parent.get("integration", {}).get("pr_state"),
+                }
+            )
+            if state in PARENT_INTEGRATION_SLOT_STATES:
+                slot_holders.append(parent_id)
+
+    max_slots = config.get("integration", {}).get("max_integration_ready_pull_requests", 1)
+    if not isinstance(max_slots, int) or max_slots <= 0:
+        raise TaskOperationError("max_integration_ready_pull_requests must be a positive integer")
+    if len(slot_holders) > max_slots:
+        raise TaskOperationError(
+            "master integration slot conflict: "
+            + ", ".join(sorted(slot_holders))
+            + f" occupy {len(slot_holders)} slots; maximum is {max_slots}"
+        )
+    return {
+        "active_slot": slot_holders[0] if slot_holders else None,
+        "slot_holders": sorted(slot_holders),
+        "max_slots": max_slots,
+        "parents": parents,
     }
 
 
@@ -537,6 +628,7 @@ def parse_args() -> argparse.Namespace:
 
     sub.add_parser("summary")
     sub.add_parser("ready")
+    sub.add_parser("integration-queue")
 
     show = sub.add_parser("show")
     show.add_argument("task_id")
@@ -554,6 +646,10 @@ def parse_args() -> argparse.Namespace:
     spawn.add_argument("--priority", default="P1")
     spawn.add_argument("--depends-on", action="append", default=[])
     spawn.add_argument("--optional", action="store_true")
+
+    fanout = sub.add_parser("fanout")
+    fanout.add_argument("parent_id")
+    fanout.add_argument("--spec-file", type=Path, required=True)
 
     claim = sub.add_parser("claim")
     claim.add_argument("task_id")
@@ -606,6 +702,8 @@ def main() -> int:
             _print(summary(args.root))
         elif args.command == "ready":
             _print(list_ready(args.root))
+        elif args.command == "integration-queue":
+            _print(parent_integration_queue(args.root))
         elif args.command == "show":
             _print(load_task(args.root, args.task_id))
         elif args.command == "parent-status":
@@ -625,6 +723,9 @@ def main() -> int:
                     required_for_parent=not args.optional,
                 )
             )
+        elif args.command == "fanout":
+            specs = json.loads(args.spec_file.read_text(encoding="utf-8"))
+            _print(fanout_parent_tasks(args.root, args.parent_id, specs))
         elif args.command == "claim":
             _print(claim_task(args.root, args.task_id, owner=args.owner, branch=args.branch, at=args.at))
         elif args.command == "heartbeat":
@@ -673,7 +774,7 @@ def main() -> int:
             )
         else:
             raise TaskOperationError(f"unknown command: {args.command}")
-    except TaskOperationError as exc:
+    except (TaskOperationError, OSError, json.JSONDecodeError) as exc:
         print(f"AGENT TASK ERROR: {exc}", file=sys.stderr)
         return 2
     return 0
