@@ -1,8 +1,31 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "control_branch": "agent-coordination",
   "coordination_task_dir": ".agents/coordination/tasks",
+  "coordination_parent_dir": ".agents/coordination/parents",
   "branch_pattern": "^agent/[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$",
+  "parent_branch_pattern": "^work/(ie|ee|cs1|cs2)/[a-z0-9][a-z0-9-]*$",
+  "parent_workstreams": [
+    "ie",
+    "ee",
+    "cs1",
+    "cs2"
+  ],
+  "child_agent_limit": null,
+  "parent_states": [
+    "ACTIVE",
+    "BLOCKED",
+    "WAITING_HUMAN",
+    "READY_FOR_INTEGRATION",
+    "INTEGRATING",
+    "MERGED_VERIFYING",
+    "COMPLETE"
+  ],
+  "parent_pr_states": [
+    "DRAFT",
+    "READY",
+    "MERGED"
+  ],
   "role_branches": {
     "ie": "role/ie-customer-discovery",
     "ee": "role/ee-physical-systems",
@@ -75,14 +98,17 @@
   "integration": {
     "scope": "per-role-master-integration",
     "allow_parallel_role_pull_requests": true,
+    "allow_parallel_parent_work": true,
     "max_open_pull_requests": 1,
     "max_open_feature_pull_requests_per_role": 3,
+    "max_integration_ready_pull_requests": 1,
     "merge_method": "merge",
     "require_latest_master": true,
     "require_latest_role_base": true,
     "require_exact_head_ci": true,
     "require_post_merge_verification": true,
-    "shared_change_requires_cross_role_checklist": true
+    "shared_change_requires_cross_role_checklist": true,
+    "child_target_must_be_role_branch": true
   },
   "lease": {
     "default_ttl_minutes": 360,

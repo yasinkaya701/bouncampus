@@ -37,6 +37,12 @@ TRANSITIONS: dict[str, set[str]] = {
     "CANCELLED": set(),
 }
 
+PARENT_INTEGRATION_SLOT_STATES = {
+    "READY_FOR_INTEGRATION",
+    "INTEGRATING",
+    "MERGED_VERIFYING",
+}
+
 
 class TaskOperationError(RuntimeError):
     pass
@@ -58,6 +64,14 @@ def task_path(root: Path, task_id: str) -> Path:
     return root / config["coordination_task_dir"] / f"{task_id}.json"
 
 
+def parent_path(root: Path, parent_id: str) -> Path:
+    config = load_config(root)
+    parent_dir = config.get("coordination_parent_dir")
+    if not isinstance(parent_dir, str) or not parent_dir:
+        raise TaskOperationError("fabric schema does not configure parent workstreams")
+    return root / parent_dir / f"{parent_id}.json"
+
+
 def load_task(root: Path, task_id: str) -> dict[str, Any]:
     path = task_path(root, task_id)
     if not path.is_file():
@@ -68,6 +82,19 @@ def load_task(root: Path, task_id: str) -> dict[str, Any]:
         raise TaskOperationError(f"invalid task JSON for {task_id}: {exc}") from exc
     if not isinstance(value, dict):
         raise TaskOperationError(f"task {task_id} must be a JSON object")
+    return value
+
+
+def load_parent(root: Path, parent_id: str) -> dict[str, Any]:
+    path = parent_path(root, parent_id)
+    if not path.is_file():
+        raise TaskOperationError(f"parent workstream not found: {parent_id}")
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise TaskOperationError(f"invalid parent JSON for {parent_id}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise TaskOperationError(f"parent {parent_id} must be a JSON object")
     return value
 
 
@@ -116,6 +143,65 @@ def _append_note(task: dict[str, Any], note: str | None) -> None:
         task.setdefault("notes", []).append(note)
 
 
+def _load_task_template(root: Path) -> dict[str, Any]:
+    path = root / fabric.TEMPLATE_PATH
+    if not path.is_file():
+        raise TaskOperationError(f"missing task template: {path}")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise TaskOperationError("task template must be a JSON object")
+    return value
+
+
+def _assert_spawn_paths_available(
+    tasks: dict[str, dict[str, Any]],
+    *,
+    task_id: str,
+    touched_paths: list[str],
+) -> None:
+    for existing_id, existing in tasks.items():
+        if existing.get("state") not in fabric.ACTIVE_OWNERSHIP_STATES:
+            continue
+        for requested in touched_paths:
+            for owned in existing.get("touched_paths", []):
+                if not isinstance(requested, str) or not isinstance(owned, str):
+                    continue
+                try:
+                    overlaps = fabric.paths_overlap(requested, owned)
+                except ValueError as exc:
+                    raise TaskOperationError(f"invalid touched path for {task_id}: {exc}") from exc
+                if overlaps:
+                    raise TaskOperationError(
+                        f"path ownership conflict: {task_id} requests {requested!r} while "
+                        f"{existing_id} owns {owned!r}"
+                    )
+
+
+def _assert_fanout_specs_nonoverlapping(specs: list[dict[str, Any]]) -> None:
+    normalized: list[tuple[str, list[str]]] = []
+    for spec in specs:
+        if not isinstance(spec, dict):
+            raise TaskOperationError("each fanout child specification must be an object")
+        task_id = str(spec.get("task_id", ""))
+        touched = list(spec.get("touched_paths") or [])
+        if not touched:
+            raise TaskOperationError(f"fanout child {task_id!r} requires touched_paths")
+        normalized.append((task_id, touched))
+    for index, (left_id, left_paths) in enumerate(normalized):
+        for right_id, right_paths in normalized[index + 1 :]:
+            for left in left_paths:
+                for right in right_paths:
+                    try:
+                        overlaps = fabric.paths_overlap(str(left), str(right))
+                    except ValueError as exc:
+                        raise TaskOperationError(f"invalid fanout path: {exc}") from exc
+                    if overlaps:
+                        raise TaskOperationError(
+                            f"fanout sibling path conflict: {left_id} owns {left!r} and "
+                            f"{right_id} owns {right!r}"
+                        )
+
+
 def list_ready(root: Path) -> list[str]:
     tasks = _validate_repo_or_raise(root)
     return fabric.ready_task_ids(tasks)
@@ -138,6 +224,224 @@ def summary(root: Path) -> dict[str, Any]:
         "ready": fabric.ready_task_ids(tasks),
         "waiting_human": waiting_human,
         "blocked": blocked,
+    }
+
+
+def spawn_child_task(
+    root: Path,
+    *,
+    parent_id: str,
+    task_id: str,
+    title: str,
+    execution_role: str,
+    lane: str,
+    touched_paths: list[str],
+    priority: str = "P1",
+    depends_on: list[str] | None = None,
+    required_for_parent: bool = True,
+) -> dict[str, Any]:
+    config = load_config(root)
+    if config.get("schema_version") != 2:
+        raise TaskOperationError("child spawning requires fabric schema v2")
+    parent = load_parent(root, parent_id)
+    parent_workstream = parent.get("workstream")
+    if parent_workstream not in config.get("parent_workstreams", []):
+        raise TaskOperationError(f"invalid parent workstream: {parent_workstream!r}")
+    role_branches = config.get("role_branches", {})
+    if execution_role not in role_branches:
+        raise TaskOperationError(f"unknown execution role: {execution_role!r}")
+    if not touched_paths:
+        raise TaskOperationError("child task requires at least one touched path")
+    destination = task_path(root, task_id)
+    if destination.exists():
+        raise TaskOperationError(f"task already exists: {task_id}")
+
+    tasks = _validate_repo_or_raise(root)
+    _assert_spawn_paths_available(tasks, task_id=task_id, touched_paths=touched_paths)
+
+    candidate = deepcopy(_load_task_template(root))
+    candidate.update(
+        {
+            "schema_version": 2,
+            "id": task_id,
+            "title": title,
+            "priority": priority,
+            "lane": lane,
+            "state": "READY",
+            "owner_agent": None,
+            "branch": None,
+            "depends_on": list(depends_on or []),
+            "touched_paths": list(touched_paths),
+            "acceptance_criteria": [],
+            "validation_commands": [],
+            "agent_kind": "CHILD",
+            "parent_id": parent_id,
+            "parent_workstream": parent_workstream,
+            "execution_role": execution_role,
+            "required_for_parent": bool(required_for_parent),
+            "child_integration": {
+                "target_role_branch": role_branches[execution_role],
+                "pull_request": None,
+                "validated_head_sha": None,
+                "integrated_commit_sha": None,
+                "verified_at": None,
+            },
+            "notes": [
+                f"Spawned under {parent_id}; durable execution role is {execution_role}."
+            ],
+        }
+    )
+
+    parent_previous = deepcopy(parent)
+    parent_candidate = deepcopy(parent)
+    children = parent_candidate.setdefault("child_ids", [])
+    if task_id in children:
+        raise TaskOperationError(f"parent already references child task: {task_id}")
+    children.append(task_id)
+
+    _atomic_write(destination, candidate)
+    try:
+        errors, _, _ = fabric.validate_repository(root)
+        if errors:
+            raise TaskOperationError("spawn rejected by fabric invariants:\n- " + "\n- ".join(errors))
+        _atomic_write(parent_path(root, parent_id), parent_candidate)
+    except Exception:
+        try:
+            destination.unlink()
+        except FileNotFoundError:
+            pass
+        _atomic_write(parent_path(root, parent_id), parent_previous)
+        raise
+    return candidate
+
+
+def fanout_parent_tasks(
+    root: Path,
+    parent_id: str,
+    specs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if not isinstance(specs, list) or not specs:
+        raise TaskOperationError("parent fanout requires at least one child specification")
+    _assert_fanout_specs_nonoverlapping(specs)
+    parent_before = deepcopy(load_parent(root, parent_id))
+    created_ids: list[str] = []
+    spawned: list[dict[str, Any]] = []
+    try:
+        for spec in specs:
+            child = spawn_child_task(
+                root,
+                parent_id=parent_id,
+                task_id=str(spec.get("task_id", "")),
+                title=str(spec.get("title", "")),
+                execution_role=str(spec.get("execution_role", "")),
+                lane=str(spec.get("lane", "")),
+                touched_paths=list(spec.get("touched_paths") or []),
+                priority=str(spec.get("priority", "P1")),
+                depends_on=list(spec.get("depends_on") or []),
+                required_for_parent=bool(spec.get("required_for_parent", True)),
+            )
+            created_ids.append(child["id"])
+            spawned.append(child)
+    except Exception:
+        for created_id in created_ids:
+            try:
+                task_path(root, created_id).unlink()
+            except FileNotFoundError:
+                pass
+        _atomic_write(parent_path(root, parent_id), parent_before)
+        raise
+    return spawned
+
+
+def _child_role_fan_in_verified(child: dict[str, Any]) -> bool:
+    integration = child.get("child_integration")
+    if not isinstance(integration, dict):
+        return False
+    return all(
+        [
+            isinstance(integration.get("pull_request"), int),
+            isinstance(integration.get("validated_head_sha"), str) and bool(integration.get("validated_head_sha", "").strip()),
+            isinstance(integration.get("integrated_commit_sha"), str) and bool(integration.get("integrated_commit_sha", "").strip()),
+            isinstance(integration.get("verified_at"), str) and bool(integration.get("verified_at", "").strip()),
+        ]
+    )
+
+
+def parent_status(root: Path, parent_id: str) -> dict[str, Any]:
+    parent = load_parent(root, parent_id)
+    tasks = _validate_repo_or_raise(root)
+    child_ids = parent.get("child_ids", [])
+    if not isinstance(child_ids, list):
+        raise TaskOperationError(f"parent {parent_id} child_ids must be a list")
+
+    states: dict[str, int] = {}
+    required_remaining: list[str] = []
+    missing: list[str] = []
+    for child_id in child_ids:
+        child = tasks.get(child_id)
+        if child is None:
+            missing.append(str(child_id))
+            required_remaining.append(str(child_id))
+            continue
+        state = str(child.get("state"))
+        states[state] = states.get(state, 0) + 1
+        if child.get("required_for_parent", True) and not _child_role_fan_in_verified(child):
+            required_remaining.append(str(child_id))
+
+    return {
+        "parent_id": parent_id,
+        "workstream": parent.get("workstream"),
+        "child_count": len(child_ids),
+        "states": dict(sorted(states.items())),
+        "missing_children": sorted(missing),
+        "required_remaining": sorted(required_remaining),
+        "ready_for_integration": bool(child_ids) and not required_remaining,
+    }
+
+
+def parent_integration_queue(root: Path) -> dict[str, Any]:
+    config = load_config(root)
+    parent_dir_value = config.get("coordination_parent_dir")
+    if not isinstance(parent_dir_value, str) or not parent_dir_value:
+        raise TaskOperationError("fabric schema does not configure parent workstreams")
+    parent_dir = root / parent_dir_value
+    parents: list[dict[str, Any]] = []
+    slot_holders: list[str] = []
+    if parent_dir.is_dir():
+        for path in sorted(parent_dir.glob("*.json")):
+            try:
+                parent = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as exc:
+                raise TaskOperationError(f"invalid parent JSON {path.name}: {exc}") from exc
+            if not isinstance(parent, dict):
+                raise TaskOperationError(f"parent file {path.name} must contain an object")
+            parent_id = str(parent.get("id", ""))
+            state = str(parent.get("state", ""))
+            parents.append(
+                {
+                    "id": parent_id,
+                    "workstream": parent.get("workstream"),
+                    "state": state,
+                    "pr_state": parent.get("integration", {}).get("pr_state"),
+                }
+            )
+            if state in PARENT_INTEGRATION_SLOT_STATES:
+                slot_holders.append(parent_id)
+
+    max_slots = config.get("integration", {}).get("max_integration_ready_pull_requests", 1)
+    if not isinstance(max_slots, int) or max_slots <= 0:
+        raise TaskOperationError("max_integration_ready_pull_requests must be a positive integer")
+    if len(slot_holders) > max_slots:
+        raise TaskOperationError(
+            "master integration slot conflict: "
+            + ", ".join(sorted(slot_holders))
+            + f" occupy {len(slot_holders)} slots; maximum is {max_slots}"
+        )
+    return {
+        "active_slot": slot_holders[0] if slot_holders else None,
+        "slot_holders": sorted(slot_holders),
+        "max_slots": max_slots,
+        "parents": parents,
     }
 
 
@@ -272,6 +576,100 @@ def transition_task(
     return candidate
 
 
+def integrate_child_task(
+    root: Path,
+    task_id: str,
+    *,
+    owner: str,
+    pull_request: int,
+    validated_head_sha: str,
+    target_role_branch: str,
+    at: str | None = None,
+) -> dict[str, Any]:
+    previous = load_task(root, task_id)
+    if previous.get("agent_kind") != "CHILD":
+        raise TaskOperationError("integrate-child requires a CHILD task")
+    execution_role = previous.get("execution_role")
+    configured_target = load_config(root).get("role_branches", {}).get(execution_role)
+    if not configured_target:
+        raise TaskOperationError(f"child has unknown execution role: {execution_role!r}")
+    if target_role_branch != configured_target:
+        raise TaskOperationError(
+            f"child target mismatch: execution role {execution_role!r} must target {configured_target!r}"
+        )
+    _require_owner(previous, owner)
+    if previous.get("state") != "READY_FOR_INTEGRATION":
+        raise TaskOperationError(
+            f"integrate-child requires READY_FOR_INTEGRATION, found {previous.get('state')}"
+        )
+    if not isinstance(validated_head_sha, str) or not validated_head_sha.strip():
+        raise TaskOperationError("integrate-child requires validated head SHA")
+
+    integrated = transition_task(
+        root,
+        task_id,
+        owner=owner,
+        target="INTEGRATING",
+        pull_request=pull_request,
+        at=at,
+        note=f"Child fan-in to {target_role_branch} via PR #{pull_request}.",
+    )
+    candidate = deepcopy(integrated)
+    candidate["child_integration"] = {
+        **candidate.get("child_integration", {}),
+        "target_role_branch": target_role_branch,
+        "pull_request": pull_request,
+        "validated_head_sha": validated_head_sha,
+        "integrated_commit_sha": None,
+        "verified_at": None,
+    }
+    _write_validated(root, task_id, integrated, candidate)
+    return candidate
+
+
+def verify_child_role_integration(
+    root: Path,
+    task_id: str,
+    *,
+    owner: str,
+    integrated_commit_sha: str,
+    at: str | None = None,
+) -> dict[str, Any]:
+    previous = load_task(root, task_id)
+    if previous.get("agent_kind") != "CHILD":
+        raise TaskOperationError("verify-child-role requires a CHILD task")
+    _require_owner(previous, owner)
+    if previous.get("state") != "INTEGRATING":
+        raise TaskOperationError(
+            f"verify-child-role requires INTEGRATING, found {previous.get('state')}"
+        )
+    child_integration = previous.get("child_integration")
+    if not isinstance(child_integration, dict):
+        raise TaskOperationError("child integration metadata is missing")
+    execution_role = previous.get("execution_role")
+    configured_target = load_config(root).get("role_branches", {}).get(execution_role)
+    if child_integration.get("target_role_branch") != configured_target:
+        raise TaskOperationError("child integration target no longer matches configured execution role")
+    if not isinstance(child_integration.get("pull_request"), int):
+        raise TaskOperationError("child role verification requires the feature pull request")
+    if not isinstance(child_integration.get("validated_head_sha"), str) or not child_integration.get("validated_head_sha", "").strip():
+        raise TaskOperationError("child role verification requires validated head SHA")
+    if not isinstance(integrated_commit_sha, str) or not integrated_commit_sha.strip():
+        raise TaskOperationError("child role verification requires integrated commit SHA")
+
+    candidate = deepcopy(previous)
+    stamp = at or iso_now()
+    candidate["child_integration"]["integrated_commit_sha"] = integrated_commit_sha
+    candidate["child_integration"]["verified_at"] = stamp
+    candidate.setdefault("lease", {})["heartbeat_at"] = stamp
+    _append_note(
+        candidate,
+        f"Role-branch fan-in verified at {integrated_commit_sha} on {stamp}; task remains non-terminal until master verification.",
+    )
+    _write_validated(root, task_id, previous, candidate)
+    return candidate
+
+
 def decide_human_gate(
     root: Path,
     task_id: str,
@@ -313,9 +711,28 @@ def parse_args() -> argparse.Namespace:
 
     sub.add_parser("summary")
     sub.add_parser("ready")
+    sub.add_parser("integration-queue")
 
     show = sub.add_parser("show")
     show.add_argument("task_id")
+
+    parent = sub.add_parser("parent-status")
+    parent.add_argument("parent_id")
+
+    spawn = sub.add_parser("spawn-child")
+    spawn.add_argument("parent_id")
+    spawn.add_argument("task_id")
+    spawn.add_argument("--title", required=True)
+    spawn.add_argument("--execution-role", required=True)
+    spawn.add_argument("--lane", required=True)
+    spawn.add_argument("--path", action="append", dest="touched_paths", required=True)
+    spawn.add_argument("--priority", default="P1")
+    spawn.add_argument("--depends-on", action="append", default=[])
+    spawn.add_argument("--optional", action="store_true")
+
+    fanout = sub.add_parser("fanout")
+    fanout.add_argument("parent_id")
+    fanout.add_argument("--spec-file", type=Path, required=True)
 
     claim = sub.add_parser("claim")
     claim.add_argument("task_id")
@@ -344,6 +761,20 @@ def parse_args() -> argparse.Namespace:
     transition.add_argument("--human-kind")
     transition.add_argument("--human-question")
 
+    integrate = sub.add_parser("integrate-child")
+    integrate.add_argument("task_id")
+    integrate.add_argument("--owner", required=True)
+    integrate.add_argument("--pr", type=int, required=True, dest="pull_request")
+    integrate.add_argument("--validated-head-sha", required=True)
+    integrate.add_argument("--target-role-branch", required=True)
+    integrate.add_argument("--at")
+
+    verify_child = sub.add_parser("verify-child-role")
+    verify_child.add_argument("task_id")
+    verify_child.add_argument("--owner", required=True)
+    verify_child.add_argument("--integrated-commit-sha", required=True)
+    verify_child.add_argument("--at")
+
     decision = sub.add_parser("human-decision")
     decision.add_argument("task_id")
     decision.add_argument("--status", choices=["APPROVED", "REJECTED"], required=True)
@@ -360,8 +791,30 @@ def main() -> int:
             _print(summary(args.root))
         elif args.command == "ready":
             _print(list_ready(args.root))
+        elif args.command == "integration-queue":
+            _print(parent_integration_queue(args.root))
         elif args.command == "show":
             _print(load_task(args.root, args.task_id))
+        elif args.command == "parent-status":
+            _print(parent_status(args.root, args.parent_id))
+        elif args.command == "spawn-child":
+            _print(
+                spawn_child_task(
+                    args.root,
+                    parent_id=args.parent_id,
+                    task_id=args.task_id,
+                    title=args.title,
+                    execution_role=args.execution_role,
+                    lane=args.lane,
+                    touched_paths=args.touched_paths,
+                    priority=args.priority,
+                    depends_on=args.depends_on,
+                    required_for_parent=not args.optional,
+                )
+            )
+        elif args.command == "fanout":
+            specs = json.loads(args.spec_file.read_text(encoding="utf-8"))
+            _print(fanout_parent_tasks(args.root, args.parent_id, specs))
         elif args.command == "claim":
             _print(claim_task(args.root, args.task_id, owner=args.owner, branch=args.branch, at=args.at))
         elif args.command == "heartbeat":
@@ -385,6 +838,28 @@ def main() -> int:
                     human_question=args.human_question,
                 )
             )
+        elif args.command == "integrate-child":
+            _print(
+                integrate_child_task(
+                    args.root,
+                    args.task_id,
+                    owner=args.owner,
+                    pull_request=args.pull_request,
+                    validated_head_sha=args.validated_head_sha,
+                    target_role_branch=args.target_role_branch,
+                    at=args.at,
+                )
+            )
+        elif args.command == "verify-child-role":
+            _print(
+                verify_child_role_integration(
+                    args.root,
+                    args.task_id,
+                    owner=args.owner,
+                    integrated_commit_sha=args.integrated_commit_sha,
+                    at=args.at,
+                )
+            )
         elif args.command == "human-decision":
             _print(
                 decide_human_gate(
@@ -398,7 +873,7 @@ def main() -> int:
             )
         else:
             raise TaskOperationError(f"unknown command: {args.command}")
-    except TaskOperationError as exc:
+    except (TaskOperationError, OSError, json.JSONDecodeError) as exc:
         print(f"AGENT TASK ERROR: {exc}", file=sys.stderr)
         return 2
     return 0

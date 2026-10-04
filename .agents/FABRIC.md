@@ -1,115 +1,188 @@
 # BOUNCAMPUS Autonomous Agent Fabric
 
-This document defines the control plane for parallel AI/human work. It extends `AGENTS.md`.
+This document defines the executable coordination model layered on top of `AGENTS.md`.
 
 ## Operating principle
 
-**Autonomous by default; parallel by role; verified on `master`.**
+**Autonomous by default; parallel by child/role; serialized at final master integration; verified on `master`.**
 
-Implementation and review can happen concurrently. Final product truth remains serialized by the requirement that every `master` integration PR contains the latest `master` and passes exact-head CI.
+BOUNCAMPUS has four human parent workstreams (`ie`, `ee`, `cs1`, `cs2`) and five durable execution roles (`ie`, `ee`, `ehb`, `cs1`, `cs2`). Human-team count and execution-role count are intentionally different.
 
-## Control plane
+## Control-plane surfaces
 
 - Durable product truth: `master`
-- Role integration branches:
+- Role branches:
   - `role/ie-customer-discovery`
   - `role/ee-physical-systems`
   - `role/ehb-embedded-integration`
   - `role/cs1-decision-intelligence`
   - `role/cs2-product-strategy`
-- Short-lived implementation branches: `agent/<lane>/<task>`
+- Human parent branch pattern: `work/<ie|ee|cs1|cs2>/<workstream>`
+- Short-lived child/task branches: `agent/<lane>/<task>`
 - Coordination metadata branch: `agent-coordination`
 - Task store: `.agents/coordination/tasks/`
+- Parent store: `.agents/coordination/parents/`
+- Task template: `.agents/TASK_TEMPLATE.json`
+- Parent template: `.agents/PARENT_WORKSTREAM_TEMPLATE.json`
 
-Execution-role count is independent of human-team count. KREATE remains a four-human team while the control plane exposes five execution roles.
+## Parent versus execution role
 
-Task JSON remains the authority for ownership, dependencies, path claims, leases, human gates, and final integration evidence.
+A parent is a human-owned coordination unit. An execution role is a durable technical ownership/integration unit.
 
-## Hardware ownership boundary
+Examples:
 
-- **EE:** measurement architecture, sensor/measurement selection, calibration, uncertainty and field verification.
-- **EHB:** embedded electronics, PCB, firmware, communications, device-side power/interface implementation, bring-up, buffering/recovery and HW↔SW integration.
-- **Shared:** EE↔EHB interface contract and system-level verification.
-- **CS1:** downstream data/model/decision semantics; CS1 consumer review is required when a device/data-contract change can alter inference or decision behavior.
+- A CS1 parent normally spawns children targeting `cs1`.
+- The EE parent may spawn an EE calibration child and an EHB firmware child in parallel.
+- The EHB firmware child still targets `role/ehb-embedded-integration`; it never becomes EE-owned merely because the human parent is EE.
 
-The canonical EE↔EHB handoff template is `KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md`. Cross-boundary changes must not silently redefine ownership or evidence semantics.
+The configured `role_branches` map is authoritative. `hardware.primary_role` is forbidden.
 
-## Parallel PR model
+## Hardware boundary
 
-The repository-wide single-PR lock no longer exists.
+- **EE:** measurement architecture, measurement/sensor selection, calibration, uncertainty, field verification.
+- **EHB:** embedded electronics, PCB, firmware, communications, device-side power/interface implementation, bring-up, recovery/buffering and HW/SW integration.
+- **Shared:** EE↔EHB interface contract and system verification.
+- **CS1:** downstream inference/decision semantics; consumer review is required when device/data-contract changes can alter those semantics.
 
-Two PR classes are expected:
-
-### Feature PR
-
-```text
-agent/<lane>/<task> -> role/<role>
-```
-
-Feature PRs allow each role to integrate independently. Up to 3 may be open against a role branch at once.
-
-### Role integration PR
-
-```text
-role/<role> -> master
-```
-
-Each role may have at most one open integration PR to `master` at a time. Different roles may have integration PRs open concurrently.
-
-A `master` PR is mergeable only if it contains the current `master` base SHA. Therefore, after any `master` merge, other open role PRs must sync and revalidate before merging.
-
-Repository-wide policy/bootstrap changes may use `agent/quality-release/<task> -> master`.
+Evidence labels are locked to `.agents/fabric.json` and `KREATE/HARDWARE/EE_EHB_INTERFACE_CONTRACT_TEMPLATE.md`.
 
 ## Task lifecycle
 
 `BACKLOG -> READY -> CLAIMED -> ACTIVE -> READY_FOR_INTEGRATION -> INTEGRATING -> MERGED_VERIFYING -> MERGED_VERIFIED`
 
-Side states:
-
-- `BLOCKED`
-- `WAITING_HUMAN`
-- `CANCELLED`
+Side states: `BLOCKED`, `WAITING_HUMAN`, `CANCELLED`.
 
 There is no branch-only `DONE` state.
 
-A feature PR merged into a role branch does not make a task terminal. The task remains non-terminal until its commits reach verified `master`.
+## Parent lifecycle
 
-## Claim and lease protocol
+Parent workstreams may use:
+
+- `ACTIVE`
+- `BLOCKED`
+- `WAITING_HUMAN`
+- `READY_FOR_INTEGRATION`
+- `INTEGRATING`
+- `MERGED_VERIFYING`
+- `COMPLETE`
+
+Multiple parents may be ACTIVE in parallel. Only one parent-level workstream may occupy the final master integration slot at a time.
+
+## Child spawning and fanout
+
+A child task must declare:
+
+- `agent_kind = CHILD`
+- `parent_id`
+- `parent_workstream`
+- `execution_role`
+- `required_for_parent`
+- `touched_paths`
+- `child_integration.target_role_branch`
+
+There is no fixed child-agent count cap. Parallelism is bounded by contracts instead:
+
+- path ownership;
+- dependencies;
+- leases;
+- execution-role target;
+- human gates;
+- final integration slot.
+
+`spawn-child` rejects active path overlap before mutating parent state. `fanout` is batch-rollback-safe: any failed specification removes children created by that batch and restores the original parent metadata.
+
+Examples:
+
+```bash
+python scripts/agent_task.py spawn-child HUMAN-EE-HARDWARE TASK-EHB-NETWORK \
+  --title "Implement retry transport" \
+  --execution-role ehb \
+  --lane ehb-comms \
+  --path KREATE/HARDWARE/runtime
+
+python scripts/agent_task.py fanout HUMAN-EE-HARDWARE --spec-file /tmp/children.json
+python scripts/agent_task.py parent-status HUMAN-EE-HARDWARE
+```
+
+## Claim, lease and path ownership
 
 To claim a task:
 
-1. read the task and current blob SHA from `agent-coordination`;
-2. require `READY` or satisfy stale-reclaim rules;
-3. require all hard dependencies to be `MERGED_VERIFIED`;
-4. verify declared `touched_paths` do not overlap another active task;
-5. set owner, feature branch, claim timestamp, heartbeat, and state;
-6. update using the current blob SHA precondition;
-7. create the feature branch from the correct role branch.
+1. task is `READY`;
+2. hard dependencies are `MERGED_VERIFIED`;
+3. no unresolved human gate blocks execution;
+4. declared paths do not overlap another active owner;
+5. owner, branch, claim time and heartbeat are recorded.
 
-A material commit or meaningful validation checkpoint should refresh the heartbeat.
+A material commit or meaningful validation checkpoint should refresh heartbeat.
 
-A stale lease may be reclaimed only when:
+Parent-child relationships never waive path ownership. Parent and child coordination is metadata; product paths remain exclusive while active.
 
-- TTL expired;
-- the task is not actively integrating/verifying;
-- no repository evidence shows fresh execution;
-- the reclaim is recorded.
+## Child fan-in
 
-## File ownership
+A child integrates only to the branch configured for its `execution_role`.
 
-`touched_paths` is an execution contract.
+```bash
+python scripts/agent_task.py integrate-child TASK-EHB-NETWORK \
+  --owner agent-ehb-network \
+  --pr 123 \
+  --validated-head-sha <sha> \
+  --target-role-branch role/ehb-embedded-integration
+```
 
-- Two active tasks may not own overlapping product paths.
-- Parent/child paths count as overlap.
-- Coordination metadata is not product ownership.
-- If a new required path conflicts with another active owner, re-scope or coordinate explicitly.
-- Shared/high-conflict files require the broad merge checklist in `AGENTS.md`.
+`integrate-child` fails closed if the requested branch differs from the configured execution-role branch.
 
-Parallel PRs do not weaken path ownership.
+A role-branch merge is staging. Final `MERGED_VERIFIED` requires verified master containment.
+
+## Parent readiness
+
+`parent-status` reports child state counts and `required_remaining`.
+
+A parent is ready only when all children marked `required_for_parent` are `MERGED_VERIFIED`. Optional children do not block readiness.
+
+## Single master integration slot
+
+Parallel implementation/review remains allowed, but final master integration is serialized.
+
+```bash
+python scripts/agent_task.py integration-queue
+```
+
+Parent states occupying the slot:
+
+- `READY_FOR_INTEGRATION`
+- `INTEGRATING`
+- `MERGED_VERIFYING`
+
+`.agents/fabric.json` sets `max_integration_ready_pull_requests = 1`. If more than one parent occupies these states, the queue fails closed.
+
+This slot does not cap active children, active parents, or draft review work. It prevents competing final integrations from racing stale master state.
+
+## PR topology
+
+### Child/feature PR
+
+```text
+agent/<lane>/<task> -> configured role branch
+```
+
+### Role integration PR
+
+```text
+role/<execution-role> -> master
+```
+
+### Governance PR
+
+```text
+agent/quality-release/<task> -> master
+```
+
+A master-targeting PR must contain current `master`, own the integration slot, pass exact-head gates, use a normal merge commit, and receive post-merge verification.
 
 ## Human gates
 
-Allowed human gates:
+Only these gate kinds may interrupt autonomous work:
 
 - `EVIDENCE_ATTESTATION`
 - `IRREVERSIBLE_ACTION`
@@ -117,83 +190,31 @@ Allowed human gates:
 - `EXTERNAL_COMMITMENT`
 - `PRODUCT_DIRECTION`
 
-Normal engineering decisions, branches, PRs, tests, conflict resolution, and reversible changes are autonomous.
-
-`WAITING_HUMAN` is valid only when a real gate is pending, one concrete question is recorded, and independent work is already complete.
-
-## Integration protocol
-
-### Feature integration into a role branch
-
-The owning workstream agent:
-
-1. updates from the latest role branch;
-2. resolves conflicts deliberately;
-3. passes targeted and repository-required checks;
-4. opens/updates the feature PR;
-5. drives exact-head CI green;
-6. merges into the role branch.
-
-This is staging, not final completion.
-
-### Role integration into master
-
-The role integration owner:
-
-1. confirms the included workstreams are compatible;
-2. synchronizes the role branch from latest `master`;
-3. opens/updates the role-to-`master` PR;
-4. runs feature-preservation, fabric, KREATE, frontend, Python, and data gates as applicable;
-5. drives exact-head CI green;
-6. merges with a normal merge commit;
-7. verifies the resulting `master`;
-8. records the shared PR/head/merge evidence on each included task;
-9. moves included tasks to `MERGED_VERIFIED`.
-
-Several tasks may share the same role integration PR number.
-
-## Direct-master-push recovery
-
-Direct push to `master` is a policy violation even though repository administration may not enforce branch protection.
-
-When detected:
-
-1. preserve/revert based on repository evidence;
-2. create a P0 recovery task;
-3. route the current state through a normal reviewed PR;
-4. require exact-head full validation;
-5. merge with a normal merge commit;
-6. verify `master`;
-7. keep the violation auditable.
+Routine child fanout, branch/PR creation, reversible refactoring, tests, conflict resolution, merge execution, and plugin discovery are autonomous.
 
 ## Agent-to-agent communication
 
 Prefer repository-visible state:
 
-- task JSON
-- dependency IDs
-- branch/PR references
-- blocker evidence
-- explicit integration notes
+- parent/task JSON;
+- dependency IDs;
+- path claims;
+- leases/heartbeats;
+- branch/PR references;
+- blocker evidence;
+- integration notes.
 
-Do not require synchronous human relay.
+Do not require synchronous human relay for ordinary coordination.
 
 ## Mechanical checks
 
 Run:
 
 ```bash
-python scripts/agent_fabric_check.py
 python scripts/test_agent_fabric_check.py
+python scripts/test_agent_task.py
+python scripts/agent_fabric_check.py
+python -m compileall -q backend/app scripts
 ```
 
-CI additionally enforces:
-
-- approved PR base/head topology;
-- latest-target-base ancestry;
-- per-role feature PR concurrency;
-- feature preservation;
-- exact-head repository validation;
-- merged-PR provenance for `master`;
-- normal merge-commit semantics;
-- post-merge containment through `agent_exit_gate.py`.
+CI additionally enforces current-base ancestry, approved topology, feature preservation, KREATE/data/frontend/backend gates, normal master merge provenance, and post-merge containment.
