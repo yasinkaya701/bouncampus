@@ -61,11 +61,27 @@ def test_incomplete_decision_audit_blocks_measured_row_benchmark_eligibility() -
     assert "DECISION_AUDIT_UNKNOWN_INPUT_SNAPSHOT" in result["reason_codes"]
 
 
+def test_complete_measured_intake_still_requires_canonical_service_truth_admission() -> None:
+    row = copy.deepcopy(contract.sandbox_row())
+    row["evidence_class"] = dining.MEASURED_EVIDENCE_CLASS
+
+    result = dining.assess_service_row(row)
+
+    assert result["contract_complete"] is True, result
+    assert result["decision_audit_complete"] is True, result
+    assert result["intake_candidate"] is True, result
+    assert result["benchmark_eligible"] is False, result
+    assert result["canonical_admission_required"] is True, result
+    assert result["canonical_admission_contract"] == "SERVICE_TRUTH_V1", result
+    assert "CANONICAL_SERVICE_TRUTH_ADMISSION_REQUIRED" in result["reason_codes"]
+
+
 def main() -> int:
     tests = [
         test_service_without_reservation_workflow_can_omit_reservation_snapshot,
         test_after_cutoff_snapshot_cannot_satisfy_decision_audit_provenance,
         test_incomplete_decision_audit_blocks_measured_row_benchmark_eligibility,
+        test_complete_measured_intake_still_requires_canonical_service_truth_admission,
     ]
     for test in tests:
         test()
