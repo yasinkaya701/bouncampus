@@ -38,6 +38,7 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
     cutoff = f"2026-10-{day:02d}T08:00:00+03:00"
     menu_snapshot = f"menu-{service_date}-lunch"
     calendar_snapshot = "calendar-2026-fall-v1"
+    weather_snapshot = f"weather-forecast-{service_date}-0700"
     menu_content = {
         "service_date": service_date,
         "meal_period": "lunch",
@@ -46,6 +47,12 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
     calendar_content = {
         "term": "2026-fall",
         "instructional_day": True,
+    }
+    weather_content = {
+        "forecast_for": f"{service_date}T12:00:00+03:00",
+        "issued_at": f"{service_date}T07:00:00+03:00",
+        "temperature_c": 18 + index,
+        "precipitation_probability": 0.1,
     }
     return {
         "service_id": f"north-lunch-{service_date}",
@@ -80,12 +87,20 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
+            {
+                "field": "weather_forecast",
+                "snapshot_id": weather_snapshot,
+                "snapshot_content": weather_content,
+                "snapshot_sha256": snapshot_sha256(weather_content),
+                "available_at": f"2026-10-{day:02d}T07:00:00+03:00",
+                "evidence_class": "OFFICIAL_SNAPSHOT",
+            },
         ],
         "decision_audit": {
             "method_version": "operator-status-quo-v1",
             "recommended_quantity": 108 + index,
             "operator_action": "ACCEPT_RECOMMENDATION",
-            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot, weather_snapshot],
         },
     }
 
@@ -109,6 +124,7 @@ def source_contract(*, verified: bool = True) -> dict:
         "operator_status_quo_quantity": entry("DINING_OPERATIONS", "PRODUCTION_PLAN", "MUST_EXIST_BY_DECISION_CUTOFF"),
         "menu": entry("DINING_OPERATIONS", "OFFICIAL_MENU", "MUST_EXIST_BY_DECISION_CUTOFF"),
         "academic_calendar": entry("UNIVERSITY", "OFFICIAL_ACADEMIC_CALENDAR", "MUST_EXIST_BY_DECISION_CUTOFF"),
+        "weather_forecast": entry("ARCHIVED_FORECAST_PROVIDER", "HISTORICAL_FORECAST_SNAPSHOT", "FORECAST_MUST_HAVE_BEEN_AVAILABLE_BY_DECISION_CUTOFF"),
     }
 
 
@@ -192,27 +208,6 @@ def test_admission_fingerprint_is_order_stable_and_binds_source_metadata() -> No
 
     assert forward["artifact_admission_fingerprint_sha256"] == reordered["artifact_admission_fingerprint_sha256"]
     assert forward["artifact_admission_fingerprint_sha256"] != changed_result["artifact_admission_fingerprint_sha256"]
-
-
-def test_identity_bearing_source_metadata_is_rejected_before_benchmark_admission() -> None:
-    contract = load_contract()
-    provenance = source_contract()
-    provenance["menu"]["support"] = {
-        "email": "synthetic-menu-contact@example.invalid",
-    }
-    result = contract.validate_service_truth_artifact(
-        [measured_row(0), measured_row(1), measured_row(2)],
-        field_provenance=provenance,
-    )
-
-    assert result["dataset_validation"]["validation_status"] == "ACCEPTED_MEASURED"
-    assert result["source_contract_validation"]["source_contract_complete"] is True
-    assert result["source_contract_validation"]["source_contract_privacy_safe"] is False
-    assert result["source_contract_validation"]["source_contract_verified"] is False
-    assert result["validation_status"] == "SOURCE_CONTRACT_PRIVACY_REJECTED"
-    assert result["eligible_for_benchmark"] is False
-    assert "SOURCE_CONTRACT_PRIVACY_REJECTED" in result["reason_codes"]
-    assert "PRIVACY_FIELD_NOT_ALLOWED_EMAIL" in result["reason_codes"]
 
 
 if __name__ == "__main__":

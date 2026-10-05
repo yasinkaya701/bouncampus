@@ -42,6 +42,7 @@ def measured_row(
     service_date = f"2026-10-{day:02d}"
     menu_snapshot = f"menu-{service_date}-lunch"
     calendar_snapshot = "calendar-2026-fall-v1"
+    weather_snapshot = f"weather-forecast-{service_date}-0700"
     menu_content = {
         "service_date": service_date,
         "meal_period": "lunch",
@@ -50,6 +51,12 @@ def measured_row(
     calendar_content = {
         "term": "2026-fall",
         "instructional_day": True,
+    }
+    weather_content = {
+        "forecast_for": f"{service_date}T12:00:00+03:00",
+        "issued_at": f"{service_date}T07:00:00+03:00",
+        "temperature_c": 18 + index,
+        "precipitation_probability": 0.1,
     }
     menu_input = {
         "field": "menu",
@@ -63,12 +70,20 @@ def measured_row(
         "available_at": "2026-09-01T00:00:00+03:00",
         "evidence_class": "OFFICIAL_SNAPSHOT",
     }
+    weather_input = {
+        "field": "weather_forecast",
+        "snapshot_id": weather_snapshot,
+        "available_at": f"2026-10-{day:02d}T07:00:00+03:00",
+        "evidence_class": "OFFICIAL_SNAPSHOT",
+    }
     if include_content:
         menu_input["snapshot_content"] = menu_content
         calendar_input["snapshot_content"] = calendar_content
+        weather_input["snapshot_content"] = weather_content
     if include_hashes:
         menu_input["snapshot_sha256"] = digest_content(menu_content)
         calendar_input["snapshot_sha256"] = digest_content(calendar_content)
+        weather_input["snapshot_sha256"] = digest_content(weather_content)
     return {
         "service_id": f"north-lunch-{service_date}",
         "granularity": "CAMPUS_MEAL_SERVICE",
@@ -85,12 +100,12 @@ def measured_row(
         "operator_status_quo_quantity": 108 + index,
         "reservation_workflow_active": False,
         "evidence_class": "OFFICIAL_OPERATIONAL_EXPORT",
-        "decision_inputs": [menu_input, calendar_input],
+        "decision_inputs": [menu_input, calendar_input, weather_input],
         "decision_audit": {
             "method_version": "operator-status-quo-v1",
             "recommended_quantity": 108 + index,
             "operator_action": "ACCEPT_RECOMMENDATION",
-            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot, weather_snapshot],
         },
     }
 
@@ -112,6 +127,7 @@ def source_contract() -> dict:
         "operator_status_quo_quantity": entry("PRODUCTION_PLAN"),
         "menu": entry("OFFICIAL_MENU"),
         "academic_calendar": entry("OFFICIAL_ACADEMIC_CALENDAR"),
+        "weather_forecast": entry("HISTORICAL_FORECAST_SNAPSHOT"),
     }
 
 

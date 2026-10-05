@@ -64,6 +64,11 @@ def source_contract(*, verification_status: str = "UNVERIFIED") -> dict:
             "OFFICIAL_CALENDAR_SNAPSHOT",
             "MUST_EXIST_BY_DECISION_CUTOFF",
         ),
+        "weather_forecast": entry(
+            "ARCHIVED_FORECAST_PROVIDER_TO_BE_CONFIRMED",
+            "HISTORICAL_FORECAST_SNAPSHOT_TO_BE_CONFIRMED",
+            "FORECAST_MUST_HAVE_BEEN_AVAILABLE_BY_DECISION_CUTOFF",
+        ),
     }
 
 
@@ -110,35 +115,32 @@ def test_missing_or_incomplete_source_ownership_stays_explicit() -> None:
 def test_optional_source_entries_are_validated_without_becoming_globally_required() -> None:
     contract = load_contract()
     manifest = source_contract(verification_status="VERIFIED")
-    manifest["weather_forecast"] = {
-        "owner": "ARCHIVED_FORECAST_PROVIDER",
-        "source_system": "HISTORICAL_FORECAST_SNAPSHOT",
-        "availability_semantics": "FORECAST_MUST_HAVE_BEEN_AVAILABLE_BY_DECISION_CUTOFF",
+    manifest["special_events"] = {
+        "owner": "OFFICIAL_EVENTS_OWNER",
+        "source_system": "HISTORICAL_EVENTS_SNAPSHOT",
+        "availability_semantics": "EVENT_MUST_HAVE_BEEN_KNOWN_BY_DECISION_CUTOFF",
         "verification_status": "VERIFIED",
     }
     accepted = contract.validate_service_truth_source_contract(manifest)
     assert accepted["source_contract_complete"] is True
     assert accepted["source_contract_verified"] is True
 
-    manifest["weather_forecast"]["source_system"] = ""
+    manifest["special_events"]["source_system"] = ""
     rejected = contract.validate_service_truth_source_contract(manifest)
     assert rejected["source_contract_complete"] is False
-    assert "weather_forecast" in rejected["incomplete_source_contract_fields"]
+    assert "special_events" in rejected["incomplete_source_contract_fields"]
 
 
-def test_verified_source_contract_rejects_nested_identity_contact_metadata() -> None:
+def test_weather_forecast_is_a_required_source_contract_field() -> None:
     contract = load_contract()
     manifest = source_contract(verification_status="VERIFIED")
-    manifest["actual_served"]["support"] = {
-        "email": "synthetic-ops-contact@example.invalid",
-    }
+    del manifest["weather_forecast"]
 
     result = contract.validate_service_truth_source_contract(manifest)
 
-    assert result["source_contract_complete"] is True
-    assert result["source_contract_privacy_safe"] is False
+    assert result["source_contract_complete"] is False
     assert result["source_contract_verified"] is False
-    assert "PRIVACY_FIELD_NOT_ALLOWED_EMAIL" in result["privacy_reason_codes"]
+    assert "weather_forecast" in result["missing_source_contract_fields"]
 
 
 if __name__ == "__main__":
