@@ -24,6 +24,7 @@ def measured_row(day: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT
     date = f"2026-09-{day:02d}"
     menu_snapshot = f"menu:{date}"
     calendar_snapshot = "calendar:2026-fall-v1"
+    weather_snapshot = f"weather:{date}:0700"
     return {
         "service_id": f"NORTH-LUNCH-{date}",
         "granularity": "CAMPUS_MEAL_SERVICE",
@@ -55,12 +56,18 @@ def measured_row(day: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_PUBLIC",
             },
+            {
+                "field": "weather_forecast",
+                "snapshot_id": weather_snapshot,
+                "available_at": f"{date}T07:00:00+03:00",
+                "evidence_class": "OFFICIAL_SNAPSHOT",
+            },
         ],
         "decision_audit": {
             "method_version": "operator-status-quo-v1",
             "recommended_quantity": 108 + day,
             "operator_action": "ACCEPT_RECOMMENDATION",
-            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot, weather_snapshot],
         },
     }
 
@@ -119,7 +126,7 @@ def test_decision_input_published_after_cutoff_is_rejected() -> None:
     assert "DECISION_INPUT_NOT_AVAILABLE_AT_CUTOFF" in result["reason_codes"]
 
 
-def test_required_menu_and_calendar_snapshots_must_be_immutable_and_preknown() -> None:
+def test_required_menu_calendar_and_weather_snapshots_must_be_preknown() -> None:
     contract = load_contract()
     rows = valid_rows()
     rows[0]["decision_inputs"] = [
@@ -134,6 +141,7 @@ def test_required_menu_and_calendar_snapshots_must_be_immutable_and_preknown() -
     assert result["validation_status"] == "REJECTED"
     assert "DECISION_INPUT_SNAPSHOT_ID_REQUIRED" in result["reason_codes"]
     assert "REQUIRED_DECISION_INPUT_MISSING_ACADEMIC_CALENDAR" in result["reason_codes"]
+    assert "REQUIRED_DECISION_INPUT_MISSING_WEATHER_FORECAST" in result["reason_codes"]
 
 
 def test_reservation_count_is_required_only_when_workflow_is_active() -> None:
@@ -179,6 +187,7 @@ def test_decision_audit_requires_method_recommendation_and_operator_action() -> 
         "input_snapshot_ids": [
             rows[0]["decision_inputs"][0]["snapshot_id"],
             rows[0]["decision_inputs"][1]["snapshot_id"],
+            rows[0]["decision_inputs"][2]["snapshot_id"],
         ]
     }
     result = contract.validate_service_truth_dataset(rows)
