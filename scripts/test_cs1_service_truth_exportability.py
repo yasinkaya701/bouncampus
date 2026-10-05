@@ -19,6 +19,8 @@ from test_cs1_service_truth_artifact_admission import source_contract  # noqa: E
 
 def test_verified_measured_sources_require_service_level_exportability() -> None:
     provenance = source_contract()
+    provenance["actual_served"].pop("data_granularity")
+    provenance["actual_served"].pop("exportability_status")
 
     result = validate_service_truth_source_contract(provenance)
 
