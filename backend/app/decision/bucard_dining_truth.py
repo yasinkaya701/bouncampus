@@ -23,16 +23,50 @@ _ALLOWED_COUNT_SEMANTICS = frozenset(
 )
 _ALLOWED_RECONCILIATION_STATUSES = frozenset({"UNRECONCILED", RECONCILED_STATUS})
 _ALLOWED_MAPPING_STATUSES = frozenset({"UNVERIFIED", VERIFIED_MAPPING_STATUS})
-_PRIVACY_FIELD_TOKENS = (
-    "card",
-    "student",
-    "person",
-    "user",
-    "email",
-    "phone",
-    "identity",
-    "biometric",
-    "face",
+_FORBIDDEN_PRIVACY_FIELDS = frozenset(
+    {
+        "card",
+        "cardid",
+        "carduid",
+        "cardnumber",
+        "cardtoken",
+        "bucard",
+        "bucardid",
+        "bucarduid",
+        "student",
+        "studentid",
+        "studentnumber",
+        "studentidentity",
+        "studentno",
+        "studentname",
+        "person",
+        "personid",
+        "personidentity",
+        "personname",
+        "passengerid",
+        "passengername",
+        "user",
+        "userid",
+        "username",
+        "fullname",
+        "email",
+        "emailaddress",
+        "phone",
+        "phonenumber",
+        "identity",
+        "identityid",
+        "identitynumber",
+        "nationalid",
+        "tckn",
+        "tcidentitynumber",
+        "biometric",
+        "biometricid",
+        "face",
+        "faceid",
+        "faceembedding",
+        "campuscardid",
+        "transactionid",
+    }
 )
 
 
@@ -57,9 +91,7 @@ def _privacy_fields(value: Any, *, _seen: set[int] | None = None) -> set[str]:
         seen.add(object_id)
         for key, nested in value.items():
             normalized = _normalized_field_name(key)
-            if normalized == "transactionid" or any(
-                token in normalized for token in _PRIVACY_FIELD_TOKENS
-            ):
+            if normalized in _FORBIDDEN_PRIVACY_FIELDS:
                 found.add(normalized)
             found.update(_privacy_fields(nested, _seen=seen))
         return found
@@ -255,6 +287,7 @@ def validate_bucard_dining_export(
     return {
         "validation_status": status,
         "eligible_as_actual_served": eligible,
+        "benchmark_eligible": False,
         "decision_input_eligible": False,
         "automatic_action": False,
         "privacy_safe": privacy_safe,
@@ -266,9 +299,13 @@ def validate_bucard_dining_export(
         "source_system": "BUCARD_DINING_REPORT",
         "result_scope": "BUCARD_AGGREGATE_OUTCOME_ADMISSION_ONLY",
         "claim_boundary": (
-            "Admission validates the supplied aggregate structure and declared reconciliation "
-            "metadata only. It does not prove live access, external-source accuracy, forecast "
-            "value, operational impact, savings, or authorization for automatic action."
+            "Admission validates only caller-supplied aggregate structure and declared "
+            "reconciliation, mapping, and evidence labels. Caller-supplied reconciliation, "
+            "mapping, and evidence labels do not prove authenticity. Benchmark use still "
+            "requires canonical validate_service_truth_artifact admission with a verified "
+            "source contract and content-bound source snapshots. This adapter does not prove "
+            "live access, external-source accuracy, forecast value, operational impact, "
+            "savings, or authorization for automatic action."
         ),
     }
 
