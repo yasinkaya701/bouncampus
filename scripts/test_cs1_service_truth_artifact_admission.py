@@ -108,23 +108,66 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
 def source_contract(*, verified: bool = True) -> dict:
     verification_status = "VERIFIED" if verified else "UNVERIFIED"
 
-    def entry(owner: str, source_system: str, availability_semantics: str) -> dict:
-        return {
+    def entry(
+        owner: str,
+        source_system: str,
+        availability_semantics: str,
+        *,
+        service_level_operational: bool = False,
+    ) -> dict:
+        result = {
             "owner": owner,
             "source_system": source_system,
             "availability_semantics": availability_semantics,
             "verification_status": verification_status,
         }
+        if service_level_operational:
+            result["data_granularity"] = "CAMPUS_MEAL_SERVICE"
+            result["exportability_status"] = "VERIFIED_EXPORTABLE"
+        return result
 
     return {
-        "actual_served": entry("DINING_OPERATIONS", "SERVICE_EXPORT", "POST_SERVICE_RECONCILED"),
-        "produced_portions": entry("DINING_OPERATIONS", "PRODUCTION_LOG", "POST_PRODUCTION_RECORDED"),
-        "surplus_or_waste": entry("DINING_OPERATIONS", "SURPLUS_LOG", "POST_SERVICE_MEASURED"),
-        "shortage_or_early_sellout": entry("DINING_OPERATIONS", "SERVICE_STATUS", "POST_SERVICE_RECORDED"),
-        "operator_status_quo_quantity": entry("DINING_OPERATIONS", "PRODUCTION_PLAN", "MUST_EXIST_BY_DECISION_CUTOFF"),
+        "actual_served": entry(
+            "DINING_OPERATIONS",
+            "SERVICE_EXPORT",
+            "POST_SERVICE_RECONCILED",
+            service_level_operational=True,
+        ),
+        "produced_portions": entry(
+            "DINING_OPERATIONS",
+            "PRODUCTION_LOG",
+            "POST_PRODUCTION_RECORDED",
+            service_level_operational=True,
+        ),
+        "surplus_or_waste": entry(
+            "DINING_OPERATIONS",
+            "SURPLUS_LOG",
+            "POST_SERVICE_MEASURED",
+            service_level_operational=True,
+        ),
+        "shortage_or_early_sellout": entry(
+            "DINING_OPERATIONS",
+            "SERVICE_STATUS",
+            "POST_SERVICE_RECORDED",
+            service_level_operational=True,
+        ),
+        "operator_status_quo_quantity": entry(
+            "DINING_OPERATIONS",
+            "PRODUCTION_PLAN",
+            "MUST_EXIST_BY_DECISION_CUTOFF",
+            service_level_operational=True,
+        ),
         "menu": entry("DINING_OPERATIONS", "OFFICIAL_MENU", "MUST_EXIST_BY_DECISION_CUTOFF"),
-        "academic_calendar": entry("UNIVERSITY", "OFFICIAL_ACADEMIC_CALENDAR", "MUST_EXIST_BY_DECISION_CUTOFF"),
-        "weather_forecast": entry("ARCHIVED_FORECAST_PROVIDER", "HISTORICAL_FORECAST_SNAPSHOT", "FORECAST_MUST_HAVE_BEEN_AVAILABLE_BY_DECISION_CUTOFF"),
+        "academic_calendar": entry(
+            "UNIVERSITY",
+            "OFFICIAL_ACADEMIC_CALENDAR",
+            "MUST_EXIST_BY_DECISION_CUTOFF",
+        ),
+        "weather_forecast": entry(
+            "ARCHIVED_FORECAST_PROVIDER",
+            "HISTORICAL_FORECAST_SNAPSHOT",
+            "FORECAST_MUST_HAVE_BEEN_AVAILABLE_BY_DECISION_CUTOFF",
+        ),
     }
 
 
