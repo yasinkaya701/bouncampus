@@ -14,6 +14,7 @@ from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
 from app.decision.roomnode_truth import summarize_roomnode_window, validate_roomnode_event
+from app.decision.shuttle_truth import aggregate_shuttle_count_events, validate_shuttle_count_event
 from app.decision.solar_site_planning import analyze_room_solar_exposure, rank_new_building_orientations
 from app.decision.water_advisory import plan_water_advisory
 
@@ -39,6 +40,7 @@ def capabilities() -> dict[str, Any]:
             "campus_state",
             "food",
             "shuttle",
+            "shuttle_passenger_count_observations",
             "space_activation",
             "class_scheduling",
             "solar_exposure",
@@ -53,8 +55,8 @@ def capabilities() -> dict[str, Any]:
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
-        "truth_boundary": "RoomNode observation endpoints validate caller-supplied physical event payloads only and do not imply a live RoomNode device connection. No live cafeteria POS, shuttle GPS, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
-        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode event payloads use a dedicated fail-closed anonymous measurement contract.",
+        "truth_boundary": "RoomNode and shuttle passenger-count observation endpoints validate caller-supplied physical event payloads only and do not imply live device, shuttle GPS, or absolute-occupancy integration. Shuttle measurement admission requires the caller-supplied EE confidence threshold and does not automatically inject observations into the shuttle optimizer. No live cafeteria POS, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
+        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode and shuttle passenger-count event payloads use dedicated fail-closed anonymous measurement contracts.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
 
@@ -79,6 +81,41 @@ def roomnode_window(payload: dict[str, Any]) -> dict[str, Any]:
             station_id=str(_payload_value(payload, "station_id", "")),
             window_start=str(_payload_value(payload, "window_start", "")),
             window_end=str(_payload_value(payload, "window_end", "")),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/shuttle-count/event")
+def shuttle_count_event(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate one caller-supplied shuttle count event without optimizer injection."""
+
+    try:
+        return validate_shuttle_count_event(
+            _payload_value(payload, "event", {}),
+            min_measurement_confidence=_payload_value(
+                payload, "min_measurement_confidence", None
+            ),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/shuttle-count/window")
+def shuttle_count_window(payload: dict[str, Any]) -> dict[str, Any]:
+    """Expose descriptive IN/OUT count deltas for one shuttle/time window."""
+
+    try:
+        return aggregate_shuttle_count_events(
+            _payload_value(payload, "events", []),
+            expected_vehicle_id=str(
+                _payload_value(payload, "expected_vehicle_id", "")
+            ),
+            window_start=str(_payload_value(payload, "window_start", "")),
+            window_end=str(_payload_value(payload, "window_end", "")),
+            min_measurement_confidence=_payload_value(
+                payload, "min_measurement_confidence", None
+            ),
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
