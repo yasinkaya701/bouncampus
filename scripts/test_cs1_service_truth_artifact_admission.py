@@ -45,7 +45,6 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
     }
     calendar_content = {
         "term": "2026-fall",
-        "service_date": service_date,
         "instructional_day": True,
     }
     return {
