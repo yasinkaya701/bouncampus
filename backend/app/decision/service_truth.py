@@ -290,9 +290,9 @@ def validate_service_truth_dataset(
     `SANDBOX_ONLY` with `eligible_for_benchmark=False`.
 
     `require_snapshot_hashes=True` additionally requires each decision-input
-    snapshot to carry a SHA-256 content digest and rejects a reused snapshot ID
-    if it resolves to different content. Source-bound artifact admission enables
-    this mode so immutable-source claims are cryptographically enforceable.
+    snapshot to carry canonical JSON-compatible ``snapshot_content`` plus its
+    SHA-256 digest. The digest is recomputed at admission and a reused snapshot
+    ID is rejected if it resolves to different canonical content.
     """
 
     if isinstance(rows, (str, bytes)) or not isinstance(rows, Sequence):
@@ -438,13 +438,29 @@ def validate_service_truth_dataset(
 
                 raw_snapshot_hash = _text(source.get("snapshot_sha256"))
                 snapshot_hash = _sha256_hex(source.get("snapshot_sha256"))
+                snapshot_content_present = (
+                    "snapshot_content" in source and source.get("snapshot_content") is not None
+                )
+                snapshot_content_hash: str | None = None
+                if snapshot_content_present:
+                    try:
+                        snapshot_content_hash = _canonical_json_sha256(
+                            source.get("snapshot_content")
+                        )
+                    except ValueError:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_CONTENT_INVALID")
+
                 snapshot_integrity_ok = not require_snapshot_hashes
                 if require_snapshot_hashes:
+                    if not snapshot_content_present:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_CONTENT_REQUIRED")
                     if raw_snapshot_hash is None:
                         _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_REQUIRED")
                     elif snapshot_hash is None:
                         _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_INVALID")
-                    elif snapshot_id is not None:
+                    elif snapshot_content_hash is not None and snapshot_hash != snapshot_content_hash:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_MISMATCH")
+                    elif snapshot_content_hash is not None and snapshot_id is not None:
                         previous_hash = snapshot_hashes_by_id.get(snapshot_id)
                         if previous_hash is not None and previous_hash != snapshot_hash:
                             _append_unique(errors, "DECISION_INPUT_SNAPSHOT_HASH_CONFLICT")
@@ -581,8 +597,10 @@ def validate_service_truth_dataset(
         "snapshot_integrity_required": require_snapshot_hashes,
         "result_scope": "SERVICE_TRUTH_ADMISSION_ONLY",
         "claim_boundary": (
-            "Contract acceptance validates structure, provenance and decision-time availability; "
-            "it does not prove forecast value, operational impact, or savings."
+            "Contract acceptance validates structure, declared provenance, decision-time "
+            "availability, and (when required) the binding between supplied canonical "
+            "snapshot content and its digest; it does not prove external-source accuracy, "
+            "forecast value, operational impact, or savings."
         ),
     }
 
@@ -599,7 +617,7 @@ def validate_service_truth_artifact(
     This function composes the canonical dataset and source-contract validators.
     It adds no new evidence semantics: benchmark eligibility requires both an
     ``ACCEPTED_MEASURED`` dataset and a fully verified source contract. Source-
-    bound admission also requires immutable content hashes for decision snapshots.
+    bound admission also requires content-bound decision snapshots.
     """
 
     dataset_validation = validate_service_truth_dataset(
@@ -657,8 +675,9 @@ def validate_service_truth_artifact(
         "reason_codes": reasons,
         "result_scope": "SERVICE_TRUTH_ARTIFACT_ADMISSION_ONLY",
         "claim_boundary": (
-            "Artifact admission proves only structural and declared-source provenance "
-            "eligibility for offline benchmark input; it does not prove data accuracy, "
-            "model value, pilot readiness, operational impact, or savings."
+            "Artifact admission proves only structural, declared-source provenance, and "
+            "supplied-snapshot content/digest binding eligibility for offline benchmark "
+            "input; it does not prove external-source accuracy, model value, pilot "
+            "readiness, operational impact, or savings."
         ),
     }
