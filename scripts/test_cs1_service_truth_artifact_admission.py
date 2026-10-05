@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,12 +21,33 @@ def load_contract():
     return module
 
 
+def snapshot_sha256(content: object) -> str:
+    payload = json.dumps(
+        content,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT") -> dict:
     day = index + 1
     service_date = f"2026-10-{day:02d}"
     cutoff = f"2026-10-{day:02d}T08:00:00+03:00"
     menu_snapshot = f"menu-{service_date}-lunch"
     calendar_snapshot = "calendar-2026-fall-v1"
+    menu_content = {
+        "service_date": service_date,
+        "meal_period": "lunch",
+        "items": ["lentil_soup", "rice", "seasonal_main"],
+    }
+    calendar_content = {
+        "term": "2026-fall",
+        "service_date": service_date,
+        "instructional_day": True,
+    }
     return {
         "service_id": f"north-lunch-{service_date}",
         "granularity": "CAMPUS_MEAL_SERVICE",
@@ -45,12 +68,16 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
             {
                 "field": "menu",
                 "snapshot_id": menu_snapshot,
+                "snapshot_content": menu_content,
+                "snapshot_sha256": snapshot_sha256(menu_content),
                 "available_at": f"2026-10-{day:02d}T07:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
             {
                 "field": "academic_calendar",
                 "snapshot_id": calendar_snapshot,
+                "snapshot_content": calendar_content,
+                "snapshot_sha256": snapshot_sha256(calendar_content),
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
@@ -96,6 +123,7 @@ def test_verified_measured_artifact_is_bound_and_benchmark_eligible() -> None:
     assert result["validation_status"] == "ACCEPTED_FOR_OFFLINE_BENCHMARK"
     assert result["eligible_for_benchmark"] is True
     assert result["dataset_validation"]["validation_status"] == "ACCEPTED_MEASURED"
+    assert result["dataset_validation"]["snapshot_integrity_required"] is True
     assert result["source_contract_validation"]["source_contract_verified"] is True
     assert len(result["artifact_admission_fingerprint_sha256"]) == 64
     assert result["reason_codes"] == []
