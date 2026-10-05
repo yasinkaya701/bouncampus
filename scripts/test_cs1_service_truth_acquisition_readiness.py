@@ -18,6 +18,7 @@ for path in (BACKEND, SCRIPTS):
 from app.decision.service_truth_acquisition import (  # noqa: E402
     validate_service_truth_acquisition,
 )
+from kreate_check import check_service_truth_acquisition  # noqa: E402
 from test_cs1_service_truth_artifact_admission import source_contract  # noqa: E402
 from test_cs1_service_truth_contract import valid_rows  # noqa: E402
 
@@ -73,6 +74,26 @@ def test_verified_measured_acquisition_only_becomes_ready_for_canonical_validati
     assert result["benchmark_eligible"] is False
     assert result["pilot_evidence_eligible"] is False
     assert "canonical service-truth admission" in result["claim_boundary"]
+
+
+def test_kreate_guard_accepts_current_fail_closed_acquisition_template() -> None:
+    errors: list[str] = []
+
+    check_service_truth_acquisition(errors, artifact=acquisition_template())
+
+    assert errors == []
+
+
+def test_kreate_guard_rejects_self_declared_acquisition_eligibility() -> None:
+    artifact = acquisition_template()
+    artifact["benchmark_eligible"] = True
+    artifact["pilot_evidence_eligible"] = True
+    errors: list[str] = []
+
+    check_service_truth_acquisition(errors, artifact=artifact)
+
+    assert any("benchmark_eligible" in error for error in errors)
+    assert any("pilot_evidence_eligible" in error for error in errors)
 
 
 if __name__ == "__main__":
