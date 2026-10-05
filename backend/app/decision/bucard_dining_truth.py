@@ -13,6 +13,8 @@ import hashlib
 import json
 from typing import Any
 
+from app.decision.service_truth import PRIVACY_FIELD_NAMES
+
 SERVICE_LEVEL_GRANULARITY = "CAMPUS_MEAL_SERVICE"
 OFFICIAL_EXPORT_EVIDENCE = "OFFICIAL_OPERATIONAL_EXPORT"
 RECONCILED_STATUS = "RECONCILED_BY_SKS"
@@ -23,17 +25,7 @@ _ALLOWED_COUNT_SEMANTICS = frozenset(
 )
 _ALLOWED_RECONCILIATION_STATUSES = frozenset({"UNRECONCILED", RECONCILED_STATUS})
 _ALLOWED_MAPPING_STATUSES = frozenset({"UNVERIFIED", VERIFIED_MAPPING_STATUS})
-_PRIVACY_FIELD_TOKENS = (
-    "card",
-    "student",
-    "person",
-    "user",
-    "email",
-    "phone",
-    "identity",
-    "biometric",
-    "face",
-)
+_PRIVACY_FIELD_NAMES = PRIVACY_FIELD_NAMES | frozenset({"transactionid"})
 
 
 def _text(value: Any) -> str | None:
@@ -57,9 +49,7 @@ def _privacy_fields(value: Any, *, _seen: set[int] | None = None) -> set[str]:
         seen.add(object_id)
         for key, nested in value.items():
             normalized = _normalized_field_name(key)
-            if normalized == "transactionid" or any(
-                token in normalized for token in _PRIVACY_FIELD_TOKENS
-            ):
+            if normalized in _PRIVACY_FIELD_NAMES:
                 found.add(normalized)
             found.update(_privacy_fields(nested, _seen=seen))
         return found
@@ -255,6 +245,7 @@ def validate_bucard_dining_export(
     return {
         "validation_status": status,
         "eligible_as_actual_served": eligible,
+        "benchmark_eligible": False,
         "decision_input_eligible": False,
         "automatic_action": False,
         "privacy_safe": privacy_safe,
@@ -266,9 +257,13 @@ def validate_bucard_dining_export(
         "source_system": "BUCARD_DINING_REPORT",
         "result_scope": "BUCARD_AGGREGATE_OUTCOME_ADMISSION_ONLY",
         "claim_boundary": (
-            "Admission validates the supplied aggregate structure and declared reconciliation "
-            "metadata only. It does not prove live access, external-source accuracy, forecast "
-            "value, operational impact, savings, or authorization for automatic action."
+            "Admission validates the supplied aggregate structure and caller-supplied "
+            "reconciliation metadata only; caller-supplied labels do not prove authenticity. "
+            "Reconciled projections remain benchmark-ineligible until "
+            "validate_service_truth_artifact re-admits them under a verified source contract "
+            "with content-bound snapshots. This does not prove live access, external-source "
+            "accuracy, forecast value, operational impact, savings, or authorization for "
+            "automatic action."
         ),
     }
 
