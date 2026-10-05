@@ -167,6 +167,46 @@ def test_accepted_artifact_is_validated_sorted_and_checksum_bound() -> None:
     assert "external-source accuracy" in report["claim_boundary"]
 
 
+def test_explicit_series_selection_revalidates_only_selected_rows() -> None:
+    handoff = load_handoff()
+    north_rows = [measured_row(index) for index in range(3)]
+    south_rows = []
+    for index in range(3):
+        row = json.loads(json.dumps(measured_row(index)))
+        row["campus_id"] = "south"
+        row["service_id"] = row["service_id"].replace("north-", "south-", 1)
+        row["outcome_source_record_id"] = f"south-ops-record-{index}"
+        south_rows.append(row)
+
+    report = handoff.build_admitted_benchmark_report(
+        {
+            "rows": [south_rows[2], north_rows[1], south_rows[0], north_rows[2], north_rows[0], south_rows[1]],
+            "field_provenance": source_contract(),
+        },
+        dataset_id="north-lunch-selected-v1",
+        dataset_label="North lunch selected series",
+        git_commit_sha="b" * 40,
+        rolling_window=2,
+        seasonal_lag=1,
+        campus_id="north",
+        meal_period="lunch",
+    )
+
+    admission = report["service_truth_admission"]
+    assert admission["dataset_validation"]["service_count"] == 3
+    assert admission["dataset_validation"]["chronological_service_ids"] == [
+        "north-lunch-2026-10-01",
+        "north-lunch-2026-10-02",
+        "north-lunch-2026-10-03",
+    ]
+    assert report["reproducibility"]["dataset"]["sha256"] == admission[
+        "dataset_validation"
+    ]["artifact_checksum_sha256"]
+    assert report["service_truth_series"]["service_count"] == 3
+
+
 if __name__ == "__main__":
-    test_accepted_artifact_is_validated_sorted_and_checksum_bound()
-    print("ok: 1 service-truth benchmark handoff test")
+    tests = [name for name in globals() if name.startswith("test_")]
+    for name in tests:
+        globals()[name]()
+    print(f"ok: {len(tests)} service-truth benchmark handoff tests")
