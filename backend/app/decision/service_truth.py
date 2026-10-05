@@ -37,7 +37,7 @@ ALLOWED_INPUT_EVIDENCE_CLASSES = frozenset(
         "GENERATED_SANDBOX",
     }
 )
-REQUIRED_DECISION_INPUTS = frozenset({"menu", "academic_calendar"})
+REQUIRED_DECISION_INPUTS = frozenset({"menu", "academic_calendar", "weather_forecast"})
 REQUIRED_SOURCE_CONTRACT_FIELDS = frozenset(
     {
         "actual_served",
@@ -47,6 +47,7 @@ REQUIRED_SOURCE_CONTRACT_FIELDS = frozenset(
         "operator_status_quo_quantity",
         "menu",
         "academic_calendar",
+        "weather_forecast",
     }
 )
 SOURCE_CONTRACT_ENTRY_FIELDS = (
