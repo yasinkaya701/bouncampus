@@ -68,6 +68,20 @@ def test_dining_count_window_endpoint_is_retry_safe_and_descriptive_only() -> No
     assert "served_portions_observed" not in result
 
 
+def test_capabilities_exposes_dining_counts_without_claiming_live_integration() -> None:
+    router = load_router()
+    result = router.capabilities()
+
+    assert "dining_physical_counts" in result["modules"]
+    truth_boundary = result["truth_boundary"].lower()
+    privacy_boundary = result["privacy_boundary"].lower()
+    assert "dining" in truth_boundary
+    assert "caller-supplied" in truth_boundary
+    assert "live" in truth_boundary
+    assert "dining" in privacy_boundary
+    assert "anonymous" in privacy_boundary
+
+
 if __name__ == "__main__":
     tests = [name for name in globals() if name.startswith("test_")]
     for name in tests:
