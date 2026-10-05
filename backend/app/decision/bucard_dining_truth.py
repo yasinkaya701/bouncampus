@@ -277,12 +277,11 @@ def validate_bucard_dining_export(
         "source_system": "BUCARD_DINING_REPORT",
         "result_scope": "BUCARD_AGGREGATE_OUTCOME_ADMISSION_ONLY",
         "claim_boundary": (
-            "Admission validates only caller-supplied aggregate structure and declared "
-            "reconciliation, mapping, and evidence labels; those labels do not prove "
-            "authenticity. Benchmark use still requires canonical "
-            "validate_service_truth_artifact admission. This adapter does not prove live "
-            "access, external-source accuracy, forecast value, operational impact, savings, "
-            "or authorization for automatic action."
+            "Admission validates only caller-supplied aggregate structure. Caller-supplied "
+            "reconciliation, mapping, and evidence metadata does not prove authenticity. "
+            "Benchmark use still requires canonical validate_service_truth_artifact admission. "
+            "This adapter does not prove live access, external-source accuracy, forecast value, "
+            "operational impact, savings, or authorization for automatic action."
         ),
     }
 
