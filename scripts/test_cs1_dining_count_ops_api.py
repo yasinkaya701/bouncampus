@@ -46,6 +46,28 @@ def test_dining_count_event_endpoint_exposes_measurement_without_truth_promotion
     assert "served_portions" not in result
 
 
+def test_dining_count_window_endpoint_is_retry_safe_and_descriptive_only() -> None:
+    router = load_router()
+    event = valid_event()
+    result = router.dining_count_window(
+        {
+            "events": [event, event.copy()],
+            "station_id": "north-dining-line-1",
+            "window_start": "2026-10-05T12:00:00+03:00",
+            "window_end": "2026-10-05T13:00:00+03:00",
+        }
+    )
+
+    assert result["aggregation_status"] == "AGGREGATED"
+    assert result["total_event_count"] == 2
+    assert result["unique_event_count"] == 1
+    assert result["idempotent_replay_count"] == 1
+    assert result["served_trays_observed"] == 7
+    assert result["reconciled_service_truth"] is False
+    assert "actual_served" not in result
+    assert "served_portions_observed" not in result
+
+
 if __name__ == "__main__":
     tests = [name for name in globals() if name.startswith("test_")]
     for name in tests:
