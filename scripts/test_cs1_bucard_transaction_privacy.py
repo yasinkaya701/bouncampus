@@ -49,6 +49,20 @@ def test_transaction_identifier_remains_privacy_rejected() -> None:
     assert "PRIVACY_FIELD_NOT_ALLOWED_TRANSACTIONID" in result["reason_codes"]
 
 
+def test_transaction_identifier_text_value_does_not_trigger_privacy_rejection() -> None:
+    rows = [reconciled_row(i) for i in range(3)]
+    rows[0]["debug_note"] = "transactionId is intentionally mentioned as plain audit text"
+
+    result = validate_bucard_dining_export(rows)
+
+    assert result["validation_status"] == "ACCEPTED_RECONCILED_OUTCOME"
+    assert result["eligible_as_actual_served"] is True
+    assert result["privacy_safe"] is True
+    assert "PRIVACY_FIELD_NOT_ALLOWED_TRANSACTIONID" not in result["reason_codes"]
+
+
 if __name__ == "__main__":
-    test_transaction_identifier_remains_privacy_rejected()
-    print("ok: BUCard transaction identifiers remain privacy-rejected")
+    tests = [name for name in globals() if name.startswith("test_")]
+    for name in tests:
+        globals()[name]()
+    print(f"ok: {len(tests)} BUCard transaction privacy regressions")
