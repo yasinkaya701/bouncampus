@@ -135,6 +135,17 @@ def test_artifact_admission_rejects_decision_inputs_without_snapshot_content() -
     assert "DECISION_INPUT_SNAPSHOT_CONTENT_REQUIRED" in result["reason_codes"]
 
 
+def test_artifact_admission_rejects_malformed_snapshot_digest() -> None:
+    contract = load_contract()
+    rows = [measured_row(index) for index in range(3)]
+    rows[0]["decision_inputs"][0]["snapshot_sha256"] = "not-a-sha256"
+    result = contract.validate_service_truth_artifact(rows, field_provenance=source_contract())
+
+    assert result["validation_status"] == "DATASET_REJECTED"
+    assert result["eligible_for_benchmark"] is False
+    assert "DECISION_INPUT_SNAPSHOT_SHA256_INVALID" in result["reason_codes"]
+
+
 def test_artifact_admission_rejects_digest_that_does_not_match_snapshot_content() -> None:
     contract = load_contract()
     rows = [measured_row(index) for index in range(3)]
@@ -158,6 +169,20 @@ def test_artifact_admission_rejects_snapshot_id_reused_with_different_content() 
     assert result["validation_status"] == "DATASET_REJECTED"
     assert result["eligible_for_benchmark"] is False
     assert "DECISION_INPUT_SNAPSHOT_HASH_CONFLICT" in result["reason_codes"]
+
+
+def test_dataset_only_validation_remains_backward_compatible_without_snapshot_hashes() -> None:
+    contract = load_contract()
+    rows = [
+        measured_row(index, include_hashes=False, include_content=False)
+        for index in range(3)
+    ]
+    result = contract.validate_service_truth_dataset(rows)
+
+    assert result["validation_status"] == "ACCEPTED_MEASURED"
+    assert result["eligible_for_benchmark"] is True
+    assert result["snapshot_integrity_required"] is False
+    assert result["reason_codes"] == []
 
 
 def test_artifact_admission_accepts_content_bound_snapshots() -> None:
