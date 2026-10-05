@@ -10,7 +10,7 @@ from app.decision.capacity_planning import optimize_shuttle_plan, optimize_space
 from app.decision.campus_orchestrator import build_integrated_campus_plan
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
-from app.decision.dining_count_truth import validate_dining_count_event
+from app.decision.dining_count_truth import aggregate_dining_count_events, validate_dining_count_event
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
@@ -66,6 +66,21 @@ def dining_count_event(payload: dict[str, Any]) -> dict[str, Any]:
 
     try:
         return validate_dining_count_event(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/dining-count/window")
+def dining_count_window(payload: dict[str, Any]) -> dict[str, Any]:
+    """Expose retry-safe descriptive dining count aggregation for one station/time window."""
+
+    try:
+        return aggregate_dining_count_events(
+            _payload_value(payload, "events", []),
+            expected_station_id=str(_payload_value(payload, "station_id", "")),
+            window_start=str(_payload_value(payload, "window_start", "")),
+            window_end=str(_payload_value(payload, "window_end", "")),
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
