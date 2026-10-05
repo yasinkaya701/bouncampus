@@ -111,20 +111,24 @@ def measured_row(
 
 
 def source_contract() -> dict:
-    def entry(source_system: str) -> dict:
-        return {
+    def entry(source_system: str, *, service_level_operational: bool = False) -> dict:
+        result = {
             "owner": "VERIFIED_OWNER",
             "source_system": source_system,
             "availability_semantics": "TIMESTAMPED_AND_RECONCILED",
             "verification_status": "VERIFIED",
         }
+        if service_level_operational:
+            result["data_granularity"] = "CAMPUS_MEAL_SERVICE"
+            result["exportability_status"] = "VERIFIED_EXPORTABLE"
+        return result
 
     return {
-        "actual_served": entry("SERVICE_EXPORT"),
-        "produced_portions": entry("PRODUCTION_LOG"),
-        "surplus_or_waste": entry("SURPLUS_LOG"),
-        "shortage_or_early_sellout": entry("SERVICE_STATUS"),
-        "operator_status_quo_quantity": entry("PRODUCTION_PLAN"),
+        "actual_served": entry("SERVICE_EXPORT", service_level_operational=True),
+        "produced_portions": entry("PRODUCTION_LOG", service_level_operational=True),
+        "surplus_or_waste": entry("SURPLUS_LOG", service_level_operational=True),
+        "shortage_or_early_sellout": entry("SERVICE_STATUS", service_level_operational=True),
+        "operator_status_quo_quantity": entry("PRODUCTION_PLAN", service_level_operational=True),
         "menu": entry("OFFICIAL_MENU"),
         "academic_calendar": entry("OFFICIAL_ACADEMIC_CALENDAR"),
         "weather_forecast": entry("HISTORICAL_FORECAST_SNAPSHOT"),

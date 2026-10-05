@@ -100,21 +100,48 @@ def measured_row(index: int) -> dict:
 
 
 def source_contract() -> dict:
-    def entry(source_system: str, availability_semantics: str) -> dict:
-        return {
+    def entry(
+        source_system: str,
+        availability_semantics: str,
+        *,
+        service_level_operational: bool = False,
+    ) -> dict:
+        result = {
             "owner": "DINING_OPERATIONS",
             "source_system": source_system,
             "availability_semantics": availability_semantics,
             "verification_status": "VERIFIED",
         }
+        if service_level_operational:
+            result["data_granularity"] = "CAMPUS_MEAL_SERVICE"
+            result["exportability_status"] = "VERIFIED_EXPORTABLE"
+        return result
 
     return {
-        "actual_served": entry("SERVICE_EXPORT", "POST_SERVICE_RECONCILED"),
-        "produced_portions": entry("PRODUCTION_LOG", "POST_PRODUCTION_RECORDED"),
-        "surplus_or_waste": entry("SURPLUS_LOG", "POST_SERVICE_MEASURED"),
-        "shortage_or_early_sellout": entry("SERVICE_STATUS", "POST_SERVICE_RECORDED"),
+        "actual_served": entry(
+            "SERVICE_EXPORT",
+            "POST_SERVICE_RECONCILED",
+            service_level_operational=True,
+        ),
+        "produced_portions": entry(
+            "PRODUCTION_LOG",
+            "POST_PRODUCTION_RECORDED",
+            service_level_operational=True,
+        ),
+        "surplus_or_waste": entry(
+            "SURPLUS_LOG",
+            "POST_SERVICE_MEASURED",
+            service_level_operational=True,
+        ),
+        "shortage_or_early_sellout": entry(
+            "SERVICE_STATUS",
+            "POST_SERVICE_RECORDED",
+            service_level_operational=True,
+        ),
         "operator_status_quo_quantity": entry(
-            "PRODUCTION_PLAN", "MUST_EXIST_BY_DECISION_CUTOFF"
+            "PRODUCTION_PLAN",
+            "MUST_EXIST_BY_DECISION_CUTOFF",
+            service_level_operational=True,
         ),
         "menu": entry("OFFICIAL_MENU", "MUST_EXIST_BY_DECISION_CUTOFF"),
         "academic_calendar": {
