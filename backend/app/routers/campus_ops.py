@@ -10,6 +10,7 @@ from app.decision.capacity_planning import optimize_shuttle_plan, optimize_space
 from app.decision.campus_orchestrator import build_integrated_campus_plan
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
+from app.decision.dining_count_truth import validate_dining_count_event
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
@@ -57,6 +58,16 @@ def capabilities() -> dict[str, Any]:
         "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode event payloads use a dedicated fail-closed anonymous measurement contract.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
+
+
+@router.post("/dining-count/event")
+def dining_count_event(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate one caller-supplied anonymous dining physical-count event."""
+
+    try:
+        return validate_dining_count_event(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.post("/roomnode/event")
