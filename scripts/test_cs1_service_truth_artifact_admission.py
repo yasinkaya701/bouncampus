@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 from pathlib import Path
 
@@ -17,6 +18,10 @@ def load_contract():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def snapshot_sha256(snapshot_id: str) -> str:
+    return hashlib.sha256(snapshot_id.encode("utf-8")).hexdigest()
 
 
 def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT") -> dict:
@@ -45,12 +50,14 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
             {
                 "field": "menu",
                 "snapshot_id": menu_snapshot,
+                "snapshot_sha256": snapshot_sha256(menu_snapshot),
                 "available_at": f"2026-10-{day:02d}T07:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
             {
                 "field": "academic_calendar",
                 "snapshot_id": calendar_snapshot,
+                "snapshot_sha256": snapshot_sha256(calendar_snapshot),
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
@@ -96,6 +103,7 @@ def test_verified_measured_artifact_is_bound_and_benchmark_eligible() -> None:
     assert result["validation_status"] == "ACCEPTED_FOR_OFFLINE_BENCHMARK"
     assert result["eligible_for_benchmark"] is True
     assert result["dataset_validation"]["validation_status"] == "ACCEPTED_MEASURED"
+    assert result["dataset_validation"]["snapshot_integrity_required"] is True
     assert result["source_contract_validation"]["source_contract_verified"] is True
     assert len(result["artifact_admission_fingerprint_sha256"]) == 64
     assert result["reason_codes"] == []
