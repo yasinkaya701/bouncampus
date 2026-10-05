@@ -7,6 +7,15 @@ import importlib.util
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SERVICE_LEVEL_OPERATIONAL_FIELDS = frozenset(
+    {
+        "actual_served",
+        "produced_portions",
+        "surplus_or_waste",
+        "shortage_or_early_sellout",
+        "operator_status_quo_quantity",
+    }
+)
 
 
 def load_contract():
@@ -67,6 +76,13 @@ def source_contract(*, verification_status: str = "UNVERIFIED") -> dict:
     }
 
 
+def mark_service_level_exports(manifest: dict) -> dict:
+    for field in SERVICE_LEVEL_OPERATIONAL_FIELDS:
+        manifest[field]["data_granularity"] = "CAMPUS_MEAL_SERVICE"
+        manifest[field]["exportability_status"] = "VERIFIED_EXPORTABLE"
+    return manifest
+
+
 def test_source_contract_hash_is_deterministic_and_verification_is_separate() -> None:
     contract = load_contract()
     manifest = source_contract()
@@ -84,11 +100,23 @@ def test_source_contract_hash_is_deterministic_and_verification_is_separate() ->
     assert first["incomplete_source_contract_fields"] == []
 
     verified = contract.validate_service_truth_source_contract(
-        source_contract(verification_status="VERIFIED")
+        mark_service_level_exports(source_contract(verification_status="VERIFIED"))
     )
     assert verified["source_contract_complete"] is True
     assert verified["source_contract_verified"] is True
     assert verified["unverified_source_contract_fields"] == []
+
+
+def test_verified_operational_source_rejects_aggregate_granularity() -> None:
+    contract = load_contract()
+    manifest = mark_service_level_exports(source_contract(verification_status="VERIFIED"))
+    manifest["actual_served"]["data_granularity"] = "CAMPUS_DAILY_AGGREGATE"
+
+    result = contract.validate_service_truth_source_contract(manifest)
+
+    assert result["source_contract_complete"] is True
+    assert result["source_contract_verified"] is False
+    assert "actual_served" in result["non_service_level_source_fields"]
 
 
 def test_missing_or_incomplete_source_ownership_stays_explicit() -> None:
@@ -109,7 +137,7 @@ def test_missing_or_incomplete_source_ownership_stays_explicit() -> None:
 
 def test_optional_source_entries_are_validated_without_becoming_globally_required() -> None:
     contract = load_contract()
-    manifest = source_contract(verification_status="VERIFIED")
+    manifest = mark_service_level_exports(source_contract(verification_status="VERIFIED"))
     manifest["weather_forecast"] = {
         "owner": "ARCHIVED_FORECAST_PROVIDER",
         "source_system": "HISTORICAL_FORECAST_SNAPSHOT",
