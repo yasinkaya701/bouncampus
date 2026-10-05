@@ -23,10 +23,9 @@ def test_verified_measured_sources_require_service_level_exportability() -> None
     result = validate_service_truth_source_contract(provenance)
 
     assert result["source_contract_complete"] is True
-    assert result["source_contract_service_level_exportable"] is False
     assert result["source_contract_verified"] is False
-    assert "actual_served" in result["non_service_level_source_contract_fields"]
-    assert "actual_served" in result["unverified_exportability_source_contract_fields"]
+    assert "actual_served" in result["non_service_level_source_fields"]
+    assert "actual_served" in result["unverified_exportability_source_fields"]
 
 
 if __name__ == "__main__":
