@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,8 +21,15 @@ def load_contract():
     return module
 
 
-def snapshot_sha256(snapshot_id: str) -> str:
-    return hashlib.sha256(snapshot_id.encode("utf-8")).hexdigest()
+def snapshot_sha256(content: object) -> str:
+    payload = json.dumps(
+        content,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT") -> dict:
@@ -30,6 +38,16 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
     cutoff = f"2026-10-{day:02d}T08:00:00+03:00"
     menu_snapshot = f"menu-{service_date}-lunch"
     calendar_snapshot = "calendar-2026-fall-v1"
+    menu_content = {
+        "service_date": service_date,
+        "meal_period": "lunch",
+        "items": ["lentil_soup", "rice", "seasonal_main"],
+    }
+    calendar_content = {
+        "term": "2026-fall",
+        "service_date": service_date,
+        "instructional_day": True,
+    }
     return {
         "service_id": f"north-lunch-{service_date}",
         "granularity": "CAMPUS_MEAL_SERVICE",
@@ -50,14 +68,16 @@ def measured_row(index: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPO
             {
                 "field": "menu",
                 "snapshot_id": menu_snapshot,
-                "snapshot_sha256": snapshot_sha256(menu_snapshot),
+                "snapshot_content": menu_content,
+                "snapshot_sha256": snapshot_sha256(menu_content),
                 "available_at": f"2026-10-{day:02d}T07:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
             {
                 "field": "academic_calendar",
                 "snapshot_id": calendar_snapshot,
-                "snapshot_sha256": snapshot_sha256(calendar_snapshot),
+                "snapshot_content": calendar_content,
+                "snapshot_sha256": snapshot_sha256(calendar_content),
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
