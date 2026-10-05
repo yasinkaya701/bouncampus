@@ -76,6 +76,23 @@ def test_declared_weather_still_fails_closed_when_available_after_cutoff() -> No
     assert "DECISION_INPUT_NOT_AVAILABLE_AT_CUTOFF" in result["reason_codes"]
 
 
+def test_declared_weather_requires_matching_source_provenance() -> None:
+    rows = [deepcopy(measured_row(index)) for index in range(3)]
+    provenance = deepcopy(source_contract())
+    provenance.pop("weather_forecast", None)
+
+    result = validate_service_truth_artifact(
+        rows,
+        field_provenance=provenance,
+    )
+
+    assert result["validation_status"] == "SOURCE_CONTRACT_INCOMPLETE"
+    assert result["eligible_for_benchmark"] is False
+    assert "weather_forecast" in result["source_contract_validation"][
+        "missing_source_contract_fields"
+    ]
+
+
 if __name__ == "__main__":
     tests = [name for name in globals() if name.startswith("test_")]
     for name in tests:
