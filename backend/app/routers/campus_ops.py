@@ -10,6 +10,7 @@ from app.decision.capacity_planning import optimize_shuttle_plan, optimize_space
 from app.decision.campus_orchestrator import build_integrated_campus_plan
 from app.decision.campus_state import build_campus_state
 from app.decision.class_conflicts import optimize_conflict_aware_class_schedule
+from app.decision.dining_count_truth import aggregate_dining_count_events, validate_dining_count_event
 from app.decision.energy_advisory import plan_energy_advisory
 from app.decision.food_production import optimize_food_production
 from app.decision.resource_allocation import allocate_shared_capacity
@@ -48,6 +49,7 @@ def capabilities() -> dict[str, Any]:
             "energy_advisory",
             "water_advisory",
             "roomnode_observations",
+            "dining_physical_counts",
             "shuttle_count_observations",
             "bundle",
             "integrated_plan",
@@ -55,10 +57,35 @@ def capabilities() -> dict[str, Any]:
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
-        "truth_boundary": "RoomNode and shuttle passenger-count observation endpoints validate caller-supplied physical event payloads only and do not imply live device connections. Shuttle count windows expose descriptive IN/OUT deltas only, never absolute vehicle occupancy. No live cafeteria POS, shuttle GPS, passenger-count telemetry, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
-        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode and shuttle count event payloads use dedicated fail-closed anonymous measurement contracts.",
+        "truth_boundary": "RoomNode, dining physical-count, and shuttle passenger-count observation endpoints validate caller-supplied physical event payloads only and do not imply live device connections. Dining counts remain descriptive device observations: serving tray counts are not promoted to portions or actual_served, and no reconciled service truth, savings, or operational impact is implied. Shuttle count windows expose descriptive IN/OUT deltas only and are never promoted to absolute vehicle occupancy. No live cafeteria POS, shuttle GPS, passenger-count telemetry, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
+        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode, dining physical-count, and shuttle passenger-count event payloads use dedicated fail-closed anonymous measurement contracts.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
+
+
+@router.post("/dining-count/event")
+def dining_count_event(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate one caller-supplied anonymous dining physical-count event."""
+
+    try:
+        return validate_dining_count_event(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/dining-count/window")
+def dining_count_window(payload: dict[str, Any]) -> dict[str, Any]:
+    """Expose retry-safe descriptive dining count aggregation for one station/time window."""
+
+    try:
+        return aggregate_dining_count_events(
+            _payload_value(payload, "events", []),
+            expected_station_id=str(_payload_value(payload, "station_id", "")),
+            window_start=str(_payload_value(payload, "window_start", "")),
+            window_end=str(_payload_value(payload, "window_end", "")),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.post("/roomnode/event")
