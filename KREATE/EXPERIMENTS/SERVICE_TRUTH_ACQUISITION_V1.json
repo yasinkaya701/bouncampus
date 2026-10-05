@@ -93,6 +93,13 @@
         "report_generated_at",
         "source_report_id"
       ],
+      "contract_mapping": {
+        "source_field": "served_count",
+        "target_field": "actual_served",
+        "status": "SEMANTIC_MAPPING_UNVERIFIED",
+        "required_confirmation": "Dining Services / SKS must confirm the reconciliation semantics that make aggregate BUCard served_count correspond to accepted served meals, including duplicate, reversal, refund, retry, second-meal, staff, student, guest, package sale-versus-pickup handling, and the accepted final report state.",
+        "admission_rule": "BUCard served_count must not be admitted as actual_served until the required semantic reconciliation has been confirmed and recorded."
+      },
       "reconciliation_questions": [
         "Does one accepted passage always correspond to one served meal?",
         "How are duplicate charges, reversals, refunds, retries, and turnstile corrections represented?",
