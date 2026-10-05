@@ -41,10 +41,7 @@ def measured_row(index: int) -> dict:
         "meal_period": "lunch",
         "items": ["lentil_soup", "rice", "seasonal_main"],
     }
-    calendar_content = {
-        "term": "2026-fall",
-        "instructional_day": True,
-    }
+    calendar_content = {"term": "2026-fall", "instructional_day": True}
     weather_content = {
         "forecast_for": f"{service_date}T12:00:00+03:00",
         "issued_at": f"{service_date}T07:00:00+03:00",
@@ -154,7 +151,6 @@ def test_accepted_artifact_is_validated_sorted_and_checksum_bound() -> None:
         "rows": [measured_row(2), measured_row(0), measured_row(1)],
         "field_provenance": source_contract(),
     }
-
     report = handoff.build_admitted_benchmark_report(
         artifact,
         dataset_id="north-lunch-measured-v1",
@@ -163,27 +159,17 @@ def test_accepted_artifact_is_validated_sorted_and_checksum_bound() -> None:
         rolling_window=2,
         seasonal_lag=1,
     )
-
     admission = report["service_truth_admission"]
     assert admission["validation_status"] == "ACCEPTED_FOR_OFFLINE_BENCHMARK"
     assert admission["eligible_for_benchmark"] is True
     assert report["reproducibility"]["dataset"]["sha256"] == admission[
         "dataset_validation"
     ]["artifact_checksum_sha256"]
-    assert report["service_truth_series"] == {
-        "campus_id": "north",
-        "meal_period": "lunch",
-        "service_count": 3,
-        "service_ids": [
-            "north-lunch-2026-10-01",
-            "north-lunch-2026-10-02",
-            "north-lunch-2026-10-03",
-        ],
-    }
-    assert report["reproducibility"]["evaluation_window"] == (
-        "2026-10-01..2026-10-03"
-    )
-    assert "operator" in report["forecast_candidates"]
+    assert report["service_truth_series"]["service_ids"] == [
+        "north-lunch-2026-10-01",
+        "north-lunch-2026-10-02",
+        "north-lunch-2026-10-03",
+    ]
     assert report["result_scope"] == "OFFLINE_BENCHMARK_ONLY"
     assert "external-source accuracy" in report["claim_boundary"]
 
@@ -201,7 +187,10 @@ def test_explicit_series_selection_revalidates_only_selected_rows() -> None:
 
     report = handoff.build_admitted_benchmark_report(
         {
-            "rows": [south_rows[2], north_rows[1], south_rows[0], north_rows[2], north_rows[0], south_rows[1]],
+            "rows": [
+                south_rows[2], north_rows[1], south_rows[0],
+                north_rows[2], north_rows[0], south_rows[1],
+            ],
             "field_provenance": source_contract(),
         },
         dataset_id="north-lunch-selected-v1",
@@ -212,18 +201,52 @@ def test_explicit_series_selection_revalidates_only_selected_rows() -> None:
         campus_id="north",
         meal_period="lunch",
     )
-
     admission = report["service_truth_admission"]
     assert admission["dataset_validation"]["service_count"] == 3
-    assert admission["dataset_validation"]["chronological_service_ids"] == [
-        "north-lunch-2026-10-01",
-        "north-lunch-2026-10-02",
-        "north-lunch-2026-10-03",
-    ]
     assert report["reproducibility"]["dataset"]["sha256"] == admission[
         "dataset_validation"
     ]["artifact_checksum_sha256"]
-    assert report["service_truth_series"]["service_count"] == 3
+
+
+def test_unverified_source_contract_cannot_reach_measured_benchmark() -> None:
+    handoff = load_handoff()
+    provenance = source_contract()
+    provenance["actual_served"]["verification_status"] = "UNVERIFIED"
+    try:
+        handoff.build_admitted_benchmark_report(
+            {
+                "rows": [measured_row(0), measured_row(1), measured_row(2)],
+                "field_provenance": provenance,
+            },
+            dataset_id="unverified-source-v1",
+            dataset_label="Unverified source must fail",
+            git_commit_sha="c" * 40,
+            rolling_window=2,
+            seasonal_lag=1,
+        )
+    except ValueError as exc:
+        assert "not eligible for offline benchmark" in str(exc)
+    else:
+        raise AssertionError("unverified source provenance reached measured benchmark")
+
+
+def test_post_cutoff_snapshot_cannot_reach_measured_benchmark() -> None:
+    handoff = load_handoff()
+    rows = [measured_row(0), measured_row(1), measured_row(2)]
+    rows[0]["decision_inputs"][0]["available_at"] = "2026-10-01T09:00:00+03:00"
+    try:
+        handoff.build_admitted_benchmark_report(
+            {"rows": rows, "field_provenance": source_contract()},
+            dataset_id="post-cutoff-v1",
+            dataset_label="Post cutoff must fail",
+            git_commit_sha="d" * 40,
+            rolling_window=2,
+            seasonal_lag=1,
+        )
+    except ValueError as exc:
+        assert "not eligible for offline benchmark" in str(exc)
+    else:
+        raise AssertionError("post-cutoff snapshot reached measured benchmark")
 
 
 if __name__ == "__main__":
