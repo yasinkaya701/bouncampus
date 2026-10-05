@@ -4,59 +4,142 @@
   "measured_rows": [],
   "benchmark_eligible": false,
   "pilot_evidence_eligible": false,
-  "claim_boundary": "This artifact is an acquisition handoff only. It contains no real measured campus × meal-period × service rows, proves no source access, and is not benchmark, pilot-evidence, savings, or operational-readiness evidence until real measured records and source ownership are verified.",
+  "claim_boundary": "This artifact is an acquisition handoff only. It contains no real measured campus × meal-period × service rows, proves no raw operational data access, and is not benchmark, pilot-evidence, savings, or operational-readiness evidence until real measured records, source semantics, and access are verified.",
   "field_provenance": {
     "actual_served": {
-      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
-      "source_system": "UNCONFIRMED_EXISTING_EXPORT_OR_SERVING_LINE_MEASUREMENT",
-      "availability_semantics": "Must be measured or reconciled after the service and must never be treated as known at the decision cutoff.",
-      "verification_status": "UNVERIFIED"
+      "owner": "BUCARD_OFFICE_WITH_DINING_SERVICES_SEMANTIC_RECONCILIATION",
+      "source_system": "BUCARD_DINING_DAILY_PASSAGE_REPORT_OR_ACCEPTED_DINING_EXPORT",
+      "availability_semantics": "Post-service reconciled aggregate only. A BUCard passage/meal transaction must not be assumed to equal one accepted served meal until Dining Services confirms duplicate, reversal, second-meal, staff/student, package-sale versus package-pickup, and correction rules. report_generated_at and source_report_id must be retained.",
+      "institutional_routing_status": "VERIFIED",
+      "source_existence_status": "VERIFIED_INTERNAL_REPORTING_EXISTS",
+      "data_access_status": "UNVERIFIED_NO_EXPORT_IN_REPOSITORY",
+      "verification_status": "UNVERIFIED",
+      "evidence_refs": [
+        "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf#MADDE-7",
+        "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf#page=25"
+      ]
     },
     "produced_portions": {
-      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "owner": "YEMEK_HIZMETLERI_SUBE_MUDURLUGU_OR_ACCEPTED_CONTRACTOR_RECORD_TO_VERIFY",
       "source_system": "UNCONFIRMED_KITCHEN_RECORD_OR_PRODUCTION_COUNT_MEASUREMENT",
       "availability_semantics": "Must represent actual produced portions for the same campus × meal period × service date and may become available only after production is recorded.",
       "verification_status": "UNVERIFIED"
     },
     "surplus_or_waste": {
-      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "owner": "YEMEK_HIZMETLERI_SUBE_MUDURLUGU_OR_ACCEPTED_MEASUREMENT_OWNER_TO_VERIFY",
       "source_system": "UNCONFIRMED_WASTE_RECORD_OR_TRAYGATE_MEASUREMENT",
       "availability_semantics": "Must be an accepted measured surplus/waste outcome tied to the same service; TrayGate percentage outputs are not mass or gram truth without separate measured calibration.",
       "verification_status": "UNVERIFIED"
     },
     "shortage_or_early_sellout": {
-      "owner": "UNCONFIRMED_OPERATIONAL_OWNER",
+      "owner": "YEMEK_HIZMETLERI_SUBE_MUDURLUGU_OR_SERVICE_OPERATOR_TO_VERIFY",
       "source_system": "UNCONFIRMED_SERVICE_INCIDENT_OR_OPERATOR_RECORD",
       "availability_semantics": "Must be a post-service reconciled outcome or timestamped incident record; absence of a record cannot be silently interpreted as no shortage.",
       "verification_status": "UNVERIFIED"
     },
     "operator_status_quo_quantity": {
-      "owner": "UNCONFIRMED_DECISION_OWNER",
+      "owner": "YEMEK_HIZMETLERI_SUBE_MUDURLUGU_OR_PRODUCTION_DECISION_OWNER_TO_VERIFY",
       "source_system": "UNCONFIRMED_PRE_SERVICE_PRODUCTION_PLAN_OR_OPERATOR_RECORD",
       "availability_semantics": "Must be the quantity estimate or plan actually available before the registered decision_cutoff_at, preserved with an immutable timestamp/snapshot.",
       "verification_status": "UNVERIFIED"
     },
     "menu": {
-      "owner": "UNCONFIRMED_MENU_DATA_OWNER",
+      "owner": "YEMEK_HIZMETLERI_SUBE_MUDURLUGU",
       "source_system": "OFFICIAL_DINING_MENU_OR_TIMESTAMPED_OPERATIONAL_EXPORT_TO_VERIFY",
-      "availability_semantics": "Only a menu snapshot demonstrably published or available no later than decision_cutoff_at may enter historical decision inputs.",
+      "availability_semantics": "Only a menu snapshot demonstrably published or available no later than decision_cutoff_at may enter historical decision inputs. Archive existence alone does not prove historical publication time.",
       "verification_status": "UNVERIFIED"
     },
     "academic_calendar": {
-      "owner": "UNCONFIRMED_CALENDAR_DATA_OWNER",
+      "owner": "BOGAZICI_UNIVERSITY_OFFICIAL_ACADEMIC_CALENDAR",
       "source_system": "OFFICIAL_ACADEMIC_CALENDAR_SNAPSHOT_TO_VERIFY",
       "availability_semantics": "Use only the calendar/version known by decision_cutoff_at; later corrections must not leak backward into historical features.",
       "verification_status": "UNVERIFIED"
     }
   },
+  "institutional_evidence": {
+    "bucard_office_dining_data_role": {
+      "status": "VERIFIED_PUBLIC_INSTITUTIONAL_EVIDENCE",
+      "source": "Boğaziçi Üniversitesi Yemek Hizmetleri Yönergesi, BUCard Ofisi / MADDE 7",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf",
+      "evidence": "BUCard Office operates/controls the dining smart-card system, reports to Dining Services governance/branch management, and is responsible for storing digital data.",
+      "boundary": "This verifies institutional routing and data stewardship, not access to row-level or aggregate exports."
+    },
+    "bucard_dining_reports_exist": {
+      "status": "VERIFIED_PUBLIC_INSTITUTIONAL_EVIDENCE",
+      "source": "Boğaziçi Üniversitesi Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025, BUCard Yemekhane ve Paket Yemek Sistemleri Geliştirmeleri",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+      "evidence": "The BUCard dining real-time report page includes package-meal counts and daily passage reports include package-meal information.",
+      "boundary": "This proves that internal reporting exists. It does not prove that CS1 has export/API access or that raw passage counts are already reconciled served-meal truth."
+    }
+  },
+  "data_access_routes": {
+    "served_count_bucard": {
+      "technical_owner": "BUCard Office / Bilgi İşlem Daire Başkanlığı",
+      "semantic_owner": "Yemek Hizmetleri Şube Müdürlüğü / SKS",
+      "access_status": "REQUEST_REQUIRED",
+      "privacy_rule": "Request aggregate service-level rows only; no person identifiers, card identifiers, student/personnel identifiers, balances, or transaction-level personal data.",
+      "minimum_requested_export_fields": [
+        "service_date",
+        "campus_id",
+        "meal_period",
+        "served_count",
+        "package_meal_count",
+        "report_generated_at",
+        "source_report_id"
+      ],
+      "reconciliation_questions": [
+        "Does one accepted passage always correspond to one served meal?",
+        "How are duplicate charges, reversals, refunds, retries, and turnstile corrections represented?",
+        "How are student, staff, guest, second-meal, and package-meal records distinguished?",
+        "Does package-meal count represent sale/reservation, preparation, or physical pickup?",
+        "Which report state is accepted/reconciled by Dining Services and when is it final?"
+      ]
+    },
+    "production_and_outcome_records": {
+      "technical_or_operational_owner": "Yemek Hizmetleri Şube Müdürlüğü / SKS, with contractor source ownership to be confirmed where applicable",
+      "access_status": "REQUEST_REQUIRED",
+      "minimum_requested_fields": [
+        "service_date",
+        "campus_id",
+        "meal_period",
+        "produced_portions",
+        "actual_surplus_portions_or_waste_kg",
+        "shortage_or_early_sellout",
+        "operator_status_quo_quantity",
+        "decision_cutoff_at",
+        "outcome_reconciled",
+        "source_record_id"
+      ],
+      "required_semantics": [
+        "Identify which values are contractor records versus university-accepted/reconciled records.",
+        "Preserve pre-service production-plan version/timestamp separately from post-service outcomes.",
+        "Distinguish true no-shortage/no-surplus from missing or unrecorded outcome data."
+      ]
+    },
+    "bucampus_menu_poll_history": {
+      "technical_owner": "Bilgi İşlem Daire Başkanlığı / BUCampus owner to confirm",
+      "semantic_owner": "Yemek Hizmetleri Şube Müdürlüğü / SKS",
+      "access_status": "UNVERIFIED_HISTORY_EXPORT",
+      "requested_fields": [
+        "menu_id",
+        "poll_snapshot_at",
+        "vote_count_or_aggregate_result",
+        "service_date",
+        "campus_or_package_scope"
+      ],
+      "eligibility_rule": "Do not use historical poll state as a decision feature unless an immutable export proves that the snapshot existed no later than decision_cutoff_at."
+    }
+  },
   "acquisition_questions": {
-    "actual_served": "Which operational owner and source can export or measure actual served portions per campus × meal period × service date, with a stable source record ID?",
-    "produced_portions": "Which kitchen record, counter, or operator-owned source provides actual produced portions at the same service granularity, and when does that value become available?",
+    "actual_served": "Can BUCard Office provide the minimum aggregate daily dining report export, and can Dining Services define the reconciliation rules that turn passage/meal transactions into an accepted served_count?",
+    "produced_portions": "Which kitchen record, counter, contractor export, or operator-owned source provides actual produced portions at the same service granularity, and when does that value become available?",
     "surplus_or_waste": "Which accepted measurement process provides surplus portions or waste mass for the same service, and what reconciliation/calibration rules define an accepted outcome?",
     "shortage_or_early_sellout": "Where are shortage or early-sellout events recorded, who reconciles them, and how can absence versus missing data be distinguished?",
-    "operator_status_quo_quantity": "What quantity did the operator or existing process plan before each service, where is that plan recorded, and can its pre-cutoff timestamp be preserved?",
+    "operator_status_quo_quantity": "What quantity did the operator or existing process plan before each service, where is that plan recorded, and can its pre-cutoff timestamp/version be preserved?",
     "menu": "Can the official or operational menu history be exported as immutable snapshots with publication/availability timestamps proving what was known by each decision cutoff?",
-    "academic_calendar": "Which official calendar snapshot/version was available before each historical decision cutoff, including later correction/version history where relevant?"
+    "academic_calendar": "Which official calendar snapshot/version was available before each historical decision cutoff, including later correction/version history where relevant?",
+    "reservation_coverage": "Does normal-term reservation data exist outside the documented Kilyos holiday workflow, and if so for which campuses, meal periods, and dates with timestamped cancellation/no-show semantics?",
+    "bucampus_poll_history": "Can historical BUCampus menu-poll snapshots be exported with menu IDs and timestamps, without personal voter data?"
   },
   "candidate_measurement_paths": {
     "produced_portions": {
@@ -65,9 +148,9 @@
       "evidence_boundary": "Architecture candidate only; not accepted operational truth until ownership, measurement procedure, identity mapping, timestamps, and reconciliation are verified."
     },
     "actual_served": {
-      "source": "Serving Line Counter or an existing aggregate serving/POS export",
-      "status": "CANDIDATE_UNVERIFIED",
-      "evidence_boundary": "Candidate measurement path only; no assumed access, accuracy, or campus deployment."
+      "source": "Preferred: privacy-preserving aggregate BUCard dining report after Dining Services reconciliation. Fallback: Serving Line Counter only if existing export cannot satisfy the data contract.",
+      "status": "INSTITUTIONAL_SOURCE_ROUTE_VERIFIED_ACCESS_UNVERIFIED",
+      "evidence_boundary": "Internal report existence and institutional routing are verified publicly; CS1 still has no asserted export/API access, accuracy, reconciliation, or campus-level availability."
     },
     "surplus_or_waste": {
       "source": "TrayGate plus an accepted surplus/waste reconciliation process",
@@ -76,11 +159,13 @@
     }
   },
   "required_next_evidence": [
-    "Confirm the operational owner/source for every required field.",
+    "Request the privacy-preserving aggregate BUCard dining report export and record the access decision; do not request personal/card-level records.",
+    "Have Dining Services define reconciliation semantics for served_count, including duplicate/reversal/correction, second-meal, staff/student/guest, and package-meal handling.",
+    "Confirm the operational owner/source for produced portions, surplus/waste, shortage/sellout, and the pre-service operator status-quo quantity.",
     "Obtain several chronological real measured campus × meal-period × service rows with immutable source IDs/snapshots.",
     "Verify field availability timestamps relative to decision_cutoff_at and reject future leakage.",
     "Determine whether reservation data exists outside the documented Kilyos holiday workflow before using reservation features elsewhere.",
-    "Determine whether timestamped BUCampus/menu rating history can be exported.",
-    "Verify served, produced, shortage/sellout, and surplus/waste reconciliation at service granularity before enabling benchmark or pilot eligibility."
+    "Determine whether timestamped BUCampus menu-poll history can be exported.",
+    "Admit measured rows through SERVICE_TRUTH_V1 only after ownership, access, semantics, and reconciliation are verified; then retain accepted artifact fingerprint/checksum for #69/#70."
   ]
 }
