@@ -49,6 +49,15 @@ REQUIRED_SOURCE_CONTRACT_FIELDS = frozenset(
         "academic_calendar",
     }
 )
+SERVICE_LEVEL_OPERATIONAL_FIELDS = frozenset(
+    {
+        "actual_served",
+        "produced_portions",
+        "surplus_or_waste",
+        "shortage_or_early_sellout",
+        "operator_status_quo_quantity",
+    }
+)
 CONDITIONALLY_REQUIRED_SOURCE_CONTRACT_FIELDS = frozenset({"weather_forecast"})
 SOURCE_CONTRACT_ENTRY_FIELDS = (
     "owner",
@@ -261,6 +270,9 @@ def validate_service_truth_source_contract(
     decision actually consumed it. Identity/contact-bearing metadata is rejected
     independently from structural completeness so a complete manifest cannot
     become verified by hiding personal data inside nested provenance fields.
+    Measured operational sources additionally require explicit service-level
+    granularity and exportability evidence before declared verification can make
+    them eligible for benchmark admission.
     """
 
     if not isinstance(field_provenance, Mapping):
@@ -280,6 +292,8 @@ def validate_service_truth_source_contract(
     missing = sorted(required_fields - declared_fields)
     incomplete: list[str] = []
     unverified: list[str] = list(missing)
+    non_service_level_source_fields: list[str] = []
+    unverified_exportability_source_fields: list[str] = []
 
     for raw_field, entry in field_provenance.items():
         field = str(raw_field)
@@ -295,30 +309,55 @@ def validate_service_truth_source_contract(
         if verification_status != "VERIFIED" and field not in unverified:
             unverified.append(field)
 
+        if field in SERVICE_LEVEL_OPERATIONAL_FIELDS:
+            data_granularity = (
+                _text(entry.get("data_granularity")) if isinstance(entry, Mapping) else None
+            )
+            exportability_status = (
+                _text(entry.get("exportability_status")) if isinstance(entry, Mapping) else None
+            )
+            if data_granularity != SERVICE_LEVEL_GRANULARITY:
+                non_service_level_source_fields.append(field)
+            if exportability_status != "VERIFIED_EXPORTABLE":
+                unverified_exportability_source_fields.append(field)
+
     incomplete.sort()
     unverified.sort()
+    non_service_level_source_fields.sort()
+    unverified_exportability_source_fields.sort()
     source_contract_complete = not missing and not incomplete
+    source_contract_service_level_exportable = (
+        not non_service_level_source_fields and not unverified_exportability_source_fields
+    )
     privacy_reason_codes = _privacy_reason_codes(field_provenance)
     source_contract_privacy_safe = not privacy_reason_codes
     source_contract_verified = (
-        source_contract_complete and not unverified and source_contract_privacy_safe
+        source_contract_complete
+        and not unverified
+        and source_contract_privacy_safe
+        and source_contract_service_level_exportable
     )
 
     return {
         "source_contract_complete": source_contract_complete,
         "source_contract_privacy_safe": source_contract_privacy_safe,
+        "source_contract_service_level_exportable": source_contract_service_level_exportable,
         "source_contract_verified": source_contract_verified,
         "source_contract_sha256": _canonical_json_sha256(field_provenance),
         "required_source_contract_fields": sorted(required_fields),
         "missing_source_contract_fields": missing,
         "incomplete_source_contract_fields": incomplete,
         "unverified_source_contract_fields": unverified,
+        "non_service_level_source_fields": non_service_level_source_fields,
+        "unverified_exportability_source_fields": unverified_exportability_source_fields,
         "privacy_reason_codes": privacy_reason_codes,
         "result_scope": "SERVICE_TRUTH_SOURCE_CONTRACT_ONLY",
         "claim_boundary": (
-            "Source ownership and availability metadata must remain identity-free; "
-            "structural completeness and declared verification do not prove measured-data "
-            "availability, benchmark eligibility, pilot readiness, or savings."
+            "Source ownership and availability metadata must remain identity-free; measured "
+            "operational sources must also declare service-level granularity and verified "
+            "exportability. Structural completeness and declared verification do not prove "
+            "measured-data availability, source accuracy, benchmark value, pilot readiness, "
+            "or savings."
         ),
     }
 
