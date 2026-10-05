@@ -48,14 +48,15 @@ def capabilities() -> dict[str, Any]:
             "energy_advisory",
             "water_advisory",
             "roomnode_observations",
+            "dining_physical_counts",
             "bundle",
             "integrated_plan",
         ],
         "decision_mode": "ADVISORY",
         "automatic_actuation": False,
         "operator_approval_required": True,
-        "truth_boundary": "RoomNode observation endpoints validate caller-supplied physical event payloads only and do not imply a live RoomNode device connection. No live cafeteria POS, shuttle GPS, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
-        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode event payloads use a dedicated fail-closed anonymous measurement contract.",
+        "truth_boundary": "RoomNode and dining physical-count observation endpoints validate caller-supplied physical event payloads only and do not imply a live RoomNode or dining counter connection. Dining counts remain descriptive device observations: serving tray counts are not promoted to portions or actual_served, and no reconciled service truth, savings, or operational impact is implied. No live cafeteria POS, shuttle GPS, room-occupancy feed, BMS, smart-meter/water-meter, Wi-Fi/turnstile, registrar telemetry, calibrated daylight simulation, or calibrated building thermal model is implied by these optimization endpoints.",
+        "privacy_boundary": "Aggregate planning only; person-level identifiers and individual movement traces are rejected. RoomNode and dining physical-count event payloads use dedicated fail-closed anonymous measurement contracts.",
         "objective_units": "REGISTERED_RELATIVE_SENSITIVITY_UNITS",
     }
 
