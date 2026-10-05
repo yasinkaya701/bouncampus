@@ -149,7 +149,8 @@
     },
     "actual_served": {
       "source": "Preferred: privacy-preserving aggregate BUCard dining report after Dining Services reconciliation. Fallback: Serving Line Counter only if existing export cannot satisfy the data contract.",
-      "status": "INSTITUTIONAL_SOURCE_ROUTE_VERIFIED_ACCESS_UNVERIFIED",
+      "status": "CANDIDATE_UNVERIFIED",
+      "institutional_route_status": "INSTITUTIONAL_SOURCE_ROUTE_VERIFIED_ACCESS_UNVERIFIED",
       "evidence_boundary": "Internal report existence and institutional routing are verified publicly; CS1 still has no asserted export/API access, accuracy, reconciliation, or campus-level availability."
     },
     "surplus_or_waste": {
