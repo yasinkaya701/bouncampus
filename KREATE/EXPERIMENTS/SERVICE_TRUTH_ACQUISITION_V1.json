@@ -93,6 +93,13 @@
         "report_generated_at",
         "source_report_id"
       ],
+      "contract_mapping": {
+        "source_field": "served_count",
+        "target_field": "actual_served",
+        "status": "SEMANTIC_MAPPING_UNVERIFIED",
+        "required_confirmation": "Dining Services must reconcile and document the report semantics for duplicates, reversals, retries, second meals, staff/student/guest records, package meals, corrections, and final report state before the mapping is accepted.",
+        "admission_rule": "Raw BUCard passage or report counts must not populate actual_served until the served_count semantics have been reconciled by Dining Services and the resulting source provenance is separately verified for SERVICE_TRUTH_V1 admission."
+      },
       "reconciliation_questions": [
         "Does one accepted passage always correspond to one served meal?",
         "How are duplicate charges, reversals, refunds, retries, and turnstile corrections represented?",
