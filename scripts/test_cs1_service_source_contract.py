@@ -131,16 +131,17 @@ def test_optional_source_entries_are_validated_without_becoming_globally_require
     assert "special_events" in rejected["incomplete_source_contract_fields"]
 
 
-def test_weather_forecast_is_a_required_source_contract_field() -> None:
+def test_weather_forecast_is_not_a_globally_required_source_contract_field() -> None:
     contract = load_contract()
     manifest = source_contract(verification_status="VERIFIED")
     del manifest["weather_forecast"]
 
     result = contract.validate_service_truth_source_contract(manifest)
 
-    assert result["source_contract_complete"] is False
-    assert result["source_contract_verified"] is False
-    assert "weather_forecast" in result["missing_source_contract_fields"]
+    assert result["source_contract_complete"] is True
+    assert result["source_contract_verified"] is True
+    assert "weather_forecast" not in result["missing_source_contract_fields"]
+    assert "weather_forecast" not in result["required_source_contract_fields"]
 
 
 if __name__ == "__main__":
