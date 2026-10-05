@@ -49,6 +49,7 @@ REQUIRED_SOURCE_CONTRACT_FIELDS = frozenset(
         "academic_calendar",
     }
 )
+CONDITIONALLY_REQUIRED_SOURCE_CONTRACT_FIELDS = frozenset({"weather_forecast"})
 SOURCE_CONTRACT_ENTRY_FIELDS = (
     "owner",
     "source_system",
@@ -222,8 +223,33 @@ def _canonical_json_sha256(value: Any) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _conditionally_required_source_fields(
+    rows: Sequence[Mapping[str, Any]],
+) -> set[str]:
+    """Return optional source fields that become required when a decision uses them."""
+
+    required: set[str] = set()
+    for raw_row in rows:
+        if not isinstance(raw_row, Mapping):
+            continue
+        decision_inputs = raw_row.get("decision_inputs")
+        if not isinstance(decision_inputs, Sequence) or isinstance(
+            decision_inputs, (str, bytes)
+        ):
+            continue
+        for source in decision_inputs:
+            if not isinstance(source, Mapping):
+                continue
+            field = _text(source.get("field"))
+            if field in CONDITIONALLY_REQUIRED_SOURCE_CONTRACT_FIELDS:
+                required.add(field)
+    return required
+
+
 def validate_service_truth_source_contract(
     field_provenance: Mapping[str, Any],
+    *,
+    additional_required_fields: Sequence[str] = (),
 ) -> dict[str, object]:
     """Validate ownership/availability metadata without upgrading it to evidence.
 
@@ -231,13 +257,25 @@ def validate_service_truth_source_contract(
     an explicitly owned source can be complete while still marked ``UNVERIFIED``.
     Optional source entries are not globally required, but any optional entry that
     is declared must satisfy the same structural contract as required entries.
+    Artifact admission may additionally require an optional field when an audited
+    decision actually consumed it.
     """
 
     if not isinstance(field_provenance, Mapping):
         raise ValueError("field_provenance must be a mapping")
+    if isinstance(additional_required_fields, (str, bytes)) or not isinstance(
+        additional_required_fields, Sequence
+    ):
+        raise ValueError("additional_required_fields must be a sequence of field names")
 
+    additional_required = {
+        field
+        for raw_field in additional_required_fields
+        if (field := _text(raw_field)) is not None
+    }
+    required_fields = REQUIRED_SOURCE_CONTRACT_FIELDS | additional_required
     declared_fields = {str(field) for field in field_provenance}
-    missing = sorted(REQUIRED_SOURCE_CONTRACT_FIELDS - declared_fields)
+    missing = sorted(required_fields - declared_fields)
     incomplete: list[str] = []
     unverified: list[str] = list(missing)
 
@@ -264,7 +302,7 @@ def validate_service_truth_source_contract(
         "source_contract_complete": source_contract_complete,
         "source_contract_verified": source_contract_verified,
         "source_contract_sha256": _canonical_json_sha256(field_provenance),
-        "required_source_contract_fields": sorted(REQUIRED_SOURCE_CONTRACT_FIELDS),
+        "required_source_contract_fields": sorted(required_fields),
         "missing_source_contract_fields": missing,
         "incomplete_source_contract_fields": incomplete,
         "unverified_source_contract_fields": unverified,
@@ -617,7 +655,8 @@ def validate_service_truth_artifact(
     This function composes the canonical dataset and source-contract validators.
     It adds no new evidence semantics: benchmark eligibility requires both an
     ``ACCEPTED_MEASURED`` dataset and a fully verified source contract. Source-
-    bound admission also requires content-bound decision snapshots.
+    bound admission also requires content-bound decision snapshots. Optional
+    source fields become required when an audited decision actually consumes them.
     """
 
     dataset_validation = validate_service_truth_dataset(
@@ -626,7 +665,11 @@ def validate_service_truth_artifact(
         min_services=min_services,
         require_snapshot_hashes=True,
     )
-    source_contract_validation = validate_service_truth_source_contract(field_provenance)
+    conditional_source_fields = _conditionally_required_source_fields(rows)
+    source_contract_validation = validate_service_truth_source_contract(
+        field_provenance,
+        additional_required_fields=sorted(conditional_source_fields),
+    )
 
     fingerprint_payload = {
         "contract_version": CONTRACT_VERSION,
