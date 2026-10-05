@@ -210,6 +210,27 @@ def test_admission_fingerprint_is_order_stable_and_binds_source_metadata() -> No
     assert forward["artifact_admission_fingerprint_sha256"] != changed_result["artifact_admission_fingerprint_sha256"]
 
 
+def test_identity_bearing_source_metadata_is_rejected_before_benchmark_admission() -> None:
+    contract = load_contract()
+    provenance = source_contract()
+    provenance["menu"]["support"] = {
+        "email": "synthetic-menu-contact@example.invalid",
+    }
+    result = contract.validate_service_truth_artifact(
+        [measured_row(0), measured_row(1), measured_row(2)],
+        field_provenance=provenance,
+    )
+
+    assert result["dataset_validation"]["validation_status"] == "ACCEPTED_MEASURED"
+    assert result["source_contract_validation"]["source_contract_complete"] is True
+    assert result["source_contract_validation"]["source_contract_privacy_safe"] is False
+    assert result["source_contract_validation"]["source_contract_verified"] is False
+    assert result["validation_status"] == "SOURCE_CONTRACT_PRIVACY_REJECTED"
+    assert result["eligible_for_benchmark"] is False
+    assert "SOURCE_CONTRACT_PRIVACY_REJECTED" in result["reason_codes"]
+    assert "PRIVACY_FIELD_NOT_ALLOWED_EMAIL" in result["reason_codes"]
+
+
 if __name__ == "__main__":
     tests = [name for name in globals() if name.startswith("test_")]
     for name in tests:
