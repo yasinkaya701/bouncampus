@@ -86,20 +86,6 @@ def build_admitted_benchmark_report(
         name="artifact field_provenance",
     )
 
-    admission = validate_service_truth_artifact(
-        rows,
-        field_provenance=field_provenance,
-    )
-    if (
-        admission.get("validation_status") != "ACCEPTED_FOR_OFFLINE_BENCHMARK"
-        or admission.get("eligible_for_benchmark") is not True
-    ):
-        reasons = admission.get("reason_codes") or []
-        raise ValueError(
-            "service-truth artifact is not eligible for offline benchmark: "
-            + ", ".join(str(reason) for reason in reasons)
-        )
-
     if (campus_id is None) != (meal_period is None):
         raise ValueError("campus_id and meal_period must be provided together")
 
@@ -122,6 +108,23 @@ def build_admitted_benchmark_report(
     )
     if not selected_rows:
         raise ValueError("selected service-truth series is empty")
+
+    # Admission must bind the exact rows that enter the benchmark. Validating a
+    # larger multi-series container and then filtering would make the manifest
+    # checksum describe data that the benchmark did not actually evaluate.
+    admission = validate_service_truth_artifact(
+        selected_rows,
+        field_provenance=field_provenance,
+    )
+    if (
+        admission.get("validation_status") != "ACCEPTED_FOR_OFFLINE_BENCHMARK"
+        or admission.get("eligible_for_benchmark") is not True
+    ):
+        reasons = admission.get("reason_codes") or []
+        raise ValueError(
+            "selected service-truth series is not eligible for offline benchmark: "
+            + ", ".join(str(reason) for reason in reasons)
+        )
 
     benchmark_rows = [
         {
@@ -177,8 +180,8 @@ def build_admitted_benchmark_report(
         "service_ids": [str(row["service_id"]) for row in selected_rows],
     }
     report["claim_boundary"] = (
-        "This is an offline benchmark over a service-truth artifact admitted for "
-        "structural, provenance, cutoff, and canonical-content integrity checks. "
+        "This is an offline benchmark over a selected service-truth series admitted "
+        "for structural, provenance, cutoff, and canonical-content integrity checks. "
         "Admission does not prove external-source accuracy, model value, pilot "
         "readiness, operational impact, savings, or automatic-action readiness."
     )
