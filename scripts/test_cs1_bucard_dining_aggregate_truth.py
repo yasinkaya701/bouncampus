@@ -107,6 +107,17 @@ def test_identity_bearing_fields_are_rejected_recursively() -> None:
     assert "PRIVACY_FIELD_NOT_ALLOWED_CARDUID" in result["reason_codes"]
 
 
+def test_transaction_identifier_remains_privacy_rejected() -> None:
+    rows = [reconciled_row(i) for i in range(3)]
+    rows[0]["debug"] = {"transactionId": "transaction-linked-record"}
+
+    result = validate_bucard_dining_export(rows)
+
+    assert result["validation_status"] == "REJECTED"
+    assert result["privacy_safe"] is False
+    assert "PRIVACY_FIELD_NOT_ALLOWED_TRANSACTIONID" in result["reason_codes"]
+
+
 def test_non_identity_field_names_containing_card_text_are_allowed() -> None:
     rows = [reconciled_row(i) for i in range(3)]
     rows[0]["discarded_meal_count"] = 7
