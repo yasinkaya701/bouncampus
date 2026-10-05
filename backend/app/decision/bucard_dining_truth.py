@@ -25,6 +25,7 @@ _ALLOWED_COUNT_SEMANTICS = frozenset(
 )
 _ALLOWED_RECONCILIATION_STATUSES = frozenset({"UNRECONCILED", RECONCILED_STATUS})
 _ALLOWED_MAPPING_STATUSES = frozenset({"UNVERIFIED", VERIFIED_MAPPING_STATUS})
+_BUCARD_PRIVACY_FIELD_NAMES = PRIVACY_FIELD_NAMES | {"transactionid"}
 
 
 def _text(value: Any) -> str | None:
@@ -39,7 +40,7 @@ def _normalized_field_name(value: Any) -> str:
 
 
 def _privacy_fields(value: Any, *, _seen: set[int] | None = None) -> set[str]:
-    """Return identity-bearing keys via the canonical exact normalized deny set."""
+    """Return identity-bearing keys via the exact normalized deny set."""
 
     seen = _seen if _seen is not None else set()
     found: set[str] = set()
@@ -50,7 +51,7 @@ def _privacy_fields(value: Any, *, _seen: set[int] | None = None) -> set[str]:
         seen.add(object_id)
         for key, nested in value.items():
             normalized = _normalized_field_name(key)
-            if normalized in PRIVACY_FIELD_NAMES:
+            if normalized in _BUCARD_PRIVACY_FIELD_NAMES:
                 found.add(normalized)
             found.update(_privacy_fields(nested, _seen=seen))
         return found
