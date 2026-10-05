@@ -594,6 +594,79 @@ def check_food_decision_integrity(errors: list[str]) -> None:
         errors.append("food decision integrity: food API lost explicit food-waste claim boundary context")
 
 
+def check_service_truth_acquisition_readiness(errors: list[str]) -> None:
+    """Ensure the durable acquisition handoff cannot bypass canonical truth admission."""
+
+    import json
+
+    backend = ROOT / "backend"
+    if str(backend) not in sys.path:
+        sys.path.insert(0, str(backend))
+
+    try:
+        from app.decision.service_truth_acquisition import validate_service_truth_acquisition
+    except ImportError as exc:
+        errors.append(f"service truth acquisition: readiness validator import failed: {exc}")
+        return
+
+    relative_path = "KREATE/EXPERIMENTS/SERVICE_TRUTH_ACQUISITION_V1.json"
+    path = ROOT / relative_path
+    if not path.is_file():
+        errors.append(f"service truth acquisition: missing durable artifact {relative_path}")
+        return
+
+    try:
+        artifact = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"service truth acquisition: unreadable acquisition artifact: {exc}")
+        return
+
+    try:
+        result = validate_service_truth_acquisition(artifact)
+    except (TypeError, ValueError) as exc:
+        errors.append(f"service truth acquisition: readiness validation failed closed: {exc}")
+        return
+
+    if artifact.get("benchmark_eligible") is not False:
+        errors.append(
+            "service truth acquisition: benchmark_eligible must remain false before canonical admission"
+        )
+    if artifact.get("pilot_evidence_eligible") is not False:
+        errors.append(
+            "service truth acquisition: pilot_evidence_eligible must remain false before canonical admission"
+        )
+    if result.get("benchmark_eligible") is not False or result.get("pilot_evidence_eligible") is not False:
+        errors.append(
+            "service truth acquisition: readiness validation must never grant benchmark/pilot eligibility"
+        )
+
+    status = result.get("validation_status")
+    ready = result.get("ready_for_service_truth_validation")
+    if ready is True:
+        if status != "READY_FOR_SERVICE_TRUTH_VALIDATION":
+            errors.append("service truth acquisition: ready state/status mismatch")
+    elif ready is False:
+        if status != "ACQUISITION_BLOCKED":
+            errors.append("service truth acquisition: blocked state/status mismatch")
+    else:
+        errors.append("service truth acquisition: readiness must be an explicit boolean")
+
+    reasons = result.get("reason_codes")
+    reason_codes = reasons if isinstance(reasons, list) else []
+    if not artifact.get("measured_rows"):
+        if status != "ACQUISITION_BLOCKED" or "MEASURED_ROWS_REQUIRED" not in reason_codes:
+            errors.append(
+                "service truth acquisition: unmeasured acquisition must remain blocked with MEASURED_ROWS_REQUIRED"
+            )
+
+    source_result = result.get("source_contract_validation")
+    if isinstance(source_result, dict) and source_result.get("source_contract_verified") is False:
+        if status != "ACQUISITION_BLOCKED" or "SOURCE_CONTRACT_UNVERIFIED" not in reason_codes:
+            errors.append(
+                "service truth acquisition: unverified source contract must remain blocked"
+            )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -610,6 +683,7 @@ def main() -> int:
     warnings: list[str] = []
 
     check_required_files(errors)
+    check_service_truth_acquisition_readiness(errors)
     evidence = parse_evidence_registry(errors, args.submission)
     check_interview_tracker(errors, evidence, args.submission)
     check_assumptions(errors, evidence)
@@ -634,6 +708,7 @@ def main() -> int:
 
     print(f"KREATE {mode} validation PASSED")
     print("- required operating files present")
+    print("- service-truth acquisition readiness is fail-closed and cannot self-promote benchmark/pilot eligibility")
     print("- evidence IDs/types/confidence and cross-references are mechanically consistent")
     print("- 16 exact interview slots and tracker state rules are valid")
     print("- assumption and decision states are valid")
