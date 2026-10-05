@@ -119,6 +119,18 @@ def test_verified_operational_source_rejects_aggregate_granularity() -> None:
     assert "actual_served" in result["non_service_level_source_fields"]
 
 
+def test_verified_operational_source_requires_exportability_evidence() -> None:
+    contract = load_contract()
+    manifest = mark_service_level_exports(source_contract(verification_status="VERIFIED"))
+    manifest["produced_portions"]["exportability_status"] = "UNVERIFIED"
+
+    result = contract.validate_service_truth_source_contract(manifest)
+
+    assert result["source_contract_complete"] is True
+    assert result["source_contract_verified"] is False
+    assert "produced_portions" in result["unverified_exportability_source_fields"]
+
+
 def test_missing_or_incomplete_source_ownership_stays_explicit() -> None:
     contract = load_contract()
     manifest = source_contract()
