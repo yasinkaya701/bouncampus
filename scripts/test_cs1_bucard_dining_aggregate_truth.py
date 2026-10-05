@@ -107,6 +107,59 @@ def test_identity_bearing_fields_are_rejected_recursively() -> None:
     assert "PRIVACY_FIELD_NOT_ALLOWED_CARDUID" in result["reason_codes"]
 
 
+def test_canonical_identity_aliases_remain_rejected_recursively() -> None:
+    rows = [reconciled_row(i) for i in range(3)]
+    rows[0]["debug"] = {
+        "nested": {
+            "username": "operator-account",
+            "fullName": "Example Person",
+            "personName": "Example Person",
+            "passengerId": "passenger-1",
+            "campusCardId": "campus-card-1",
+            "nationalId": "national-id-1",
+            "tckn": "00000000000",
+        }
+    }
+
+    result = validate_bucard_dining_export(rows)
+
+    assert result["validation_status"] == "REJECTED"
+    assert result["privacy_safe"] is False
+    expected = {
+        "PRIVACY_FIELD_NOT_ALLOWED_USERNAME",
+        "PRIVACY_FIELD_NOT_ALLOWED_FULLNAME",
+        "PRIVACY_FIELD_NOT_ALLOWED_PERSONNAME",
+        "PRIVACY_FIELD_NOT_ALLOWED_PASSENGERID",
+        "PRIVACY_FIELD_NOT_ALLOWED_CAMPUSCARDID",
+        "PRIVACY_FIELD_NOT_ALLOWED_NATIONALID",
+        "PRIVACY_FIELD_NOT_ALLOWED_TCKN",
+    }
+    assert expected.issubset(set(result["reason_codes"]))
+
+
+def test_non_identity_field_names_containing_card_text_are_allowed() -> None:
+    rows = [reconciled_row(i) for i in range(3)]
+    rows[0]["discarded_meal_count"] = 7
+    rows[1]["aggregate_card_count"] = 91
+    result = validate_bucard_dining_export(rows)
+
+    assert result["validation_status"] == "ACCEPTED_RECONCILED_OUTCOME"
+    assert result["privacy_safe"] is True
+    assert not any(
+        code.startswith("PRIVACY_FIELD_NOT_ALLOWED_") for code in result["reason_codes"]
+    )
+
+
+def test_reconciled_projection_is_not_benchmark_admission() -> None:
+    result = validate_bucard_dining_export([reconciled_row(i) for i in range(3)])
+
+    assert result["eligible_as_actual_served"] is True
+    assert result["benchmark_eligible"] is False
+    assert "validate_service_truth_artifact" in result["claim_boundary"]
+    assert "caller-supplied" in result["claim_boundary"]
+    assert "do not prove authenticity" in result["claim_boundary"]
+
+
 def test_counts_must_be_nonnegative_integers_and_timestamp_timezone_aware() -> None:
     rows = [reconciled_row(i) for i in range(3)]
     rows[0]["count_value"] = 12.5
