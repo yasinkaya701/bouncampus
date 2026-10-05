@@ -24,6 +24,7 @@ def measured_row(day: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT
     date = f"2026-09-{day:02d}"
     menu_snapshot = f"menu:{date}"
     calendar_snapshot = "calendar:2026-fall-v1"
+    weather_snapshot = f"weather-forecast:{date}:cutoff"
     return {
         "service_id": f"NORTH-LUNCH-{date}",
         "granularity": "CAMPUS_MEAL_SERVICE",
@@ -55,12 +56,18 @@ def measured_row(day: int, *, evidence_class: str = "OFFICIAL_OPERATIONAL_EXPORT
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_PUBLIC",
             },
+            {
+                "field": "weather_forecast",
+                "snapshot_id": weather_snapshot,
+                "available_at": f"{date}T08:00:00+03:00",
+                "evidence_class": "EXTERNAL_LIVE",
+            },
         ],
         "decision_audit": {
             "method_version": "operator-status-quo-v1",
             "recommended_quantity": 108 + day,
             "operator_action": "ACCEPT_RECOMMENDATION",
-            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot, weather_snapshot],
         },
     }
 
