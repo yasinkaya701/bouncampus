@@ -35,6 +35,7 @@ def measured_row(index: int) -> dict:
     service_date = f"2026-10-{day:02d}"
     menu_snapshot = f"menu-{service_date}-lunch"
     calendar_snapshot = "calendar-2026-fall-v1"
+    weather_snapshot = f"weather-forecast-{service_date}-0700"
     menu_content = {
         "service_date": service_date,
         "meal_period": "lunch",
@@ -43,6 +44,12 @@ def measured_row(index: int) -> dict:
     calendar_content = {
         "term": "2026-fall",
         "instructional_day": True,
+    }
+    weather_content = {
+        "forecast_for": f"{service_date}T12:00:00+03:00",
+        "issued_at": f"{service_date}T07:00:00+03:00",
+        "temperature_c": 18 + index,
+        "precipitation_probability": 0.1,
     }
     return {
         "service_id": f"north-lunch-{service_date}",
@@ -77,12 +84,20 @@ def measured_row(index: int) -> dict:
                 "available_at": "2026-09-01T00:00:00+03:00",
                 "evidence_class": "OFFICIAL_SNAPSHOT",
             },
+            {
+                "field": "weather_forecast",
+                "snapshot_id": weather_snapshot,
+                "snapshot_content": weather_content,
+                "snapshot_sha256": snapshot_sha256(weather_content),
+                "available_at": f"{service_date}T07:00:00+03:00",
+                "evidence_class": "OFFICIAL_SNAPSHOT",
+            },
         ],
         "decision_audit": {
             "method_version": "operator-status-quo-v1",
             "recommended_quantity": 108 + index,
             "operator_action": "ACCEPT_RECOMMENDATION",
-            "input_snapshot_ids": [menu_snapshot, calendar_snapshot],
+            "input_snapshot_ids": [menu_snapshot, calendar_snapshot, weather_snapshot],
         },
     }
 
@@ -109,6 +124,12 @@ def source_contract() -> dict:
             "owner": "UNIVERSITY",
             "source_system": "OFFICIAL_ACADEMIC_CALENDAR",
             "availability_semantics": "MUST_EXIST_BY_DECISION_CUTOFF",
+            "verification_status": "VERIFIED",
+        },
+        "weather_forecast": {
+            "owner": "ARCHIVED_FORECAST_PROVIDER",
+            "source_system": "HISTORICAL_FORECAST_SNAPSHOT",
+            "availability_semantics": "FORECAST_MUST_HAVE_BEEN_AVAILABLE_BY_DECISION_CUTOFF",
             "verification_status": "VERIFIED",
         },
     }
