@@ -126,7 +126,7 @@ def test_decision_input_published_after_cutoff_is_rejected() -> None:
     assert "DECISION_INPUT_NOT_AVAILABLE_AT_CUTOFF" in result["reason_codes"]
 
 
-def test_required_menu_calendar_and_weather_snapshots_must_be_preknown() -> None:
+def test_required_core_snapshots_must_be_preknown_without_globally_requiring_weather() -> None:
     contract = load_contract()
     rows = valid_rows()
     rows[0]["decision_inputs"] = [
@@ -141,7 +141,7 @@ def test_required_menu_calendar_and_weather_snapshots_must_be_preknown() -> None
     assert result["validation_status"] == "REJECTED"
     assert "DECISION_INPUT_SNAPSHOT_ID_REQUIRED" in result["reason_codes"]
     assert "REQUIRED_DECISION_INPUT_MISSING_ACADEMIC_CALENDAR" in result["reason_codes"]
-    assert "REQUIRED_DECISION_INPUT_MISSING_WEATHER_FORECAST" in result["reason_codes"]
+    assert "REQUIRED_DECISION_INPUT_MISSING_WEATHER_FORECAST" not in result["reason_codes"]
 
 
 def test_reservation_count_is_required_only_when_workflow_is_active() -> None:

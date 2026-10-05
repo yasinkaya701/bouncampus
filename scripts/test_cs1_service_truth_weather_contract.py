@@ -43,7 +43,7 @@ def weather_input(row: dict) -> dict:
     )
 
 
-def test_weather_forecast_snapshot_is_required_for_dataset_admission() -> None:
+def test_weather_forecast_snapshot_is_optional_when_decision_did_not_use_it() -> None:
     module = contract()
     data = rows()
     for row in data:
@@ -53,9 +53,9 @@ def test_weather_forecast_snapshot_is_required_for_dataset_admission() -> None:
 
     result = module.validate_service_truth_dataset(data)
 
-    assert result["validation_status"] == "REJECTED"
-    assert result["eligible_for_benchmark"] is False
-    assert "REQUIRED_DECISION_INPUT_MISSING_WEATHER_FORECAST" in result["reason_codes"]
+    assert result["validation_status"] == "ACCEPTED_MEASURED"
+    assert result["eligible_for_benchmark"] is True
+    assert "REQUIRED_DECISION_INPUT_MISSING_WEATHER_FORECAST" not in result["reason_codes"]
 
 
 def test_weather_forecast_published_after_cutoff_is_rejected() -> None:
