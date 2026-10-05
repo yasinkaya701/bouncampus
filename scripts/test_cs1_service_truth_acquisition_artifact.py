@@ -83,6 +83,30 @@ def test_hardware_candidates_remain_candidates_not_accepted_truth() -> None:
     assert "TrayGate" in candidates["surplus_or_waste"]["source"]
 
 
+def test_bucard_served_count_mapping_to_actual_served_stays_fail_closed() -> None:
+    artifact = load_artifact()
+    route = artifact["data_access_routes"]["served_count_bucard"]
+    mapping = route["contract_mapping"]
+
+    assert mapping["source_field"] == "served_count"
+    assert mapping["target_field"] == "actual_served"
+    assert mapping["status"] == "SEMANTIC_MAPPING_UNVERIFIED"
+    assert "reconcil" in mapping["required_confirmation"].lower()
+    assert "must not" in mapping["admission_rule"].lower()
+    assert "actual_served" in mapping["admission_rule"]
+
+    provenance = artifact["field_provenance"]["actual_served"]
+    assert provenance["verification_status"] == "UNVERIFIED"
+    assert "UNVERIFIED" in provenance["data_access_status"]
+
+    requested_fields = {field.casefold() for field in route["minimum_requested_export_fields"]}
+    banned_fragments = ("student", "person", "card", "transaction", "email", "phone")
+    assert all(
+        not any(fragment in field for fragment in banned_fragments)
+        for field in requested_fields
+    )
+
+
 if __name__ == "__main__":
     tests = [name for name in globals() if name.startswith("test_")]
     for name in tests:
