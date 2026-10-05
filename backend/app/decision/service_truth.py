@@ -232,6 +232,9 @@ def validate_service_truth_source_contract(
     an explicitly owned source can be complete while still marked ``UNVERIFIED``.
     Optional source entries are not globally required, but any optional entry that
     is declared must satisfy the same structural contract as required entries.
+    Identity/contact-bearing metadata is rejected independently from structural
+    completeness so a complete manifest cannot become verified by hiding personal
+    data inside nested provenance fields.
     """
 
     if not isinstance(field_provenance, Mapping):
@@ -259,19 +262,26 @@ def validate_service_truth_source_contract(
     incomplete.sort()
     unverified.sort()
     source_contract_complete = not missing and not incomplete
-    source_contract_verified = source_contract_complete and not unverified
+    privacy_reason_codes = _privacy_reason_codes(field_provenance)
+    source_contract_privacy_safe = not privacy_reason_codes
+    source_contract_verified = (
+        source_contract_complete and not unverified and source_contract_privacy_safe
+    )
 
     return {
         "source_contract_complete": source_contract_complete,
+        "source_contract_privacy_safe": source_contract_privacy_safe,
         "source_contract_verified": source_contract_verified,
         "source_contract_sha256": _canonical_json_sha256(field_provenance),
         "required_source_contract_fields": sorted(REQUIRED_SOURCE_CONTRACT_FIELDS),
         "missing_source_contract_fields": missing,
         "incomplete_source_contract_fields": incomplete,
         "unverified_source_contract_fields": unverified,
+        "privacy_reason_codes": privacy_reason_codes,
         "result_scope": "SERVICE_TRUTH_SOURCE_CONTRACT_ONLY",
         "claim_boundary": (
-            "Source ownership and availability metadata do not prove measured-data "
+            "Source ownership and availability metadata must remain identity-free; "
+            "structural completeness and declared verification do not prove measured-data "
             "availability, benchmark eligibility, pilot readiness, or savings."
         ),
     }
@@ -640,6 +650,9 @@ def validate_service_truth_artifact(
 
     dataset_status = dataset_validation["validation_status"]
     source_complete = bool(source_contract_validation["source_contract_complete"])
+    source_privacy_safe = bool(
+        source_contract_validation["source_contract_privacy_safe"]
+    )
     source_verified = bool(source_contract_validation["source_contract_verified"])
     reasons: list[str] = []
 
@@ -658,6 +671,12 @@ def validate_service_truth_artifact(
         status = "SOURCE_CONTRACT_INCOMPLETE"
         eligible = False
         _append_unique(reasons, "SOURCE_CONTRACT_INCOMPLETE")
+    elif not source_privacy_safe:
+        status = "SOURCE_CONTRACT_PRIVACY_REJECTED"
+        eligible = False
+        _append_unique(reasons, "SOURCE_CONTRACT_PRIVACY_REJECTED")
+        for code in source_contract_validation.get("privacy_reason_codes", []):
+            _append_unique(reasons, str(code))
     elif not source_verified:
         status = "SOURCE_CONTRACT_UNVERIFIED"
         eligible = False
@@ -676,9 +695,9 @@ def validate_service_truth_artifact(
         "reason_codes": reasons,
         "result_scope": "SERVICE_TRUTH_ARTIFACT_ADMISSION_ONLY",
         "claim_boundary": (
-            "Artifact admission proves only structural, declared-source provenance, and "
-            "supplied-snapshot content/digest binding eligibility for offline benchmark "
-            "input; it does not prove external-source accuracy, model value, pilot "
-            "readiness, operational impact, or savings."
+            "Artifact admission proves only structural, privacy-safe declared-source "
+            "provenance and supplied-snapshot content/digest binding eligibility for "
+            "offline benchmark input; it does not prove external-source accuracy, model "
+            "value, pilot readiness, operational impact, or savings."
         ),
     }
