@@ -11,7 +11,6 @@ from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 import hashlib
 import json
-import re
 from typing import Any
 
 SERVICE_LEVEL_GRANULARITY = "CAMPUS_MEAL_SERVICE"
@@ -24,18 +23,37 @@ _ALLOWED_COUNT_SEMANTICS = frozenset(
 )
 _ALLOWED_RECONCILIATION_STATUSES = frozenset({"UNRECONCILED", RECONCILED_STATUS})
 _ALLOWED_MAPPING_STATUSES = frozenset({"UNVERIFIED", VERIFIED_MAPPING_STATUS})
-_PRIVACY_FIELD_TOKENS = frozenset(
+_FORBIDDEN_PRIVACY_FIELDS = frozenset(
     {
         "card",
+        "cardid",
+        "carduid",
+        "cardnumber",
+        "cardtoken",
         "bucard",
+        "bucardid",
+        "bucarduid",
         "student",
+        "studentid",
+        "studentnumber",
+        "studentidentity",
         "person",
+        "personid",
+        "personidentity",
         "user",
+        "userid",
         "email",
+        "emailaddress",
         "phone",
+        "phonenumber",
         "identity",
+        "identityid",
         "biometric",
+        "biometricid",
         "face",
+        "faceid",
+        "faceembedding",
+        "transactionid",
     }
 )
 
@@ -51,13 +69,6 @@ def _normalized_field_name(value: Any) -> str:
     return "".join(character for character in str(value).casefold() if character.isalnum())
 
 
-def _field_tokens(value: Any) -> tuple[str, ...]:
-    """Split snake/kebab/camel field names without substring false positives."""
-
-    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", str(value))
-    return tuple(token for token in re.split(r"[^A-Za-z0-9]+", text.casefold()) if token)
-
-
 def _privacy_fields(value: Any, *, _seen: set[int] | None = None) -> set[str]:
     seen = _seen if _seen is not None else set()
     found: set[str] = set()
@@ -68,8 +79,7 @@ def _privacy_fields(value: Any, *, _seen: set[int] | None = None) -> set[str]:
         seen.add(object_id)
         for key, nested in value.items():
             normalized = _normalized_field_name(key)
-            tokens = set(_field_tokens(key))
-            if normalized == "transactionid" or tokens.intersection(_PRIVACY_FIELD_TOKENS):
+            if normalized in _FORBIDDEN_PRIVACY_FIELDS:
                 found.add(normalized)
             found.update(_privacy_fields(nested, _seen=seen))
         return found
@@ -278,11 +288,12 @@ def validate_bucard_dining_export(
         "result_scope": "BUCARD_AGGREGATE_OUTCOME_ADMISSION_ONLY",
         "claim_boundary": (
             "Admission validates only caller-supplied aggregate structure and declared "
-            "reconciliation, mapping, and evidence labels; those labels do not prove "
-            "authenticity. Benchmark use still requires canonical "
-            "validate_service_truth_artifact admission. This adapter does not prove live "
-            "access, external-source accuracy, forecast value, operational impact, savings, "
-            "or authorization for automatic action."
+            "reconciliation, mapping, and evidence labels. Caller-supplied reconciliation, "
+            "mapping, and evidence labels do not prove authenticity. Benchmark use still "
+            "requires canonical validate_service_truth_artifact admission with a verified "
+            "source contract and content-bound source snapshots. This adapter does not prove "
+            "live access, external-source accuracy, forecast value, operational impact, "
+            "savings, or authorization for automatic action."
         ),
     }
 
