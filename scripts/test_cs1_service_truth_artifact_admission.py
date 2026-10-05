@@ -86,19 +86,114 @@ def source_contract(*, verified: bool = True) -> dict:
     }
 
 
+def artifact_manifest(contract, rows: list[dict], provenance: dict, *, artifact_id: str = "north-lunch-oct-2026-v1") -> dict:
+    return contract.build_service_truth_artifact_manifest(
+        rows,
+        field_provenance=provenance,
+        artifact_id=artifact_id,
+    )
+
+
 def test_verified_measured_artifact_is_bound_and_benchmark_eligible() -> None:
     contract = load_contract()
+    rows = [measured_row(0), measured_row(1), measured_row(2)]
+    provenance = source_contract()
+    manifest = artifact_manifest(contract, rows, provenance)
     result = contract.validate_service_truth_artifact(
-        [measured_row(0), measured_row(1), measured_row(2)],
-        field_provenance=source_contract(),
+        rows,
+        field_provenance=provenance,
+        artifact_manifest=manifest,
     )
 
     assert result["validation_status"] == "ACCEPTED_FOR_OFFLINE_BENCHMARK"
     assert result["eligible_for_benchmark"] is True
     assert result["dataset_validation"]["validation_status"] == "ACCEPTED_MEASURED"
     assert result["source_contract_validation"]["source_contract_verified"] is True
+    assert result["artifact_manifest_validation"]["manifest_verified"] is True
+    assert result["artifact_manifest_validation"]["artifact_id"] == "north-lunch-oct-2026-v1"
     assert len(result["artifact_admission_fingerprint_sha256"]) == 64
     assert result["reason_codes"] == []
+
+
+def test_missing_manifest_blocks_otherwise_valid_measured_artifact() -> None:
+    contract = load_contract()
+    result = contract.validate_service_truth_artifact(
+        [measured_row(0), measured_row(1), measured_row(2)],
+        field_provenance=source_contract(),
+    )
+
+    assert result["validation_status"] == "ARTIFACT_MANIFEST_REQUIRED"
+    assert result["eligible_for_benchmark"] is False
+    assert result["artifact_manifest_validation"]["manifest_verified"] is False
+    assert "ARTIFACT_MANIFEST_REQUIRED" in result["reason_codes"]
+
+
+def test_dataset_checksum_mismatch_fails_closed() -> None:
+    contract = load_contract()
+    rows = [measured_row(0), measured_row(1), measured_row(2)]
+    provenance = source_contract()
+    manifest = artifact_manifest(contract, rows, provenance)
+    manifest["dataset_checksum_sha256"] = "0" * 64
+    result = contract.validate_service_truth_artifact(
+        rows,
+        field_provenance=provenance,
+        artifact_manifest=manifest,
+    )
+
+    assert result["validation_status"] == "ARTIFACT_MANIFEST_MISMATCH"
+    assert result["eligible_for_benchmark"] is False
+    assert "ARTIFACT_DATASET_CHECKSUM_MISMATCH" in result["reason_codes"]
+
+
+def test_source_contract_checksum_mismatch_fails_closed() -> None:
+    contract = load_contract()
+    rows = [measured_row(0), measured_row(1), measured_row(2)]
+    provenance = source_contract()
+    manifest = artifact_manifest(contract, rows, provenance)
+    manifest["source_contract_checksum_sha256"] = "f" * 64
+    result = contract.validate_service_truth_artifact(
+        rows,
+        field_provenance=provenance,
+        artifact_manifest=manifest,
+    )
+
+    assert result["validation_status"] == "ARTIFACT_MANIFEST_MISMATCH"
+    assert result["eligible_for_benchmark"] is False
+    assert "ARTIFACT_SOURCE_CONTRACT_CHECKSUM_MISMATCH" in result["reason_codes"]
+
+
+def test_blank_artifact_id_is_invalid() -> None:
+    contract = load_contract()
+    rows = [measured_row(0), measured_row(1), measured_row(2)]
+    provenance = source_contract()
+    manifest = artifact_manifest(contract, rows, provenance)
+    manifest["artifact_id"] = "  "
+    result = contract.validate_service_truth_artifact(
+        rows,
+        field_provenance=provenance,
+        artifact_manifest=manifest,
+    )
+
+    assert result["validation_status"] == "ARTIFACT_MANIFEST_INVALID"
+    assert result["eligible_for_benchmark"] is False
+    assert "ARTIFACT_ID_REQUIRED" in result["reason_codes"]
+
+
+def test_manifest_contract_version_mismatch_fails_closed() -> None:
+    contract = load_contract()
+    rows = [measured_row(0), measured_row(1), measured_row(2)]
+    provenance = source_contract()
+    manifest = artifact_manifest(contract, rows, provenance)
+    manifest["contract_version"] = "SERVICE_TRUTH_V0"
+    result = contract.validate_service_truth_artifact(
+        rows,
+        field_provenance=provenance,
+        artifact_manifest=manifest,
+    )
+
+    assert result["validation_status"] == "ARTIFACT_MANIFEST_MISMATCH"
+    assert result["eligible_for_benchmark"] is False
+    assert "ARTIFACT_MANIFEST_CONTRACT_VERSION_MISMATCH" in result["reason_codes"]
 
 
 def test_unverified_source_contract_blocks_otherwise_valid_measured_rows() -> None:
