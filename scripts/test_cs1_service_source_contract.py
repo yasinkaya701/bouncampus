@@ -126,6 +126,21 @@ def test_optional_source_entries_are_validated_without_becoming_globally_require
     assert "weather_forecast" in rejected["incomplete_source_contract_fields"]
 
 
+def test_verified_source_contract_rejects_nested_identity_contact_metadata() -> None:
+    contract = load_contract()
+    manifest = source_contract(verification_status="VERIFIED")
+    manifest["actual_served"]["support"] = {
+        "email": "synthetic-ops-contact@example.invalid",
+    }
+
+    result = contract.validate_service_truth_source_contract(manifest)
+
+    assert result["source_contract_complete"] is True
+    assert result["source_contract_privacy_safe"] is False
+    assert result["source_contract_verified"] is False
+    assert "PRIVACY_FIELD_NOT_ALLOWED_EMAIL" in result["privacy_reason_codes"]
+
+
 if __name__ == "__main__":
     tests = [name for name in globals() if name.startswith("test_")]
     for name in tests:
