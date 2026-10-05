@@ -93,6 +93,16 @@ def _text(value: Any) -> str | None:
     return text or None
 
 
+def _sha256_hex(value: Any) -> str | None:
+    text = _text(value)
+    if text is None or len(text) != 64:
+        return None
+    normalized = text.casefold()
+    if any(character not in "0123456789abcdef" for character in normalized):
+        return None
+    return normalized
+
+
 def _normalized_field_name(value: Any) -> str:
     return "".join(character for character in str(value).casefold() if character.isalnum())
 
@@ -271,12 +281,18 @@ def validate_service_truth_dataset(
     *,
     require_measured: bool = True,
     min_services: int = 3,
+    require_snapshot_hashes: bool = False,
 ) -> dict[str, object]:
     """Validate a service-level truth artifact before benchmark admission.
 
     `require_measured=True` is the production/offline-evidence path. Generated
     rows may be validated structurally only by setting it to False, and remain
     `SANDBOX_ONLY` with `eligible_for_benchmark=False`.
+
+    `require_snapshot_hashes=True` additionally requires each decision-input
+    snapshot to carry canonical JSON-compatible ``snapshot_content`` plus its
+    SHA-256 digest. The digest is recomputed at admission and a reused snapshot
+    ID is rejected if it resolves to different canonical content.
     """
 
     if isinstance(rows, (str, bytes)) or not isinstance(rows, Sequence):
@@ -285,11 +301,14 @@ def validate_service_truth_dataset(
         raise ValueError("min_services must be a positive integer")
     if not isinstance(require_measured, bool):
         raise ValueError("require_measured must be boolean")
+    if not isinstance(require_snapshot_hashes, bool):
+        raise ValueError("require_snapshot_hashes must be boolean")
 
     reasons: list[str] = []
     row_errors: dict[str, list[str]] = {}
     parsed_rows: list[tuple[date, datetime, str]] = []
     seen_service_ids: set[str] = set()
+    snapshot_hashes_by_id: dict[str, str] = {}
     saw_sandbox = False
 
     for index, raw_row in enumerate(rows):
@@ -412,9 +431,45 @@ def validate_service_truth_dataset(
                     _append_unique(errors, "DECISION_INPUT_FIELD_REQUIRED")
                 else:
                     observed_fields.add(field)
+
                 snapshot_id = _text(source.get("snapshot_id"))
                 if snapshot_id is None:
                     _append_unique(errors, "DECISION_INPUT_SNAPSHOT_ID_REQUIRED")
+
+                raw_snapshot_hash = _text(source.get("snapshot_sha256"))
+                snapshot_hash = _sha256_hex(source.get("snapshot_sha256"))
+                snapshot_content_present = (
+                    "snapshot_content" in source and source.get("snapshot_content") is not None
+                )
+                snapshot_content_hash: str | None = None
+                if snapshot_content_present:
+                    try:
+                        snapshot_content_hash = _canonical_json_sha256(
+                            source.get("snapshot_content")
+                        )
+                    except ValueError:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_CONTENT_INVALID")
+
+                snapshot_integrity_ok = not require_snapshot_hashes
+                if require_snapshot_hashes:
+                    if not snapshot_content_present:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_CONTENT_REQUIRED")
+                    if raw_snapshot_hash is None:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_REQUIRED")
+                    elif snapshot_hash is None:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_INVALID")
+                    elif snapshot_content_hash is not None and snapshot_hash != snapshot_content_hash:
+                        _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_MISMATCH")
+                    elif snapshot_content_hash is not None and snapshot_id is not None:
+                        previous_hash = snapshot_hashes_by_id.get(snapshot_id)
+                        if previous_hash is not None and previous_hash != snapshot_hash:
+                            _append_unique(errors, "DECISION_INPUT_SNAPSHOT_HASH_CONFLICT")
+                        else:
+                            snapshot_hashes_by_id[snapshot_id] = snapshot_hash
+                            snapshot_integrity_ok = True
+                elif raw_snapshot_hash is not None and snapshot_hash is None:
+                    _append_unique(errors, "DECISION_INPUT_SNAPSHOT_SHA256_INVALID")
+
                 available_at = _aware_timestamp(source.get("available_at"))
                 if available_at is None:
                     _append_unique(errors, "DECISION_INPUT_AVAILABLE_AT_MUST_BE_TIMEZONE_AWARE")
@@ -425,6 +480,7 @@ def validate_service_truth_dataset(
                     _append_unique(errors, "UNKNOWN_DECISION_INPUT_EVIDENCE_CLASS")
                 if (
                     snapshot_id is not None
+                    and snapshot_integrity_ok
                     and available_at is not None
                     and cutoff is not None
                     and available_at <= cutoff
@@ -538,10 +594,13 @@ def validate_service_truth_dataset(
         "row_errors": row_errors,
         "required_granularity": SERVICE_LEVEL_GRANULARITY,
         "required_decision_inputs": sorted(REQUIRED_DECISION_INPUTS),
+        "snapshot_integrity_required": require_snapshot_hashes,
         "result_scope": "SERVICE_TRUTH_ADMISSION_ONLY",
         "claim_boundary": (
-            "Contract acceptance validates structure, provenance and decision-time availability; "
-            "it does not prove forecast value, operational impact, or savings."
+            "Contract acceptance validates structure, declared provenance, decision-time "
+            "availability, and (when required) the binding between supplied canonical "
+            "snapshot content and its digest; it does not prove external-source accuracy, "
+            "forecast value, operational impact, or savings."
         ),
     }
 
@@ -557,13 +616,15 @@ def validate_service_truth_artifact(
 
     This function composes the canonical dataset and source-contract validators.
     It adds no new evidence semantics: benchmark eligibility requires both an
-    ``ACCEPTED_MEASURED`` dataset and a fully verified source contract.
+    ``ACCEPTED_MEASURED`` dataset and a fully verified source contract. Source-
+    bound admission also requires content-bound decision snapshots.
     """
 
     dataset_validation = validate_service_truth_dataset(
         rows,
         require_measured=require_measured,
         min_services=min_services,
+        require_snapshot_hashes=True,
     )
     source_contract_validation = validate_service_truth_source_contract(field_provenance)
 
@@ -614,8 +675,9 @@ def validate_service_truth_artifact(
         "reason_codes": reasons,
         "result_scope": "SERVICE_TRUTH_ARTIFACT_ADMISSION_ONLY",
         "claim_boundary": (
-            "Artifact admission proves only structural and declared-source provenance "
-            "eligibility for offline benchmark input; it does not prove data accuracy, "
-            "model value, pilot readiness, operational impact, or savings."
+            "Artifact admission proves only structural, declared-source provenance, and "
+            "supplied-snapshot content/digest binding eligibility for offline benchmark "
+            "input; it does not prove external-source accuracy, model value, pilot "
+            "readiness, operational impact, or savings."
         ),
     }

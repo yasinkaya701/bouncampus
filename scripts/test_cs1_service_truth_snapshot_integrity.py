@@ -49,7 +49,6 @@ def measured_row(
     }
     calendar_content = {
         "term": "2026-fall",
-        "service_date": service_date,
         "instructional_day": True,
     }
     menu_input = {
