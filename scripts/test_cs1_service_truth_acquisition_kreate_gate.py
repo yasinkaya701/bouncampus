@@ -3,11 +3,14 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import importlib.util
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 KREATE_CHECK = ROOT / "scripts/kreate_check.py"
+ACQUISITION_PATH = ROOT / "KREATE/EXPERIMENTS/SERVICE_TRUTH_ACQUISITION_V1.json"
 
 
 def load_kreate_check():
@@ -19,13 +22,42 @@ def load_kreate_check():
     return module
 
 
-def test_kreate_check_exposes_service_truth_acquisition_readiness_gate() -> None:
+def acquisition_template() -> dict:
+    return json.loads(ACQUISITION_PATH.read_text(encoding="utf-8"))
+
+
+def test_current_blocked_acquisition_is_valid_kreate_ci_state() -> None:
     contract = load_kreate_check()
     assert hasattr(contract, "check_service_truth_acquisition_readiness")
 
     errors: list[str] = []
-    contract.check_service_truth_acquisition_readiness(errors)
+    contract.check_service_truth_acquisition_readiness(
+        errors,
+        artifact=acquisition_template(),
+    )
     assert errors == []
+
+
+def test_kreate_guard_rejects_raw_benchmark_self_promotion() -> None:
+    contract = load_kreate_check()
+    artifact = deepcopy(acquisition_template())
+    artifact["benchmark_eligible"] = True
+    errors: list[str] = []
+
+    contract.check_service_truth_acquisition_readiness(errors, artifact=artifact)
+
+    assert any("benchmark_eligible" in error for error in errors)
+
+
+def test_kreate_guard_rejects_raw_pilot_self_promotion() -> None:
+    contract = load_kreate_check()
+    artifact = deepcopy(acquisition_template())
+    artifact["pilot_evidence_eligible"] = True
+    errors: list[str] = []
+
+    contract.check_service_truth_acquisition_readiness(errors, artifact=artifact)
+
+    assert any("pilot_evidence_eligible" in error for error in errors)
 
 
 def test_kreate_main_invokes_acquisition_readiness_gate() -> None:
