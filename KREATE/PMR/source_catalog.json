@@ -2012,6 +2012,94 @@
         "reservation_source": "https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu",
         "staff_route": "https://sksd.kayseri.edu.tr/tr/akademik-personel"
       }
+    },
+    {
+      "id": "S-BU-027",
+      "title": "Tahakkuk Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch states it performs tender, direct-procurement, transfer and hakediş payments",
+        "provides a first-party payment-routing path for the hakediş package and responsible contract-payment owner"
+      ],
+      "limitations": [
+        "general hakediş-payment responsibility does not establish the food contract's payable unit, acceptance count, signatory chain, freeze/change rights or incentive allocation"
+      ]
+    },
+    {
+      "id": "S-BU-028",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/iletisim/2116",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official contact surface lists Procurement and Tahakkuk branch phone routes and the general IMID contact"
+      ],
+      "limitations": [
+        "contact information is routing evidence only"
+      ]
+    },
+    {
+      "id": "S-BU-029",
+      "title": "İhale ve Satınalma Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch is responsible for procurement and tender processes under public procurement rules",
+        "provides a first-party route for authoritative tender/specification ownership and referral"
+      ],
+      "limitations": [
+        "branch responsibility does not prove contract-specific document ownership, operational quantity authority, software-buying authority or settlement semantics"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "Control Organization performs service-work oversight under general conditions, signed contracts and technical specifications and is responsible to the relevant Spending Authority",
+        "after preliminary acceptance review, Control Organization prepares the KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant Spending Authority for hakediş preparation",
+        "2025 report identifies food-service procurement among recurring service works overseen through this acceptance process"
+      ],
+      "limitations": [
+        "does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily production freeze/change rights or shortage/excess economics",
+        "does not substitute for current IKN 2025/1727143 technical/admin specifications or an actual hakediş artifact"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot. Added S-TR-011…013 for IE second-site / reservation-counter-archetype targeting on 2026-10-06; these are secondary routing/falsifier sources, not interview evidence."
