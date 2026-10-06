@@ -1945,7 +1945,7 @@
     },
     {
       "id": "S-BU-029",
-      "title": "2026 Genel Sekreterlik — Kontrol Teşkilatı Görev Dağılımı",
+      "title": "Genel Sekreterlik 2023 Faaliyet Raporu — service acceptance/control precedent",
       "type": "OFFICIAL_UNIVERSITY",
       "publisher": "Boğaziçi University General Secretariat",
       "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/564-genel-sekreterlik-20260112-095525.pdf",
@@ -1958,11 +1958,38 @@
         "ACCEPTANCE"
       ],
       "supports": [
-        "January 2026 official assignment document explicitly covers the food-service procurement scope",
-        "names the current dining cooking/distribution control organization; Aygül Demir Yolasığmazoğlu is listed as a principal member"
+        "historical General Secretariat report documents service acceptance/control process and food-service control organization",
+        "historical report shows Control Organization members prepared Service Works Acceptance Proposal documents for service procurements"
       ],
       "limitations": [
-        "membership does not by itself prove which member owns daily quantity decisions, acceptance signatures, data systems or hakediş calculations"
+        "this is historical-process evidence and must not be treated as the current 2026 contract's exact acceptance, payment or membership record",
+        "current membership is better supported by S-BU-014; current institutional process is better supported by the 2025 administration report"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "Control Organization works under service general conditions, signed contracts and technical specifications and is responsible to the relevant spending authority",
+        "after preliminary acceptance review, Control Organization prepares KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant spending authority for hakediş preparation",
+        "2025 report states food-service procurements were performed on a monthly basis and acceptance proposal documents were prepared as services were performed",
+        "service deficiencies affecting functionality are reported to relevant authorities"
+      ],
+      "limitations": [
+        "report describes institutional acceptance/hakediş workflow but does not identify the food contract's payable count, unit-price schedule, exact spending-authority identity, daily production freeze or shortage/excess economics",
+        "it does not substitute for the current IKN 2025/1727143 technical/admin specifications or actual hakediş artifact"
       ]
     }
   ],
