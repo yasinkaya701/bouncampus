@@ -125,6 +125,38 @@ That gives a concrete next desk artifact task: obtain both predecessor and curre
 
 See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
 
+## Acceptance / hakediş workflow now narrowed
+
+The official Boğaziçi 2025 Administration Activity Report (`S-BU-030`) materially narrows the institutional workflow:
+
+1. the Control Organization supervises contracted service work under the service general conditions, signed contract and technical specification;
+2. after the contractor requests acceptance and submits the required documents, the Control Organization performs preliminary review;
+3. if acceptable, it prepares **KİK56.0/H — Hizmet İşleri Kabul Teklif Belgesi**;
+4. the proposal is submitted to the relevant **Harcama Yetkilisi** for hakediş preparation;
+5. the same report states that the 2025 food-service work was performed **monthly** and acceptance-proposal documents were prepared as services were performed.
+
+The official Tahakkuk branch (`S-BU-027`) separately states that it processes **hakediş payments**. The official Procurement branch (`S-BU-026`) is a first-party route for procurement/tender documentation.
+
+This closes the weak question “does a formal acceptance/hakediş route exist?” but leaves the economically decisive question open:
+
+> Which current food-service operational quantity — ordered, produced, delivered, served, accepted, or another reconciled quantity — becomes payable under IKN 2025/1727143, using which source artifact and unit-price item?
+
+Do not infer that answer from the generic institutional process.
+
+### Exact current EKAP acquisition route
+
+The public mirror's current-document controls resolve to the official EKAP citizen-document endpoint for IKN `2025/1727143` with stable `ihaleId`:
+
+`8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc`
+
+Resolved targets:
+
+- current tender bundle: `https://ekap.kik.gov.tr/EKAP/Ortak/VatandasIlanGoruntuleme.aspx?ddac=true&aramaDownload=true&ihaleId=8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc&wots=false&Iszylnm=false`
+- mirror-labelled “Teknik Şartname Hariç Doküman” bundle: `https://ekap.kik.gov.tr/EKAP/Ortak/VatandasIlanGoruntuleme.aspx?ddac=true&aramaDownload=true&ihaleId=8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc&wots=true&Iszylnm=false`
+- current EKAP search route: `https://ekapv2.kik.gov.tr/ekap/search/2025_1727143`
+
+This environment can resolve the redirect target but cannot fetch the official payload. Therefore the route is **VERIFIED_ROUTING**, while the specification/contract artifacts remain **RETRIEVAL_REQUIRED**. The public mirror also reports `Düzeltme İlanı: Var`; the affected clause must remain unknown until the correction/addendum artifact is retrieved.
+
 ## Do not infer settlement from the headline contract
 
 The public result is sufficient for **scope, contractor and procurement-route context**. It is not sufficient for:
