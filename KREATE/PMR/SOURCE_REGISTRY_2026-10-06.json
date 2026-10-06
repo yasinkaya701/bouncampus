@@ -1,0 +1,278 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-10-06",
+  "purpose": "Cumulative source and provenance registry for KREATE PMR preparation. Records marked NOT_PMR must never be promoted to customer interview evidence.",
+  "evidence_classes": [
+    "PUBLIC_OFFICIAL",
+    "ACADEMIC",
+    "METHOD_REFERENCE",
+    "VENDOR_CLAIM",
+    "REPO_SYNTHESIS"
+  ],
+  "sources": [
+    {
+      "id": "SRC-METHOD-DE-PMR-2019",
+      "title": "Disciplined Entrepreneurship — Primary Market Research",
+      "publisher": "Disciplined Entrepreneurship",
+      "url": "https://www.d-eship.com/wp-content/uploads/2019/03/Disciplined_Entrepreneurship_-_Primary_Market_Research.pdf",
+      "source_type": "pdf",
+      "evidence_class": "METHOD_REFERENCE",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "PMR method",
+        "direct customer interaction",
+        "qualitative-first learning",
+        "hypothesis testing",
+        "interview and observation guidance"
+      ],
+      "caveat": "Method reference only; it does not validate the BOUNCAMPUS problem or customer."
+    },
+    {
+      "id": "SRC-METHOD-DE-STEP1A",
+      "title": "Primary Market Research — Step 1A",
+      "publisher": "Disciplined Entrepreneurship",
+      "url": "https://www.d-eship.com/step1a/",
+      "source_type": "web",
+      "evidence_class": "METHOD_REFERENCE",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "ongoing PMR practice",
+        "interview resources",
+        "worksheets"
+      ],
+      "caveat": "Method reference only."
+    },
+    {
+      "id": "SRC-METHOD-MIT-ORBIT-PMR",
+      "title": "What is primary market research?",
+      "publisher": "MIT Orbit",
+      "url": "https://orbit-kb.mit.edu/hc/en-us/articles/204891786-What-is-primary-market-research/",
+      "source_type": "web",
+      "evidence_class": "METHOD_REFERENCE",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "distinguish primary from secondary research",
+        "interviews",
+        "focus groups",
+        "field tests",
+        "observation"
+      ],
+      "caveat": "Method reference only."
+    },
+    {
+      "id": "SRC-BOUN-FOODWASTE-2025",
+      "title": "2.2.1 Campus food waste tracking",
+      "publisher": "Boğaziçi University — Kurumsal Veri / SDG",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "source_type": "web",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "2025 monthly food-waste public series",
+        "annual food-waste total",
+        "ISTAÇ and waste-oil totals",
+        "dining population and service context",
+        "dining-hall capacity table",
+        "official media links"
+      ],
+      "key_facts": {
+        "reported_2025_total_food_waste_kg": 48251,
+        "reported_2025_delivered_to_istac_kg": 33430,
+        "reported_2025_waste_oil_kg": 6305,
+        "approx_students": 13000,
+        "approx_staff": 2000,
+        "listed_total_dining_capacity": 1734
+      },
+      "known_conflicts": [
+        "August row reports total food waste 1502 kg while delivered to ISTAC is 3550 kg.",
+        "October row reports total food waste 1334 kg while delivered to ISTAC is 4850 kg."
+      ],
+      "caveat": "Public reporting does not establish causal waste stage, forecast-error causality, service-level semantics, or customer validation.",
+      "asset_urls": [
+        "https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png",
+        "https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155358.png",
+        "https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155428.png",
+        "https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155707.png"
+      ]
+    },
+    {
+      "id": "SRC-BOUN-FOODWASTE-2025-XLSX",
+      "title": "2025 Yılı Atık Bilgisi — raw spreadsheet linked by official page",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx",
+      "source_type": "xlsx",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "raw public waste-data artifact",
+        "future semantic reconciliation and checksum capture"
+      ],
+      "caveat": "Linked as a raw artifact. Column semantics must be verified with the source owner before use as pilot truth."
+    },
+    {
+      "id": "SRC-BOUN-FOODWASTE-2024",
+      "title": "2.2.1 Campus food waste tracking — earlier SDG site",
+      "publisher": "Boğaziçi University — Sustainable Development Goals",
+      "url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+      "source_type": "web",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "2024 annual public food-waste totals",
+        "historical comparison"
+      ],
+      "key_facts": {
+        "reported_2024_total_food_waste_kg": 50993,
+        "reported_2024_delivered_to_istac_kg": 29776,
+        "reported_2024_waste_oil_kg": 5710
+      },
+      "caveat": "Historical public reporting; do not assume definitions are identical across years without data-owner confirmation."
+    },
+    {
+      "id": "SRC-BOUN-SUSTAINABLE-FOOD",
+      "title": "2.3.3 Sustainable food choices on campus",
+      "publisher": "Boğaziçi University — Kurumsal Veri / SDG",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/233-sustainable-food-choices-on-campus/1313",
+      "source_type": "web",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "food-service process context",
+        "central kitchen and sustainable-food context",
+        "menu/portion context"
+      ],
+      "caveat": "Public operating description; current decision ownership and freeze time still require PMR."
+    },
+    {
+      "id": "SRC-BOUN-MENU-SURVEY",
+      "title": "Menu Anketi",
+      "publisher": "Boğaziçi University Dining",
+      "url": "https://yemekhane.bogazici.edu.tr/menu-anketi",
+      "source_type": "web",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "public evidence that an authenticated menu-preference signal exists",
+        "candidate pre-service context signal"
+      ],
+      "caveat": "Menu preference is not equivalent to reservation, served demand, payment, or production quantity."
+    },
+    {
+      "id": "SRC-BOUN-MENU-OCT2026",
+      "title": "Boğaziçi Dining monthly menu",
+      "publisher": "Boğaziçi University Dining",
+      "url": "https://yemekhane.bogazici.edu.tr/aylik-menu",
+      "source_type": "web",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "meal/menu context",
+        "candidate calendar and menu feature vocabulary"
+      ],
+      "caveat": "The page is dynamic by month. A published menu does not prove production quantity or actual consumption."
+    },
+    {
+      "id": "SRC-BOUN-DINING-CONTROL",
+      "title": "Üniversite Yönetim Kurulu Kurul ve Komisyonları — Yemekhane, Yemek Pişirme ve Yemek Dağıtım Kontrol Teşkilatı",
+      "publisher": "Boğaziçi University",
+      "url": "https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246",
+      "source_type": "web",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "governance/control-role discovery",
+        "PMR target-role mapping"
+      ],
+      "caveat": "Committee membership does not by itself establish daily quantity authority, data ownership, procurement authority, or pilot approval rights."
+    },
+    {
+      "id": "SRC-BOUN-SDG2-2024-PDF",
+      "title": "Boğaziçi University SDG 2 publication",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf",
+      "source_type": "pdf",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "official sustainability and food-system background",
+        "archivable PDF reference"
+      ],
+      "caveat": "Institutional report; verify year/metric semantics before comparing with current operations."
+    },
+    {
+      "id": "SRC-UNEP-FWI-2024",
+      "title": "Food Waste Index Report 2024",
+      "publisher": "United Nations Environment Programme",
+      "url": "https://wedocs.unep.org/items/dbe2cd4c-8384-4636-8359-5847f42b9711",
+      "pdf_url": "https://wedocs.unep.org/bitstream/handle/20.500.11822/45230/food_waste_index_report_2024.pdf",
+      "source_type": "report",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "food-waste measurement framework",
+        "food-service measurement guidance",
+        "reporting boundary discipline"
+      ],
+      "caveat": "Global measurement guidance, not a local Boğaziçi causal or impact estimate."
+    },
+    {
+      "id": "SRC-FLW-STANDARD",
+      "title": "Food Loss and Waste Accounting and Reporting Standard",
+      "publisher": "Food Loss and Waste Protocol",
+      "url": "https://flwprotocol.org/flw-standard/",
+      "source_type": "standard",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "measurement scope",
+        "quantification",
+        "reporting discipline",
+        "pilot measurement design"
+      ],
+      "caveat": "Standard/framework reference; local operational semantics still require source-owner confirmation."
+    },
+    {
+      "id": "SRC-FLW-OVERVIEW-PDF",
+      "title": "FLW Standard Overview",
+      "publisher": "Food Loss and Waste Protocol",
+      "url": "https://flwprotocol.org/wp-content/uploads/2016/12/FLW-Standard_Overview_December-2016.pdf",
+      "source_type": "pdf",
+      "evidence_class": "PUBLIC_OFFICIAL",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "portable overview of FLW accounting/reporting concepts"
+      ],
+      "caveat": "Overview document; use the current standard/tools for implementation details."
+    },
+    {
+      "id": "SRC-ACADEMIC-TURKER-2025",
+      "title": "Reducing Food Waste in Campus Dining: A Data-Driven Approach to Demand Prediction and Sustainability",
+      "publisher": "Sustainability (MDPI)",
+      "url": "https://doi.org/10.3390/su17020379",
+      "source_type": "academic_article",
+      "evidence_class": "ACADEMIC",
+      "pmr_status": "NOT_PMR",
+      "retrieved_at": "2026-10-06",
+      "use": [
+        "external campus-dining benchmark",
+        "candidate demand/context variables",
+        "measurement and modeling inspiration"
+      ],
+      "caveat": "External study. Do not transfer its data availability, model performance, causal mechanism, or impact magnitude to Boğaziçi."
+    }
+  ]
+}
