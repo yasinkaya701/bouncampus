@@ -199,10 +199,10 @@ These are **interview-routing evidence**, not proof that any named public role o
 Current first-party university evidence now narrows the institutional chain without resolving the economic/quantity semantics:
 
 - `S-BU-026` (Yemek Hizmeti Yürütme Kurulu Yönergesi): Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Muayene Kabul Komisyonu; Article 7 places dining BUCard operation/reporting/data retention with the BUCard Office/BİDB; Article 9 routes meal-service procurement through SKS + İMİD.
-- `S-BU-027`: the official İhale ve Satınalma unit is the first-party procurement/tender route.
-- `S-BU-028`: the official Tahakkuk unit explicitly lists tender, direct-procurement, transfer and hakediş payments.
-- `S-BU-029`: the official İMİD contact surface provides fallback institutional routing.
-- `S-BU-030` (2025 Administration Activity Report): the Control Organization works under the signed contract/technical specification, performs preliminary acceptance, prepares KİK56.0/H when service is acceptable, and submits it to the relevant Spending Authority for hakediş preparation; the report explicitly includes food-service procurement in this recurring service-control surface.
+- `S-BU-028`: the official İhale ve Satınalma unit is the first-party procurement/tender route.
+- `S-BU-029`: the official Tahakkuk unit explicitly lists tender, direct-procurement, transfer and hakediş payments.
+- `S-BU-030`: the official İMİD contact surface provides fallback institutional routing.
+- `S-BU-031` (2025 Administration Activity Report): the Control Organization works under the signed contract/technical specification, performs preliminary acceptance, prepares KİK56.0/H when service is acceptable, and submits it to the relevant Spending Authority for hakediş preparation; the report explicitly includes food-service procurement in this recurring service-control surface.
 
 This materially narrows **who to ask**, not **what the contract pays for**. Still unresolved for IKN `2025/1727143`:
 
