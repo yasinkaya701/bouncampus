@@ -1,0 +1,960 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-06",
+  "evidence_firewall": "Secondary/public research informs PMR but is not PMR/customer validation.",
+  "source_types": [
+    "PMR_METHOD",
+    "OFFICIAL_UNIVERSITY",
+    "STANDARD",
+    "ACADEMIC",
+    "VENDOR",
+    "INTERNAL_PROVENANCE"
+  ],
+  "sources": [
+    {
+      "id": "S-PMR-001",
+      "title": "Disciplined Entrepreneurship - Primary Market Research",
+      "type": "PMR_METHOD",
+      "publisher": "Disciplined Entrepreneurship",
+      "url": "https://www.d-eship.com/wp-content/uploads/2019/03/Disciplined_Entrepreneurship_-_Primary_Market_Research.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "license_note": "publicly accessible; repository redistribution terms not established",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "direct-customer-interaction definition",
+        "secondary-vs-primary evidence firewall"
+      ],
+      "limitations": [
+        "does not validate BOUNCAMPUS claims"
+      ]
+    },
+    {
+      "id": "S-PMR-002",
+      "title": "Primary Market Research step",
+      "type": "PMR_METHOD",
+      "publisher": "Disciplined Entrepreneurship",
+      "url": "https://www.d-eship.com/steps/primary-market-research/",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "customer-discovery workflow"
+      ],
+      "limitations": [
+        "method only"
+      ]
+    },
+    {
+      "id": "S-PMR-003",
+      "title": "Primary Market Research",
+      "type": "PMR_METHOD",
+      "publisher": "MIT Trust Center for MIT Entrepreneurship",
+      "url": "https://entrepreneurship.mit.edu/primary-market-research/",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "direct customer learning before solution commitment"
+      ],
+      "limitations": [
+        "method only"
+      ]
+    },
+    {
+      "id": "S-BU-001",
+      "title": "SKS 2025 Activity Report",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University SKS",
+      "url": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H5"
+      ],
+      "supports": [
+        "dining scale and governance context"
+      ],
+      "limitations": [
+        "not service-level labels",
+        "does not identify quantity owner/freeze point"
+      ]
+    },
+    {
+      "id": "S-BU-002",
+      "title": "Campus Food Waste Tracking",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "public aggregate food-waste context"
+      ],
+      "limitations": [
+        "does not establish waste stage or causal mechanism"
+      ]
+    },
+    {
+      "id": "S-BU-003",
+      "title": "Healthy and Affordable Food Choices",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/234-healthy-and-affordable-food-choices/1314",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H4"
+      ],
+      "supports": [
+        "central-kitchen and advance planning context"
+      ],
+      "limitations": [
+        "does not identify actual production decision owner"
+      ]
+    },
+    {
+      "id": "S-BU-004",
+      "title": "Official Dining Menu",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Dining Services",
+      "url": "https://yemekhane.bogazici.edu.tr/",
+      "related_url": "https://yemekhane.bogazici.edu.tr/aylik-menu",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "decision-time menu context candidate"
+      ],
+      "limitations": [
+        "current page is not immutable historical snapshot"
+      ]
+    },
+    {
+      "id": "S-BU-005",
+      "title": "Academic Calendar",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://akademiktakvim.bogazici.edu.tr/",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "known-ahead academic context candidate"
+      ],
+      "limitations": [
+        "must preserve decision-time snapshot semantics"
+      ]
+    },
+    {
+      "id": "S-BU-006",
+      "title": "Kilyos reservation notice - May 2026",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Dining Services",
+      "url": "https://yemekhane.bogazici.edu.tr/node/493",
+      "published_at": "2026-05-20",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "specific-period reservation workflow precedent"
+      ],
+      "limitations": [
+        "must not be generalized to all services/campuses"
+      ]
+    },
+    {
+      "id": "S-TR-001",
+      "title": "Gebze Technical University Dining Services",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Gebze Technical University",
+      "url": "https://www.gtu.edu.tr/kategori/5904/0/display.aspx",
+      "updated_at": "2026-09-10",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H6"
+      ],
+      "supports": [
+        "historical consumption/user-count planning",
+        "unexpected demand and replenishment mechanism"
+      ],
+      "limitations": [
+        "not Boğaziçi evidence",
+        "does not prove WTP"
+      ]
+    },
+    {
+      "id": "S-TR-002",
+      "title": "ITU cafeteria food-waste prevention and production planning",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Istanbul Technical University",
+      "url": "https://sustainability.itu.edu.tr/tr/itu-kafeteryalari-ve-yemek-hizmetleri-gida-israfini-onlemeye-yonelik-ozel-programlar-saglamaktadir",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H3",
+        "H6"
+      ],
+      "supports": [
+        "calendar/course/exam/menu/weather/history used in planning",
+        "contingency preparation"
+      ],
+      "limitations": [
+        "not Boğaziçi workflow evidence"
+      ]
+    },
+    {
+      "id": "S-TR-003",
+      "title": "ITU Food Services",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Istanbul Technical University SKS",
+      "url": "https://www.sks.itu.edu.tr/hizmetlerimiz/beslenme-hizmetleri",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "H5"
+      ],
+      "supports": [
+        "service topology",
+        "electronic-card/automation context"
+      ],
+      "limitations": [
+        "role topology does not identify exact quantity decision owner"
+      ]
+    },
+    {
+      "id": "S-TR-004",
+      "title": "ITU Dining Reservation System Guide",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Istanbul Technical University",
+      "url": "https://sksv2.mozaik-test.itu.edu.tr/docs/librariesprovider73/default-document-library/it%C3%BC-say-sistemi-kullan%C4%B1m-detaylar%C4%B1.pdf?sfvrsn=0",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "reservation workflow precedent"
+      ],
+      "limitations": [
+        "recheck current availability and semantics before external publication"
+      ]
+    },
+    {
+      "id": "S-MEAS-001",
+      "title": "Food Waste Index Report 2024",
+      "type": "STANDARD",
+      "publisher": "UNEP",
+      "url": "https://www.unep.org/resources/publication/food-waste-index-report-2024",
+      "pdf_url": "https://wedocs.unep.org/bitstream/handle/20.500.11822/45230/food_waste_index_report_2024.pdf",
+      "published_at": "2024",
+      "accessed_at": "2026-10-06",
+      "authority": "international_methodology",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "food-service measurement methods",
+        "scope/comparability discipline"
+      ],
+      "limitations": [
+        "not local effect evidence"
+      ]
+    },
+    {
+      "id": "S-MEAS-002",
+      "title": "Food Loss and Waste Accounting and Reporting Standard",
+      "type": "STANDARD",
+      "publisher": "FLW Protocol / WRI",
+      "url": "https://flwprotocol.org/flw-standard/",
+      "pdf_url": "https://flwprotocol.org/wp-content/uploads/2017/05/FLW_Standard_final_2016.pdf",
+      "published_at": "2016",
+      "accessed_at": "2026-10-06",
+      "authority": "international_standard",
+      "license_note": "Creative Commons indicated by WRI; preserve exact attribution/license",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "scope/inventory/reporting boundaries"
+      ],
+      "limitations": [
+        "not local causality or product validation"
+      ]
+    },
+    {
+      "id": "S-MEAS-003",
+      "title": "Wasted Food Scale",
+      "type": "STANDARD",
+      "publisher": "US EPA",
+      "url": "https://www.epa.gov/sustainable-management-food/wasted-food-scale",
+      "asset_url": "https://www.epa.gov/sustainable-management-food/wasted-food-scale-graphics",
+      "accessed_at": "2026-10-06",
+      "authority": "government_guidance",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "prevention/source-reduction hierarchy"
+      ],
+      "limitations": [
+        "does not establish intervention effectiveness"
+      ]
+    },
+    {
+      "id": "S-ACAD-001",
+      "title": "Yemekhane için Yapay Zeka Teknikleri Kullanımı ile Günlük Talep Tahmini",
+      "type": "ACADEMIC",
+      "publisher": "European Journal of Science and Technology / Dergipark",
+      "url": "https://dergipark.org.tr/tr/pub/ejosat/article/397549",
+      "published_at": "2018",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "university cafeteria ML demand forecasting precedent"
+      ],
+      "limitations": [
+        "not local benchmark or PMR"
+      ]
+    },
+    {
+      "id": "S-ACAD-002",
+      "title": "Machine Learning Techniques for Cafeteria Demand Forecasting: An Institutional Case",
+      "type": "ACADEMIC",
+      "publisher": "OPUS Journal of Society Research / Dergipark",
+      "url": "https://dergipark.org.tr/en/pub/opusjsr/article/1649256",
+      "published_at": "2025",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H4",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "turnstile data as institutional demand signal class"
+      ],
+      "limitations": [
+        "does not establish Boğaziçi access/semantics"
+      ]
+    },
+    {
+      "id": "S-ACAD-003",
+      "title": "Demand Forecasting for Food Production Using Machine Learning Algorithms: A Case Study of University Refectory",
+      "type": "ACADEMIC",
+      "publisher": "Technical Gazette",
+      "url": "https://hrcak.srce.hr/en/clanak/446387",
+      "doi": "10.17559/TV-20230117000232",
+      "published_at": "2023",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "calendar/menu-aware forecasting precedent"
+      ],
+      "limitations": [
+        "not local decision utility"
+      ]
+    },
+    {
+      "id": "S-ACAD-004",
+      "title": "Preventing food waste in subsidy-based university dining systems: An optimization approach",
+      "type": "ACADEMIC",
+      "publisher": "Waste Management & Research",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/33971773/",
+      "pdf_url": "https://ris.utwente.nl/ws/files/266946365/Faezirad_2021_Preventing_food_waste_in_subsidy_ba.pdf",
+      "doi": "10.1177/0734242X211017974",
+      "published_at": "2021",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H3",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "waste-vs-shortage asymmetric decision framing"
+      ],
+      "limitations": [
+        "local cost/penalty weights must be discovered"
+      ]
+    },
+    {
+      "id": "S-ACAD-005",
+      "title": "Reducing Food Waste in Campus Dining: A Data-Driven Approach",
+      "type": "ACADEMIC",
+      "publisher": "Sustainability / MDPI",
+      "url": "https://www.mdpi.com/2071-1050/17/2/379",
+      "pdf_url": "https://www.mdpi.com/2071-1050/17/2/379/pdf",
+      "doi": "10.3390/su17020379",
+      "published_at": "2025",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "license_note": "CC BY; attribution required",
+      "hypotheses": [
+        "H2",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "context-feature research benchmark"
+      ],
+      "limitations": [
+        "do not transfer reported performance/effect to Boğaziçi"
+      ]
+    },
+    {
+      "id": "S-ACAD-006",
+      "title": "Meal demand prediction study using historical consumption, holidays and menu/context",
+      "type": "ACADEMIC",
+      "publisher": "SBSI 2026",
+      "url": "https://doi.org/10.5753/sbsi.2026.248351",
+      "published_at": "2026",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_conference",
+      "hypotheses": [
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "recent demand-prediction feature precedent"
+      ],
+      "limitations": [
+        "method precedent only"
+      ]
+    },
+    {
+      "id": "S-COMP-001",
+      "title": "Winnow platform",
+      "type": "VENDOR",
+      "publisher": "Winnow",
+      "url": "https://www.winnowsolutions.com/",
+      "accessed_at": "2026-10-06",
+      "authority": "vendor_first_party",
+      "hypotheses": [
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "current vendor capability claims"
+      ],
+      "limitations": [
+        "outcomes/capabilities are vendor claims unless independently verified"
+      ]
+    },
+    {
+      "id": "S-COMP-002",
+      "title": "Introducing Winnow Foresight",
+      "type": "VENDOR",
+      "publisher": "Winnow",
+      "url": "https://www.winnowsolutions.com/resources/news/introducing-winnow-foresight-a-new-way-to-prevent-food-waste-and-improve-guest-satisfaction-with-ai-powered-forecasting",
+      "published_at": "2026-09-28",
+      "accessed_at": "2026-10-06",
+      "authority": "vendor_first_party",
+      "hypotheses": [
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "generic AI kitchen-demand/production forecasting novelty is unsafe"
+      ],
+      "limitations": [
+        "does not establish Turkish university fit"
+      ]
+    },
+    {
+      "id": "S-COMP-003",
+      "title": "Leanpath College & University / Food Waste Tracking",
+      "type": "VENDOR",
+      "publisher": "Leanpath",
+      "url": "https://www.leanpath.com/industries/college-university/",
+      "related_url": "https://www.leanpath.com/products/food-waste-tracking/",
+      "accessed_at": "2026-10-06",
+      "authority": "vendor_first_party",
+      "hypotheses": [
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "mature university food-waste tracking/feedback alternative"
+      ],
+      "limitations": [
+        "vendor claims; exact parity requires verification"
+      ]
+    },
+    {
+      "id": "S-COMP-004",
+      "title": "Emissary Campus",
+      "type": "VENDOR",
+      "publisher": "Emissary",
+      "url": "https://emissary.com.tr/tr/cozumler/emissary-campus",
+      "accessed_at": "2026-10-06",
+      "authority": "vendor_first_party",
+      "hypotheses": [
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "broad campus sustainability/evidence platform novelty is unsafe"
+      ],
+      "limitations": [
+        "does not prove food-production control-point parity"
+      ]
+    },
+    {
+      "id": "S-INT-001",
+      "title": "PR #213 - deepen PMR, market and evidence red-team",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "BOUNCAMPUS repo",
+      "url": "https://github.com/yasinkaya701/bouncampus/pull/213",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_merged_provenance",
+      "hypotheses": [
+        "ALL"
+      ],
+      "supports": [
+        "current-master research lineage"
+      ],
+      "limitations": [
+        "internal synthesis is not external authority"
+      ]
+    },
+    {
+      "id": "S-INT-002",
+      "title": "Boğaziçi PMR target-map stale agent branch",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "BOUNCAMPUS repo",
+      "url": "https://github.com/yasinkaya701/bouncampus/tree/agent/campus-data-geo/bogazici-pmr-target-map",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_stale_branch",
+      "hypotheses": [
+        "H1",
+        "H4",
+        "H5"
+      ],
+      "supports": [
+        "target/source discovery backlog"
+      ],
+      "limitations": [
+        "materially stale; do not merge wholesale"
+      ]
+    },
+    {
+      "id": "S-INT-003",
+      "title": "Deep PMR/market stale research branch",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "BOUNCAMPUS repo",
+      "url": "https://github.com/yasinkaya701/bouncampus/tree/research/kreate-deep-pmr-market-20261004",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_stale_branch",
+      "hypotheses": [
+        "ALL"
+      ],
+      "supports": [
+        "large additive research backlog"
+      ],
+      "limitations": [
+        "materially stale; selectively salvage source-level facts only"
+      ]
+    },
+    {
+      "id": "S-PMR-004",
+      "title": "What is primary market research?",
+      "type": "PMR_METHOD",
+      "publisher": "MIT Orbit",
+      "url": "https://orbit-kb.mit.edu/hc/en-us/articles/204891786-What-is-primary-market-research/",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "verification_status": "inherited_from_master_snapshot",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "primary-vs-secondary research distinction"
+      ],
+      "limitations": [
+        "method only"
+      ]
+    },
+    {
+      "id": "S-BU-007",
+      "title": "2025 Yılı Atık Bilgisi - raw workbook",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx",
+      "asset_type": "xlsx",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "raw public waste-data artifact"
+      ],
+      "limitations": [
+        "field semantics require source-owner reconciliation before operational use"
+      ]
+    },
+    {
+      "id": "S-BU-008",
+      "title": "Boğaziçi Impact - Campus Food Waste Tracking 2024",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+      "related_url": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_and_agent_snapshot",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "2024 aggregate monthly/historical context"
+      ],
+      "limitations": [
+        "definitions may differ by year; not service-level truth"
+      ]
+    },
+    {
+      "id": "S-BU-009",
+      "title": "Sustainable food choices on campus",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/233-sustainable-food-choices-on-campus/1313",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H1",
+        "H4"
+      ],
+      "supports": [
+        "food-service and sustainability operating context"
+      ],
+      "limitations": [
+        "does not identify quantity owner or freeze point"
+      ]
+    },
+    {
+      "id": "S-BU-010",
+      "title": "Boğaziçi Dining Menu Survey",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Dining",
+      "url": "https://yemekhane.bogazici.edu.tr/menu-anketi",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "public evidence of a menu-preference signal class"
+      ],
+      "limitations": [
+        "preference is not reservation, served demand or production quantity"
+      ]
+    },
+    {
+      "id": "S-BU-011",
+      "title": "Dining cooking and distribution control organization",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H5"
+      ],
+      "supports": [
+        "governance/control-role discovery"
+      ],
+      "limitations": [
+        "membership does not establish daily quantity authority or procurement rights"
+      ]
+    },
+    {
+      "id": "S-BU-012",
+      "title": "Boğaziçi SDG 2 publication",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "archivable institutional food/sustainability background"
+      ],
+      "limitations": [
+        "verify year/metric semantics before comparisons"
+      ]
+    },
+    {
+      "id": "S-MEAS-004",
+      "title": "FLW Standard Overview",
+      "type": "STANDARD",
+      "publisher": "Food Loss and Waste Protocol",
+      "url": "https://flwprotocol.org/wp-content/uploads/2016/12/FLW-Standard_Overview_December-2016.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "international_standard",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "portable overview of FLW measurement concepts"
+      ],
+      "limitations": [
+        "overview; use full standard for implementation"
+      ]
+    },
+    {
+      "id": "S-MEAS-005",
+      "title": "Otel, Restoran ve Diğer Toplu Tüketim Yerlerinde Gıda İsrafı ile Mücadele Kılavuzu",
+      "type": "STANDARD",
+      "publisher": "T.C. Tarım ve Orman Bakanlığı / FAO / partners",
+      "url": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "government_guidance",
+      "verification_status": "web_verified_2026-10-06",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "Türkiye food-service waste-prevention context"
+      ],
+      "limitations": [
+        "guidance is not local PMR or measured impact"
+      ]
+    },
+    {
+      "id": "S-MEAS-006",
+      "title": "Sıfır Atık Yönetmeliği official announcement",
+      "type": "STANDARD",
+      "publisher": "T.C. Ministry of Environment",
+      "url": "https://cygm.csb.gov.tr/sifir-atik-yonetmeligi-resmi-gazetede-yayimlanarak-yururluge-girmistir.-duyuru-383053",
+      "accessed_at": "2026-10-06",
+      "authority": "government_official",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "Türkiye zero-waste regulatory context"
+      ],
+      "limitations": [
+        "not legal advice; verify current consolidated regulation before compliance claims"
+      ]
+    },
+    {
+      "id": "S-MEAS-007",
+      "title": "Hospitality and Food Service guidance",
+      "type": "STANDARD",
+      "publisher": "WRAP",
+      "url": "https://www.wrap.ngo/resources/guide/hospitality-and-food-service",
+      "accessed_at": "2026-10-06",
+      "authority": "sector_guidance",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "food-service prevention and measurement practice"
+      ],
+      "limitations": [
+        "UK-sector guidance, not local regulation or PMR"
+      ]
+    },
+    {
+      "id": "S-ACAD-007",
+      "title": "Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste",
+      "type": "ACADEMIC",
+      "publisher": "Journal of Cleaner Production",
+      "url": "https://doi.org/10.1016/j.jclepro.2023.140265",
+      "published_at": "2024-01-05",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "license_note": "search metadata indicates CC BY-NC-ND 4.0; verify article version before redistribution",
+      "hypotheses": [
+        "MODEL_METHOD",
+        "H3"
+      ],
+      "supports": [
+        "multi-year catering demand forecasting benchmark",
+        "comparison with operator estimates"
+      ],
+      "limitations": [
+        "external results must not be transferred to Boğaziçi"
+      ]
+    },
+    {
+      "id": "S-ACAD-008",
+      "title": "Food waste reduction and its environmental consequences: a quasi-experimental study in a campus canteen",
+      "type": "ACADEMIC",
+      "publisher": "Agriculture & Food Security",
+      "url": "https://doi.org/10.1186/s40066-024-00488-y",
+      "published_at": "2024-09-10",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "license_note": "CC BY 4.0 unless figure credit states otherwise",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "direct weighing precedent",
+        "alternative waste causes such as quality/taste/portion/menu"
+      ],
+      "limitations": [
+        "external intervention outcome; not Boğaziçi effect"
+      ]
+    },
+    {
+      "id": "S-ACAD-009",
+      "title": "Food waste management: an example from university refectory",
+      "type": "ACADEMIC",
+      "publisher": "British Food Journal",
+      "url": "https://doi.org/10.1108/BFJ-09-2020-0802",
+      "published_at": "2022",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "license_note": "publisher page indicates licensed re-use rights only",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "plate-waste and qualitative-interview evidence in a Turkish university refectory"
+      ],
+      "limitations": [
+        "plate waste is not production surplus; reuse restricted"
+      ]
+    },
+    {
+      "id": "S-ACAD-010",
+      "title": "Determination of the Amount of Food Waste and Improving Meals to Reduce Food Waste in the University Refectory",
+      "type": "ACADEMIC",
+      "publisher": "Aydın Gastronomy / Dergipark",
+      "url": "https://dergipark.org.tr/tr/pub/aydingas/article/1503134",
+      "published_at": "2025-01-16",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "menu quality/awareness as alternative food-waste intervention mechanisms"
+      ],
+      "limitations": [
+        "does not validate production-forecasting causality"
+      ]
+    },
+    {
+      "id": "S-TR-005",
+      "title": "İTÜ Kart - Dining Application",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Istanbul Technical University",
+      "url": "https://kim.itu.edu.tr/itukart/yemekhane-uygulamasi",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "electronic dining access/payment signal class"
+      ],
+      "limitations": [
+        "does not establish Boğaziçi access or exact semantics"
+      ]
+    },
+    {
+      "id": "S-COMP-005",
+      "title": "Winnow - Universities",
+      "type": "VENDOR",
+      "publisher": "Winnow",
+      "url": "https://www.winnowsolutions.com/industries/universities",
+      "accessed_at": "2026-10-06",
+      "authority": "vendor_first_party",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "university vertical capability claim"
+      ],
+      "limitations": [
+        "vendor claim"
+      ]
+    },
+    {
+      "id": "S-COMP-006",
+      "title": "Leanpath - University of Nebraska case study",
+      "type": "VENDOR",
+      "publisher": "Leanpath",
+      "url": "https://www.leanpath.com/case-study-u-of-nebraska/",
+      "accessed_at": "2026-10-06",
+      "authority": "vendor_first_party",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "university case-study capability/outcome claim"
+      ],
+      "limitations": [
+        "vendor case study; not independent evidence"
+      ]
+    }
+  ],
+  "reconciliation_note": "Canonical S-* registry reconciles current-master dated snapshots, IE role catalog, and unique sources from parallel PMR agents. Legacy registries remain provenance snapshots.",
+  "legacy_registries": [
+    "KREATE/PMR/SOURCE_REGISTRY_2026-10-06.json",
+    "agent/ie-pmr/pmr-reference-hub:KREATE/PMR/source_catalog.json"
+  ]
+}
