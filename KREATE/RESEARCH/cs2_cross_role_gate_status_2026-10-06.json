@@ -1,0 +1,342 @@
+{
+  "schema_version": "1.0",
+  "artifact": "CS2_CROSS_ROLE_GATE_STATUS",
+  "date": "2026-10-06",
+  "evidence_class": "PRODUCT_SYNTHESIS_NOT_PRIMARY_EVIDENCE",
+  "product_decision": "KEEP_CONDITIONALLY",
+  "core_hypothesis": "Human-reviewed pre-freeze institutional dining quantity/allocation decision support with privacy-minimized aggregate signals and prospective outcome verification.",
+  "gates": [
+    {
+      "id": "EA-01",
+      "gate": "REACHABLE_DECISION",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [
+        358
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "reachable control point and pilot timing"
+    },
+    {
+      "id": "EA-02",
+      "gate": "SOURCE_EXPORTABILITY",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [
+        292
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "privacy-minimized aggregate service data path",
+      "route_progress": "BUCARD_REPORTING_OWNER_PATH_NARROWED__NAMED_REPORT_SURFACES_PENDING_CANONICAL_SOURCE_INGESTION__EXPORT_SCHEMA_GRAIN_FINALITY_AND_PERMISSION_STILL_REQUIRED"
+    },
+    {
+      "id": "EA-03",
+      "gate": "SEMANTIC_MAPPING_VERIFIED",
+      "owner": [
+        "IE",
+        "CS1"
+      ],
+      "issue_refs": [
+        292,
+        82
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "eligible target/service truth",
+      "route_progress": "REPORTING_SURFACES_AND_OWNER_PATH_NARROWED__REAL_AGGREGATE_ROWS_AND_SKS_SEMANTIC_RECONCILIATION_STILL_REQUIRED"
+    },
+    {
+      "id": "EA-04",
+      "gate": "PHYSICAL_OUTCOME_MEASURABLE",
+      "owner": [
+        "EE",
+        "EHB"
+      ],
+      "issue_refs": [
+        322,
+        119
+      ],
+      "status": "OPEN",
+      "unlocks": "prospective surplus/waste/shortage measurement"
+    },
+    {
+      "id": "EA-05",
+      "gate": "REPORTING_RECONCILIATION",
+      "owner": [
+        "IE",
+        "CS1"
+      ],
+      "issue_refs": [
+        82,
+        322
+      ],
+      "status": "OPEN",
+      "unlocks": "governance-to-service reconciliation when decision relevant"
+    },
+    {
+      "id": "EA-06",
+      "gate": "INCENTIVE_AND_AUTHORITY_MAP",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [
+        358
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "buyer/beneficiary/settlement claim boundaries",
+      "route_progress": "TAHAKKUK_IMID_PROCUREMENT_AND_ACCEPTANCE_ROUTES_NARROWED__PAYABLE_QUANTITY_FREEZE_CHANGE_RIGHTS_PENALTIES_BUYER_AND_ECONOMICS_STILL_REQUIRED"
+    }
+  ],
+  "portfolio": [
+    {
+      "surface": "human_reviewed_quantity_decision_support",
+      "decision": "KEEP_CONDITIONAL"
+    },
+    {
+      "surface": "generic_ai_forecasting_positioning",
+      "decision": "KILL_AS_POSITIONING"
+    },
+    {
+      "surface": "generic_sustainability_dashboard",
+      "decision": "KILL_AS_WEDGE"
+    },
+    {
+      "surface": "generic_waste_tracking_as_differentiation",
+      "decision": "KILL_AS_DIFFERENTIATION"
+    },
+    {
+      "surface": "reservation_menu_calendar_weather_features",
+      "decision": "HOLD_PENDING_REAL_DATA"
+    },
+    {
+      "surface": "bucard_turnstile_counts",
+      "decision": "HOLD_PENDING_SEMANTIC_ADMISSION"
+    },
+    {
+      "surface": "new_sensing_hardware",
+      "decision": "HOLD_BEHIND_MEASUREMENT_GAP"
+    },
+    {
+      "surface": "contract_procurement_evidence_layer",
+      "decision": "SUPPORTING_CAPABILITY"
+    },
+    {
+      "surface": "complex_modeling",
+      "decision": "DEFER_UNTIL_BASELINE_GATE"
+    }
+  ],
+  "compressed_truth_packages": [
+    "decision_rights_and_freeze_time",
+    "aggregate_service_truth_and_semantics",
+    "outcome_measurement_and_economics"
+  ],
+  "no_claims_until_gates_close": [
+    "measured waste reduction",
+    "cost savings",
+    "carbon reduction",
+    "operator/model superiority",
+    "buyer willingness_to_pay",
+    "contract incentive alignment"
+  ],
+  "base_role_sha": "7624bae5b8954571c3b3336c74fc56a80b039782",
+  "claim_policy_source": "KREATE/PMR/CS2_APPLICATION_CLAIM_GATE_2026-10-06.md",
+  "scope_boundary": "PRODUCT_PORTFOLIO_AND_CROSS_ROLE_GATES_ONLY__APPLICATION_CLAIM_WORDING_OWNED_BY_CLAIM_GATE",
+  "latest_route_inputs": [
+    {
+      "source_id": "S-BU-026",
+      "effect": "Food Services governance directive; narrows BUCard/reporting and acceptance-hakedis owner routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-027",
+      "effect": "Tahakkuk branch; narrows hakediş/payment routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-028",
+      "effect": "IMID contact; fallback first-party routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-029",
+      "effect": "Procurement branch; narrows tender/specification ownership and referral",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-030",
+      "effect": "2025 Administration Activity Report; narrows institutional acceptance-flow routing",
+      "closes_gate": false
+    }
+  ],
+  "route_update_rule": "ROUTE_DISCOVERY_IS_NOT_EXPORT_ACCESS_SERVICE_TRUTH_SETTLEMENT_ECONOMICS_OR_PRIMARY_INTERVIEW_EVIDENCE",
+  "pending_route_observations": [
+    {
+      "observation": "IE verified named BUCard dining report surfaces, but CS2 does not bind them to S-BU-027 because IE #430 canonically assigns S-BU-027 to Tahakkuk. Wait for canonical source ingestion before source-ID promotion.",
+      "closes_gate": false
+    }
+  ],
+  "application_claim_route_links": [
+    {
+      "claim_id": "C-005",
+      "claim_summary": "A material, still-reversible pre-service quantity/batch/allocation decision exists at Bogazici.",
+      "claim_policy_state": "HYPOTHESIS_DRAFT",
+      "gate_ids": [
+        "EA-01",
+        "EA-06"
+      ],
+      "route_source_ids": [
+        "S-BU-026",
+        "S-BU-029",
+        "S-BU-030"
+      ],
+      "route_effect": "FOOD_SERVICES_GOVERNANCE__PROCUREMENT__AND_ACCEPTANCE_ROUTES_NARROWED",
+      "established": [
+        "governance route",
+        "procurement/specification route",
+        "acceptance/control route"
+      ],
+      "still_required": [
+        "actual daily decision owner",
+        "decision object",
+        "revision rights",
+        "freeze/cutoff",
+        "recent service reconstruction"
+      ],
+      "promotion_effect": "NONE",
+      "issue_refs": [
+        358
+      ]
+    },
+    {
+      "claim_id": "C-007",
+      "claim_summary": "Privacy-minimized service-level operational truth is exportable and semantically usable for CS1.",
+      "claim_policy_state": "UNKNOWN_DRAFT",
+      "gate_ids": [
+        "EA-02",
+        "EA-03"
+      ],
+      "route_source_ids": [
+        "S-BU-026"
+      ],
+      "pending_route_observations": [
+        "Named BUCard dining report surfaces verified by IE but not yet assigned a canonical source ID"
+      ],
+      "route_effect": "BUCARD_REPORTING_OWNER_PATH_NARROWED",
+      "established": [
+        "next owner/reporting route for aggregate-export request"
+      ],
+      "still_required": [
+        "export permission",
+        "aggregate rows",
+        "schema",
+        "grain",
+        "availability/finality time",
+        "correction semantics",
+        "SKS reconciliation"
+      ],
+      "integrity_rule": "DO_NOT_BIND_BUCARD_REPORT_SURFACES_TO_S-BU-027__S-BU-027_IS_TAHAKKUK",
+      "promotion_effect": "NONE",
+      "issue_refs": [
+        292,
+        82
+      ]
+    },
+    {
+      "claim_id": "C-008",
+      "claim_summary": "The intended operational user can safely act on a BOUNCAMPUS recommendation before freeze.",
+      "claim_policy_state": "HYPOTHESIS_DRAFT",
+      "gate_ids": [
+        "EA-01",
+        "EA-06"
+      ],
+      "route_source_ids": [
+        "S-BU-026",
+        "S-BU-030"
+      ],
+      "route_effect": "OPERATIONAL_AND_ACCEPTANCE_ACTOR_PATH_NARROWED",
+      "established": [
+        "candidate Food Services governance route",
+        "institutional acceptance/control route"
+      ],
+      "still_required": [
+        "action authority",
+        "approval path",
+        "freeze time",
+        "override behavior",
+        "risk guardrails",
+        "observed willingness to act"
+      ],
+      "promotion_effect": "NONE",
+      "issue_refs": [
+        358
+      ]
+    },
+    {
+      "claim_id": "C-010",
+      "claim_summary": "BUCard/turnstile count equals meals physically served.",
+      "claim_policy_state": "CUT",
+      "gate_ids": [
+        "EA-03"
+      ],
+      "route_source_ids": [
+        "S-BU-026"
+      ],
+      "pending_route_observations": [
+        "Named BUCard dining report surfaces verified by IE but not yet assigned a canonical source ID"
+      ],
+      "route_effect": "REPORTING_OWNER_PATH_NARROWED_ONLY",
+      "established": [
+        "reporting-owner route"
+      ],
+      "still_required": [
+        "source-owner semantics",
+        "corrections/refunds",
+        "duplicate handling",
+        "second-meal handling",
+        "late-correction handling",
+        "reconciliation to physical service truth"
+      ],
+      "promotion_effect": "NONE__FORBIDDEN_EQUALITY_REMAINS_CUT",
+      "issue_refs": [
+        292,
+        82
+      ]
+    },
+    {
+      "claim_id": "C-014",
+      "claim_summary": "Public tender scale proves buyer willingness-to-pay or favorable contract economics.",
+      "claim_policy_state": "CUT",
+      "gate_ids": [
+        "EA-06"
+      ],
+      "route_source_ids": [
+        "S-BU-027",
+        "S-BU-029",
+        "S-BU-030"
+      ],
+      "route_effect": "PAYMENT_PROCUREMENT_AND_ACCEPTANCE_ROUTES_NARROWED",
+      "established": [
+        "Tahakkuk payment-processing route",
+        "procurement/specification route",
+        "acceptance/control route"
+      ],
+      "still_required": [
+        "accepted/payable quantity",
+        "unit-price mechanics",
+        "exact Spending Authority",
+        "penalties",
+        "freeze/change rights",
+        "economic beneficiary",
+        "buyer identity",
+        "willingness to pay"
+      ],
+      "promotion_effect": "NONE__ECONOMICS_AND_WTP_CLAIM_REMAINS_CUT",
+      "issue_refs": [
+        358
+      ]
+    }
+  ],
+  "application_claim_route_linkage_rule": "ROUTE_OWNER_DISCOVERY_NARROWS_ACQUISITION_TARGETS_BUT_NEVER_PROMOTES_APPLICATION_CLAIMS_WITHOUT_REQUIRED_PRIMARY_EVIDENCE",
+  "application_claim_ledger_source": "KREATE/APPLICATION_RUBRIC.md"
+}
