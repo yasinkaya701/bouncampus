@@ -1902,7 +1902,205 @@
         "does not expose awarded unit prices or sufficiently complete descriptions for the additional monthly schedule rows",
         "does not establish payable or accepted quantity, daily or campus allocation, penalties, change rights, contractor margin, software budget, or savings"
       ]
+    },
+    {
+      "id": "S-BU-026",
+      "title": "Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "DATA_OWNER",
+        "CONTRACT",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "Article 7 places the BUCard Office within BİDB and assigns it operation/control of the dining BUCard system, reporting to the Food Services Board and Food Services Branch, and retention of digital data",
+        "Article 5(f) states the Food Services Board and the Inspection/Acceptance Commission jointly carry out meal-hakediş payment orders and accrual",
+        "Article 8 states dining-service charge transactions are processed through dining-hall payment turnstiles and distinguishes second-meal handling",
+        "Article 9 states meal-service procurement is carried out by SKS together with Administrative and Financial Affairs and requires separate student/personnel invoices"
+      ],
+      "limitations": [
+        "the directive does not prove research/export authorization, report grain, retention period or that one BUCard event equals one physically served meal",
+        "the hakediş workflow actor statement does not establish which quantity/unit is payable, exact signer sequence, freeze/change rights, penalty mechanics, economic beneficiary or software buyer authority"
+      ]
+    },
+    {
+      "id": "S-TR-011",
+      "title": "BAİBÜ Beslenme Hizmetleri operational forms and multi-site dining surface",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Bolu Abant İzzet Baysal University Health, Culture and Sports Department",
+      "url": "https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri-kullanilan-formlar/9853",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "SECOND_SITE",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "public operational record names include daily food production/consumption and meals sent to central/district units",
+        "supports selecting BAİBÜ as a mature-operation second-site interview target"
+      ],
+      "limitations": [
+        "record names do not establish field semantics, actual usage, decision timing, reservation-to-production coupling or measured waste outcomes",
+        "does not prove the same product or procurement motion repeats at Boğaziçi"
+      ],
+      "assets": {
+        "operations_page": "https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri/9713",
+        "contact_page": "https://sksdb.ibu.edu.tr/tr/page/dahili-iletisim/9732"
+      }
+    },
+    {
+      "id": "S-TR-012",
+      "title": "BANÜ off-central-campus vocational-school mandatory dining reservation rollout — 5 Oct 2026",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Bandırma Onyedi Eylül University Health, Culture and Sports Department",
+      "url": "https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-MERKEZ-YERLESKE-DISINDAKI-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94035",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H6",
+        "SECOND_SITE",
+        "FALSIFIER"
+      ],
+      "supports": [
+        "official notice states dining at vocational schools outside the central campus becomes fully reservation-based from 5 Oct 2026",
+        "official notice states users without reservation will not receive meal service in the announced scope",
+        "official rationale explicitly links reservation to more accurate daily planning, effective resource use and reducing food waste",
+        "supports selecting BANÜ as a reservation-first counter-archetype that can falsify a generic forecasting wedge"
+      ],
+      "limitations": [
+        "stated goals are not measured outcomes",
+        "does not establish reservation cutoff/cancellation/no-show semantics, kitchen order logic, residual forecast error or actual waste reduction",
+        "does not establish product demand or buyer willingness"
+      ]
+    },
+    {
+      "id": "S-TR-013",
+      "title": "Kayseri University Social Enterprises and Dining Halls operating model",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Kayseri University Health, Culture and Sports Department",
+      "url": "https://sksd.kayseri.edu.tr/tr/i/12-1/sosyal-isletmeler-ve-yemekhaneler-sube-mudurlugu",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H3",
+        "H5",
+        "SECOND_SITE",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "official unit page states central-campus meals are produced in university kitchens while district-campus dining is supplied through prepared-meal procurement",
+        "combined with existing S-TR-006, supports a within-institution own-kitchen versus procured-meal comparison after reservation expansion"
+      ],
+      "limitations": [
+        "does not establish freeze points, quantity ownership, contract economics, service-level outcomes or whether reservation changes production decisions"
+      ],
+      "assets": {
+        "reservation_source": "https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu",
+        "staff_route": "https://sksd.kayseri.edu.tr/tr/akademik-personel"
+      }
+    },
+    {
+      "id": "S-BU-027",
+      "title": "Tahakkuk Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch states it performs tender, direct-procurement, transfer and hakediş payments",
+        "provides a first-party payment-routing path for the hakediş package and responsible contract-payment owner"
+      ],
+      "limitations": [
+        "general hakediş-payment responsibility does not establish the food contract's payable unit, acceptance count, signatory chain, freeze/change rights or incentive allocation"
+      ]
+    },
+    {
+      "id": "S-BU-028",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/iletisim/2116",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official contact surface lists Procurement and Tahakkuk branch phone routes and the general IMID contact"
+      ],
+      "limitations": [
+        "contact information is routing evidence only"
+      ]
+    },
+    {
+      "id": "S-BU-029",
+      "title": "İhale ve Satınalma Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch is responsible for procurement and tender processes under public procurement rules",
+        "provides a first-party route for authoritative tender/specification ownership and referral"
+      ],
+      "limitations": [
+        "branch responsibility does not prove contract-specific document ownership, operational quantity authority, software-buying authority or settlement semantics"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "Control Organization performs service-work oversight under general conditions, signed contracts and technical specifications and is responsible to the relevant Spending Authority",
+        "after preliminary acceptance review, Control Organization prepares the KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant Spending Authority for hakediş preparation",
+        "2025 report identifies food-service procurement among recurring service works overseen through this acceptance process"
+      ],
+      "limitations": [
+        "does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily production freeze/change rights or shortage/excess economics",
+        "does not substitute for current IKN 2025/1727143 technical/admin specifications or an actual hakediş artifact"
+      ]
     }
   ],
-  "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
+  "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot. Added S-TR-011…013 for IE second-site / reservation-counter-archetype targeting on 2026-10-06; these are secondary routing/falsifier sources, not interview evidence."
 }

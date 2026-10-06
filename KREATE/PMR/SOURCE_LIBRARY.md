@@ -528,3 +528,73 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - **S-ACAD-019** — institutional catering intervention evidence; no local causal transfer.
 
 Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Current governance / owner-route delta — 2026-10-06
+
+### S-BU-026 — Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf
+- Use: authoritative owner-routing for dining BUCard reporting/data custody, meal-service procurement, and the hakediş payment-order/accrual workflow.
+- Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
+- Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
+- Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
+
+## IE second-site falsifier cases — 2026-10-06
+
+These are **secondary target-selection sources**, not PMR/interview evidence.
+
+### S-TR-011 — BAİBÜ operational dining forms
+- Type: official university.
+- Publisher: Bolu Abant İzzet Baysal University SKS.
+- URL: https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri-kullanilan-formlar/9853
+- Related:
+  - https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri/9713
+  - https://sksdb.ibu.edu.tr/tr/page/dahili-iletisim/9732
+- Use: mature-operation interview target; public record names include daily production/consumption and meals-sent-to-units forms across a multi-site contracted dining surface.
+- Boundary: record names do not prove field semantics, actual workflow use, decision timing, reservation-to-production coupling or measured outcomes.
+- Maps to: H1, H2, H3, H4, SECOND_SITE, OPERATIONS.
+
+### S-TR-012 — BANÜ off-central-campus MYO mandatory reservation rollout
+- Type: official university.
+- Publisher: Bandırma Onyedi Eylül University SKS.
+- URL: https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-MERKEZ-YERLESKE-DISINDAKI-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94035
+- Current notice updated: 2026-10-02; announced effective date 2026-10-05.
+- Use: reservation-first counter-archetype. The current notice says the announced **off-central-campus vocational-school scope** is fully reservation-based and users without reservations will not receive meal service; stated goals include planning/resource efficiency and food-waste reduction.
+- Boundary: stated goals are not achieved outcomes; reservation cutoff/no-show/order logic, residual uncertainty and actual waste impact require primary evidence.
+- Maps to: H1, H2, H3, H6, SECOND_SITE, FALSIFIER.
+
+### S-TR-013 — Kayseri University dining operating-model contrast
+- Type: official university.
+- Publisher: Kayseri University SKS.
+- URL: https://sksd.kayseri.edu.tr/tr/i/12-1/sosyal-isletmeler-ve-yemekhaneler-sube-mudurlugu
+- Related:
+  - S-TR-006 — university-wide reservation expansion.
+  - https://sksd.kayseri.edu.tr/tr/akademik-personel
+- Use: within-institution comparison: central-campus own-kitchen production versus district-campus prepared-meal procurement after reservation expansion.
+- Boundary: does not establish freeze points, decision owner, contract economics, service outcomes or production response to reservations.
+- Maps to: H1, H3, H5, SECOND_SITE, OPERATIONS.
+## First-party procurement / hakediş routing integrity — 2026-10-06
+
+These routes are first-party owner/routing evidence. They do **not** resolve the current food contract's payable quantity, freeze/change rights, penalties, unit economics or software buyer.
+
+### S-BU-027 — Tahakkuk Şube Müdürlüğü
+- Official: https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119
+- Use: first-party route for tender/direct-procurement/transfer/hakediş payments and referral to the responsible food-contract payment owner.
+- Boundary: general payment responsibility does not establish the food contract's payable unit, acceptance count, signer chain or incentive allocation.
+
+### S-BU-028 — İMİD contact
+- Official: https://imid.bogazici.edu.tr/tr/pages/iletisim/2116
+- Use: general first-party routing when the exact Procurement or Tahakkuk owner is unknown.
+- Boundary: contact surface only.
+
+### S-BU-029 — İhale ve Satınalma Şube Müdürlüğü
+- Official: https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117
+- Use: authoritative procurement/tender routing for IKN 2025/1727143 document ownership/referral.
+- Boundary: procurement responsibility does not prove operational quantity authority, contract-specific settlement semantics or software-buying authority.
+
+### S-BU-030 — 2025 Administration Activity Report
+- Official PDF: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
+- Use: first-party institutional acceptance-flow evidence. The Control Organization performs preliminary acceptance review and, when suitable, prepares the KİK56.0/H Service Works Acceptance Proposal for the relevant Spending Authority so hakediş can be prepared; the report includes food-service procurement among recurring service works.
+- Boundary: this does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily freeze/change rights or shortage/excess economics.

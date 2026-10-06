@@ -171,6 +171,7 @@ New owner-routing evidence is canonical:
 - **S-BU-021:** BİDB service inventory → BUCard technical ownership/contact; SKS+BİDB cafeteria-card services; BİDB turnstile/card-reader support.
 - **S-BU-023:** BUCampus user-facing passage history proves an event-history surface exists.
 - **S-BU-025:** reservation recurs across special operating regimes; it is still not an always-on demand label.
+- **S-BU-026:** current Food Services directive assigns dining-BUCard operation/reporting/data-retention duties to the BUCard Office, places meal-service procurement across SKS + Administrative and Financial Affairs, and places hakediş payment-order/accrual work with the Food Services Board + Inspection/Acceptance Commission. Use this to narrow owner routing only; it does not prove export rights, served-meal semantics, payable quantity or freeze mechanics.
 - **S-PROC-002:** predecessor procurement cancellation reason is explicit; clause identity remains unresolved.
 
 **IE**
@@ -260,3 +261,10 @@ Return only decision-changing deltas:
 - **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
 
 Do not send generic research summaries back to PMR-A.
+
+
+## Evidence-unlock contract — 2026-10-06
+
+Use [PRIMARY_EVIDENCE_UNLOCK_MATRIX.md](PRIMARY_EVIDENCE_UNLOCK_MATRIX.md) before promoting any #292/#358 result downstream. The matrix separates report existence, exportability, reconciliation, served-truth admission, outcome linkage, contract semantics, freeze rights, risk ownership, measurement gaps and buyer authority into distinct gates.
+
+A downstream agent should receive **gate ID + provenance + source-native field/wording**, not a generalized conclusion.
