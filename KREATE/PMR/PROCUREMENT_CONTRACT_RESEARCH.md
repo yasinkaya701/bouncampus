@@ -82,6 +82,25 @@ We still need to learn:
 
 The same notice describes a 5,000-meal/day bidder-capacity threshold as one-half of the administration's stated daily meal need. Treat that as **procurement capacity context only**, not measured actual daily demand.
 
+### Public schedule mirror: line-item ambiguity
+
+A second EKAP-derived public mirror (`S-PROC-005`) confirms the current tender's **unit-price contract** form and exposes three identifiable meal rows:
+
+- 380,000 student breakfasts;
+- 2,500,000 student meals;
+- 250,000 staff meals.
+
+The same public schedule surface also exposes **additional monthly rows** whose descriptions are not sufficiently visible in the mirror to determine what they represent. The public surface is therefore **not complete enough to reconstruct the awarded unit-price schedule or settlement model**.
+
+Operational implication:
+
+- do not assume the three meal rows are the only priced work items;
+- do not infer that campus allocation, staffing, service, equipment or other monthly obligations are absent merely because their descriptions are not visible in the mirror;
+- do not use the public schedule to derive awarded unit prices, contractor margin, meal cost or savings;
+- retrieve the authoritative EKAP administrative/technical specification, unit-price bid schedule and contract/acceptance documents before clause-level or economic claims.
+
+This ambiguity strengthens, rather than closes, #358.
+
 ### Retrieval attempt status
 
 The public tender mirror exposes links that redirect to the official EKAP tender-document route for **IKN 2025/1727143**. The current environment can resolve the route but cannot retrieve the underlying document bundle.

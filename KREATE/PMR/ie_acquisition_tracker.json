@@ -7,7 +7,14 @@
       "issue": 292,
       "name": "BUCard/SKS aggregate service truth",
       "state": "REQUEST_READY",
-      "routes": ["S-BU-010", "S-BU-011", "S-BU-015"],
+      "routes": [
+        "S-BU-010",
+        "S-BU-011",
+        "S-BU-015",
+        "S-BU-021",
+        "S-BU-022",
+        "S-BU-023"
+      ],
       "required_grain": "campus_id x meal_period x service_date",
       "required_outputs": [
         "source-native aggregate passage/meal count",
@@ -17,7 +24,9 @@
         "production/outcome record owner",
         "export/access decision"
       ],
-      "downstream": ["CS1 #82"],
+      "downstream": [
+        "CS1 #82"
+      ],
       "forbidden_inference": [
         "passage_count == actual_served without reconciliation",
         "generated sandbox data as service truth",
@@ -28,7 +37,14 @@
       "issue": 358,
       "name": "IKN 2025/1727143 contract and hakediş semantics",
       "state": "REQUEST_READY",
-      "routes": ["S-PROC-001", "S-BU-010", "S-BU-014"],
+      "routes": [
+        "S-PROC-001",
+        "S-BU-010",
+        "S-BU-014",
+        "S-BU-026",
+        "S-BU-030",
+        "S-BU-027"
+      ],
       "required_outputs": [
         "authoritative current admin/technical spec retrieval status",
         "unit-price schedule retrieval status",
@@ -36,9 +52,16 @@
         "quantity freeze/change rights",
         "acceptance/hakediş owner",
         "excess/shortage economic-risk owner",
-        "production/reconciliation artifact owner"
+        "production/reconciliation artifact owner",
+        "exact food-contract Spending Authority or explicit unresolved state",
+        "KİK56.0/H / hakediş package field semantics"
       ],
-      "downstream": ["CS2", "CS1", "EE", "EHB"],
+      "downstream": [
+        "CS2",
+        "CS1",
+        "EE",
+        "EHB"
+      ],
       "forbidden_inference": [
         "headline contract value / listed meals == unit meal price",
         "historical clauses == current clauses",
