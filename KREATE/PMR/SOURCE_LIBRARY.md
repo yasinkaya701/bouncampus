@@ -440,3 +440,17 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - Use: supports avoiding biometric shortcuts when aggregate signals suffice.
 - Boundary: not a legal opinion for a particular institution.
 - Maps to: H4, PRIVACY.
+
+
+## Final concurrent-agent reconciliation — 2026-10-06
+
+These unique records were absent from the latest 53-source role catalog and are retained in the canonical registry:
+- **S-BU-009…014** — sustainable-food/menu-survey/governance/SDG2/Sustainability 2025 official Boğaziçi context.
+- **S-PMR-006** — MIT Sloan Disciplined Entrepreneurship reference.
+- **S-MEAS-006…009** — Türkiye Zero Waste, WRAP and EPA source-reduction/assessment guidance.
+- **S-ACAD-013** — physical weighing and portion inadequacy in a university canteen.
+- **S-ACAD-014** — university cafeteria machine-vision precedent; its face-linkage design is a privacy caution, not a recommendation.
+- **S-ACAD-015** — controlled catering interventions showing forecasting, plate tracking and awareness can affect different waste fractions.
+- **S-TR-011** — Bakırçay smart-campus report as external digital-operations target discovery.
+
+This reconciliation does not upgrade any item to PMR/customer evidence.

@@ -70,3 +70,13 @@ transformation = none | crop | redraw | derived-chart
 ```
 
 No binary currently becomes evidence merely by being committed to the repository.
+
+
+## Final unique PDF / visual additions
+
+| ID | Asset | Direct link | Format | Status | Note |
+| --- | --- | --- | --- | --- | --- |
+| A-025 | Boğaziçi Sustainability 2025 | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf | PDF | LINK_ONLY | Official report |
+| A-026 | Boğaziçi SDG 2 publication | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf | PDF | LINK_ONLY | Official report |
+| A-027 | Bakırçay Smart Campus report | https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf | PDF | LINK_ONLY | Official target-discovery artifact |
+| A-028 | Machine-vision university cafeteria study | https://www.mdpi.com/2076-3417/15/9/5036/pdf | PDF | COPY_CANDIDATE | Open-access publisher; verify exact CC attribution before mirroring |

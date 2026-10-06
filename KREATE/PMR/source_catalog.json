@@ -1099,7 +1099,311 @@
       ],
       "accessed_at": "2026-10-06",
       "license_note": "link/reference only unless reuse terms are separately verified"
+    },
+    {
+      "id": "S-BU-009",
+      "title": "Sustainable food choices on campus",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/233-sustainable-food-choices-on-campus/1313",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H1",
+        "H4"
+      ],
+      "supports": [
+        "food-service and sustainability operating context"
+      ],
+      "limitations": [
+        "does not identify quantity owner or freeze point"
+      ]
+    },
+    {
+      "id": "S-BU-010",
+      "title": "Boğaziçi Dining Menu Survey",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Dining",
+      "url": "https://yemekhane.bogazici.edu.tr/menu-anketi",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "public evidence of a menu-preference signal class"
+      ],
+      "limitations": [
+        "preference is not reservation, served demand or production quantity"
+      ]
+    },
+    {
+      "id": "S-BU-011",
+      "title": "Dining cooking and distribution control organization",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H5"
+      ],
+      "supports": [
+        "governance/control-role discovery"
+      ],
+      "limitations": [
+        "membership does not establish daily quantity authority or procurement rights"
+      ]
+    },
+    {
+      "id": "S-BU-012",
+      "title": "Boğaziçi SDG 2 publication",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_current_master_registry",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "archivable institutional food/sustainability background"
+      ],
+      "limitations": [
+        "verify year/metric semantics before comparisons"
+      ]
+    },
+    {
+      "id": "S-MEAS-006",
+      "title": "Sıfır Atık Yönetmeliği official announcement",
+      "type": "STANDARD",
+      "publisher": "T.C. Ministry of Environment",
+      "url": "https://cygm.csb.gov.tr/sifir-atik-yonetmeligi-resmi-gazetede-yayimlanarak-yururluge-girmistir.-duyuru-383053",
+      "accessed_at": "2026-10-06",
+      "authority": "government_official",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "Türkiye zero-waste regulatory context"
+      ],
+      "limitations": [
+        "not legal advice; verify current consolidated regulation before compliance claims"
+      ]
+    },
+    {
+      "id": "S-MEAS-007",
+      "title": "Hospitality and Food Service guidance",
+      "type": "STANDARD",
+      "publisher": "WRAP",
+      "url": "https://www.wrap.ngo/resources/guide/hospitality-and-food-service",
+      "accessed_at": "2026-10-06",
+      "authority": "sector_guidance",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "food-service prevention and measurement practice"
+      ],
+      "limitations": [
+        "UK-sector guidance, not local regulation or PMR"
+      ]
+    },
+    {
+      "id": "S-BU-013",
+      "title": "Boğaziçi University Sustainability 2025",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "discovered_parallel_agent_index_verified",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "institutional sustainability context"
+      ],
+      "limitations": [
+        "reporting context is not service-level operational truth"
+      ]
+    },
+    {
+      "id": "S-BU-014",
+      "title": "Boğaziçi Sustainability Reports index",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/surdurulebilirlik-raporlari/1063",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "web_verified_2026-10-06",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "current official report index including Sustainability 2025 and 2024"
+      ],
+      "limitations": [
+        "index only"
+      ]
+    },
+    {
+      "id": "S-PMR-006",
+      "title": "Disciplined Entrepreneurship: questions for startup success",
+      "type": "PMR_METHOD",
+      "publisher": "MIT Sloan",
+      "url": "https://mitsloan.mit.edu/ideas-made-to-matter/disciplined-entrepreneurship-6-questions-startup-success",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "disciplined entrepreneurship framing"
+      ],
+      "limitations": [
+        "method only"
+      ]
+    },
+    {
+      "id": "S-MEAS-008",
+      "title": "Prevent Wasted Food Through Source Reduction",
+      "type": "STANDARD",
+      "publisher": "US EPA",
+      "url": "https://www.epa.gov/sustainable-management-food/prevent-wasted-food-through-source-reduction",
+      "accessed_at": "2026-10-06",
+      "authority": "government_guidance",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "source-reduction intervention hierarchy"
+      ],
+      "limitations": [
+        "not local effectiveness evidence"
+      ]
+    },
+    {
+      "id": "S-MEAS-009",
+      "title": "Resources for Assessing Wasted Food",
+      "type": "STANDARD",
+      "publisher": "US EPA",
+      "url": "https://www.epa.gov/sustainable-management-food/resources-assessing-wasted-food",
+      "accessed_at": "2026-10-06",
+      "authority": "government_guidance",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "baseline/waste-assessment methods"
+      ],
+      "limitations": [
+        "guidance only"
+      ]
+    },
+    {
+      "id": "S-ACAD-013",
+      "title": "Inadequacy of Meals Served and Food Waste in a Portuguese University Canteen",
+      "type": "ACADEMIC",
+      "publisher": "Sustainability / MDPI",
+      "url": "https://www.mdpi.com/2071-1050/16/10/4317",
+      "published_at": "2024",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "physical weighing precedent and portion inadequacy/plate-waste mechanism"
+      ],
+      "limitations": [
+        "external university context"
+      ]
+    },
+    {
+      "id": "S-ACAD-014",
+      "title": "Strategies for Automated Identification of Food Waste in University Cafeterias: A Machine Vision Recognition Approach",
+      "type": "ACADEMIC",
+      "publisher": "Applied Sciences / MDPI",
+      "url": "https://doi.org/10.3390/app15095036",
+      "published_at": "2025-05-01",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "hypotheses": [
+        "H4",
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "university cafeteria machine-vision precedent"
+      ],
+      "limitations": [
+        "uses diner face linkage in its context; privacy/acceptability and local need must be independently assessed"
+      ]
+    },
+    {
+      "id": "S-ACAD-015",
+      "title": "Testing interventions to reduce food waste in school catering",
+      "type": "ACADEMIC",
+      "publisher": "Resources, Conservation and Recycling",
+      "url": "https://doi.org/10.1016/j.resconrec.2021.105997",
+      "published_at": "2022-02",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "verification_status": "web_verified_2026-10-06",
+      "license_note": "open access under a Creative Commons license; verify exact terms for redistribution",
+      "hypotheses": [
+        "H2",
+        "H6"
+      ],
+      "supports": [
+        "forecasting, plate-waste tracker and awareness interventions can target different waste fractions"
+      ],
+      "limitations": [
+        "school catering, not university PMR; context-specific outcomes"
+      ]
+    },
+    {
+      "id": "S-TR-011",
+      "title": "Bakırçay University Smart Campus Project interim report",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "İzmir Bakırçay University",
+      "url": "https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "verification_status": "inherited_from_parallel_agent",
+      "hypotheses": [
+        "REPEATABILITY"
+      ],
+      "supports": [
+        "smart-campus/digital operations target discovery"
+      ],
+      "limitations": [
+        "not necessarily dining-specific"
+      ]
     }
   ],
-  "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
+  "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot.",
+  "reconciliation_note": "68-source canonical registry after converging current role state with unique sources from concurrent PMR agents; legacy registries remain provenance snapshots."
 }
