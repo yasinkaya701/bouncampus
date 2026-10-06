@@ -260,3 +260,12 @@ Return only decision-changing deltas:
 - **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
 
 Do not send generic research summaries back to PMR-A.
+
+
+### #358 workflow narrowing
+
+First-party evidence now supports `Control Organization → KİK56.0/H → relevant Spending Authority → hakediş preparation` (S-BU-030), with Tahakkuk as a source-backed institutional hakediş-payment route (S-BU-027). Procurement/specification routing is source-backed through S-BU-026.
+
+This does **not** close #358: payable operational count, exact food-contract Spending Authority, current unit-price schedule, penalty/correction rules and production freeze remain unresolved.
+
+Aygül Demir is source-backed as a current principal member of the dining control organization (S-BU-014). No repo evidence of a completed interview exists, so no `E-INT-*` or completed tracker state is created.
