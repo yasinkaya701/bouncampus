@@ -1,75 +1,80 @@
 # VPMR Canonical Source Registry
 
-**Access date for this initial pass:** 2026-10-06 unless stated otherwise.
+**Curated:** 2026-10-06
 
-Each source has a stable VPMR ID. IDs describe the source, not a conclusion. If a source materially changes, keep the old ID/history and add a dated successor rather than silently changing semantics.
+Every row below has the same stable ID and core semantics as `source_registry.json`. Direct PDFs, graphics and alternate download URLs are also indexed in `VISUALS_AND_PDFS.md`.
 
-## A. Boğaziçi official/public sources
+Public, academic and standards sources are **not PMR/customer validation**. They can verify public facts, constrain hypotheses, identify targets and shape measurement/technical methods.
 
-| ID | Source | Class | What it can support | Critical boundary / note |
+## A. Official/public context and procurement precedents
+
+| ID | Source | Publisher | What it can support | Critical boundary |
 | --- | --- | --- | --- | --- |
-| VPMR-SRC-001 | [Boğaziçi — Campus food waste tracking](https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310) | PUBLIC_CONTEXT | Official 2025 campus food-waste baseline, monthly values, reported service/capacity context | Total waste does not equal overproduction; stage/cause separation is not established |
-| VPMR-SRC-002 | [Boğaziçi SKS — 2025 activity report](https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096) | PUBLIC_CONTEXT | Dining-hall count, daily meal scale, packaged-meal/public survey context | Published aggregates are not service-level labels |
-| VPMR-SRC-003 | [Boğaziçi — Healthy and affordable food choices](https://kurumsalveri.bogazici.edu.tr/tr/pages/234-healthy-and-affordable-food-choices/1314) | PUBLIC_CONTEXT | Central North Campus kitchen, menu/portion/nutrition preparation context | Does not establish daily quantity owner, freeze time or service-level truth |
-| VPMR-SRC-004 | [Boğaziçi Dining — current menu](https://yemekhane.bogazici.edu.tr/) | PUBLIC_CONTEXT | Public pre-service menu composition, portions/calories when published | Menu is an input/context feature, not realized demand |
-| VPMR-SRC-005 | [Boğaziçi Dining — Menu survey](https://yemekhane.bogazici.edu.tr/menu-anketi) | PUBLIC_CONTEXT | Authenticated preference-voting workflow and timing | Preference vote != attendance reservation != served meal |
-| VPMR-SRC-006 | [Boğaziçi Dining — Kilyos reservation notice, 20 May 2026](https://yemekhane.bogazici.edu.tr/node/493) | PUBLIC_CONTEXT | Concrete evidence that one campus/time period used pre-service meal reservation and cancellation rules | Do not generalize the workflow/cutoff to other campuses or dates |
-| VPMR-SRC-007 | [Boğaziçi academic calendar](https://akademiktakvim.bogazici.edu.tr/) | ARCHIVED_DECISION_INPUT | Pre-known academic regime/calendar features | Snapshot/version should be bound to the prediction date for historical evaluation |
-| VPMR-SRC-008 | [Boğaziçi Dining FAQ](https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0) | PUBLIC_CONTEXT | Public clues about date/time/campus/turnstile context in payment/access troubleshooting | Does not prove retention, exportability, accessibility, cleanliness or equivalence to served meals |
-| VPMR-SRC-009 | [BUCampus v1.1.2 announcement](https://bilgiislem.bogazici.edu.tr/tr/news/kampus/2/bucampusun-yeni-versiyonu-yayinda/3351) | PUBLIC_CONTEXT | Public clue that menu voting/results and calendar surfaces exist in BUCampus | Product surface != backend export/API access |
-| VPMR-SRC-010 | [Boğaziçi 2025 Administration Activity Report PDF](https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu(3).pdf) | PUBLIC_CONTEXT | Contracted food-service governance/administrative context | PDF claims should be cited to exact page after human re-check before submission |
+| VPMR-SRC-001 | [Campus food waste tracking](https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310) | Boğaziçi University | official campus food-waste baseline; monthly aggregate context | service-level overproduction labels; causal attribution of waste |
+| VPMR-SRC-002 | [2025 SKS activity report](https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096) | Boğaziçi University SKS | dining operation scale; public aggregate meal/dining-hall context | campus-meal service truth |
+| VPMR-SRC-003 | [Healthy and affordable food choices](https://kurumsalveri.bogazici.edu.tr/tr/pages/234-healthy-and-affordable-food-choices/1314) | Boğaziçi University | central-kitchen context; portion/nutrition planning context | quantity decision owner; freeze time; service-level outcome |
+| VPMR-SRC-004 | [Dining menu](https://yemekhane.bogazici.edu.tr/) | Boğaziçi University | public menu context | realized demand |
+| VPMR-SRC-005 | [Menu survey](https://yemekhane.bogazici.edu.tr/menu-anketi) | Boğaziçi University | menu preference workflow | attendance reservation; served demand |
+| VPMR-SRC-006 | [Kilyos meal reservation notice (20 May 2026)](https://yemekhane.bogazici.edu.tr/node/493) | Boğaziçi University | existence of a reservation workflow for the cited campus/period | universal reservation policy |
+| VPMR-SRC-008 | [Dining FAQ](https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0) | Boğaziçi University | public clues about date/time/campus/turnstile context | data access; retention; served-meal equivalence |
+| VPMR-SRC-009 | [BUCampus v1.1.2 announcement](https://bilgiislem.bogazici.edu.tr/tr/news/kampus/2/bucampusun-yeni-versiyonu-yayinda/3351) | Boğaziçi University IT | existence of menu voting/calendar product surfaces | backend export/API availability |
+| VPMR-SRC-010 | [2025 Administration Activity Report](https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu(3).pdf) | Boğaziçi University | administrative/contracted service context | daily quantity semantics without exact clause/owner verification |
+| VPMR-SRC-027 | [Insights Engine](https://insights-engine.refed.org/) | ReFED | external benchmark/solution context | local market validation |
+| VPMR-SRC-028 | [Solutions Database](https://insights-engine.refed.org/solution-database) | ReFED | intervention landscape | local implementation feasibility |
+| VPMR-SRC-030 | [KİK 2026/UH.I-2269 — Kırıkkale University Malzemeli Yemek Hizmeti](https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=0b6db2bdc4dcba60ddf7cb70334f72bf03b482e26ad51295bd12345ea082c52b) | Kamu İhale Kurumu / EKAP | official Turkish university procurement precedent where contractor determines daily quantity using prior meal counts; payment based on actually consumed meals; administration not responsible for excess production; shortage and demand-variation risk can be contractually asymmetric | Boğaziçi/TEMAŞ contract semantics; Boğaziçi buyer or decision owner |
+| VPMR-SRC-031 | [KİK university dining precedent — production quantity and turnstile-based payment](https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=9611128e0826cb5014a4ac6f4dfc5a19d9efd22c609d58c78f14a636b0ac7250&KararMetni=bc6844c56eeb209fc60f05e3a7cc8b7abfe3b86dc04f193fe56fbb6d02a60da7) | Kamu İhale Kurumu / EKAP | official precedent where daily production quantity is set by contractor with administration approval and notified at least one day before; turnstile/mobile/ticket records can be settlement inputs | Boğaziçi event semantics; claim that one passage always equals one consumed meal in Boğaziçi |
+| VPMR-SRC-032 | [İTÜ SAY Sistemi Rezervasyon İşlemi Detayları](https://sksv2.mozaik-test.itu.edu.tr/docs/librariesprovider73/default-document-library/it%C3%BC-say-sistemi-kullan%C4%B1m-detaylar%C4%B1.pdf?sfvrsn=0) | İstanbul Technical University | reservation-to-production planning precedent; published 48-hour preparation constraint; day/cafeteria/meal reservation semantics | current Boğaziçi reservation coverage; Boğaziçi freeze time |
+| VPMR-SRC-033 | [İTÜ food-waste prevention and production-planning program](https://sustainability.itu.edu.tr/tr/itu-kafeteryalari-ve-yemek-hizmetleri-gida-israfini-onlemeye-yonelik-ozel-programlar-saglamaktadir) | İstanbul Technical University | Turkish university precedent using academic calendar, course/exam schedule, menu options, weather and historical meal counts in production estimation; documented replenishment/contingency behavior | Boğaziçi feature value; Boğaziçi current heuristic |
+| VPMR-SRC-034 | [GTÜ dining services — production planning and unexpected demand](https://www.gtu.edu.tr/kategori/5904/0/display.aspx) | Gebze Technical University | current 2026 Turkish university precedent using historical consumption and daily user counts in production planning; early sell-out and rapid replenishment as an operational shortage pattern | Boğaziçi workflow; Boğaziçi willingness to pay |
 
-## B. Measurement and reporting standards
+## B. Measurement, policy and reporting methods
 
-| ID | Source | Class | What it can support | Critical boundary / note |
+| ID | Source | Publisher | What it can support | Critical boundary |
 | --- | --- | --- | --- | --- |
-| VPMR-SRC-011 | [UNEP Food Waste Index Report 2024](https://www.unep.org/resources/publication/food-waste-index-report-2024) | STANDARD_METHOD | International food-waste measurement/reporting methodology and food-service scope | Methodology does not provide a Boğaziçi outcome |
-| VPMR-SRC-012 | [UNEP report repository/handle](https://wedocs.unep.org/handle/20.500.11822/45230) | STANDARD_METHOD | Stable report landing page and downloadable report | Prefer this or UNEP publication page over third-party copies |
-| VPMR-SRC-013 | [Food Loss and Waste Accounting and Reporting Standard — WRI/FLW Protocol](https://www.wri.org/research/food-loss-and-waste-accounting-and-reporting-standard) | STANDARD_METHOD | Scope, inventory, reporting and comparability discipline | Standard compliance is not implied unless actually implemented |
-| VPMR-SRC-014 | [FLW Standard — full PDF](https://flwprotocol.org/wp-content/uploads/2017/05/FLW_Standard_final_2016.pdf) | STANDARD_METHOD | Full methodology PDF; reusable reference under the publisher's stated license | Verify license/attribution before vendoring |
-| VPMR-SRC-015 | [FLW Protocol — Guidance on Quantification Methods PDF](https://flwprotocol.org/wp-content/uploads/2017/06/FLW-Protocol_Guidance-on-FLW-Quantification-Methods.pdf) | STANDARD_METHOD | Weighing, counting, volume, waste-composition, records, diaries, surveys, mass-balance/model/proxy methods | Method selection must match pilot boundary and uncertainty |
-| VPMR-SRC-016 | [WRAP — Measuring and reporting food waste in hospitality and food service](https://www.wrap.ngo/resources/guide/measuring-and-reporting-food-waste-hospitality-and-food-service) | STANDARD_METHOD | Practical hospitality/food-service measurement/reporting guidance and downloadable templates/PDFs | UK practice guidance; adapt to local operations |
-| VPMR-SRC-017 | [US EPA — Wasted Food Scale](https://www.epa.gov/sustainable-management-food/wasted-food-scale) | STANDARD_METHOD | Prevention hierarchy; source reduction/prevention prioritized over downstream management | US policy graphic, not a local legal requirement or measured outcome |
-| VPMR-SRC-018 | [US EPA — Resources for assessing wasted food](https://www.epa.gov/sustainable-management-food/resources-assessing-wasted-food) | STANDARD_METHOD | Practical assessment guides, logs and food-service measurement resources | Adapt field protocols to the local operational boundary |
+| VPMR-SRC-011 | [Food Waste Index Report 2024](https://www.unep.org/resources/publication/food-waste-index-report-2024) | UNEP | food-service measurement methodology; global reporting context | Boğaziçi measured result |
+| VPMR-SRC-012 | [Food Loss and Waste Accounting and Reporting Standard](https://www.wri.org/research/food-loss-and-waste-accounting-and-reporting-standard) | WRI / FLW Protocol | inventory scope/boundary/reporting discipline | claim of implementation/compliance |
+| VPMR-SRC-013 | [Guidance on FLW Quantification Methods](https://flwprotocol.org/wp-content/uploads/2017/06/FLW-Protocol_Guidance-on-FLW-Quantification-Methods.pdf) | FLW Protocol | measurement method selection | local measurement result |
+| VPMR-SRC-014 | [Measuring and reporting food waste in hospitality and food service](https://www.wrap.ngo/resources/guide/measuring-and-reporting-food-waste-hospitality-and-food-service) | WRAP | practical measurement/reporting protocol design | Boğaziçi result |
+| VPMR-SRC-015 | [Wasted Food Scale](https://www.epa.gov/sustainable-management-food/wasted-food-scale) | US EPA | prevention hierarchy | Turkish legal mandate; Boğaziçi outcome |
+| VPMR-SRC-016 | [Resources for Assessing Wasted Food](https://www.epa.gov/sustainable-management-food/resources-assessing-wasted-food) | US EPA | practical assessment/log design | local measured outcome |
+| VPMR-SRC-026 | [Foodservice methodology](https://insights-engine.refed.org/methodology/foodservice) | ReFED | US foodservice surplus/waste methodology reference | local customer validation |
+| VPMR-SRC-029 | [Otel, Restoran ve Diğer Toplu Tüketim Yerlerinde Gıda İsrafı ile Mücadele Kılavuzu](https://www.tarimorman.gov.tr/abdgm/link/68/yayinlarimiz) | T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye | Türkiye-specific institutional food-service waste prevention context; separation/measurement/planning/service prevention practices | Boğaziçi measured outcome; proof that forecast error is the dominant local waste cause |
 
-## C. External evidence and analogues
+## C. Academic and external mechanism analogues
 
-| ID | Source | Class | What it can support | Critical boundary / note |
+| ID | Source | Publisher | What it can support | Critical boundary |
 | --- | --- | --- | --- | --- |
-| VPMR-SRC-019 | [Türker (2025), Sustainability — Reducing Food Waste in Campus Dining](https://www.mdpi.com/2071-1050/17/2/379) | ACADEMIC_ANALOGUE | Plausibility of campus demand/waste modeling using contextual signals | Reported model performance is not transferable to Boğaziçi |
-| VPMR-SRC-020 | [Özokcu & Özdemir (2026) — Understanding drivers of consumer-level food waste in a university cafeteria](https://link.springer.com/article/10.1007/s44274-025-00509-y) | ACADEMIC_ANALOGUE | Turkish-university evidence on consumer-level food-waste drivers using survey + interviews | Consumer/plate-waste drivers are not automatically production-surplus drivers |
-| VPMR-SRC-021 | [Özokcu & Özdemir — open PDF](https://link.springer.com/content/pdf/10.1007/s44274-025-00509-y.pdf) | ACADEMIC_ANALOGUE | Direct full-text PDF for review and exact citation | Preserve article license/attribution |
-| VPMR-SRC-022 | [Every Plate Counts (2019), Resources Conservation & Recycling](https://doi.org/10.1016/j.resconrec.2019.104316) | ACADEMIC_ANALOGUE | Example of intervention evaluation with treatment/comparison dining halls and weighing | Intervention effect/context cannot be assumed at Boğaziçi |
-| VPMR-SRC-023 | [Smaller servings vs information intervention (2020)](https://doi.org/10.1016/j.resconrec.2020.104786) | ACADEMIC_ANALOGUE | Portion-size intervention can be tested as a separate causal lever | Does not validate demand forecasting as the dominant lever |
-| VPMR-SRC-024 | [Food Choice and Waste in University Dining Commons (2021)](https://www.mdpi.com/2071-1050/13/4/2129) | ACADEMIC_ANALOGUE | Multi-campus dining-waste observation and photo-based measurement analogue | External campus context only |
-| VPMR-SRC-025 | [Plate Food Waste in Food Services — systematic review/meta-analysis (2024)](https://doi.org/10.3390/foods13111739) | ACADEMIC_ANALOGUE | Broad food-service plate-waste evidence and methodological context | Plate waste should not be conflated with unserved surplus |
-| VPMR-SRC-026 | [Automated food-waste identification in university cafeterias (machine vision, 2025)](https://www.mdpi.com/2076-3417/15/4/1814) | ACADEMIC_ANALOGUE | Computer-vision feasibility analogue for TrayGate-like measurement | Requires local calibration/validation; pixels/classes are not certified mass |
+| VPMR-SRC-017 | [Reducing Food Waste in Campus Dining: A Data-Driven Approach](https://www.mdpi.com/2071-1050/17/2/379) | MDPI Sustainability | technical plausibility of contextual campus modeling | expected Boğaziçi model score; local causal effect |
+| VPMR-SRC-018 | [Understanding the drivers of consumer level food waste in a university cafeteria](https://link.springer.com/article/10.1007/s44274-025-00509-y) | Springer | Turkish university consumer-level driver analogue | production-surplus causal claim |
+| VPMR-SRC-019 | [Every plate counts: Evaluation of a food waste reduction campaign](https://doi.org/10.1016/j.resconrec.2019.104316) | Resources, Conservation & Recycling | campus intervention-evaluation analogue | Boğaziçi intervention effect |
+| VPMR-SRC-020 | [Smaller servings vs information intervention](https://doi.org/10.1016/j.resconrec.2020.104786) | Resources, Conservation & Recycling | alternative causal lever: portion size | forecasting as dominant lever |
+| VPMR-SRC-021 | [Food Choice and Waste in University Dining Commons](https://www.mdpi.com/2071-1050/13/4/2129) | MDPI Sustainability | multi-campus dining-waste observation analogue | local operational semantics |
+| VPMR-SRC-022 | [Plate Food Waste in Food Services: systematic review/meta-analysis](https://doi.org/10.3390/foods13111739) | MDPI Foods | broad food-service plate-waste context | unserved surplus equivalence |
+| VPMR-SRC-023 | [Automated food waste identification in university cafeterias using machine vision](https://www.mdpi.com/2076-3417/15/4/1814) | MDPI Applied Sciences | computer-vision measurement feasibility analogue | certified local mass measurement |
+| VPMR-SRC-035 | [Machine learning models for short-term demand forecasting in food catering services](https://www.sciencedirect.com/science/article/pii/S0959652623044232) | Journal of Cleaner Production / Elsevier | multi-canteen catering demand-forecasting precedent; need to compare ML against operational/baseline forecasts; joint surplus and unmet-demand evaluation | transfer of reported waste-reduction percentages to Boğaziçi; local model utility before admitted service truth |
+| VPMR-SRC-036 | [Demand Forecasting for Food Production Using Machine Learning Algorithms: A Case Study of University Refectory](https://hrcak.srce.hr/en/clanak/446387) | Technical Gazette / Hrčak | university-refectory demand forecasting precedent; calendar and meal-ingredient features as candidate inputs | Boğaziçi performance; novelty claim for calendar/menu-aware forecasting |
+| VPMR-SRC-037 | [Machine Learning Techniques for Cafeteria Demand Forecasting: An Institutional Case](https://dergipark.org.tr/en/pub/opusjsr/article/1649256) | OPUS Journal of Society Research / Dergipark | institutional turnstile-demand forecasting precedent; multi-resolution demand modeling precedent | Boğaziçi turnstile access or field semantics; transfer of reported metrics/impact |
 
-## D. Decision-time data and external reference datasets
+## D. Decision-time external inputs
 
-| ID | Source | Class | What it can support | Critical boundary / note |
+| ID | Source | Publisher | What it can support | Critical boundary |
 | --- | --- | --- | --- | --- |
-| VPMR-SRC-027 | [Open-Meteo Historical Forecast API](https://open-meteo.com/en/docs/historical-forecast-api) | ARCHIVED_DECISION_INPUT | Historical forecast snapshots that better represent what could have been known at the decision horizon | Do not use hindsight observations/reanalysis as if known at forecast cutoff |
-| VPMR-SRC-028 | [Genpact Food Demand Forecasting dataset mirror](https://github.com/ashishpatel26/Food-Demand-Forecasting) | REFERENCE_DATASET | Sandbox demand-forecasting pipeline/schema practice | Not Boğaziçi, not university-specific ground truth, not waste labels, not PMR |
+| VPMR-SRC-007 | [Academic calendar](https://akademiktakvim.bogazici.edu.tr/) | Boğaziçi University | calendar/regime features known in advance | demand outcome |
+| VPMR-SRC-024 | [Historical Forecast API](https://open-meteo.com/en/docs/historical-forecast-api) | Open-Meteo | historical forecast input known at a decision horizon | hindsight actual weather masquerading as forecast |
 
-## E. Market-method reference tools
+## E. Reference datasets
 
-| ID | Source | Class | What it can support | Critical boundary / note |
+| ID | Source | Publisher | What it can support | Critical boundary |
 | --- | --- | --- | --- | --- |
-| VPMR-SRC-029 | [ReFED — Foodservice methodology](https://insights-engine.refed.org/methodology/foodservice) | STANDARD_METHOD | US foodservice surplus/waste methodology, equations, assumptions and data caveats | US-centric; use as method reference only |
-| VPMR-SRC-030 | [ReFED Insights Engine](https://insights-engine.refed.org/) | PUBLIC_CONTEXT | Structured external benchmark/context and solutions research | Not local market validation |
-| VPMR-SRC-031 | [ReFED Solutions Database](https://insights-engine.refed.org/solution-database) | PUBLIC_CONTEXT | Intervention catalogue and downloadable solution context | Evaluate local feasibility separately |
+| VPMR-SRC-025 | [Food Demand Forecasting dataset mirror](https://github.com/ashishpatel26/Food-Demand-Forecasting) | GitHub community mirror / Genpact challenge data | sandbox forecasting pipeline tests | Boğaziçi model performance; waste labels; PMR |
 
 ## Internal cross-reference artifacts
 
-These are repo artifacts, not external evidence. They are valuable because other agents already did substantial research:
+- Issue #82 — current CS1 service-truth acquisition contract.
+- Issue #317 — VPMR cross-agent intake/coordination.
+- `KREATE/PMR/` — parallel PMR source library, claim-source matrix, asset manifest and interview execution surfaces.
+- Archive research branches listed in `AGENT_HANDOFF.md` — selective source salvage only; never wholesale-merge stale shared state.
 
-- Current master: `KREATE/RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md` — current evidence/product boundary.
-- Issue #82 — CS1 service-truth acquisition contract and public source inventory.
-- Archive branch `research/kreate-deep-pmr-market-20261004` — deep market/PMR synthesis, academic demand evidence, procurement, persona and beachhead research.
-- Archive branch `research/kreate-evidence-20261005` — measurement standard, falsification matrix and information-value queue.
-- Archive branch `research/kreate-contractor-gtm-clean-20261005` — contractor-led GTM and TEMAŞ PMR role map.
-- Archive branch `agent/campus-data-geo/bogazici-pmr-target-map` — Boğaziçi operations/procurement/PMR target mapping.
-- Archive branch `agent/decision-intelligence/cafeteria-data-research` — cafeteria data source manifests and modeling contracts.
+## Registry rule
 
-Do not merge those stale branches wholesale. Recut only source-backed conclusions into current-master-compatible files and preserve their claim boundaries.
+Do not assign a new ID to a PDF merely because it is an alternate representation of the same source. Put alternate PDF/data/visual URLs in the JSON source record and `VISUALS_AND_PDFS.md`. Create a new source ID only when the artifact has materially distinct provenance or claim semantics.
