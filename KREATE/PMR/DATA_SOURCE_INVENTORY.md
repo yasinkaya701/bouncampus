@@ -13,6 +13,7 @@ This file separates public context/features from source-owned operational truth 
 | `PUBLIC_CONTEXT` | Feature/context only | menu, calendar, event signals |
 | `PUBLIC_AGGREGATE_OUTCOME` | Aggregate context/sanity checks; not service labels | campus waste totals |
 | `PUBLIC_PROCUREMENT` | Contract/market structure only; not operational labels | buyer, contractor, scope, procurement route |
+| `ACCESS_EVIDENCE` | Not a benchmark dataset | owner route, event-surface and exportability questions |
 | `PENDING_INTERNAL` | Ineligible until acquired and verified | production, settlement, service-level waste |
 | `GENERATED_SANDBOX` | Never measured truth | demo/synthetic repo data |
 
@@ -31,6 +32,20 @@ This file separates public context/features from source-owned operational truth 
 | DS-009 | Contract acceptance / hakediş | settlement unit, corrections, liability, penalties | PENDING_INTERNAL | public procurement scope known via S-PROC-001; clause semantics still missing | economic buyer / beneficiary / shortage-excess incentives |
 | DS-010 | 2026–2027 public procurement (S-PROC-001) | IKN, listed meal quantities, campuses, contractor, contract period/value | PUBLIC_PROCUREMENT | available as public result context | interview target and contract-document acquisition route |
 | DS-011 | Repo historical generated CSVs | synthetic/generated schemas | GENERATED_SANDBOX | available | demos/tests only; explicitly ineligible for measured claims |
+| DS-012 | BİDB Service Inventory (S-BU-021) | service owner/responsible-unit/contact metadata | ACCESS_EVIDENCE | available | narrows BUCard/SKS/BİDB acquisition route; not data access |
+| DS-013 | BUCampus Geçişlerim surface (S-BU-023) | user-facing turnstile/card-reader passage history | ACCESS_EVIDENCE | available | proves event-history surface exists; reader scope/exportability/reconciliation unknown |
+| DS-014 | Intersession reservation workflow (S-BU-025) | reservation by service/date/campus special regime | PUBLIC_CONTEXT / PENDING_INTERNAL | public workflow known; snapshots/export unknown | decision-time intent signal candidate only |
+
+### Public ownership / event-surface evidence
+
+The acquisition route is now narrower:
+
+- **S-BU-021:** BİDB service inventory lists BUCard as a BİDB service; cafeteria BUCard top-up/refund includes SKS + BİDB; turnstile/card-reader faults route to BİDB.
+- **S-BU-023:** BUCampus documents a user-facing history of turnstile/card-reader passages.
+
+These sources support **owner routing and the existence of an event surface only**. They do not establish research access, cafeteria-reader separation, retention, aggregate export, or `actual_served` semantics.
+
+See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
 
 ## DS-006 — service truth contract
 
@@ -130,7 +145,7 @@ A dataset is eligible for measured claims only when all are true:
 
 ## Highest-value next acquisitions
 
-1. #292 aggregate BUCard/SKS export + reconciliation.
+1. #292 aggregate BUCard/SKS export + reconciliation using the now-verified BİDB/SKS owner route.
 2. Current contract technical/admin specifications and settlement/hakediş semantics for IKN 2025/1727143.
 3. Actual production/allocation record or at least owner/schema/timestamp semantics.
 4. Service-level, stage-separated waste measurement.

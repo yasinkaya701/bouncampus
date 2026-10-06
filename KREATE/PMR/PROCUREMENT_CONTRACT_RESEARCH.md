@@ -82,6 +82,30 @@ We still need to learn:
 
 The same notice describes a 5,000-meal/day bidder-capacity threshold as one-half of the administration's stated daily meal need. Treat that as **procurement capacity context only**, not measured actual daily demand.
 
+### Retrieval attempt status
+
+The public tender mirror exposes links that redirect to the official EKAP tender-document route for **IKN 2025/1727143**. The current environment can resolve the route but cannot retrieve the underlying document bundle.
+
+Record this as:
+
+~~~text
+current announcement/result: VERIFIED_PUBLIC
+current admin specification: RETRIEVAL_REQUIRED
+current technical specification: RETRIEVAL_REQUIRED
+current unit-price schedule: RETRIEVAL_REQUIRED
+current contract/acceptance clauses: RETRIEVAL_REQUIRED
+~~~
+
+Do not backfill current clauses from the 2023/2024–2025 procurement.
+
+### Predecessor cancellation is now explicit
+
+For **IKN 2025/1335958**, the public cancellation notice states that objections to the tender documents required changes to some specification provisions, but an EKAP addendum could not be issued at the tender date, so the tender was cancelled.
+
+That gives a concrete next desk artifact task: obtain both predecessor and current authoritative specification bundles and make a clause-level diff. The cancellation notice does **not** identify the changed clauses.
+
+See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
+
 ## Do not infer settlement from the headline contract
 
 The public result is sufficient for **scope, contractor and procurement-route context**. It is not sufficient for:
