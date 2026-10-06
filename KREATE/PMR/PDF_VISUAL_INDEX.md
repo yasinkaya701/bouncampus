@@ -9,6 +9,7 @@ This file makes source artifacts easy to retrieve without redistributing copyrig
 | Source ID | Artifact | Direct link | Notes |
 | --- | --- | --- | --- |
 | PMR-SRC-001 | Boğaziçi 2025 public source workbook | https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx | Official spreadsheet; preserve raw semantics. |
+| PMR-SRC-002 | Boğaziçi 2024 food-waste report | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf | Official one-page university PDF matching the 2024 public table. |
 | PMR-SRC-002 | Boğaziçi 2023 food-waste report | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf | Official university PDF. |
 | PMR-SRC-007 | Disciplined Entrepreneurship — Primary Market Research | https://www.d-eship.com/wp-content/uploads/2019/03/Disciplined_Entrepreneurship_-_Primary_Market_Research.pdf | PMR method. |
 | PMR-SRC-008 | UNEP Food Waste Index 2024 | https://wedocs.unep.org/bitstream/handle/20.500.11822/45230/food_waste_index_report_2024.pdf | Global methodology/report. |
