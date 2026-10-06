@@ -18,7 +18,7 @@ This directory is the canonical entry point for KREATE Primary Market Research. 
 5. [source_catalog.json](source_catalog.json) — machine-readable stable-ID catalog.
 6. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — source-to-hypothesis firewall and exact PMR gaps.
 7. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — asset/license/provenance policy.
-8. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/EE-EHB/CS1/CS2 reuse and append contract.
+8. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/EE-EHB/CS1/CS2 reuse and append contract.\n9. [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md) — public/context signals vs source-owned operational truth and dataset promotion gates.
 
 ### Real PMR execution
 9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral tests and reject/support criteria.
@@ -26,12 +26,12 @@ This directory is the canonical entry point for KREATE Primary Market Research. 
 11. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
 
 ### VPMR research layer
-12. [../VPMR/README.md](../VPMR/README.md) — verifiable secondary-research layer.
-13. [../VPMR/SOURCE_REGISTRY.md](../VPMR/SOURCE_REGISTRY.md) / [../VPMR/source_registry.json](../VPMR/source_registry.json) — canonical-link registry.
-14. [../VPMR/DATASETS.md](../VPMR/DATASETS.md) — public/reference/private-required data map.
-15. [../VPMR/PMR_GUIDE.md](../VPMR/PMR_GUIDE.md) — H-001…H-006 interview/falsification conversion.
-16. [../VPMR/VISUALS_AND_PDFS.md](../VPMR/VISUALS_AND_PDFS.md) — PDF/visual index.
-17. [../VPMR/AGENT_HANDOFF.md](../VPMR/AGENT_HANDOFF.md) — stale-branch recut/dedupe rules.
+13. [../VPMR/README.md](../VPMR/README.md) — verifiable secondary-research layer.
+14. [../VPMR/SOURCE_REGISTRY.md](../VPMR/SOURCE_REGISTRY.md) / [../VPMR/source_registry.json](../VPMR/source_registry.json) — canonical-link registry.
+15. [../VPMR/DATASETS.md](../VPMR/DATASETS.md) — public/reference/private-required data map.
+16. [../VPMR/PMR_GUIDE.md](../VPMR/PMR_GUIDE.md) — H-001…H-006 interview/falsification conversion.
+17. [../VPMR/VISUALS_AND_PDFS.md](../VPMR/VISUALS_AND_PDFS.md) — PDF/visual index.
+18. [../VPMR/AGENT_HANDOFF.md](../VPMR/AGENT_HANDOFF.md) — stale-branch recut/dedupe rules.
 
 The two machine-readable registries intentionally have different namespaces (`SRC-*`/stable catalog and `VPMR-SRC-*`/VPMR registry). Do not silently collapse IDs. Future consolidation should preserve aliases/provenance.
 
