@@ -1,0 +1,49 @@
+{
+  "schema": "BOUNCAMPUS_IE_ACQUISITION_TRACKER_V1",
+  "updated_at": "2026-10-06",
+  "evidence_boundary": "Tracker state is operational coordination only. It does not claim outreach, access, interviews, artifacts, customer validation, measured outcomes or contract interpretation.",
+  "workstreams": [
+    {
+      "issue": 292,
+      "name": "BUCard/SKS aggregate service truth",
+      "state": "REQUEST_READY",
+      "routes": ["S-BU-010", "S-BU-011", "S-BU-015"],
+      "required_grain": "campus_id x meal_period x service_date",
+      "required_outputs": [
+        "source-native aggregate passage/meal count",
+        "report_generated_at",
+        "source_report_id",
+        "reconciliation semantics",
+        "production/outcome record owner",
+        "export/access decision"
+      ],
+      "downstream": ["CS1 #82"],
+      "forbidden_inference": [
+        "passage_count == actual_served without reconciliation",
+        "generated sandbox data as service truth",
+        "person/card/student/staff identifiers"
+      ]
+    },
+    {
+      "issue": 358,
+      "name": "IKN 2025/1727143 contract and hakediş semantics",
+      "state": "REQUEST_READY",
+      "routes": ["S-PROC-001", "S-BU-010", "S-BU-014"],
+      "required_outputs": [
+        "authoritative current admin/technical spec retrieval status",
+        "unit-price schedule retrieval status",
+        "payable/accepted quantity semantics",
+        "quantity freeze/change rights",
+        "acceptance/hakediş owner",
+        "excess/shortage economic-risk owner",
+        "production/reconciliation artifact owner"
+      ],
+      "downstream": ["CS2", "CS1", "EE", "EHB"],
+      "forbidden_inference": [
+        "headline contract value / listed meals == unit meal price",
+        "historical clauses == current clauses",
+        "unit-price contract form == payable operational count"
+      ]
+    }
+  ]
+}
