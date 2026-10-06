@@ -194,6 +194,22 @@ Useful first-party routes now in the catalog:
 
 These are **interview-routing evidence**, not proof that any named public role owns the specific decision.
 
+## Canonical first-party procurement and hakediş routes
+
+The current IE source map separates four first-party routing/evidence surfaces instead of overloading one source ID:
+
+- **S-BU-029 — İhale ve Satınalma Şube Müdürlüğü:** procurement/tender document ownership and referral route.
+- **S-BU-027 — Tahakkuk Şube Müdürlüğü:** tender/direct-procurement/transfer/hakediş payment route.
+- **S-BU-028 — İMİD contact:** general fallback routing.
+- **S-BU-030 — 2025 Administration Activity Report:** institutional Control Organization → KİK56.0/H acceptance proposal → relevant Spending Authority → hakediş-preparation flow; explicitly includes food-service procurement among recurring service works.
+
+The current Food Services directive remains **S-BU-026** and is a distinct governance source. Do not reuse S-BU-026 for an İMİD page.
+
+Decision boundary:
+- these sources narrow **where to ask** and the generic institutional acceptance path;
+- they still do not reveal the current IKN 2025/1727143 payable meal count, accepted quantity, exact Spending Authority, signer chain, daily freeze/change rights, penalties, unit prices, economic-risk owner or software buyer;
+- the authoritative current tender bundle and real acceptance/hakediş artifact remain required.
+
 ## Contract-PMR question set
 
 Ask for one recent concrete service first, then reconstruct the documents and decisions:
