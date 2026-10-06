@@ -187,7 +187,7 @@ function DecisionStep({ band, health, nf, t }: { band: ProductionBand | null; he
   return (
     <div>
       <div className="bc-eyebrow">02 · {t('KARAR KALİTESİ', 'DECISION QUALITY')}</div>
-      <div className="mt-3 flex flex-wrap items-center gap-3"><h2 className="text-[34px] font-black tracking-[-0.05em] text-slate-950">{band.decisionReadiness}</h2><span className="rounded-full bg-slate-100 px-3 py-1 font-mono text-[8px] font-black text-slate-600">{band.signalCoveragePct}% POLICY COVERAGE</span></div>
+      <div className="mt-3 flex flex-wrap items-center gap-3"><h2 className="text-[34px] font-black tracking-[-0.05em] text-slate-950">{band.decisionReadiness === 'PILOT_READY' ? t('PROTOTİP KAPISI GEÇTİ', 'PROTOTYPE GATE PASS') : band.decisionReadiness}</h2><span className="rounded-full bg-slate-100 px-3 py-1 font-mono text-[8px] font-black text-slate-600">{band.signalCoveragePct}% POLICY COVERAGE</span></div>
       <div className="mt-5 grid gap-3 sm:grid-cols-4">
         <BigMetric label={t('Nokta tahmini', 'Point forecast')} value={nf(band.predictedMeals)} tag="MODEL_ESTIMATE" />
         <BigMetric label={t('Alt planlama sınırı', 'Lower planning bound')} value={nf(band.lowerBound)} tag="POLICY_HEURISTIC" />
@@ -210,9 +210,9 @@ function HumanGateStep({ canPilot, operatorGate, setOperatorGate, band, t }: { c
     <div>
       <div className="bc-eyebrow">03 · {t('İNSAN KAPISI', 'HUMAN GATE')}</div>
       <h2 className="mt-3 text-[34px] font-black tracking-[-0.05em] text-slate-950">{t('AI mutfağa tek başına komut vermez.', 'AI never dispatches to the kitchen alone.')}</h2>
-      <p className="mt-3 max-w-3xl text-[11px] leading-6 text-slate-500">{t('Pilot onayı yalnız actionable canlı bağlam ve PILOT_READY kararı varken açılır. Bu buton dahi harici mutfak sistemine dispatch yapmaz.', 'Pilot approval is enabled only with actionable live context and a PILOT_READY decision. Even this button does not dispatch to an external kitchen system.')}</p>
+      <p className="mt-3 max-w-3xl text-[11px] leading-6 text-slate-500">{t('Prototip senaryo kapısı yalnız gerekli bağlam erişilebilir ve iç politika durumu PILOT_READY iken açılır. Bu, kurumsal pilot onayı değildir; buton harici mutfak sistemine dispatch yapmaz.', 'The prototype scenario gate opens only when required context is available and the internal policy state is PILOT_READY. This is not institutional pilot approval, and the button does not dispatch to an external kitchen system.')}</p>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <button type="button" disabled={!canPilot} onClick={() => setOperatorGate('PILOT_APPROVED')} className={`rounded-[20px] border p-5 text-left ${operatorGate === 'PILOT_APPROVED' ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-slate-900/10 bg-white text-slate-900'} disabled:cursor-not-allowed disabled:opacity-35`}><CheckCircle2 size={17} /><div className="mt-5 text-[12px] font-black">{t('Kontrollü pilotu onayla', 'Approve controlled pilot')}</div><div className="mt-1 text-[9px] opacity-55">{band?.decisionReadiness ?? 'WITHHOLD'} · AUTO_DISPATCH=false</div></button>
+        <button type="button" disabled={!canPilot} onClick={() => setOperatorGate('PILOT_APPROVED')} className={`rounded-[20px] border p-5 text-left ${operatorGate === 'PILOT_APPROVED' ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-slate-900/10 bg-white text-slate-900'} disabled:cursor-not-allowed disabled:opacity-35`}><CheckCircle2 size={17} /><div className="mt-5 text-[12px] font-black">{t('Danışmanlık senaryosunu hazır işaretle', 'Mark advisory scenario ready')}</div><div className="mt-1 text-[9px] opacity-55">{band?.decisionReadiness === 'PILOT_READY' ? t('PROTOTİP KAPISI GEÇTİ', 'PROTOTYPE GATE PASS') : band?.decisionReadiness ?? 'WITHHOLD'} · AUTO_DISPATCH=false</div></button>
         <button type="button" onClick={() => setOperatorGate('HOLD')} className={`rounded-[20px] border p-5 text-left ${operatorGate === 'HOLD' ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-900/10 bg-white text-slate-900'}`}><ShieldCheck size={17} /><div className="mt-5 text-[12px] font-black">{t('Beklet / gözden geçir', 'Hold / review')}</div><div className="mt-1 text-[9px] opacity-55">{t('Varsayılan güvenli durum', 'Safe default')}</div></button>
       </div>
     </div>
@@ -222,11 +222,12 @@ function HumanGateStep({ canPilot, operatorGate, setOperatorGate, band, t }: { c
 function EvidenceStep({ t }: { t: (tr: string, en: string) => string }) {
   return (
     <div>
-      <div className="bc-eyebrow">04 · {t('YANLIŞLANABİLİR PİLOT', 'FALSIFIABLE PILOT')}</div>
-      <h2 className="mt-3 text-[34px] font-black tracking-[-0.05em] text-slate-950">{t('Başarıyı model değil, ölçüm ilan eder.', 'The measurement, not the model, declares success.')}</h2>
+      <div className="bc-eyebrow">04 · {t('ÖNERİLEN YANLIŞLANABİLİR PİLOT', 'PROPOSED FALSIFIABLE PILOT')}</div>
+      <h2 className="mt-3 text-[34px] font-black tracking-[-0.05em] text-slate-950">{t('Başarıyı model değil, gelecekteki ölçüm ilan edebilir.', 'Only prospective measurement can declare success.')}</h2>
+      <p className="mt-3 max-w-3xl text-[10px] leading-5 text-slate-500">{t('Bu ekran çalıştırılmış bir pilot sonucu göstermiyor; henüz uygulanmamış, yanlışlanabilir bir ölçüm protokolünü gösteriyor.', 'This screen does not show an executed pilot result; it shows a proposed, falsifiable measurement protocol that has not yet been run.')}</p>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <BigMetric label={t('Ana KPI', 'Primary KPI')} value={t('kg / 100 öğün', 'kg / 100 meals')} tag="PRE_REGISTERED" />
-        <BigMetric label={t('Hedef', 'Target')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} tag="TARGET_NOT_RESULT" />
+        <BigMetric label={t('Hedef', 'Target')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} tag="ILLUSTRATIVE_TARGET_NOT_RESULT" />
         <BigMetric label={t('Minimum kanıt', 'Minimum evidence')} value={`${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}+${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}`} tag="CONTROL+INTERVENTION" />
       </div>
       <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-[9px] leading-5 text-amber-900">{t('Erken tükenme artarsa, data-quality gate geçmezse veya gıda güvenliği süreci geçmezse PROMISING sonucu verilemez. İklim etkisi ancak gerçek ölçümden sonra ayrıca hesaplanabilir.', 'If early sell-out increases, the data-quality gate fails, or food-safety review fails, the intervention cannot be called PROMISING. Climate impact can only be calculated separately after real measurement.')}</div>
@@ -241,7 +242,7 @@ function CloseStep({ t }: { t: (tr: string, en: string) => string }) {
       <div>
         <div className="bc-eyebrow">05 · {t('KAPANIŞ', 'CLOSE')}</div>
         <h2 className="mt-3 text-[36px] font-black leading-[1.02] tracking-[-0.055em] text-slate-950">{t('48 tonluk problemi raporlamıyoruz; bir sonraki öğünde oluşmasını azaltabilecek kararı test ediyoruz.', 'We are not merely reporting the 48-ton problem; we are testing a decision that may reduce waste in the next service.')}</h2>
-        <p className="mt-4 text-[12px] font-black leading-6 text-[#173f67]">{t('Ama başarıyı AI söylemiyor — kontrollü pilot söylüyor.', 'But AI does not declare victory — the controlled pilot does.')}</p>
+        <p className="mt-4 text-[12px] font-black leading-6 text-[#173f67]">{t('Ama başarıyı AI söylemiyor — ancak gelecekteki doğrulanmış ölçüm söyleyebilir.', 'But AI does not declare victory — only future verified measurement can.')}</p>
       </div>
       <div className="rounded-[22px] bg-[#071c33] p-5 text-white">
         <div className="text-[8px] font-black uppercase tracking-[0.13em] text-[#b8e467]">{t('Ölçekleme kuralı', 'Scaling rule')}</div>
@@ -257,7 +258,7 @@ function DemoHealthPanel({ health, band, t }: { health: DemoHealth; band: Produc
     <div className="grid gap-2 rounded-[20px] border border-slate-900/10 bg-[#f7f9f6] p-4 sm:grid-cols-3">
       <HealthItem label={t('Resmi baz çizgi', 'Official baseline')} value="READY" good />
       <HealthItem label={t('Canlı bağlam', 'Live context')} value={health} good={health === 'LIVE'} />
-      <HealthItem label={t('Operasyon kararı', 'Operational decision')} value={band?.decisionReadiness ?? 'WITHHOLD'} good={band?.decisionReadiness === 'PILOT_READY'} />
+      <HealthItem label={t('Prototip aksiyon kapısı', 'Prototype action gate')} value={band?.decisionReadiness === 'PILOT_READY' ? t('GEÇTİ', 'PASS') : band?.decisionReadiness ?? 'WITHHOLD'} good={band?.decisionReadiness === 'PILOT_READY'} />
     </div>
   );
 }
