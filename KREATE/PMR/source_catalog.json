@@ -607,7 +607,8 @@
       ],
       "limitations": [
         "aggregate monthly reporting is not service-level truth or causal overproduction evidence"
-      ]
+      ],
+      "data_quality_note": "Published 2024 monthly Total Food Waste rows sum to 50,994 kg while the page/PDF prints 50,993 kg. Preserve published rows and total separately; do not silently repair."
     },
     {
       "id": "S-MEAS-004",
