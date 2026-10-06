@@ -540,3 +540,10 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
 - Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
 - Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
+
+
+## First-party hakediş routing integrity — 2026-10-06
+
+- **S-BU-027** — official Tahakkuk branch. Use as the first-party route for the hakediş payment package and responsible payment/acceptance referral; it does not prove the payable meal count or current contract clauses.
+- **S-BU-028** — official İMİD contact page. Use for general Procurement/Tahakkuk routing only.
+- **S-BU-030** — official 2025 Administration Activity Report. Supports the institutional acceptance chain Control Organization → `KİK56.0/H` → relevant Spending Authority for hakediş preparation and states 2025 food-service work was performed monthly. It does not identify the current contract's payable quantity, exact Spending Authority, freeze rights or economics.
