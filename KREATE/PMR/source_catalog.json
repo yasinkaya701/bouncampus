@@ -583,6 +583,202 @@
       "limitations": [
         "materially stale; selectively salvage source-level facts only"
       ]
+    },
+    {
+      "id": "S-PMR-004",
+      "title": "How to Talk to Users",
+      "type": "PMR_METHOD",
+      "publisher": "Y Combinator Startup School",
+      "url": "https://www.ycombinator.com/library/6g-how-to-talk-to-users",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "incident-first interviewing",
+        "past behavior and current workaround questions over product pitching"
+      ],
+      "limitations": [
+        "method only",
+        "does not validate BOUNCAMPUS claims"
+      ]
+    },
+    {
+      "id": "S-BU-007",
+      "title": "Food Services contact page",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Dining Services",
+      "url": "https://yemekhane.bogazici.edu.tr/iletisim",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H5"
+      ],
+      "supports": [
+        "official professional outreach surface for dining workflow discovery"
+      ],
+      "limitations": [
+        "public contact route is not consent, interview evidence, endorsement or decision ownership"
+      ]
+    },
+    {
+      "id": "S-BU-008",
+      "title": "Food Services staff page",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Dining Services",
+      "url": "https://yemekhane.bogazici.edu.tr/people",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H5"
+      ],
+      "supports": [
+        "current public role map for dining governance and operations"
+      ],
+      "limitations": [
+        "job title alone does not prove who sets daily production quantity or owns budget"
+      ]
+    },
+    {
+      "id": "S-BU-009",
+      "title": "Student Events Calendar",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://takvim.bogazici.edu.tr/tr/events/students",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "public event-date/type context candidate for anomalous campus attendance"
+      ],
+      "limitations": [
+        "event listing does not reveal attendance magnitude or causal effect on dining demand"
+      ]
+    },
+    {
+      "id": "S-BU-010",
+      "title": "Academic Calendar 2026–2027",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University International Relations",
+      "url": "https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "versionable term, exam and no-class context"
+      ],
+      "limitations": [
+        "calendar context is not a service-volume label and must be aligned to decision-time availability"
+      ]
+    },
+    {
+      "id": "S-TR-005",
+      "title": "Food-service hygiene and good-practice guidance index",
+      "type": "STANDARD",
+      "publisher": "Republic of Türkiye Ministry of Agriculture and Forestry — General Directorate of Food and Control",
+      "url": "https://www.tarimorman.gov.tr/GKGM/Menu/132/",
+      "accessed_at": "2026-10-06",
+      "authority": "government_official",
+      "hypotheses": [
+        "H6"
+      ],
+      "supports": [
+        "food-safety and operating-constraint question design for mass catering"
+      ],
+      "limitations": [
+        "national guidance does not identify Boğaziçi workflow, contract terms or recommendation authority"
+      ]
+    },
+    {
+      "id": "S-ACAD-007",
+      "title": "Food waste reduction and its environmental consequences: a quasi-experimental study in a campus canteen",
+      "type": "ACADEMIC",
+      "publisher": "Agriculture & Food Security / Springer Nature",
+      "url": "https://link.springer.com/article/10.1186/s40066-024-00488-y",
+      "published_at": "2024-09-10",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "direct-weighing intervention precedent",
+        "multiple non-forecast root causes including portion size, taste and quality"
+      ],
+      "limitations": [
+        "study-specific effect sizes are not transferable to Boğaziçi or BOUNCAMPUS",
+        "intervention differs from production forecasting"
+      ]
+    },
+    {
+      "id": "S-ACAD-008",
+      "title": "Understanding the drivers of consumer level food waste in a university cafeteria",
+      "type": "ACADEMIC",
+      "publisher": "Discover Environment / Springer Nature",
+      "url": "https://link.springer.com/article/10.1007/s44274-025-00509-y",
+      "published_at": "2026-01-03",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "Türkiye university-cafeteria evidence that plate waste has situational and sensory drivers such as portion size and taste/palatability"
+      ],
+      "limitations": [
+        "consumer plate-waste evidence does not establish production overforecasting as the dominant local cause"
+      ]
+    },
+    {
+      "id": "S-INT-004",
+      "title": "TEMAŞ public-pain / PMR role-map stale research branch",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "BOUNCAMPUS repo",
+      "url": "https://github.com/yasinkaya701/bouncampus/tree/research/kreate-contractor-gtm-clean-20261005",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_stale_branch",
+      "hypotheses": [
+        "H1",
+        "H3",
+        "H5",
+        "BUYER"
+      ],
+      "supports": [
+        "contractor-side role discovery and economic-beneficiary question backlog"
+      ],
+      "limitations": [
+        "stale branch",
+        "public company material is not contractor validation",
+        "reverify current facts before promotion"
+      ]
+    },
+    {
+      "id": "S-INT-005",
+      "title": "Issue #292 — privacy-preserving BUCard dining export + SKS reconciliation",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "BOUNCAMPUS repo",
+      "url": "https://github.com/yasinkaya701/bouncampus/issues/292",
+      "accessed_at": "2026-10-06",
+      "authority": "current_internal_dependency",
+      "hypotheses": [
+        "H4"
+      ],
+      "supports": [
+        "cross-role owner and required aggregate grain for real service-truth acquisition"
+      ],
+      "limitations": [
+        "the verified dataset is not yet present",
+        "must not be replaced with generated rows"
+      ]
     }
   ]
 }
