@@ -23,7 +23,8 @@ Agents should treat:
 - [source_catalog.json](source_catalog.json) as the machine-readable registry;
 - [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) as the human index;
 - [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) as the reasoning firewall;
-- [ASSET_MANIFEST.md](ASSET_MANIFEST.md) as the PDF/image/data provenance layer.
+- [ASSET_MANIFEST.md](ASSET_MANIFEST.md) as the PDF/image/data provenance layer;
+- [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md) as the operational/public/sandbox data-surface and admission layer.
 
 Do not create another standalone source dump if the material fits this schema.
 
@@ -131,3 +132,23 @@ The research base is now strong enough that more generic browsing has low inform
 - identifies a directly relevant current incumbent.
 
 Otherwise, effort should move to real PMR.
+
+
+## Active real-data dependency — #292
+
+CS1 has explicitly left measured dining service-truth acquisition as an IE/external-evidence task:
+
+- issue: **#292**;
+- parent CS1 dependency: **#82**;
+- preferred initial grain: privacy-preserving `service_date × campus_id × meal_period`;
+- no person/card-level identifier is required for the initial benchmark;
+- historical generated cafeteria/occupancy/weather/preferences rows remain `GENERATED_SANDBOX / SANDBOX_ONLY`;
+- generated/demo rows cannot support measured benchmark, savings, pilot-readiness or operational-impact claims.
+
+Before any count becomes `actual_served`, the source owner must reconcile duplicates/retries, reversals/refunds, second meals, package meals, campus/meal-period boundaries, corrections, retention and the authoritative export.
+
+When a real artifact arrives, use:
+
+`scripts/cs1_service_truth_artifact_intake.py`
+
+Preserve source identity, exact input SHA-256 and the admission result. See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md).
