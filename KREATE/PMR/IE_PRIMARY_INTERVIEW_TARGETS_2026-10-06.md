@@ -132,6 +132,108 @@ Do not choose a second site merely because access is easy.
 - same buyer but materially different decision/control point;
 - no measurable outcome or no safe intervention window.
 
+
+## IE-04 target shortlist and routing — 2026-10-06
+
+This shortlist is secondary-source routing evidence only. **No row in `INTERVIEW_TRACKER.md` may move from `TODO` until a message is actually sent or a call is actually placed.** Prepared Gmail drafts are not outreach evidence.
+
+### P0-A — mature-operation second site: Bolu Abant İzzet Baysal University (BAİBÜ)
+
+**Why this site is informative**
+- official Beslenme Hizmetleri material describes a multi-site dining operation spanning the central campus and several district campuses;
+- the service is delivered through a contracted private provider;
+- the university publicly lists operational forms including `FR.015 Günlük Yemek Üretim Ve Tüketim Formu`, `FR.018 Tüm Birimlere Gönderilen Yemek Sayıları Formu`, and `FR.019 İlçelere Gönderilen Yemek Sayıları Formu`;
+- its SKS site also shows a current 2026 reservation process, allowing comparison of reservation signals against an existing production/consumption record stack.
+
+**Primary route**
+- SKS: `saglikkultur@ibu.edu.tr`, +90 374 253 45 16.
+- Beslenme Hizmetleri internal extensions publicly list food engineers Itır Fulya Savaşan Alaoğlu (2824) and Merve Gürsoy (2842).
+
+**Interview mission**
+1. Reconstruct one recent day from reservation / expected demand → production → campus allocation → service/take-up → remaining quantity.
+2. Identify which of FR.015 / FR.018 / FR.019 is operationally authoritative versus retrospective paperwork.
+3. Establish the last reversible production/allocation cutoff.
+4. Test whether reservation counts materially change production, merely improve information, or are operationally ignored.
+5. Ask for one recent surplus and one shortage/early-sellout incident and the actual corrective action.
+6. Compare central versus district-campus planning and contractor handoff.
+
+**Falsifier value**
+- if a mature operation already has timely production, allocation and consumption truth but still cannot act before freeze, BOUNCAMPUS's current pre-service recommendation wedge weakens;
+- if the same records support a reachable intervention, this is a strong same-product repeatability test.
+
+**Official sources**
+- https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri/9713
+- https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri-kullanilan-formlar/9853
+- https://sksdb.ibu.edu.tr/tr/page/dahili-iletisim/9732
+
+**Execution state:** Gmail draft prepared; **NOT SENT**.
+
+### P0-B — reservation-first counter-archetype: Bandırma Onyedi Eylül University (BANÜ)
+
+**Why this site is informative**
+- an official 1 October 2026 notice states that, effective 5 October 2026, all vocational-school dining service is completely reservation-based;
+- the notice explicitly says users without a reservation will not receive meal service;
+- the university frames the change around more accurate daily planning, effective resource use and reducing food waste.
+
+This makes BANÜ a deliberately adversarial counter-archetype: demand is partially converted from forecast uncertainty into explicit pre-service commitment.
+
+**Primary route**
+- SKS: `sks@bandirma.edu.tr`, +90 266 717 01 17.
+- The SKS structure separately exposes Beslenme Hizmetleri and an Akıllı Kart ve Yemek Hesapları unit, so the interview should request the actual operational owner rather than infer ownership from titles.
+
+**Interview mission**
+1. Establish reservation cutoff, cancellation/release semantics, no-show handling and any exception path.
+2. Determine exactly how reservation counts become kitchen/order quantities.
+3. Identify whether a safety buffer is still added after reservations and why.
+4. Compare pre-reservation and post-reservation surplus/shortage measurement.
+5. Determine what uncertainty remains after mandatory reservation.
+6. Test whether BOUNCAMPUS has any useful decision left to improve, or whether the reservation workflow largely substitutes for it.
+
+**Kill test**
+- if mandatory reservation makes final demand known early enough and operational variance is negligible, a generic forecasting wedge should be killed for this archetype;
+- any remaining opportunity must be narrower (no-show uncertainty, cross-site allocation, menu/preference effects, late operational exceptions, or another demonstrated control point).
+
+**Official sources**
+- https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94013
+- https://sksdb.bandirma.edu.tr/
+
+**Execution state:** Gmail draft prepared; **NOT SENT**.
+
+### P1 backup / comparative migration case — Kayseri University
+
+**Why keep it as backup**
+- the reservation system already used at the 15 Temmuz campus was expanded university-wide from 6 April 2026;
+- the official dining-unit page states that the central campus produces meals in its own kitchen while district campuses use prepared-meal procurement, creating a useful within-institution operating-model contrast.
+
+**Direct public route**
+- Fatih Koç — Sosyal İşletmeler ve Yemekhaneler Şube Müdürü: `fatihkoc@kayseri.edu.tr`, 0352 504 38 38 / 10807.
+- General SKS: `sksd@kayseri.edu.tr`.
+
+**Interview mission**
+- compare reservation behavior before/after university-wide expansion;
+- compare own-kitchen versus purchased-meal planning;
+- locate the production/order freeze in both models;
+- ask which mismatch or service problem remained after reservation adoption.
+
+**Official sources**
+- https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu
+- https://sksd.kayseri.edu.tr/tr/i/12-1/sosyal-isletmeler-ve-yemekhaneler-sube-mudurlugu
+- https://sksd.kayseri.edu.tr/tr/akademik-personel
+
+**Execution state:** Gmail draft prepared; **NOT SENT**.
+
+### Promotion rule for IE-04
+
+Public pages may justify target selection and interview questions, but **cannot** prove:
+- reservation-to-production coupling;
+- actual surplus/shortage reduction;
+- current decision owner/freeze time;
+- buyer or economic beneficiary;
+- adoption willingness;
+- same-product repeatability.
+
+Only a real source-owner response, completed interview or primary operational artifact may promote those facts.
+
 ---
 
 ## Interview scoring rubric
