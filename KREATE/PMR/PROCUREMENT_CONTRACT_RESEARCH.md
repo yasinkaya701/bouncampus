@@ -35,6 +35,22 @@ The key product question is therefore:
 
 > Which party can change which quantity, before which freeze point, using which source-owned record, and who economically benefits or bears risk when quantity is wrong?
 
+## Tender mechanics visible in the public notice
+
+The public notice/result mirror additionally records:
+
+- bidder qualification included a capacity report threshold sufficient for **5,000 meals/day**;
+- award criterion was stated as **price-based**;
+- result record reports **14 bids / 7 valid bids**.
+
+Interpretation boundary:
+
+- the 5,000-meal figure is a **bidder capacity qualification**, not the university's actual daily production, a guaranteed order, or a service-level target;
+- price-based award does not tell us who captures operational savings after award;
+- bid counts do not establish switching willingness or software budget.
+
+These facts sharpen PMR around where a decision-support tool would enter: university-side contract/acceptance, contractor-side operations, or a future procurement/specification cycle.
+
 ## Do not infer settlement from the headline contract
 
 The public result is sufficient for **scope, contractor and procurement-route context**. It is not sufficient for:
