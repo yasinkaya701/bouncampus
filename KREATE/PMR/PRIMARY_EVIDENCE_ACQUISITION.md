@@ -34,6 +34,10 @@ These are execution aids for this canonical packet, not new evidence registries.
   - the BUCard Office is required to report to the Food Services Board and Food Services Branch and retain digital data;
   - Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission;
   - Article 9 identifies SKS + Administrative and Financial Affairs as the meal-service procurement route.
+- **S-BU-027 — BİDB Faaliyet Raporu 2025**
+  - names an existing BUCard dining live-report page;
+  - states daily passage reports include package-meal information;
+  - names a personnel meal report with a breakfast field.
 
 This now narrows the technical/report owner route beyond a service-contact hypothesis: the current university directive assigns dining-BUCard reporting/data-custody duties to the BUCard Office. It is **not** enough to mark any dataset `VERIFIED_EXPORTABLE`, determine report grain, or equate a turnstile/payment event with a physically served meal.
 
