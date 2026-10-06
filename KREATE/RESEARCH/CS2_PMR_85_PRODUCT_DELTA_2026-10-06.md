@@ -29,7 +29,7 @@ This remains a hypothesis because the highest-value unknowns are still external 
 
 ## What changed after the current PMR consolidation
 
-The canonical PMR surface now contains 85 sources and a materially sharper evidence boundary. The information gain is not "we now know the product works." The information gain is that several previously fuzzy assumptions are now isolated into explicit gates.
+At the base role commit, the canonical PMR surface contains 85 sources and a materially sharper evidence boundary. Later IE fan-in may advance that count; the product consequences below depend on the evidence classes and unresolved gates, not on the raw source count. The information gain is not "we now know the product works." The information gain is that several previously fuzzy assumptions are now isolated into explicit gates.
 
 ### 1. The operational stakeholder map is more concrete
 
