@@ -244,3 +244,16 @@ The next evidence promotion requires at least one of:
 4. real production/allocation record;
 5. stage-separated service-level waste measurement;
 6. completed operational interview.
+
+
+## S-BU-031 governance cross-check
+
+The current Boğaziçi Food Service Executive Board directive narrows two active acquisition lanes without closing them.
+
+For **#292**, Article 7 places BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Service Executive Board and Food Services Branch, and retention of digital data. This strengthens the report/data-custody route, but it does not prove aggregate export permission, report grain, version retention, or passage-to-served equivalence.
+
+For **#358**, Article 5(2)(f) states that meal hakediş payment orders/accrual are carried out by the Food Service Executive Board together with the Inspection and Acceptance Commission, while Article 9 routes meal-service procurement through SKS + Administrative and Financial Affairs.
+
+Preserve this food-specific governance statement alongside S-BU-030's broader Control Organization → KİK56.0/H → Spending Authority workflow. Do not collapse them into one chain until a current food-service acceptance/hakediş package or source-owner walkthrough reconciles the roles.
+
+Still unresolved: payable operational quantity/unit, exact signatory chain, routine daily quantity freeze/change rights, penalty/correction semantics, overproduction/shortage economic-risk owner, buyer/WTP.
