@@ -1,0 +1,59 @@
+{
+  "schema": "BOUNCAMPUS_IE_ACQUISITION_TRACKER_V1",
+  "updated_at": "2026-10-06",
+  "evidence_boundary": "Operational coordination only. This tracker does not claim outreach, access, interviews, artifacts, customer validation, measured outcomes or contract interpretation.",
+  "workstreams": [
+    {
+      "issue": 292,
+      "name": "BUCard/SKS aggregate service truth",
+      "state": "REQUEST_READY",
+      "routes": ["S-BU-021", "S-BU-022", "S-BU-023", "S-BU-015"],
+      "required_grain": "campus_id x meal_period x service_date",
+      "required_outputs": [
+        "source-native aggregate passage_or_meal count",
+        "report_generated_at",
+        "source_report_id",
+        "reconciliation semantics",
+        "production/outcome record owner",
+        "export/access decision"
+      ],
+      "execution_docs": [
+        "KREATE/PMR/PRIMARY_EVIDENCE_ACQUISITION.md",
+        "KREATE/PMR/IE_BUCARD_SKS_ACCESS_REQUEST_PACKET_2026-10-06.md"
+      ],
+      "downstream": ["CS1 #82"],
+      "forbidden_inference": [
+        "passage_count == actual_served without reconciliation",
+        "generated sandbox data as service truth",
+        "person/card/student/staff identifiers"
+      ]
+    },
+    {
+      "issue": 358,
+      "name": "IKN 2025/1727143 contract and hakediş semantics",
+      "state": "REQUEST_READY",
+      "routes": ["S-PROC-001", "S-PROC-002", "S-BU-010", "S-BU-014"],
+      "required_outputs": [
+        "authoritative current admin/technical spec retrieval status",
+        "current correction notice/addendum retrieval status",
+        "unit-price schedule retrieval status",
+        "payable/accepted quantity semantics",
+        "quantity freeze/change rights",
+        "acceptance/hakediş owner",
+        "excess/shortage economic-risk owner",
+        "production/reconciliation artifact owner"
+      ],
+      "execution_docs": [
+        "KREATE/PMR/PRIMARY_EVIDENCE_ACQUISITION.md",
+        "KREATE/PMR/IE_CONTRACT_HAKEDIS_REQUEST_PACKET_2026-10-06.md"
+      ],
+      "downstream": ["CS2", "CS1", "EE", "EHB"],
+      "forbidden_inference": [
+        "headline contract value / listed meals == unit meal price",
+        "historical clauses == current clauses",
+        "unit-price contract form == payable operational count",
+        "secondary correction-notice flag == known changed clause"
+      ]
+    }
+  ]
+}
