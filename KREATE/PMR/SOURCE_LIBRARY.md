@@ -216,6 +216,39 @@ The machine-readable companion is [source_catalog.json](source_catalog.json).
 - Use: large backlog of additive research topics and PMR target ideas.
 - Rule: selectively salvage current, source-traceable insights only; never overwrite newer master policy/evidence files.
 
+
+## Public-data quality, policy and academic additions — 2026-10-06
+
+### S-BU-009 — Historical Boğaziçi Campus Food Waste Tracking
+- Page: https://impact.bogazici.edu.tr/221-campus-food-waste-tracking
+- 2024 PDF: https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf
+- 2023 PDF: https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf
+- Use: cross-year public reporting context and provenance.
+- Boundary: aggregate reporting is not service truth, waste-stage causality or intervention evidence.
+
+The current 2025 source `S-BU-002` also exposes an official XLSX:
+https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx
+
+The 2024–2025 transcription in [data/bogazici_food_waste_public_snapshot.csv](data/bogazici_food_waste_public_snapshot.csv) preserves published values. 2025 August/October are flagged for semantic reconciliation because the displayed delivered-to-İSTAÇ value exceeds the displayed monthly total.
+
+### S-POL-001…003 — policy / why-now context
+- Türkiye food-service guide: https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf
+- Türkiye national strategy: https://faolex.fao.org/docs/pdf/tur209489.pdf
+- UI GreenMetric 2026: https://uigreenmetric.com/resources/university/guidelines/2026/english
+- Use: prevention/measurement and institutional sustainability-evidence context.
+- Boundary: these sources do not prove buyer intent, local causal mechanism, ranking effect or willingness to pay.
+
+### S-ACAD-013 — University foodservice practices and barriers
+- Open access: https://pmc.ncbi.nlm.nih.gov/articles/PMC9180560/
+- Use: external context for forecasting, smaller-batch production and measurement practices.
+- Boundary: U.S. practice distribution is not Boğaziçi evidence.
+
+### S-ACAD-014 — Educational-institution food-waste systematic review
+- DOI: https://doi.org/10.1108/IJCHM-07-2020-0672
+- Use: reinforces multi-causal diagnosis and protects against over-attributing food waste to demand forecasting.
+- Boundary: no Boğaziçi-specific causal share.
+
+
 ## Highest-information conversion from secondary research to PMR
 
 For each source, ask: **what primary observation would make this source operationally useful or falsify our inference?**
