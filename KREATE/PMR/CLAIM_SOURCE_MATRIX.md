@@ -40,6 +40,9 @@ Source IDs resolve through [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) and [source_ca
 | **Reservation is an always-on campus-wide demand system** | **Unsupported.** Official 2024 intersession and 2026 holiday notices show reservations recur in special operating regimes. | S-BU-025, S-BU-006 | Normal-term coverage, production-control use, snapshot retention/exportability. | Interview SKS/TEMAŞ and obtain reservation-state snapshots where active. |
 | **Current tender specifications are publicly verified in this repo** | **Unsupported.** Public notice/result and EKAP document route are verified, but underlying current specification bundle is not yet retrieved. | S-PROC-001, S-PROC-002 | Current hakediş, penalty, acceptance and quantity-change clauses. | #358 authoritative artifact retrieval; no prior-contract clause carryover. |
 
+| **Institutional acceptance-to-hakediş routing is partly known** | Control Organization → KİK56.0/H → relevant Spending Authority is source-backed; Tahakkuk is a source-backed hakediş-payment route; the food-specific directive also names Board + Inspection/Acceptance Commission. | S-BU-026, S-BU-027, S-BU-030 | Payable quantity/unit, exact food-contract Spending Authority, exact signatory chain, freeze/change rights. | #358 current acceptance/hakediş package or source-owner walkthrough. |
+| **Current procurement document routing is source-backed** | IMID Procurement is an official tender/procurement route; IMID contact is a fallback router. | S-BU-029, S-BU-028 | Contract-specific artifact ownership, buyer authority, settlement semantics. | Retrieve current IKN 2025/1727143 bundle and referral chain. |
+
 ## Promotion rule
 
 A row moves from **secondary-supported hypothesis** to **PMR-supported/contradicted** only when:
