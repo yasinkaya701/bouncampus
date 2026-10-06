@@ -528,3 +528,10 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - **S-ACAD-019** — institutional catering intervention evidence; no local causal transfer.
 
 Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Acceptance and payment-routing evidence — 2026-10-06
+
+- **S-BU-026** — official İhale ve Satınalma branch. Use as the first-party procurement/document route for the current contract bundle; it does not prove operational quantity ownership or settlement semantics.
+- **S-BU-027** — official Tahakkuk branch. Confirms an institutional hakediş-payment route; it does not identify the food contract's payable unit or accepted count.
+- **S-BU-030** — Boğaziçi 2025 Administration Activity Report. Confirms the generic service-acceptance chain: Control Organization performs preliminary acceptance review, prepares `KİK56.0/H`, and submits it to the relevant Spending Authority for hakediş preparation. The report also states 2025 food service was performed monthly. This narrows process uncertainty but does not resolve the current contract's payable operational quantity.
