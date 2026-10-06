@@ -175,5 +175,168 @@
       "observation": "IE verified named BUCard dining report surfaces, but CS2 does not bind them to S-BU-027 because IE #430 canonically assigns S-BU-027 to Tahakkuk. Wait for canonical source ingestion before source-ID promotion.",
       "closes_gate": false
     }
-  ]
+  ],
+  "application_claim_route_links": [
+    {
+      "claim_id": "C-005",
+      "claim_summary": "A material, still-reversible pre-service quantity/batch/allocation decision exists at Bogazici.",
+      "claim_policy_state": "HYPOTHESIS_DRAFT",
+      "gate_ids": [
+        "EA-01",
+        "EA-06"
+      ],
+      "route_source_ids": [
+        "S-BU-026",
+        "S-BU-029",
+        "S-BU-030"
+      ],
+      "route_effect": "FOOD_SERVICES_GOVERNANCE__PROCUREMENT__AND_ACCEPTANCE_ROUTES_NARROWED",
+      "established": [
+        "governance route",
+        "procurement/specification route",
+        "acceptance/control route"
+      ],
+      "still_required": [
+        "actual daily decision owner",
+        "decision object",
+        "revision rights",
+        "freeze/cutoff",
+        "recent service reconstruction"
+      ],
+      "promotion_effect": "NONE",
+      "issue_refs": [
+        358
+      ]
+    },
+    {
+      "claim_id": "C-007",
+      "claim_summary": "Privacy-minimized service-level operational truth is exportable and semantically usable for CS1.",
+      "claim_policy_state": "UNKNOWN_DRAFT",
+      "gate_ids": [
+        "EA-02",
+        "EA-03"
+      ],
+      "route_source_ids": [
+        "S-BU-026"
+      ],
+      "pending_route_observations": [
+        "Named BUCard dining report surfaces verified by IE but not yet assigned a canonical source ID"
+      ],
+      "route_effect": "BUCARD_REPORTING_OWNER_PATH_NARROWED",
+      "established": [
+        "next owner/reporting route for aggregate-export request"
+      ],
+      "still_required": [
+        "export permission",
+        "aggregate rows",
+        "schema",
+        "grain",
+        "availability/finality time",
+        "correction semantics",
+        "SKS reconciliation"
+      ],
+      "integrity_rule": "DO_NOT_BIND_BUCARD_REPORT_SURFACES_TO_S-BU-027__S-BU-027_IS_TAHAKKUK",
+      "promotion_effect": "NONE",
+      "issue_refs": [
+        292,
+        82
+      ]
+    },
+    {
+      "claim_id": "C-008",
+      "claim_summary": "The intended operational user can safely act on a BOUNCAMPUS recommendation before freeze.",
+      "claim_policy_state": "HYPOTHESIS_DRAFT",
+      "gate_ids": [
+        "EA-01",
+        "EA-06"
+      ],
+      "route_source_ids": [
+        "S-BU-026",
+        "S-BU-030"
+      ],
+      "route_effect": "OPERATIONAL_AND_ACCEPTANCE_ACTOR_PATH_NARROWED",
+      "established": [
+        "candidate Food Services governance route",
+        "institutional acceptance/control route"
+      ],
+      "still_required": [
+        "action authority",
+        "approval path",
+        "freeze time",
+        "override behavior",
+        "risk guardrails",
+        "observed willingness to act"
+      ],
+      "promotion_effect": "NONE",
+      "issue_refs": [
+        358
+      ]
+    },
+    {
+      "claim_id": "C-010",
+      "claim_summary": "BUCard/turnstile count equals meals physically served.",
+      "claim_policy_state": "CUT",
+      "gate_ids": [
+        "EA-03"
+      ],
+      "route_source_ids": [
+        "S-BU-026"
+      ],
+      "pending_route_observations": [
+        "Named BUCard dining report surfaces verified by IE but not yet assigned a canonical source ID"
+      ],
+      "route_effect": "REPORTING_OWNER_PATH_NARROWED_ONLY",
+      "established": [
+        "reporting-owner route"
+      ],
+      "still_required": [
+        "source-owner semantics",
+        "corrections/refunds",
+        "duplicate handling",
+        "second-meal handling",
+        "late-correction handling",
+        "reconciliation to physical service truth"
+      ],
+      "promotion_effect": "NONE__FORBIDDEN_EQUALITY_REMAINS_CUT",
+      "issue_refs": [
+        292,
+        82
+      ]
+    },
+    {
+      "claim_id": "C-014",
+      "claim_summary": "Public tender scale proves buyer willingness-to-pay or favorable contract economics.",
+      "claim_policy_state": "CUT",
+      "gate_ids": [
+        "EA-06"
+      ],
+      "route_source_ids": [
+        "S-BU-027",
+        "S-BU-029",
+        "S-BU-030"
+      ],
+      "route_effect": "PAYMENT_PROCUREMENT_AND_ACCEPTANCE_ROUTES_NARROWED",
+      "established": [
+        "Tahakkuk payment-processing route",
+        "procurement/specification route",
+        "acceptance/control route"
+      ],
+      "still_required": [
+        "accepted/payable quantity",
+        "unit-price mechanics",
+        "exact Spending Authority",
+        "penalties",
+        "freeze/change rights",
+        "economic beneficiary",
+        "buyer identity",
+        "willingness to pay"
+      ],
+      "promotion_effect": "NONE__ECONOMICS_AND_WTP_CLAIM_REMAINS_CUT",
+      "issue_refs": [
+        358
+      ]
+    }
+  ],
+  "application_claim_route_linkage_rule": "ROUTE_OWNER_DISCOVERY_NARROWS_ACQUISITION_TARGETS_BUT_NEVER_PROMOTES_APPLICATION_CLAIMS_WITHOUT_REQUIRED_PRIMARY_EVIDENCE",
+  "application_claim_ledger_source": "KREATE/APPLICATION_RUBRIC.md"
 }

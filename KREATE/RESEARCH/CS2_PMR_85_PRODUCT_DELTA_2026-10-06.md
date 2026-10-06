@@ -114,6 +114,20 @@ The latest first-party IE routing reduces acquisition ambiguity without satisfyi
 
 CS2 consequence: spend the next primary-evidence cycle on retrieving and reconciling these named artifacts, not on broad new secondary research or on promoting stronger application claims.
 
+### Application claim → IE owner/report route linkage
+
+The route findings above are now tied explicitly to the submission claim ledger in `KREATE/APPLICATION_RUBRIC.md`; SAFE/BLOCKED/KILL policy remains governed by `KREATE/PMR/CS2_APPLICATION_CLAIM_GATE_2026-10-06.md`. These links narrow **who owns the next evidence request**; they do not upgrade the claim's evidence class or submission status.
+
+| Application claim | Current claim state | Gate(s) | Canonical IE route evidence | What is now established | Still required before any promotion |
+| --- | --- | --- | --- | --- | --- |
+| **C-005** — a material, still-reversible pre-service quantity/batch/allocation decision exists | **HYPOTHESIS / DRAFT** | EA-01, EA-06 | S-BU-026 Food Services governance; S-BU-029 İhale ve Satınalma; S-BU-030 Control Organization / acceptance flow | Named governance, procurement and acceptance routes for reconstructing the decision chain | Actual daily decision owner, decision object, revision rights, freeze/cutoff and one recent service reconstruction |
+| **C-007** — privacy-minimized service-level operational truth is exportable and semantically usable | **UNKNOWN / DRAFT** | EA-02, EA-03 | S-BU-026 narrows the BUCard/reporting owner path; named BUCard dining report surfaces remain a pending routing observation with no canonical source ID yet | The next owner/reporting route to request an aggregate export is narrower | Export permission, actual aggregate rows, schema, grain, availability/finality time, correction semantics and SKS reconciliation. **Do not bind this claim to S-BU-027; S-BU-027 is Tahakkuk.** |
+| **C-008** — the intended operational user can safely act on a recommendation before freeze | **HYPOTHESIS / DRAFT** | EA-01, EA-06 | S-BU-026 Food Services governance; S-BU-030 acceptance-flow evidence | Candidate operational/acceptance actor path is narrower | Action authority, approval path, freeze time, override behavior, risk guardrails and observed willingness to use the recommendation |
+| **C-010** — “BUCard/turnstile count equals meals physically served” | **CUT** | EA-03 | S-BU-026 plus the pending named BUCard report-surface observation | Only the owner/reporting path is narrower | Source-owner semantics, corrections/refunds/duplicates/second-meal handling and reconciliation. Route discovery can never by itself restore the forbidden equality claim |
+| **C-014** — “public tender scale proves buyer WTP or favorable contract economics” | **CUT** | EA-06 | S-BU-027 Tahakkuk; S-BU-029 İhale ve Satınalma; S-BU-030 acceptance flow | Payment-processing, procurement/specification and acceptance routes are named | Accepted/payable quantity, unit-price mechanics, exact Spending Authority, penalties, freeze/change rights, economic beneficiary, buyer and WTP |
+
+**Claim firewall:** all five mappings are routing progress only. They promote **zero** application claims. EA-02, EA-03 and EA-06 remain `OPEN_EXTERNAL`; C-010 and C-014 remain `CUT`; C-005/C-007/C-008 remain unverified until the primary artifacts or owner answers listed above are obtained.
+
 ### Cross-role dependency compression
 
 For the next CS2 decision cycle, the six gates effectively compress into three external truth packages:
