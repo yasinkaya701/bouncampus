@@ -575,3 +575,22 @@ These are **secondary target-selection sources**, not PMR/interview evidence.
 - Use: within-institution comparison: central-campus own-kitchen production versus district-campus prepared-meal procurement after reservation expansion.
 - Boundary: does not establish freeze points, decision owner, contract economics, service outcomes or production response to reservations.
 - Maps to: H1, H3, H5, SECOND_SITE, OPERATIONS.
+
+
+## Procurement / acceptance routing expansion — 2026-10-06
+
+### S-BU-027 — İhale ve Satınalma Şube Müdürlüğü
+- Official IMID procurement/tender route for current specification/document acquisition.
+- Boundary: routing only; not contract-specific payment or buyer authority.
+
+### S-BU-028 — Tahakkuk Şube Müdürlüğü
+- Official branch explicitly includes hakediş payments.
+- Boundary: does not establish the food contract payable quantity/unit or signer chain.
+
+### S-BU-029 — İMİD contact
+- Official routing surface for Procurement and Tahakkuk branches.
+- Boundary: contact availability is not authority.
+
+### S-BU-030 — 2025 Administration Activity Report
+- Official report states Control Organization performs preliminary review and, when acceptable, prepares KİK56.0/H and submits it to the relevant Spending Authority for hakediş preparation.
+- Boundary: does not identify the current food contract payable count/unit, exact Spending Authority, freeze/change rights, penalties or economics.
