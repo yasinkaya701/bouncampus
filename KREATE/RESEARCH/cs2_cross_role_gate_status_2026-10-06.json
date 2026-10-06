@@ -28,7 +28,8 @@
         292
       ],
       "status": "OPEN_EXTERNAL",
-      "unlocks": "privacy-minimized aggregate service data path"
+      "unlocks": "privacy-minimized aggregate service data path",
+      "route_progress": "BUCARD_REPORTING_OWNER_PATH_NARROWED__NAMED_REPORT_SURFACES_PENDING_CANONICAL_SOURCE_INGESTION__EXPORT_SCHEMA_GRAIN_FINALITY_AND_PERMISSION_STILL_REQUIRED"
     },
     {
       "id": "EA-03",
@@ -42,7 +43,8 @@
         82
       ],
       "status": "OPEN_EXTERNAL",
-      "unlocks": "eligible target/service truth"
+      "unlocks": "eligible target/service truth",
+      "route_progress": "REPORTING_SURFACES_AND_OWNER_PATH_NARROWED__REAL_AGGREGATE_ROWS_AND_SKS_SEMANTIC_RECONCILIATION_STILL_REQUIRED"
     },
     {
       "id": "EA-04",
@@ -82,7 +84,8 @@
         358
       ],
       "status": "OPEN_EXTERNAL",
-      "unlocks": "buyer/beneficiary/settlement claim boundaries"
+      "unlocks": "buyer/beneficiary/settlement claim boundaries",
+      "route_progress": "TAHAKKUK_IMID_PROCUREMENT_AND_ACCEPTANCE_ROUTES_NARROWED__PAYABLE_QUANTITY_FREEZE_CHANGE_RIGHTS_PENALTIES_BUYER_AND_ECONOMICS_STILL_REQUIRED"
     }
   ],
   "portfolio": [
@@ -136,7 +139,41 @@
     "buyer willingness_to_pay",
     "contract incentive alignment"
   ],
-  "base_role_sha": "750000523e9b27ba780dc7f60f147ac0549e745e",
+  "base_role_sha": "7624bae5b8954571c3b3336c74fc56a80b039782",
   "claim_policy_source": "KREATE/PMR/CS2_APPLICATION_CLAIM_GATE_2026-10-06.md",
-  "scope_boundary": "PRODUCT_PORTFOLIO_AND_CROSS_ROLE_GATES_ONLY__APPLICATION_CLAIM_WORDING_OWNED_BY_CLAIM_GATE"
+  "scope_boundary": "PRODUCT_PORTFOLIO_AND_CROSS_ROLE_GATES_ONLY__APPLICATION_CLAIM_WORDING_OWNED_BY_CLAIM_GATE",
+  "latest_route_inputs": [
+    {
+      "source_id": "S-BU-026",
+      "effect": "Food Services governance directive; narrows BUCard/reporting and acceptance-hakedis owner routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-027",
+      "effect": "Tahakkuk branch; narrows hakediş/payment routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-028",
+      "effect": "IMID contact; fallback first-party routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-029",
+      "effect": "Procurement branch; narrows tender/specification ownership and referral",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-030",
+      "effect": "2025 Administration Activity Report; narrows institutional acceptance-flow routing",
+      "closes_gate": false
+    }
+  ],
+  "route_update_rule": "ROUTE_DISCOVERY_IS_NOT_EXPORT_ACCESS_SERVICE_TRUTH_SETTLEMENT_ECONOMICS_OR_PRIMARY_INTERVIEW_EVIDENCE",
+  "pending_route_observations": [
+    {
+      "observation": "IE verified named BUCard dining report surfaces, but CS2 does not bind them to S-BU-027 because IE #430 canonically assigns S-BU-027 to Tahakkuk. Wait for canonical source ingestion before source-ID promotion.",
+      "closes_gate": false
+    }
+  ]
 }
