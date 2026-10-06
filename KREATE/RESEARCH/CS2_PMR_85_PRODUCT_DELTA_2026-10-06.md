@@ -103,6 +103,17 @@ This maps the existing `EA-01..EA-06` queue onto current cross-role work so agen
 | **EA-05 REPORTING_RECONCILIATION** | IE + CS1 via #82 / #322 and the reporting owner | Current produced/consumed/discarded definitions and reporting frequency | Keep as governance context if it cannot reconcile to a service-level decision. |
 | **EA-06 INCENTIVE_AND_AUTHORITY_MAP** | IE #358 | Accepted-service/hakediş quantity, approval/signature path, corrections, relevant penalties/flexibility | Do not claim savings/WTP/buyer incentive until this is real. |
 
+### Latest IE route progress — route narrowing, not gate closure
+
+The latest first-party IE routing reduces acquisition ambiguity without satisfying the underlying CS2 gates. CS2 follows the canonical namespace freeze from IE #430:
+
+- **S-BU-026** remains the current Food Services governance directive. It narrows the institutional owner path for BUCard/reporting and the food-service acceptance/hakediş actor set. This improves who to ask; it does **not** establish export permission, payable quantity, freeze/change rights, penalties, buyer identity or economics.
+- IE separately verified named BUCard dining report surfaces. Because that finding is still being reconciled into the canonical source namespace, CS2 records it only as a **pending routing observation**, not as an S-BU-027 claim. **EA-02 remains OPEN_EXTERNAL** until a real aggregate export/schema/grain/finality/access decision is obtained.
+- Report existence is not service truth. Until real aggregate rows and SKS semantic reconciliation exist, **EA-03 remains OPEN_EXTERNAL** and BUCard/passages stay inadmissible as `actual_served` by assumption.
+- **S-BU-027** is Tahakkuk, **S-BU-028** is the İMİD contact route, **S-BU-029** is İhale ve Satınalma, and **S-BU-030** is the 2025 Administration Activity Report acceptance-flow evidence. Together they narrow where to request the current tender/acceptance/hakediş artifacts, but they do not reveal the accepted/payable operational quantity, freeze point, correction rights, penalties, WTP or value capture. **EA-06 remains OPEN_EXTERNAL**.
+
+CS2 consequence: spend the next primary-evidence cycle on retrieving and reconciling these named artifacts, not on broad new secondary research or on promoting stronger application claims.
+
 ### Cross-role dependency compression
 
 For the next CS2 decision cycle, the six gates effectively compress into three external truth packages:
