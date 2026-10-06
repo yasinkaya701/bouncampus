@@ -1,0 +1,610 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-06",
+  "owner_role": "IE",
+  "purpose": "Cumulative PMR secondary-research/source register for the institutional-dining wedge.",
+  "evidence_boundary": "Secondary/public/academic/vendor sources are not interview evidence, pilot evidence, measured service truth, or proof of live integration.",
+  "stable_id_rule": "PMR-SRC-### IDs are immutable; deduplicate academic work by DOI and prefer primary publisher/institution URLs.",
+  "sources": [
+    {
+      "id": "PMR-SRC-001",
+      "title": "Boğaziçi University — Campus Food Waste Tracking (current corporate data page)",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Boğaziçi University",
+      "year": 2025,
+      "canonical_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "direct_assets": {
+        "spreadsheet": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2",
+        "EE"
+      ],
+      "decision_use": "Aggregate official context; source-quality audit; PMR questions about reporting semantics.",
+      "limitations": "Monthly aggregate is not service truth. Some 2025 delivered-to-ISTAC values exceed displayed monthly total, requiring semantic reconciliation.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE_WITH_SEMANTIC_WARNING"
+    },
+    {
+      "id": "PMR-SRC-002",
+      "title": "Boğaziçi University Impact — Campus Food Waste Tracking",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Boğaziçi University",
+      "year": 2024,
+      "canonical_url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+      "direct_assets": {
+        "pdf_2023": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Historical aggregate context.",
+      "limitations": "Historical aggregate reporting; not service-level or causal evidence.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-003",
+      "title": "SKS 2025 Activity Report page",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Boğaziçi University SKS",
+      "year": 2025,
+      "canonical_url": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H1",
+        "H4",
+        "H5"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Operating scale, organizational/source-owner discovery.",
+      "limitations": "Re-open before date-sensitive numeric claims.",
+      "last_checked": "2026-10-06",
+      "verification_status": "REPO_INVENTORY_RECHECK_BEFORE_CLAIM"
+    },
+    {
+      "id": "PMR-SRC-004",
+      "title": "Boğaziçi Official Dining Menu",
+      "source_kind": "PUBLIC_OPERATIONAL",
+      "publisher": "Boğaziçi University",
+      "year": 2026,
+      "canonical_url": "https://yemekhane.bogazici.edu.tr/",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1"
+      ],
+      "decision_use": "Public decision-time menu context.",
+      "limitations": "Current page does not itself prove immutable historical snapshots.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-005",
+      "title": "Kilyos reservation notice — 20 May 2026",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Boğaziçi University",
+      "year": 2026,
+      "canonical_url": "https://yemekhane.bogazici.edu.tr/node/493",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H1",
+        "H4",
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Bounded evidence that a reservation-intent workflow can exist.",
+      "limitations": "Do not generalize cutoff, charging rule, campus coverage, or persistence outside the cited period.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-006",
+      "title": "Boğaziçi Academic Calendar",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Boğaziçi University",
+      "year": 2026,
+      "canonical_url": "https://akademiktakvim.bogazici.edu.tr/",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H4"
+      ],
+      "role_consumers": [
+        "CS1",
+        "IE"
+      ],
+      "decision_use": "Pre-known contextual signal candidate.",
+      "limitations": "Historical modeling must bind to the version available before decision cutoff.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-007",
+      "title": "Disciplined Entrepreneurship — Primary Market Research",
+      "source_kind": "METHOD_STANDARD",
+      "publisher": "Disciplined Entrepreneurship",
+      "year": 2019,
+      "canonical_url": "https://www.d-eship.com/step1a/",
+      "direct_assets": {
+        "pdf": "https://www.d-eship.com/wp-content/uploads/2019/03/Disciplined_Entrepreneurship_-_Primary_Market_Research.pdf"
+      },
+      "pmr_hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Direct-customer PMR method and interview discipline.",
+      "limitations": "Method guidance only.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-008",
+      "title": "UNEP Food Waste Index Report 2024",
+      "source_kind": "METHOD_STANDARD",
+      "publisher": "UNEP",
+      "year": 2024,
+      "canonical_url": "https://www.unep.org/resources/publication/food-waste-index-report-2024",
+      "direct_assets": {
+        "pdf": "https://wedocs.unep.org/bitstream/handle/20.500.11822/45230/food_waste_index_report_2024.pdf",
+        "key_messages_pdf": "https://wedocs.unep.org/bitstream/handle/20.500.11822/45275/Food-Waste-Index-2024-key-messages.pdf"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "role_consumers": [
+        "EE",
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Measurement-method and reporting context.",
+      "limitations": "Global standard/context; not site validation.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-009",
+      "title": "Food Loss and Waste Accounting and Reporting Standard",
+      "source_kind": "METHOD_STANDARD",
+      "publisher": "FLW Protocol / WRI",
+      "year": 2016,
+      "canonical_url": "https://flwprotocol.org/flw-standard/",
+      "direct_assets": {
+        "overview": "https://www.wri.org/research/food-loss-and-waste-accounting-and-reporting-standard"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "role_consumers": [
+        "EE",
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Quantification scope/boundary/reporting discipline.",
+      "limitations": "Does not choose our causal intervention or decision point.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-010",
+      "title": "Hospitality and Food Service guidance",
+      "source_kind": "METHOD_STANDARD",
+      "publisher": "WRAP",
+      "year": null,
+      "canonical_url": "https://www.wrap.ngo/resources/guide/hospitality-and-food-service",
+      "direct_assets": {
+        "visual_hierarchy_page": "https://businessofrecycling.wrap.ngo/recycling-guide/hospitality/why-your-hospitality-business-needs-to-recycle/the-benefits-of-reducing-food-waste"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "role_consumers": [
+        "EE",
+        "IE"
+      ],
+      "decision_use": "Practical measurement/action guidance.",
+      "limitations": "UK-oriented; adapt locally.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-011",
+      "title": "Otel, Restoran ve Diğer Toplu Tüketim Yerlerinde Gıda İsrafı ile Mücadele Kılavuzu",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye",
+      "year": null,
+      "canonical_url": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf",
+      "direct_assets": {
+        "pdf": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "role_consumers": [
+        "EE",
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Türkiye-specific food-service measurement/prevention/planning guidance.",
+      "limitations": "Guidance; not proof of Boğaziçi practice.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-012",
+      "title": "Sıfır Atık Yönetmeliği official announcement",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı",
+      "year": 2019,
+      "canonical_url": "https://cygm.csb.gov.tr/sifir-atik-yonetmeligi-resmi-gazetede-yayimlanarak-yururluge-girmistir.-duyuru-383053",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2",
+        "EE"
+      ],
+      "decision_use": "Regulatory-context discovery.",
+      "limitations": "Check current official legal text before compliance claims.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-013",
+      "title": "Machine Learning Techniques for Cafeteria Demand Forecasting: An Institutional Case",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "OPUS Journal of Society Research",
+      "year": 2025,
+      "canonical_url": "https://doi.org/10.26466/opusjsr.1649256",
+      "doi": "10.26466/opusjsr.1649256",
+      "direct_assets": {
+        "pdf": "https://dergipark.org.tr/en/download/article-file/4651557"
+      },
+      "pmr_hypotheses": [
+        "H1",
+        "H3",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Institutional demand-forecasting mechanism and baseline/model context.",
+      "limitations": "Published case/model estimates are not BOUNCAMPUS field impact.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-014",
+      "title": "Reducing Food Waste in Campus Dining: A Data-Driven Approach to Demand Prediction and Sustainability",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "Sustainability",
+      "year": 2025,
+      "canonical_url": "https://doi.org/10.3390/su17020379",
+      "doi": "10.3390/su17020379",
+      "direct_assets": {
+        "publisher": "https://www.mdpi.com/2071-1050/17/2/379"
+      },
+      "pmr_hypotheses": [
+        "H1",
+        "H2",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Campus-demand mechanism and context features.",
+      "limitations": "Reported reduction belongs to the paper's case/model; do not present as our measured causal impact.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-015",
+      "title": "Preventing food waste in subsidy-based university dining systems: An artificial neural network-aided model under uncertainty",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "Waste Management & Research",
+      "year": 2021,
+      "canonical_url": "https://doi.org/10.1177/0734242X211017974",
+      "doi": "10.1177/0734242X211017974",
+      "direct_assets": {
+        "pubmed": "https://pubmed.ncbi.nlm.nih.gov/33971773/"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Reservation/show-no-show uncertainty; explicit waste vs shortage cost.",
+      "limitations": "External case/model framework.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-016",
+      "title": "Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "Journal of Cleaner Production",
+      "year": 2024,
+      "canonical_url": "https://doi.org/10.1016/j.jclepro.2023.140265",
+      "doi": "10.1016/j.jclepro.2023.140265",
+      "direct_assets": {
+        "publisher": "https://www.sciencedirect.com/science/article/pii/S0959652623044232"
+      },
+      "pmr_hypotheses": [
+        "H2",
+        "H3",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1",
+        "CS2"
+      ],
+      "decision_use": "Forecast vs baseline, wasted meals, unmet-demand context across three catering services.",
+      "limitations": "External confidential datasets and modeled operational consequences.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-017",
+      "title": "Food waste reduction and its environmental consequences: a quasi-experimental study in a campus canteen",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "Agriculture & Food Security",
+      "year": 2024,
+      "canonical_url": "https://link.springer.com/article/10.1186/s40066-024-00488-y",
+      "doi": "10.1186/s40066-024-00488-y",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H2"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2",
+        "EE"
+      ],
+      "decision_use": "Contrary/alternative-cause evidence: quality, taste, portions, menu.",
+      "limitations": "Different campus and intervention.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-018",
+      "title": "Food waste management: an example from university refectory",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "British Food Journal",
+      "year": 2021,
+      "canonical_url": "https://doi.org/10.1108/BFJ-09-2020-0802",
+      "doi": "10.1108/BFJ-09-2020-0802",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H2"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2",
+        "EE"
+      ],
+      "decision_use": "Türkiye university plate-waste context.",
+      "limitations": "Plate-waste evidence is not production-surplus evidence.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-019",
+      "title": "Determination of the Amount of Food Waste and Improving Meals to Reduce Food Waste in the University Refectory",
+      "source_kind": "PEER_REVIEWED",
+      "publisher": "Aydın Gastronomy",
+      "year": 2025,
+      "canonical_url": "https://dergipark.org.tr/tr/pub/aydingas/article/1503134",
+      "direct_assets": {
+        "pdf": "https://dergipark.org.tr/tr/download/article-file/4013917"
+      },
+      "pmr_hypotheses": [
+        "H2"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2",
+        "EE"
+      ],
+      "decision_use": "Food-waste amount/menu intervention; alternative-cause pressure.",
+      "limitations": "Site-specific; not Boğaziçi causal evidence.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_ACADEMIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-020",
+      "title": "GTÜ dining operations page",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Gebze Technical University",
+      "year": 2026,
+      "canonical_url": "https://www.gtu.edu.tr/kategori/5904/0/display.aspx",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H1",
+        "H3"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2",
+        "CS1"
+      ],
+      "decision_use": "Cross-university repeatability of historical/user-count planning and reactive replenishment.",
+      "limitations": "No willingness-to-pay or exact workflow equivalence.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-021",
+      "title": "İTÜ cafeterias and food-services food-waste prevention program",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Istanbul Technical University",
+      "year": null,
+      "canonical_url": "https://sustainability.itu.edu.tr/tr/itu-kafeteryalari-ve-yemek-hizmetleri-gida-israfini-onlemeye-yonelik-ozel-programlar-saglamaktadir",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H1",
+        "H3",
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2",
+        "CS1"
+      ],
+      "decision_use": "Cross-university planning inputs and contingency behavior; novelty falsification.",
+      "limitations": "Does not validate target-customer pain or buyer.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-022",
+      "title": "İTÜ Kart — Dining application",
+      "source_kind": "OFFICIAL_PUBLIC",
+      "publisher": "Istanbul Technical University",
+      "year": null,
+      "canonical_url": "https://kim.itu.edu.tr/itukart/yemekhane-uygulamasi",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H4"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS1"
+      ],
+      "decision_use": "Example of electronic dining-entry infrastructure.",
+      "limitations": "Existence does not imply accessible/exportable reconciled service truth.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_PUBLIC_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-023",
+      "title": "Winnow — Universities",
+      "source_kind": "VENDOR_CLAIM",
+      "publisher": "Winnow",
+      "year": 2026,
+      "canonical_url": "https://www.winnowsolutions.com/industries/universities",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Competitor capability / incumbent alternative.",
+      "limitations": "Vendor marketing; independently verify outcome claims.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_VENDOR_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-024",
+      "title": "Winnow Foresight announcement",
+      "source_kind": "VENDOR_CLAIM",
+      "publisher": "Winnow",
+      "year": 2026,
+      "canonical_url": "https://www.winnowsolutions.com/resources/news/winnow-and-hilton-announce-winnow-foresight-a-mobile-first-ai-powered-forecasting-tool-designed-to-predict-kitchen-demand-and-prevent-food-waste",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H1",
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Kills novelty claim that production forecasting is absent from market.",
+      "limitations": "Vendor announcement; hotel workflow differs from target segment.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_VENDOR_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-025",
+      "title": "Leanpath — University of Nebraska case study",
+      "source_kind": "VENDOR_CLAIM",
+      "publisher": "Leanpath",
+      "year": null,
+      "canonical_url": "https://www.leanpath.com/case-study-u-of-nebraska/",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H2",
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "University incumbent alternative and waste-measurement feedback loop.",
+      "limitations": "Outcome figures are vendor-published case-study claims.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_VENDOR_SOURCE"
+    },
+    {
+      "id": "PMR-SRC-026",
+      "title": "Emissary Campus",
+      "source_kind": "VENDOR_CLAIM",
+      "publisher": "Emissary",
+      "year": null,
+      "canonical_url": "https://emissary.com.tr/tr/cozumler/emissary-campus",
+      "direct_assets": {},
+      "pmr_hypotheses": [
+        "H5",
+        "H6"
+      ],
+      "role_consumers": [
+        "IE",
+        "CS2"
+      ],
+      "decision_use": "Türkiye campus sustainability/reporting alternative; novelty red-team.",
+      "limitations": "Verify exact food-production control-point capability before comparisons.",
+      "last_checked": "2026-10-06",
+      "verification_status": "VERIFIED_VENDOR_SOURCE"
+    }
+  ]
+}
