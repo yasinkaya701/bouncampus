@@ -575,3 +575,26 @@ These are **secondary target-selection sources**, not PMR/interview evidence.
 - Use: within-institution comparison: central-campus own-kitchen production versus district-campus prepared-meal procurement after reservation expansion.
 - Boundary: does not establish freeze points, decision owner, contract economics, service outcomes or production response to reservations.
 - Maps to: H1, H3, H5, SECOND_SITE, OPERATIONS.
+## First-party procurement / hakediş routing integrity — 2026-10-06
+
+These routes are first-party owner/routing evidence. They do **not** resolve the current food contract's payable quantity, freeze/change rights, penalties, unit economics or software buyer.
+
+### S-BU-027 — Tahakkuk Şube Müdürlüğü
+- Official: https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119
+- Use: first-party route for tender/direct-procurement/transfer/hakediş payments and referral to the responsible food-contract payment owner.
+- Boundary: general payment responsibility does not establish the food contract's payable unit, acceptance count, signer chain or incentive allocation.
+
+### S-BU-028 — İMİD contact
+- Official: https://imid.bogazici.edu.tr/tr/pages/iletisim/2116
+- Use: general first-party routing when the exact Procurement or Tahakkuk owner is unknown.
+- Boundary: contact surface only.
+
+### S-BU-029 — İhale ve Satınalma Şube Müdürlüğü
+- Official: https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117
+- Use: authoritative procurement/tender routing for IKN 2025/1727143 document ownership/referral.
+- Boundary: procurement responsibility does not prove operational quantity authority, contract-specific settlement semantics or software-buying authority.
+
+### S-BU-030 — 2025 Administration Activity Report
+- Official PDF: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
+- Use: first-party institutional acceptance-flow evidence. The Control Organization performs preliminary acceptance review and, when suitable, prepares the KİK56.0/H Service Works Acceptance Proposal for the relevant Spending Authority so hakediş can be prepared; the report includes food-service procurement among recurring service works.
+- Boundary: this does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily freeze/change rights or shortage/excess economics.
