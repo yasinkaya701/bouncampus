@@ -269,3 +269,13 @@ First-party evidence now supports `Control Organization → KİK56.0/H → relev
 This does **not** close #358: payable operational count, exact food-contract Spending Authority, current unit-price schedule, penalty/correction rules and production freeze remain unresolved.
 
 Aygül Demir is source-backed as a current principal member of the dining control organization (S-BU-014). No repo evidence of a completed interview exists, so no `E-INT-*` or completed tracker state is created.
+
+
+## Governance directive handoff — 2026-10-06
+
+- **S-BU-031:** current Food Service Executive Board directive assigns dining-BUCard operation/reporting/data-retention duties to BUCard Office/BİDB; states meal hakediş payment orders/accrual are carried out by the Food Service Executive Board together with the Inspection and Acceptance Commission; routes meal-service procurement through SKS + Administrative and Financial Affairs.
+
+**CS1:** owner/data-custody routing is stronger, but `passage != actual_served` until #292 export + reconciliation.
+**CS2:** acceptance/payment-process participants are narrower, but payable quantity, buyer, WTP, savings and change rights remain blocked.
+**EE/EHB:** stronger existing-record plausibility increases the burden of proof for new sensing; hardware remains downstream of a demonstrated missing field.
+**IE:** #358 must reconcile S-BU-031's food-specific actor statement with S-BU-030's general KİK56.0/H → Spending Authority flow using a real current acceptance/hakediş artifact or source-owner walkthrough.
