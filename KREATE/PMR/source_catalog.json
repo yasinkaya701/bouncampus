@@ -1652,6 +1652,66 @@
       "limitations": [
         "does not identify changed clauses or current contract interpretation"
       ]
+    },
+    {
+      "id": "S-BU-020",
+      "title": "Boğaziçi University SDG 2 publication",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "WHY_NOW"
+      ],
+      "supports": [
+        "institutional SDG2 / food sustainability reporting context"
+      ],
+      "limitations": [
+        "does not establish service-level waste causality, current operational workflow or product impact"
+      ]
+    },
+    {
+      "id": "S-INT-004",
+      "title": "TEMAŞ public-pain / PMR role-map stale research branch",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "bouncampus repository",
+      "url": "https://github.com/yasinkaya701/bouncampus/tree/research/kreate-contractor-gtm-clean-20261005",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_provenance",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "H6",
+        "CONTRACT"
+      ],
+      "supports": [
+        "historical contractor/role research source mine"
+      ],
+      "limitations": [
+        "stale internal synthesis; do not merge wholesale or treat as external authority"
+      ]
+    },
+    {
+      "id": "S-INT-005",
+      "title": "Issue #292 — privacy-preserving BUCard dining export + SKS reconciliation",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "bouncampus repository",
+      "url": "https://github.com/yasinkaya701/bouncampus/issues/292",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_work_item",
+      "hypotheses": [
+        "H4",
+        "ACCESS"
+      ],
+      "supports": [
+        "canonical live acquisition/reconciliation dependency"
+      ],
+      "limitations": [
+        "issue plan is not evidence that access or export exists"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
