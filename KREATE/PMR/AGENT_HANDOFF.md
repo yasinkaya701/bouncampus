@@ -131,3 +131,23 @@ The research base is now strong enough that more generic browsing has low inform
 - identifies a directly relevant current incumbent.
 
 Otherwise, effort should move to real PMR.
+
+
+## Active real-data dependency — #292
+
+CS1 has explicitly handed the remaining measured service-truth acquisition to IE:
+
+- issue: **#292**;
+- parent CS1 dependency: **#82**;
+- requested grain: privacy-preserving `campus × meal-period × service-date`;
+- no person/card-level identifiers are needed for the initial benchmark;
+- repository-generated cafeteria/occupancy/weather/preferences data remain `GENERATED_SANDBOX / SANDBOX_ONLY`;
+- do not claim measured benchmark, savings, pilot readiness or operational impact from those generated files.
+
+When a real export arrives, the canonical intake is:
+
+`scripts/cs1_service_truth_artifact_intake.py`
+
+Preserve input SHA-256, source identity and admission result. The source owner must reconcile passage/served semantics before any field is promoted to `actual_served`.
+
+See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md).

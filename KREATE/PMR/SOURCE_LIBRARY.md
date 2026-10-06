@@ -227,3 +227,65 @@ Current P0:
 4. Establish which party economically benefits from lower excess / bears shortage.
 5. See the actual current quantity-entry/planning workflow.
 6. Establish a service-level truth-data path with timestamps and semantics.
+
+
+## Additive source tranche — 2026-10-06 research-hub consolidation
+
+These entries were added after cross-checking the concurrent IE source-hub work. They fill gaps rather than replacing existing canonical entries.
+
+### S-PMR-004 — Y Combinator: How to Talk to Users
+- Type: customer-discovery method.
+- URL: https://www.ycombinator.com/library/6g-how-to-talk-to-users
+- Use: reinforces incident-first interviewing, past behavior and existing workaround questions instead of product pitching/hypotheticals.
+- Boundary: method only; not customer validation.
+
+### S-BU-007 — Food Services contact page
+- Type: official university contact surface.
+- URL: https://yemekhane.bogazici.edu.tr/iletisim
+- Use: official route for workflow-discovery outreach.
+- Boundary: a public contact route is not consent, an interview, endorsement or proof of authority.
+
+### S-BU-008 — Food Services staff page
+- Type: official university role map.
+- URL: https://yemekhane.bogazici.edu.tr/people
+- Use: identify plausible dining-governance/operations participants and request referral to the actual quantity owner.
+- Boundary: title ≠ daily production authority or buyer ownership.
+
+### S-BU-009 — Student Events Calendar
+- Type: official public calendar.
+- URL: https://takvim.bogazici.edu.tr/tr/events/students
+- Use: candidate anomaly/context feature for campus attendance.
+- Boundary: event listing does not establish attendance magnitude or meal-demand effect.
+
+### S-BU-010 — Academic Calendar 2026–2027
+- Type: official PDF.
+- PDF: https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf
+- Use: versionable term/exam/no-class context.
+- Boundary: context feature only; must be aligned to what was knowable before the real decision cutoff.
+
+### S-TR-005 — Ministry food-service hygiene/good-practice guidance
+- Type: government official guidance index.
+- URL: https://www.tarimorman.gov.tr/GKGM/Menu/132/
+- Use: food-safety/holding/storage/service guardrails for PMR questions and human-in-the-loop recommendations.
+- Boundary: national guidance does not establish Boğaziçi workflow or contract rules.
+
+### S-ACAD-007 — Fatemi et al. (2024), campus-canteen quasi-experimental study
+- Article: https://link.springer.com/article/10.1186/s40066-024-00488-y
+- Use: direct-weighing/intervention precedent and strong reminder that portion size, taste/quality and consumer behavior can drive waste.
+- Boundary: study-specific effects do not transfer to Boğaziçi and the intervention is not equivalent to production forecasting.
+
+### S-ACAD-008 — Özokcu & Özdemir (2026), Türkiye university-cafeteria plate-waste drivers
+- Article: https://link.springer.com/article/10.1007/s44274-025-00509-y
+- Use: Turkey-specific evidence that portion size, taste/palatability and other situational factors matter for plate waste.
+- Boundary: plate-waste drivers do not prove overproduction is the dominant local cause.
+
+### S-INT-004 — TEMAŞ contractor-side PMR branch
+- Branch: `research/kreate-contractor-gtm-clean-20261005`
+- Use: contractor-role, economic-beneficiary and repeatability question backlog.
+- Rule: stale/internal synthesis; selectively salvage and reverify. Do not treat public company material as contractor validation.
+
+### S-INT-005 — Issue #292: BUCard/SKS aggregate service-truth acquisition
+- URL: https://github.com/yasinkaya701/bouncampus/issues/292
+- Use: current cross-role dependency for privacy-preserving `campus × meal-period × service-date` service truth and semantic reconciliation.
+- Boundary: the verified dataset is not yet present; generated rows cannot substitute for it.
+- CS1 intake when a real artifact arrives: `scripts/cs1_service_truth_artifact_intake.py`.
