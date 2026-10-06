@@ -37,6 +37,11 @@ Statuses:
 | A-013 | stale deep PMR/market branch | https://github.com/yasinkaya701/bouncampus/tree/research/kreate-deep-pmr-market-20261004 | Git branch | INTERNAL_PROVENANCE | Internal repository history | Research backlog / selective salvage |
 | A-014 | merged PMR/market red-team PR #213 | https://github.com/yasinkaya701/bouncampus/pull/213 | Git PR | INTERNAL_PROVENANCE | Merged repository provenance | Current-master research lineage |
 
+| A-015 | Boğaziçi 2024 food-waste report | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf | PDF | LINK_ONLY | Official one-page university report; preserve source URL/date | Historical public data context |
+| A-016 | Boğaziçi 2025 food-waste source workbook | https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx | XLSX | LINK_ONLY | Official linked workbook; preserve raw semantics and do not silently normalize | Current public raw-source context |
+| A-017 | Türkiye toplu tüketim gıda-israfı kılavuzu | https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf | PDF | LINK_ONLY | T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye; verify reuse terms before copying | Türkiye measurement/prevention guidance |
+| A-018 | University refectory food-waste / meal-improvement article | https://dergipark.org.tr/tr/download/article-file/4013917 | PDF | LINK_ONLY | Academic PDF; preserve article provenance and journal terms | H2 falsification / alternative-cause evidence |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
