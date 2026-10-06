@@ -216,6 +216,94 @@ The machine-readable companion is [source_catalog.json](source_catalog.json).
 - Use: large backlog of additive research topics and PMR target ideas.
 - Rule: selectively salvage current, source-traceable insights only; never overwrite newer master policy/evidence files.
 
+
+## 2026-10-06 multi-agent fan-in additions
+
+The following sources were selectively salvaged from concurrent PMR research branches and re-keyed into the canonical `S-*` namespace. Their source-level value was retained without importing a second registry or stale branch ancestry.
+
+### Boğaziçi official artifacts
+
+#### S-BU-007 — Historical Campus Food Waste Tracking
+- Page: https://impact.bogazici.edu.tr/221-campus-food-waste-tracking
+- 2024 PDF: https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf
+- 2023 PDF: https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf
+- Use: historical aggregate reporting trail and cross-year context.
+- Boundary: not service truth, cause attribution or intervention evidence.
+
+#### S-BU-008 — Sustainability Reports / Sustainability Report 2025
+- Index: https://kurumsalveri.bogazici.edu.tr/tr/pages/surdurulebilirlik-raporlari/1063
+- 2025 PDF: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf
+- Use: institutional sustainability/reporting context and official provenance.
+- Boundary: not dining workflow, economic-buyer or pilot-permission evidence.
+
+The 2025 food-waste source `S-BU-002` now also records the official downloadable workbook:
+https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx
+
+The public snapshot under [data/](data/) preserves the published 2024–2025 monthly values and flags the 2025 August/October semantic inconsistency for source-owner reconciliation.
+
+### Türkiye policy / why-now context
+
+#### S-POL-001 — Türkiye food-service food-waste prevention guide
+- PDF: https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf
+- Use: Türkiye-specific food-service prevention/measurement context.
+- Boundary: not Boğaziçi root-cause or impact evidence.
+
+#### S-POL-002 — National food loss/waste strategy
+- Stable policy archive: https://faolex.fao.org/docs/pdf/tur209489.pdf
+- Use: national prevention, reduction and monitoring context.
+- Boundary: not buyer intent or local causal proof.
+
+#### S-POL-003 — UI GreenMetric Guideline 2026
+- Landing page: https://uigreenmetric.com/resources/university/guidelines/2026/english
+- PDF: https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf
+- Use: institutional sustainability-evidence / governance-and-digitalization why-now context.
+- Boundary: do not claim BOUNCAMPUS changes ranking or proves willingness to buy.
+
+### Cross-site operational targets
+
+#### S-TR-005 / S-TR-006 — additional reservation-system archetypes
+- RTEÜ: https://sks.erdogan.edu.tr/tr/news-detail/yemekhane-rezervasyon-sistemi/4787
+- Kayseri University: https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu
+- Use: second-site PMR targets and freeze/reservation archetypes.
+- Boundary: not Boğaziçi evidence and not proof of identical economics.
+
+#### S-TR-007 — Altınbaş University MyMeal
+- https://software.altinbas.edu.tr/mymeal/index_tr.html
+- Use: existing university meal reservation/tracking alternative.
+- Boundary: public product page does not establish capability parity or adoption.
+
+### Academic mechanism / falsification pressure
+
+#### S-ACAD-007 — Rodrigues et al., Journal of Cleaner Production
+- DOI: https://doi.org/10.1016/j.jclepro.2023.140265
+- Use: real catering demand-forecasting benchmark design and forecast-vs-baseline precedent.
+- Boundary: external performance/effect values are not transferable expectations.
+
+#### S-ACAD-008 — University foodservice practices / barriers
+- Open-access article: https://pmc.ncbi.nlm.nih.gov/articles/PMC9180560/
+- Use: demand forecasting, smaller-batch production and measurement-practice context.
+- Boundary: U.S. practice distribution is not Boğaziçi practice.
+
+#### S-ACAD-009 — educational-institution food-waste systematic review
+- DOI: https://doi.org/10.1108/IJCHM-07-2020-0672
+- Use: pressure-test single-cause narratives; preserve plate, preparation, menu/quality and other causes.
+- Boundary: no Boğaziçi-specific causal share.
+
+#### S-ACAD-010 — machine-vision food-waste intervention
+- https://www.mdpi.com/2076-3417/15/9/5036
+- Use: automated measurement/intervention precedent and sensing trade-offs.
+- Boundary: does not validate TrayGate, local mass conversion or privacy acceptability.
+
+### Privacy / data-minimization boundary
+
+#### S-PRIV-001…003 — KVKK official guidance
+- General principles: https://www.kvkk.gov.tr/Icerik/6606/General-Principles-in-Processing-of-Personal-Data
+- Obligation to inform: https://www.kvkk.gov.tr/Icerik/6641/Obligation-to-inform
+- Biometric-data considerations: https://www.kvkk.gov.tr/Icerik/7462/Guideline-on-Considerations-in-The-Processing-of-Biometric-Data
+- Use: keep architecture aggregate-first, purpose-limited and proportional.
+- Boundary: regulatory guidance is not project-specific legal advice or approval.
+
+
 ## Highest-information conversion from secondary research to PMR
 
 For each source, ask: **what primary observation would make this source operationally useful or falsify our inference?**
