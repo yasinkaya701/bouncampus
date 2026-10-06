@@ -70,6 +70,14 @@ The machine-readable companion is [source_catalog.json](source_catalog.json).
 - Use: proves a reservation/intention workflow existed for a specific campus/period.
 - Boundary: do not generalize the deadline, coverage or existence of reservations to all campuses/services without primary confirmation.
 
+### S-BU-011 — Boğaziçi 2024 Campus Food Waste Tracking / official report
+- Type: official university data page + one-page PDF
+- Page: https://impact.bogazici.edu.tr/221-campus-food-waste-tracking
+- PDF: https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf
+- Use: cross-year reporting context and source-quality audit.
+- Data-quality note: the 12 published monthly total-waste rows sum to 50,994 kg while the page/PDF prints 50,993 kg.
+- Boundary: aggregate monthly waste is not produced/served/surplus truth and cannot identify forecast-error causality.
+
 ## Cross-university mechanism and repeatability
 
 ### S-TR-001 — Gebze Technical University Dining Services
@@ -124,6 +132,19 @@ The machine-readable companion is [source_catalog.json](source_catalog.json).
 - Use: prevention/source reduction hierarchy and communication.
 - Boundary: hierarchy does not prove BOUNCAMPUS intervention effectiveness.
 
+### S-MEAS-004 — Türkiye toplu tüketim gıda-israfı kılavuzu
+- Type: official national / sector guidance
+- Publisher: T.C. Tarım ve Orman Bakanlığı + FAO + Metro Türkiye
+- PDF: https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf
+- Use: Türkiye food-service separation, measurement, prevention and planning context.
+- Boundary: guidance is not evidence that Boğaziçi follows the workflow or that production forecasting is causal.
+
+### S-MEAS-005 — WRAP Hospitality & Food Service guide
+- Type: specialist food-service guidance
+- URL: https://www.wrap.ngo/resources/guide/hospitality-and-food-service
+- Use: practical measurement/action workflow and downloadable food-service measurement resources.
+- Boundary: UK-oriented guidance; local operating/legal fit must be verified.
+
 ## Academic evidence
 
 ### S-ACAD-001 — Kılıç, Akkaya & Memili (2018)
@@ -167,6 +188,25 @@ The machine-readable companion is [source_catalog.json](source_catalog.json).
 - DOI: https://doi.org/10.5753/sbsi.2026.248351
 - Use: recent academic benchmark for demand-prediction feature families.
 - Boundary: method precedent only.
+
+### S-ACAD-009 — Rodrigues et al., Journal of Cleaner Production
+- Topic: short-term catering demand forecasting; compares ML methods and baseline service estimates.
+- DOI: https://doi.org/10.1016/j.jclepro.2023.140265
+- Use: explicit waste-vs-unmet-demand trade-off and baseline comparison.
+- Boundary: external confidential datasets and modeled operational consequences are not local pilot evidence.
+
+### S-ACAD-010 — University refectory food-waste study in İzmir
+- Topic: food-waste / plate-waste management in a Turkish university refectory.
+- DOI: https://doi.org/10.1108/BFJ-09-2020-0802
+- Use: Türkiye-specific evidence that plate waste/awareness are distinct mechanisms from production surplus.
+- Boundary: plate-waste evidence cannot be relabeled as forecast-error evidence.
+
+### S-ACAD-011 — University refectory food-waste and meal-improvement study
+- Journal: Aydın Gastronomy
+- Article: https://dergipark.org.tr/tr/pub/aydingas/article/1503134
+- PDF: https://dergipark.org.tr/tr/download/article-file/4013917
+- Use: additional H2 alternative-cause/intervention evidence.
+- Boundary: site-specific; not Boğaziçi PMR or pilot evidence.
 
 ## Competitors / incumbents
 
