@@ -6,6 +6,17 @@
 **Current procurement anchor:** IKN `2025/1727143`  
 **Evidence status:** acquisition/checklist artifact only; public tender context does not establish current contract interpretation.
 
+## Route facts already verified
+
+Do not spend outreach time re-proving these public facts:
+
+- `S-BU-026`: Boğaziçi has an official Procurement branch that is a first-party route for tender/procurement documents.
+- `S-BU-030`: the generic service-acceptance chain includes Control Organization preliminary review → `KİK56.0/H` → relevant Spending Authority for hakediş preparation.
+- `S-BU-027`: the official Tahakkuk branch handles hakediş payments.
+- the current EKAP document controls for IKN `2025/1727143` resolve to a stable official `ihaleId`, but the authoritative payload has not been retrieved in this environment.
+
+The remaining request should focus on the **current food contract's field-level semantics**: exact payable/accepted quantity, unit-price item mapping, correction/reconciliation fields, current Spending Authority/sign-off chain, production-order owner, and freeze/change rights.
+
 ## Objective
 
 Resolve the operational and economic control point around meal quantity:
