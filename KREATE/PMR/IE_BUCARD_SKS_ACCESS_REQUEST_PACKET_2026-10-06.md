@@ -18,7 +18,7 @@ The request must stay aggregate. Do not request or retain student/staff identity
 3. **Dining control / contractor operations** — owner route for produced quantities, allocation, shortage/early-sellout and surplus/waste records.
 4. **CS1 intake** — only after source provenance and reconciliation are explicit; canonical intake is `scripts/cs1_service_truth_artifact_intake.py`.
 
-Public source IDs supporting the routing hypothesis: `S-BU-021`, `S-BU-022`, `S-BU-023`. These sources do **not** prove export authorization or report semantics.
+Public source IDs supporting the routing hypothesis: `S-BU-021`, `S-BU-022`, `S-BU-023`, `S-BU-031`. These sources do **not** prove export authorization or report semantics.
 
 ### Verified technical routing details
 
@@ -28,6 +28,17 @@ Public owner-routing evidence now supports:
 - `S-BU-023`: BUCampus exposes user-facing turnstile/card-reader passage history under **Geçişlerim**.
 
 This justifies asking BİDB which source system/report powers the passage history and whether it can generate an aggregate cafeteria-only export. It does **not** establish permission or exportability.
+
+## Governance-backed owner-route refinement
+
+The current official Food Service Executive Board directive (`S-BU-031`, Article 7) moves the BUCard route beyond a contact-page hypothesis: the BUCard Office is inside BİDB, operates/controls the dining BUCard system, reports to the Food Service Executive Board and Food Services Branch, and is responsible for retaining digital data.
+
+Execution consequence for #292:
+- ask BUCard/BİDB first for the existing dining report surface and privacy-preserving aggregate/export capability;
+- ask whether retained digital data include historical report snapshots/versions or only the latest corrected state;
+- ask Food Services/SKS to reconcile what each reported count means and which report/version is operationally final.
+
+Boundary unchanged: governance ownership is **not** permission to access/export data, and a dining turnstile/payment event is **not** automatically `actual_served`.
 
 ## Minimum aggregate export requested
 
