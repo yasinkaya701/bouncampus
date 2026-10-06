@@ -261,3 +261,17 @@ Return only decision-changing deltas:
 - **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
 
 Do not send generic research summaries back to PMR-A.
+
+
+## Canonical provenance mapping after governance fan-in — 2026-10-06
+
+Use these IDs exactly:
+- `S-BU-026` — Food Service Executive Board directive / BUCard + food-specific hakediş governance.
+- `S-BU-027` — IMID Procurement branch.
+- `S-BU-028` — Tahakkuk branch.
+- `S-BU-029` — IMID contact route.
+- `S-BU-030` — 2025 Administration Activity Report / Control Organization → KİK56.0/H → Spending Authority flow.
+
+**CS1:** no ID above upgrades BUCard passage to `actual_served`; #292 still needs real aggregate export + reconciliation.
+**CS2:** no ID above unlocks buyer/WTP/savings/payable-quantity/change-right claims.
+**EE/EHB:** existing-record routes remain first priority; sensing still requires a demonstrated missing field.
