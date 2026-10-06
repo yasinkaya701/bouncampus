@@ -116,6 +116,50 @@ Public notice/result establish:
 
 None of these reveals the payable operational count or hakediş formula.
 
+### Source-backed procurement / payment routing
+
+The institutional route is now narrower:
+
+- **S-BU-026 — İhale ve Satınalma Şube Müdürlüğü:** official branch responsible for tender/procurement processes; current public manager route is Bahadır Şahin.
+- **S-BU-027 — Tahakkuk Şube Müdürlüğü:** official branch explicitly states it performs tender/direct-procurement/transfer and **hakediş payments**; current public manager route is Yakup Korkmaz.
+- **S-BU-028 — İMİD contact:** official switchboard/routing surface for both branches.
+- **S-BU-014 — Control Organization page:** current dining cooking/distribution control members.
+- **S-BU-030 — 2025 Administration Activity Report:** institutional acceptance chain: Control Organization preliminary review → KİK56.0/H Service Works Acceptance Proposal → relevant Spending Authority → hakediş preparation.
+
+This resolves **routing/process surfaces**, not the food contract's payable unit or specific signatory chain.
+
+### Current acceptance workflow already supported
+
+The 2025 official report supports the following institutional workflow:
+
+~~~text
+contract / technical specification
+        ↓
+contractor performs service
+        ↓
+Control Organization monitors / reviews
+        ↓
+if acceptable: KİK56.0/H Service Works Acceptance Proposal
+        ↓
+relevant Spending Authority
+        ↓
+hakediş preparation / payment process
+        ↓
+Tahakkuk branch is a source-backed institutional payment route
+~~~
+
+The report also says 2025 food-service work was performed on a monthly basis and acceptance proposals were prepared as services were performed.
+
+Still unresolved:
+
+~~~text
+which count becomes payable?
+who is the food contract's exact Spending Authority?
+what source document establishes payable quantity?
+what are current IKN 2025/1727143 penalty and correction clauses?
+when can a daily quantity still change?
+~~~
+
 ### Document retrieval status
 
 | Artifact | Public route | Status | What it can resolve |
@@ -125,7 +169,7 @@ None of these reveals the payable operational count or hakediş formula.
 | current technical specification | EKAP IKN 2025/1727143 technical specification | **RETRIEVAL_REQUIRED** | production/distribution/service constraints, staffing, measurement/control details |
 | unit-price bid schedule | EKAP tender document | **RETRIEVAL_REQUIRED** | actual work-item structure and offered unit-price basis |
 | contract / draft contract | EKAP / source owner | **RETRIEVAL_REQUIRED** | payment, acceptance, penalties, change rights |
-| hakediş / acceptance form | SKS/procurement/control owner | **SOURCE_OWNER_REQUIRED** | which measured count becomes payable |
+| hakediş / acceptance form | Control Organization / Spending Authority / Tahakkuk route | **SOURCE_OWNER_REQUIRED** | which measured count becomes payable; S-BU-030 confirms KİK56.0/H acceptance-proposal step |
 | daily production/order record | SKS/TEMAŞ operations | **SOURCE_OWNER_REQUIRED** | actual controllable quantity and freeze/revision timestamps |
 | daily reconciliation report | SKS/TEMAŞ/BUCard | **SOURCE_OWNER_REQUIRED** | production–served–accepted linkage |
 
