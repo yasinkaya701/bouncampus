@@ -36,6 +36,13 @@ This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB
 
 Issue **#292** remains the active acquisition lane.
 
+### Procurement / current-contract document routing
+
+- **S-BU-027:** official İdari ve Mali İşler Daire Başkanlığı surface lists an **İhale ve Satınalma Şube Müdürlüğü**, a branch phone `0 (212) 359 69 18`, and the first-party general İMİD route `imid@bogazici.edu.tr` / `0 (212) 359 70 89`.
+- Acquisition objective: route IKN `2025/1727143` requests for the current technical/admin specifications, correction/addendum, unit-price schedule and acceptance/hakediş artifacts to the authoritative document owner when direct EKAP retrieval is insufficient.
+
+This is routing evidence only. Do **not** infer that İMİD is the operational quantity owner, hakediş signer, software buyer or economic beneficiary without source-owner confirmation.
+
 ### TEMAŞ contractor operations
 
 - Procurement anchor: `S-PROC-001`
@@ -57,7 +64,7 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
-| acceptance/hakediş | S-PROC-001 gives procurement route only | authoritative clause/report pending PMR |
+| acceptance/hakediş | S-PROC-001 + S-BU-026 + S-BU-027 narrow governance/document routes | authoritative payable-quantity/clause/report semantics still pending #358 |
 | contractor production planning | S-PROC-001 identifies TEMAŞ | local owner/workflow pending PMR |
 
 ## Interview order
