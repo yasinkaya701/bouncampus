@@ -116,7 +116,7 @@ CS2 consequence: spend the next primary-evidence cycle on retrieving and reconci
 
 ### Application claim → IE owner/report route linkage
 
-The route findings above are now tied explicitly to the canonical application-claim ledger. These links narrow **who owns the next evidence request**; they do not upgrade the claim's evidence class or submission status.
+The route findings above are now tied explicitly to the submission claim ledger in `KREATE/APPLICATION_RUBRIC.md`; SAFE/BLOCKED/KILL policy remains governed by `KREATE/PMR/CS2_APPLICATION_CLAIM_GATE_2026-10-06.md`. These links narrow **who owns the next evidence request**; they do not upgrade the claim's evidence class or submission status.
 
 | Application claim | Current claim state | Gate(s) | Canonical IE route evidence | What is now established | Still required before any promotion |
 | --- | --- | --- | --- | --- | --- |
