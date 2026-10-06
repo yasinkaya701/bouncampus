@@ -48,7 +48,7 @@ Default optics are defined in `TRAYGATE_OPTICAL_CAPTURE_GATE.md`.
 
 Excluding optional cooling:
 - low estimate: **USD 165**;
-- high estimate: **USD 265**.
+- high estimate: **USD 255**.
 
 With up to USD 10 cooling allowance:
 - planning envelope: **USD 165-265 per prototype station**.
@@ -99,7 +99,7 @@ Evidence: official vendor announcements; cost delta is `CALCULATION`.
 
 ## Excluded costs
 
-The USD 165-275 prototype envelope excludes:
+The USD 165-265 prototype envelope excludes:
 - VAT / Turkish taxes;
 - shipping / customs;
 - reseller markup beyond observed official pricing;
