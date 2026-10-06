@@ -44,6 +44,15 @@ Issue **#292** remains the active acquisition lane.
 
 Do not use generic company contacts as evidence of the Boğaziçi account owner; ask Food Services/control/procurement participants for the correct local referral.
 
+### Procurement / payment / acceptance routes — corrected IDs
+
+- `S-BU-027` — Procurement branch: tender/specification document route.
+- `S-BU-028` — Tahakkuk branch: hakediş payment route.
+- `S-BU-029` — IMID routing/contact.
+- `S-BU-030` — Control Organization preliminary acceptance → KİK56.0/H → relevant Spending Authority.
+
+Use these together with `S-BU-026` rather than assuming job titles collapse into one owner. #358 still needs the actual food-service acceptance/hakediş artifact and quantity basis.
+
 ## Signal-owner map
 
 | Signal / artifact | Public clue | Actual owner/status |
