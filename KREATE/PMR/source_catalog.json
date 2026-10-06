@@ -2100,6 +2100,32 @@
         "does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily production freeze/change rights or shortage/excess economics",
         "does not substitute for current IKN 2025/1727143 technical/admin specifications or an actual hakediş artifact"
       ]
+    },
+    {
+      "id": "S-BU-031",
+      "title": "Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Information Technology Department",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "DATA_OWNER",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "names an existing BUCard dining live-report page and says package-meal counts were added",
+        "states daily passage reports were updated to include package-meal information",
+        "names a personnel meal report with a breakfast field and calculation updates",
+        "reports BUCard Mobile deployment at dining halls/package distribution points and reader/software changes"
+      ],
+      "limitations": [
+        "report existence does not prove research/export authorization, exact report grain, API availability, historical snapshot retention, finality or stable report IDs",
+        "daily passage and package-meal report fields are not automatically physically served-meal truth and still require Food Services/SKS reconciliation"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot. Added S-TR-011…013 for IE second-site / reservation-counter-archetype targeting on 2026-10-06; these are secondary routing/falsifier sources, not interview evidence."
