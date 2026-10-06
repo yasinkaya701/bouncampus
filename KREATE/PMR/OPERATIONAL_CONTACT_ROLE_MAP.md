@@ -36,6 +36,15 @@ This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB
 
 Issue **#292** remains the active acquisition lane.
 
+### Canonical procurement / acceptance / payment routing
+
+- **S-BU-028 — Procurement:** retrieve IKN `2025/1727143` admin/technical specs, correction/addendum, unit-price bid schedule and contract artifacts.
+- **S-BU-031 — Control Organization / acceptance:** institutional process evidence for preliminary acceptance → `KİK56.0/H` → relevant Spending Authority.
+- **S-BU-029 — Tahakkuk:** hakediş-payment package / responsible payment-owner referral.
+- **S-BU-030 — İMİD contact:** general routing fallback only.
+
+Issue **#358** remains open until one current-contract artifact resolves the payable/accepted quantity semantics, unit-price-item mapping, correction/reconciliation path, exact sign-off owner, and quantity freeze/change rights.
+
 ### TEMAŞ contractor operations
 
 - Procurement anchor: `S-PROC-001`
