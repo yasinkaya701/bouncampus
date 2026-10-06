@@ -518,6 +518,7 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 
 - **S-PROC-001** — current 2026–2027 Boğaziçi food-service procurement, IKN 2025/1727143. Public result context identifies current contractor and headline scope/quantities; retrieve authoritative EKAP documents before clause-level claims.
 - **S-PROC-002** — cancelled predecessor IKN 2025/1335958. Use only to locate changed specifications and ask which clauses matter; do not infer a technology/waste cause.
+- **S-PROC-005** — current IKN 2025/1727143 schedule cross-check. Confirms the unit-price tender form and three identifiable meal rows, while exposing additional incompletely described monthly rows; use this ambiguity as a retrieval reason, not as settlement evidence.
 
 ### Additional method / measurement / falsification
 
