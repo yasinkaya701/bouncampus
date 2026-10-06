@@ -1625,11 +1625,15 @@
         "current two-year Boğaziçi food-service procurement scope and contractor discovery",
         "public notice requires bidder capacity report sufficient for at least 5,000 meals/day (qualification threshold, not actual production)",
         "public notice states economically most advantageous offer is determined on price basis",
-        "public result reports 14 bids, 7 valid bids, contract dated 25.12.2025 and TEMAŞ as contractor"
+        "public result reports 14 bids, 7 valid bids, contract dated 25.12.2025 and TEMAŞ as contractor",
+        "public notice states bids are submitted as item quantity × unit price and the awarded contract is a unit-price contract",
+        "public notice describes 5,000 meals/day capacity as one-half of the administration's stated daily meal need for bidder qualification"
       ],
       "limitations": [
         "does not reveal unit-price schedule, hakediş, penalties or service-level quantity mechanics",
-        "5,000 meals/day is a bidder qualification threshold, not evidence of actual daily production or committed quantity"
+        "5,000 meals/day is a bidder qualification threshold, not evidence of actual daily production or committed quantity",
+        "unit-price contract form does not reveal the actual unit-price schedule or which operational count is accepted for payment",
+        "the notice's daily-need framing is procurement/capacity context, not measured actual served demand"
       ],
       "assets": {
         "official_lookup": "https://ekap.kik.gov.tr/EKAP/",
