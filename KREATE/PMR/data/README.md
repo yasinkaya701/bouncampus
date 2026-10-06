@@ -1,17 +1,18 @@
 # PMR Public Data Snapshots
 
-This folder stores small, auditable public-data extracts for PMR/source-quality reasoning. They are secondary/public context, not customer validation or service-level measured truth.
-
 ## `bogazici_food_waste_public_snapshot.csv`
 
+A small auditable transcription of public aggregate reporting discovered by a parallel IE PMR agent and reconciled to canonical IDs.
+
 Sources:
-- 2024: `S-BU-009` — Boğaziçi Impact historical food-waste tracking.
-- 2025: `S-BU-002` — current corporate-data food-waste page and official XLSX.
+- `S-BU-008` — 2024 Boğaziçi Impact food-waste page.
+- `S-BU-002` / `S-BU-007` — 2025 corporate-data page / linked raw workbook.
 
-Each row is one published month. The file is **not** campus × meal-period truth, produced/served portions, edible surplus, plate waste, forecast error, pilot outcome or model-training truth.
+This is **not** campus × meal-period truth, produced/served portions, edible surplus, plate waste, forecast error, pilot outcome, or model-training truth.
 
-The 2025 source displays months where `delivered_to_istac_kg > total_food_waste_kg` while describing delivered waste as included in total. August and October are therefore marked `SEMANTIC_RECONCILIATION_REQUIRED`.
+### Source-quality warnings
 
-Preserve the published values. Do not clamp/recompute a “corrected” total or infer an accounting identity until the source owner clarifies field semantics through the institutional acquisition/reconciliation path (#292).
+- 2025 August and October retain published rows where `delivered_to_istac_kg > total_food_waste_kg`; they are flagged `SEMANTIC_RECONCILIATION_REQUIRED`.
+- The 12 transcribed 2024 monthly totals sum to **50,994 kg** while the inherited master snapshot records a published annual total of **50,993 kg**. Preserve the mismatch as a source-owner question; do not silently force agreement.
 
-Use this snapshot for provenance checks, cross-year context and interview questions about reporting semantics—not for impact claims.
+Use this snapshot for provenance/data-quality tests and PMR questions about reporting semantics only.
