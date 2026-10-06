@@ -42,6 +42,11 @@ Statuses:
 | A-017 | Boğaziçi official cafeteria visual | https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png | PNG | LINK_ONLY | Official-hosted image; reuse rights not established here | Visual context only; do not infer sensor/workflow geometry |
 | A-018 | İzmir Bakırçay University Akıllı Kampüs Ara Raporu | https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf | PDF | LINK_ONLY | Official university-hosted report; verify reuse terms before copying | Smart-campus dining/utilization/planning precedent |
 
+
+| A-019 | Boğaziçi 2024 food-waste report | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf | PDF | LINK_ONLY | Official one-page university report; preserve retrieval date and published semantics | Historical public-data provenance |
+| A-020 | Türkiye toplu tüketim gıda-israfı kılavuzu | https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf | PDF | LINK_ONLY | Official/FAO-sector guide; verify redistribution terms before copying binary | Türkiye measurement/prevention guidance |
+| A-021 | University refectory meal-improvement article | https://dergipark.org.tr/tr/download/article-file/4013917 | PDF | LINK_ONLY | Academic PDF; preserve journal/article provenance | H2 falsification / alternative-cause reference |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
