@@ -24,7 +24,9 @@
         "source_report_id",
         "reconciliation semantics",
         "production/outcome record owner",
-        "export/access decision"
+        "export/access decision",
+        "existing BUCard dining report name/schema and aggregate-export capability",
+        "historical report/version retention semantics"
       ],
       "downstream": [
         "CS1 #82"
@@ -70,6 +72,40 @@
         "headline contract value / listed meals == unit meal price",
         "historical clauses == current clauses",
         "unit-price contract form == payable operational count"
+      ]
+    },
+    {
+      "issue": 322,
+      "name": "IE-04 second-site repeatability falsifier",
+      "state": "REQUEST_READY",
+      "routes": [
+        "S-TR-011",
+        "S-TR-012",
+        "S-TR-013"
+      ],
+      "priority_targets": [
+        "P0 BAIBU mature multi-site contracted operation",
+        "P0 BANU reservation-first off-central-campus vocational-school scope",
+        "P1 Kayseri University own-kitchen vs procured-meal migration backup"
+      ],
+      "required_outputs": [
+        "verified quantity decision owner",
+        "last reversible production/allocation cutoff",
+        "reservation-to-production coupling",
+        "recent surplus and shortage incident",
+        "current baseline/system",
+        "economic beneficiary/buyer path",
+        "same-product and same-sales-motion verdict"
+      ],
+      "downstream": [
+        "CS2",
+        "CS1"
+      ],
+      "forbidden_inference": [
+        "prepared Gmail draft == outreach",
+        "public reservation policy == measured waste reduction",
+        "second-site public workflow == Boğaziçi service truth",
+        "stated planning goal == verified reservation-to-production coupling"
       ]
     }
   ]
