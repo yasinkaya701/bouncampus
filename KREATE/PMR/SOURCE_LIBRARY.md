@@ -528,3 +528,26 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - **S-ACAD-019** — institutional catering intervention evidence; no local causal transfer.
 
 Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## First-party procurement / hakediş routing integrity — 2026-10-06
+
+### S-BU-026 — İhale ve Satınalma Şube Müdürlüğü
+- Official: https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117
+- Use: authoritative tender/specification routing for #358; the official page identifies the procurement branch and its public manager/contact surface.
+- Boundary: branch responsibility does not prove contract-specific document ownership, quantity authority, software-buying authority or settlement semantics.
+
+### S-BU-027 — Tahakkuk Şube Müdürlüğü
+- Official: https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119
+- Use: first-party route for the hakediş payment package and referral to the responsible food-contract payment/acceptance owner.
+- Boundary: institutional hakediş-payment responsibility does not establish the payable meal count, signatory chain, incentive allocation or current contract clauses.
+
+### S-BU-028 — İMİD contact
+- Official: https://imid.bogazici.edu.tr/tr/pages/iletisim/2116
+- Use: general first-party phone/email routing for Procurement and Tahakkuk when a document owner is not known.
+- Boundary: routing evidence only.
+
+### S-BU-030 — 2025 Administration Activity Report
+- Official PDF: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
+- Use: first-party institutional acceptance-flow evidence: Control Organization preliminary review → KİK56.0/H Service Works Acceptance Proposal → relevant Spending Authority → hakediş preparation.
+- Boundary: does not identify the current food contract's payable count, exact Spending Authority, current unit-price schedule, daily freeze/change rights or shortage/excess economics; authoritative IKN 2025/1727143 artifacts remain required.
