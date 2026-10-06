@@ -1876,6 +1876,32 @@
         "special intersession workflow is not evidence of an always-on reservation process or a general production cutoff",
         "reservation count is intent, not served demand"
       ]
+    },
+    {
+      "id": "S-PROC-005",
+      "title": "İhaleTakip mirror — Boğaziçi 2026–2027 food-service tender schedule, IKN 2025/1727143",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "İhaleTakip (EKAP-derived public tender mirror)",
+      "url": "https://www.ihaletakip.com.tr/ihale/2026-2027-yili-01-01-2026-31-12-2027-malzeme-dahil-kahvalti-yemek-hazirlama-ve-dagitim-hizmeti-alimi/4374218/",
+      "accessed_at": "2026-10-06",
+      "authority": "public_procurement_record_mirror",
+      "identifier": "IKN 2025/1727143",
+      "hypotheses": [
+        "H5",
+        "H6",
+        "CONTRACT",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "cross-checks that bids are item quantity × offered unit price and the awarded agreement is a unit-price contract",
+        "public schedule mirror exposes three identifiable meal rows: 380,000 student breakfasts, 2,500,000 student meals, and 250,000 staff meals",
+        "public schedule mirror also exposes additional monthly rows whose descriptions are not sufficiently visible to interpret settlement or operating scope"
+      ],
+      "limitations": [
+        "third-party EKAP-derived mirror; authoritative EKAP specification and contract bundle remains required",
+        "does not expose awarded unit prices or sufficiently complete descriptions for the additional monthly schedule rows",
+        "does not establish payable or accepted quantity, daily or campus allocation, penalties, change rights, contractor margin, software budget, or savings"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
