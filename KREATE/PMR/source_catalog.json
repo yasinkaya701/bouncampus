@@ -1406,10 +1406,12 @@
         "H6"
       ],
       "supports": [
-        "official dining cooking/distribution control role surface"
+        "official dining cooking/distribution control role surface",
+        "current public control-organization page lists Aygül Demir among principal members"
       ],
       "limitations": [
-        "committee membership does not prove daily quantity or settlement authority"
+        "committee membership does not prove daily quantity or settlement authority",
+        "public membership is interview-routing evidence, not proof that a planned or completed interview occurred"
       ]
     },
     {
@@ -1901,6 +1903,149 @@
         "third-party EKAP-derived mirror; authoritative EKAP specification and contract bundle remains required",
         "does not expose awarded unit prices or sufficiently complete descriptions for the additional monthly schedule rows",
         "does not establish payable or accepted quantity, daily or campus allocation, penalties, change rights, contractor margin, software budget, or savings"
+      ]
+    },
+    {
+      "id": "S-BU-026",
+      "title": "İhale ve Satınalma Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official university branch responsible for procurement/tender processes under public procurement rules",
+        "current public branch manager is Bahadır Şahin with direct institutional contact route"
+      ],
+      "limitations": [
+        "branch responsibility does not prove this manager personally owns IKN 2025/1727143 documents or product-buying authority",
+        "does not reveal contract-specific payment, acceptance or quantity semantics"
+      ]
+    },
+    {
+      "id": "S-BU-027",
+      "title": "Tahakkuk Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch states it performs tender, direct-procurement, transfer and hakediş payments",
+        "current public branch manager is Yakup Korkmaz with direct institutional contact route"
+      ],
+      "limitations": [
+        "general hakediş-payment responsibility does not establish the food contract's payable unit, acceptance count, signatory chain or incentive allocation"
+      ]
+    },
+    {
+      "id": "S-BU-028",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/iletisim/2116",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official phone routing for Procurement and Tahakkuk branches and general IMID contact"
+      ],
+      "limitations": [
+        "contact information is routing evidence only"
+      ]
+    },
+    {
+      "id": "S-BU-029",
+      "title": "Genel Sekreterlik 2023 Faaliyet Raporu — service acceptance/control precedent",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University General Secretariat",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/564-genel-sekreterlik-20260112-095525.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_document",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE"
+      ],
+      "supports": [
+        "historical General Secretariat report documents service acceptance/control process and food-service control organization",
+        "historical report shows Control Organization members prepared Service Works Acceptance Proposal documents for service procurements"
+      ],
+      "limitations": [
+        "this is historical-process evidence and must not be treated as the current 2026 contract's exact acceptance, payment or membership record",
+        "current membership is better supported by S-BU-014; current institutional process is better supported by the 2025 administration report"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "Control Organization works under service general conditions, signed contracts and technical specifications and is responsible to the relevant spending authority",
+        "after preliminary acceptance review, Control Organization prepares KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant spending authority for hakediş preparation",
+        "2025 report states food-service procurements were performed on a monthly basis and acceptance proposal documents were prepared as services were performed",
+        "service deficiencies affecting functionality are reported to relevant authorities"
+      ],
+      "limitations": [
+        "report describes institutional acceptance/hakediş workflow but does not identify the food contract's payable count, unit-price schedule, exact spending-authority identity, daily production freeze or shortage/excess economics",
+        "it does not substitute for the current IKN 2025/1727143 technical/admin specifications or actual hakediş artifact"
+      ]
+    },
+    {
+      "id": "S-BU-031",
+      "title": "Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_directive",
+      "hypotheses": [
+        "H1",
+        "H4",
+        "H5",
+        "ACCESS",
+        "DATA_OWNER",
+        "CONTRACT",
+        "ACCEPTANCE"
+      ],
+      "supports": [
+        "Article 7 places BUCard Office within BİDB, assigns operation/control of the dining BUCard system, requires reporting to the Food Service Executive Board and Food Services Branch, and requires retention of digital data",
+        "Article 5(2)(f) states the Food Service Executive Board carries out meal hakediş payment orders and accrual together with the Inspection and Acceptance Commission",
+        "Article 8 states dining-service spending occurs through dining-hall payment turnstiles and distinguishes second-meal handling",
+        "Article 9 states meal-service procurement is carried out by SKS together with Administrative and Financial Affairs and requires separate student/civil-servant invoices",
+        "Article 8(5) defines a written SKS-to-board meal-count channel for university-organized national/international student social, cultural and sports activities"
+      ],
+      "limitations": [
+        "does not prove research/export authorization, report grain, retention period or passage/payment event equals a physically served meal",
+        "does not establish the current contract payable quantity/unit, exact signer chain, routine daily production freeze/change rights, penalties, economic beneficiary, willingness to pay or software buyer authority",
+        "the special-event written meal-count channel must not be generalized to routine dining production"
       ]
     }
   ],
