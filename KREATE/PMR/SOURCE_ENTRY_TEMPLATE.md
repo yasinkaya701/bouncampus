@@ -14,7 +14,7 @@ Do not create a second source ID for the same artifact just because a mirror URL
 
 ## Required record
 
-\`\`\`json
+```json
 {
   "id": "SRC-<CLASS>-<NNN>",
   "title": "Exact source title",
@@ -28,22 +28,22 @@ Do not create a second source ID for the same artifact just because a mirror URL
   "does_not_prove": "Explicit non-inference / claim boundary.",
   "pmr_question_tags": ["H1", "H4"]
 }
-\`\`\`
+```
 
 Optional fields:
 
-- \`doi\`;
-- \`asset_urls\`;
-- \`repo_snapshot\`;
-- \`bibliographic_note\`;
-- \`supersedes\`;
-- \`status: stale | conflicted | superseded\`.
+- `doi`;
+- `asset_urls`;
+- `repo_snapshot`;
+- `bibliographic_note`;
+- `supersedes`;
+- `status: stale | conflicted | superseded`.
 
 ## Human-readable synthesis rule
 
 If the source changes a PMR question or falsifier, update [SECONDARY_RESEARCH_INDEX.md](./SECONDARY_RESEARCH_INDEX.md) with:
 
-- the \`SRC-*\` ID;
+- the `SRC-*` ID;
 - the narrow finding;
 - the interview question it changes;
 - the hypothesis it pressures;
@@ -76,15 +76,15 @@ For a small official public table, a structured snapshot may be added only when:
 
 ## Interview promotion rule
 
-A source entry never creates \`E-INT-*\`.
+A source entry never creates `E-INT-*`.
 
 After a **real completed interview**:
 
 1. create/update the interview artifact from [INTERVIEW_TEMPLATE.md](./INTERVIEW_TEMPLATE.md);
 2. record the real completion in [INTERVIEW_TRACKER.md](./INTERVIEW_TRACKER.md);
-3. promote only narrow supported/contradicted claims to \`../EVIDENCE.md\`;
+3. promote only narrow supported/contradicted claims to `../EVIDENCE.md`;
 4. link the actual interview artifact;
-5. preserve contradictory evidence and \`NONE — no promotable claim\` when appropriate.
+5. preserve contradictory evidence and `NONE — no promotable claim` when appropriate.
 
 ## Cross-role routing
 
