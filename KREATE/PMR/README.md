@@ -9,7 +9,7 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 ## Read first
 
 1. [PMR_KNOWLEDGE_BASE_2026-10-06.md](PMR_KNOWLEDGE_BASE_2026-10-06.md) — current cumulative synthesis, Boğaziçi facts, unresolved questions, and interview priorities.
-2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 53 verified/reference records across parallel PMR agents.
+2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 95 deduplicated reference records across parallel PMR agents.
 3. [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) — human-readable companion to the canonical catalog, including source use and explicit inference boundaries.
 4. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — hypothesis/claim → secondary support → forbidden inference → exact primary-evidence gap.
 5. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — canonical PDF/XLSX/image/data provenance and reuse-status manifest.
@@ -19,6 +19,11 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
 10. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
 11. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
+12. [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md) — canonical evidence-acquisition design and stop rule.
+13. [IE_ACQUISITION_EXECUTION_PACK.md](IE_ACQUISITION_EXECUTION_PACK.md) — bounded #292/#358 execution order and handoffs.
+14. [IE_BUCARD_SKS_ACCESS_REQUEST_PACKET_2026-10-06.md](IE_BUCARD_SKS_ACCESS_REQUEST_PACKET_2026-10-06.md) — ready-to-send aggregate BUCard/SKS request and reconciliation checklist.
+15. [IE_CONTRACT_HAKEDIS_REQUEST_PACKET_2026-10-06.md](IE_CONTRACT_HAKEDIS_REQUEST_PACKET_2026-10-06.md) — current-contract/hakediş artifact request and one-service reconstruction.
+16. [ie_acquisition_tracker.json](ie_acquisition_tracker.json) — operational request-readiness tracker; not evidence of outreach or access.
 
 Relevant current-master research:
 - [../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md](../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md)
