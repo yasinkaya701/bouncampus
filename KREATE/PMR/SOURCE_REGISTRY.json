@@ -147,18 +147,21 @@
       "title": "Türkiye’s National Strategy Document on Prevention, Reduction and Monitoring of Food Loss and Waste and Action Plan",
       "source_class": "PUBLIC_OFFICIAL",
       "authority": "Republic of Türkiye Ministry of Agriculture and Forestry / FAO",
-      "canonical_url": "https://www.tarimorman.gov.tr/ABDGM/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/G%C4%B1dan%C4%B1%20Koru%20Strateji%20Belgesi%20ve%20Eylem%20Plan%C4%B1.pdf",
+      "canonical_url": "https://faolex.fao.org/docs/pdf/tur209489.pdf",
       "formats": [
         "PDF"
       ],
       "accessed_at": "2026-10-06",
-      "verification": "VERIFIED_SEARCH_RESULT_AND_OFFICIAL_PUBLICATION_INDEX",
+      "verification": "VERIFIED_FAOLEX_RECORD_AND_OFFICIAL_MINISTRY_PUBLICATION_INDEX",
       "narrow_use": "National policy context prioritizing prevention/reduction, measurement/monitoring and multi-stakeholder action.",
       "does_not_prove": "Boğaziçi root cause, buyer intent or BOUNCAMPUS impact.",
       "pmr_question_tags": [
         "POLICY",
         "H2",
         "H4"
+      ],
+      "asset_urls": [
+        "https://www.tarimorman.gov.tr/ABDGM/Sayfalar/Detay.aspx?SayfaId=3"
       ]
     },
     {
