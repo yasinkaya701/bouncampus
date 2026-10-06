@@ -50,6 +50,10 @@ Statuses:
 
 | A-024 | University refectory food-waste / meal-improvement article | https://dergipark.org.tr/tr/download/article-file/4013917 | PDF | LINK_ONLY | Academic PDF; preserve article/journal provenance and verify reuse terms before copying | H2 falsification / intervention reference |
 
+| A-025 | Academic Calendar 2026–2027 | https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf | PDF | LINK_ONLY | Official university PDF; preserve version/date | Known-ahead calendar snapshot |
+| A-026 | Boğaziçi SDG 2 publication | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf | PDF | LINK_ONLY | Official university publication; reuse terms not established | Institutional food/sustainability context |
+| A-027 | Boğaziçi 2026–2027 food-service procurement result mirror | https://www.ihaledetay.com/2025-1727143 | HTML | LINK_ONLY | EKAP-derived public result mirror; retrieve authoritative EKAP docs for clause claims | Current contractor/procurement discovery |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
