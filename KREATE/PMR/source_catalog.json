@@ -1928,7 +1928,91 @@
         "the directive does not prove research/export authorization, report grain, retention period or that one BUCard event equals one physically served meal",
         "the hakediş workflow actor statement does not establish which quantity/unit is payable, exact signer sequence, freeze/change rights, penalty mechanics, economic beneficiary or software buyer authority"
       ]
+    },
+    {
+      "id": "S-TR-011",
+      "title": "BAİBÜ Beslenme Hizmetleri operational forms and multi-site dining surface",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Bolu Abant İzzet Baysal University Health, Culture and Sports Department",
+      "url": "https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri-kullanilan-formlar/9853",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "SECOND_SITE",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "public operational record names include daily food production/consumption and meals sent to central/district units",
+        "supports selecting BAİBÜ as a mature-operation second-site interview target"
+      ],
+      "limitations": [
+        "record names do not establish field semantics, actual usage, decision timing, reservation-to-production coupling or measured waste outcomes",
+        "does not prove the same product or procurement motion repeats at Boğaziçi"
+      ],
+      "assets": {
+        "operations_page": "https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri/9713",
+        "contact_page": "https://sksdb.ibu.edu.tr/tr/page/dahili-iletisim/9732"
+      }
+    },
+    {
+      "id": "S-TR-012",
+      "title": "BANÜ vocational-school mandatory dining reservation rollout — 5 Oct 2026",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Bandırma Onyedi Eylül University Health, Culture and Sports Department",
+      "url": "https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94013",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H6",
+        "SECOND_SITE",
+        "FALSIFIER"
+      ],
+      "supports": [
+        "official notice states vocational-school dining becomes fully reservation-based from 5 Oct 2026",
+        "official notice states users without reservation will not receive meal service in the announced scope",
+        "official rationale explicitly links reservation to more accurate daily planning, effective resource use and reducing food waste",
+        "supports selecting BANÜ as a reservation-first counter-archetype that can falsify a generic forecasting wedge"
+      ],
+      "limitations": [
+        "stated goals are not measured outcomes",
+        "does not establish reservation cutoff/cancellation/no-show semantics, kitchen order logic, residual forecast error or actual waste reduction",
+        "does not establish product demand or buyer willingness"
+      ]
+    },
+    {
+      "id": "S-TR-013",
+      "title": "Kayseri University Social Enterprises and Dining Halls operating model",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Kayseri University Health, Culture and Sports Department",
+      "url": "https://sksd.kayseri.edu.tr/tr/i/12-1/sosyal-isletmeler-ve-yemekhaneler-sube-mudurlugu",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H3",
+        "H5",
+        "SECOND_SITE",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "official unit page states central-campus meals are produced in university kitchens while district-campus dining is supplied through prepared-meal procurement",
+        "combined with existing S-TR-006, supports a within-institution own-kitchen versus procured-meal comparison after reservation expansion"
+      ],
+      "limitations": [
+        "does not establish freeze points, quantity ownership, contract economics, service-level outcomes or whether reservation changes production decisions"
+      ],
+      "assets": {
+        "reservation_source": "https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu",
+        "staff_route": "https://sksd.kayseri.edu.tr/tr/akademik-personel"
+      }
     }
   ],
-  "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
+  "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot. Added S-TR-011…013 for IE second-site / reservation-counter-archetype targeting on 2026-10-06; these are secondary routing/falsifier sources, not interview evidence."
 }
