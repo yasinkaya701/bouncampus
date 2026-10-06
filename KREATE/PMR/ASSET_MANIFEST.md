@@ -54,6 +54,8 @@ Statuses:
 | A-026 | Boğaziçi SDG 2 publication | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf | PDF | LINK_ONLY | Official university publication; reuse terms not established | Institutional food/sustainability context |
 | A-027 | Boğaziçi 2026–2027 food-service procurement result mirror | https://www.ihaledetay.com/2025-1727143 | HTML | LINK_ONLY | EKAP-derived public result mirror; retrieve authoritative EKAP docs for clause claims | Current contractor/procurement discovery |
 
+| A-028 | Boğaziçi University 2025 Administration Activity Report | https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf | PDF | LINK_ONLY | Official university report; preserve exact URL/version | Control Organization, KİK56.0/H acceptance and hakediş routing evidence |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
