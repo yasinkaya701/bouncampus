@@ -154,3 +154,5 @@ Public-data snapshots: [data/README.md](data/README.md) and [data/bogazici_food_
 - [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) — 2026–2027 procurement/TEMAŞ context and contract-PMR questions.
 
 - [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md) — Official routing surfaces for Food Services, control, BUCard and contractor PMR.
+
+- [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md) — minimal BUCard/SKS + contract artifact request packet.

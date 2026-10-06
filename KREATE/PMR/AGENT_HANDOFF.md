@@ -162,3 +162,28 @@ See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_
 Feature integration path: `agent/ie/* → role/ie-customer-discovery → master`.
 
 Do not bypass the role lane for PMR research deltas. After a feature PR merges into the role branch and exact-head checks pass, refresh the role against current master if necessary, then use the role→master integration PR.
+
+
+## Primary-evidence acquisition handoff — 2026-10-06
+
+New owner-routing evidence is canonical:
+
+- **S-BU-021:** BİDB service inventory → BUCard technical ownership/contact; SKS+BİDB cafeteria-card services; BİDB turnstile/card-reader support.
+- **S-BU-023:** BUCampus user-facing passage history proves an event-history surface exists.
+- **S-BU-025:** reservation recurs across special operating regimes; it is still not an always-on demand label.
+- **S-PROC-002:** predecessor procurement cancellation reason is explicit; clause identity remains unresolved.
+
+**IE**
+- work #292 and #358 from [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md);
+- stop broad browsing unless a source changes an owner, artifact, clause or falsifier.
+
+**CS1**
+- do not promote Geçişlerim/event existence to `actual_served`;
+- admission still requires aggregate export, source IDs, timing and SKS reconciliation.
+
+**CS2**
+- may describe a source-backed data-owner route and an open contract-artifact acquisition path;
+- may not claim integration/access or current penalty/hakediş mechanics.
+
+**EE/EHB**
+- passage-event evidence reduces pressure for premature sensing; new hardware still requires a demonstrated measurement gap.
