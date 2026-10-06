@@ -2012,6 +2012,91 @@
         "reservation_source": "https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu",
         "staff_route": "https://sksd.kayseri.edu.tr/tr/akademik-personel"
       }
+    },
+    {
+      "id": "S-BU-027",
+      "title": "İhale ve Satınalma Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ACCESS"
+      ],
+      "supports": [
+        "official university branch responsible for procurement/tender processes under public procurement rules",
+        "source-backed institutional route for current tender/specification and procurement-process questions"
+      ],
+      "limitations": [
+        "does not prove contract-specific document ownership, payable quantity, settlement semantics or software purchasing authority"
+      ]
+    },
+    {
+      "id": "S-BU-028",
+      "title": "Tahakkuk Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch states it performs tender, direct-procurement, transfer and hakediş payments",
+        "source-backed route for payment-package and supporting-artifact questions"
+      ],
+      "limitations": [
+        "general hakediş-payment responsibility does not establish the food contract payable unit, accepted count, signatory chain, freeze rights or incentive allocation"
+      ]
+    },
+    {
+      "id": "S-BU-029",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/iletisim/2116",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official contact surface lists Procurement and Tahakkuk branch routing under Administrative and Financial Affairs"
+      ],
+      "limitations": [
+        "contact routing does not establish contract-specific ownership, approval authority or product buyer identity"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE"
+      ],
+      "supports": [
+        "Control Organization performs preliminary acceptance review under the service contract and technical specification framework",
+        "when service is acceptable, Control Organization prepares KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant Spending Authority for hakediş preparation",
+        "the report describes food-service locations as being followed by the Control Organization"
+      ],
+      "limitations": [
+        "does not identify the current food contract payable count/unit, exact Spending Authority, daily production freeze, penalty/correction semantics or economic-risk owner",
+        "does not substitute for the current IKN 2025/1727143 contract/specification or an actual food-service hakediş package"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot. Added S-TR-011…013 for IE second-site / reservation-counter-archetype targeting on 2026-10-06; these are secondary routing/falsifier sources, not interview evidence."
