@@ -82,7 +82,21 @@ Allowed labels: `FACT`, `PUBLIC SOURCE`, `INTERVIEW EVIDENCE`, `TECHNICAL TEST`,
 
 | Claim ID | Claim | Label | Evidence IDs | Domain owner | Human reviewer | Status | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| C-001 | TODO — replace with the first material application claim. This row is a bootstrap placeholder and must not be submitted as-is. | HYPOTHESIS | — | CS2 | TODO | DRAFT | TODO |
+| C-001 | Boğaziçi University publishes an official campus food-waste tracking source. | PUBLIC SOURCE | E-PUB-001 | IE | TODO — independent reviewer | DRAFT | Source existence is registered. Re-open the official page and verify date/current values before any numeric claim becomes READY. |
+| C-002 | The current repository implements human-reviewed decision readiness, abstention, transparent baselines and pilot evidence-quality gates. | FACT | E-REP-004 | CS1 | TODO — independent reviewer | DRAFT | Repo-state claim only; it does not prove operator adoption, measured accuracy or operational impact. |
+| C-003 | The repository contains a proposed falsifiable CONTROL/INTERVENTION food-waste pilot protocol with guardrails. | FACT | E-REP-002 | EE | TODO — independent reviewer | DRAFT | Protocol existence is real; pilot execution and effect are not. |
+| C-004 | The current repository/application positions institutional dining as the working product wedge. | FACT | E-REP-001, E-REP-003 | CS2 | TODO — independent reviewer | DRAFT | Positioning is not customer or beachhead validation. |
+| C-005 | A material, still-reversible pre-service quantity/batch/allocation decision exists at Boğaziçi. | HYPOTHESIS | — | IE | TODO — independent reviewer | DRAFT | Blocked on a recent-service reconstruction: owner, decision object, revision rights and freeze point. Route through #358 / CS2 claim gate. |
+| C-006 | Demand mismatch is a material cause of avoidable Boğaziçi food waste. | HYPOTHESIS | — | IE + EE | TODO — independent reviewer | DRAFT | Public waste totals establish waste existence, not causal stage or mechanism. Requires incident + stage-separated primary evidence. |
+| C-007 | Privacy-minimized service-level operational truth is exportable and semantically usable for CS1. | UNKNOWN | — | IE + CS1 | TODO — independent reviewer | DRAFT | Blocked on #292/#82: aggregate export, data dictionary, timestamps, corrections and reconciliation. |
+| C-008 | The intended operational user can safely act on a BOUNCAMPUS recommendation before freeze. | HYPOTHESIS | — | IE | TODO — independent reviewer | DRAFT | Persona, authority, trust threshold, approval path and override behavior remain primary-evidence questions. |
+| C-009 | The same product boundary repeats at a second institutional dining site. | HYPOTHESIS | — | IE + CS2 | TODO — independent reviewer | DRAFT | Requires a second-site reconstruction with comparable owner/freeze/signal/action/buyer topology. |
+| C-010 | “BUCard/turnstile count equals meals physically served.” | UNKNOWN | — | IE + CS1 | — | CUT | Forbidden equivalence until source-owner semantics and reconciliation prove a narrower relationship. |
+| C-011 | “BOUNCAMPUS has reduced food waste by 10%.” | UNKNOWN | — | EE + CS2 | — | CUT | The 10% value is only a proposed/illustrative pilot threshold; no achieved local result is registered. |
+| C-012 | “BOUNCAMPUS has already produced local cost, CO2 or water savings.” | UNKNOWN | — | CS2 + EE | — | CUT | No admitted local measured effect exists; impact conversion is downstream of measured waste reduction. |
+| C-013 | “Generic AI demand forecasting is BOUNCAMPUS's unique moat.” | UNKNOWN | — | CS2 | — | CUT | Do not use broad novelty language; canonical CS2 product strategy treats generic forecasting as non-differentiating. |
+| C-014 | “Public tender scale proves buyer willingness-to-pay or favorable contract economics.” | UNKNOWN | — | IE + CS2 | — | CUT | Blocked on #358 authoritative acceptance/hakediş, beneficiary and purchase-path evidence. |
+| C-015 | “BOUNCAMPUS is already validated to scale across universities.” | UNKNOWN | — | CS2 | — | CUT | Current portability is a repeatability hypothesis, not a validated market claim. |
 
 ### Claim promotion rules
 
