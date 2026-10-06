@@ -12,21 +12,22 @@ Secondary/public research is **not Primary Market Research**.
 
 Use these classes consistently:
 
-- \`PUBLIC_OFFICIAL\` — university, public-body, standards or policy source;
-- \`ACADEMIC\` — peer-reviewed/scholarly source;
-- \`METHOD_REFERENCE\` — research/PMR methodology;
-- \`VENDOR_CLAIM\` — vendor-published capability only;
-- \`PUBLIC_PROCUREMENT\` — tender/contract/decision artifact;
-- \`REAL_PMR\` — a completed conversation/observation with a target stakeholder;
-- \`TECHNICAL_TEST\` — measured technical result;
-- \`REPO_ARTIFACT\` — what the repository says/implements;
-- \`HYPOTHESIS\` / \`UNKNOWN\` — unresolved proposition/fact.
+- `PUBLIC_OFFICIAL` — university, public-body, standards or policy source;
+- `ACADEMIC` — peer-reviewed/scholarly source;
+- `METHOD_REFERENCE` — research/PMR methodology;
+- `VENDOR_CLAIM` — vendor-published capability only;
+- `PUBLIC_PROCUREMENT` — tender/contract/decision artifact;
+- `REAL_PMR` — a completed conversation/observation with a target stakeholder;
+- `TECHNICAL_TEST` — measured technical result;
+- `REPO_ARTIFACT` — what the repository says/implements;
+- `HYPOTHESIS` / `UNKNOWN` — unresolved proposition/fact.
 
-Only a real completed interview can create \`E-INT-*\` evidence in \`../EVIDENCE.md\`. A paper, official webpage, tender, vendor page, PDF, spreadsheet, model run or AI summary may shape questions and falsifiers; it cannot prove Boğaziçi pain, decision authority, adoption, willingness to pay, product-market fit, service-level causality or live-data access.
+Only a real completed interview can create `E-INT-*` evidence in `../EVIDENCE.md`. A paper, official webpage, tender, vendor page, PDF, spreadsheet, model run or AI summary may shape questions and falsifiers; it cannot prove Boğaziçi pain, decision authority, adoption, willingness to pay, product-market fit, service-level causality or live-data access.
 
 ## Canonical files
 
 - [SOURCE_REGISTRY.json](./SOURCE_REGISTRY.json) — machine-readable cumulative source registry with stable IDs.
+- [SOURCE_CATALOG.md](./SOURCE_CATALOG.md) — human-readable source catalog and claim boundaries.
 - [SECONDARY_RESEARCH_INDEX.md](./SECONDARY_RESEARCH_INDEX.md) — curated synthesis, falsification pressure, open questions and role handoffs.
 - [PDF_VISUAL_REFERENCE_MANIFEST.md](./PDF_VISUAL_REFERENCE_MANIFEST.md) — direct report/PDF/visual/data references and reuse rules.
 - [data/bogazici_food_waste_2025_official.csv](./data/bogazici_food_waste_2025_official.csv) — official **aggregate** 2025 monthly snapshot, never service truth.
@@ -56,11 +57,11 @@ Do not duplicate these focused packs:
 - [../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md](../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md)
 - [../RESEARCH/CS2_PILOT_EVIDENCE_GATE_2026-10-06.md](../RESEARCH/CS2_PILOT_EVIDENCE_GATE_2026-10-06.md)
 
-Historical branches such as \`research/kreate-deep-pmr-market-20261004\` and \`agent/campus-data-geo/bogazici-pmr-target-map\` contain useful prior work but are **reference archives** because they diverged substantially from current master. Reverify and recut the smallest useful artifact; never wholesale-merge stale ancestry.
+Historical branches such as `research/kreate-deep-pmr-market-20261004` and `agent/campus-data-geo/bogazici-pmr-target-map` contain useful prior work but are **reference archives** because they diverged substantially from current master. Reverify and recut the smallest useful artifact; never wholesale-merge stale ancestry.
 
 ## Highest-information PMR stack
 
-Until real interviews/artifacts close them, keep these \`UNKNOWN\`:
+Until real interviews/artifacts close them, keep these `UNKNOWN`:
 
 1. Who chose/approved the quantity for the last real service?
 2. What exact time/condition is the last meaningful adjustment point?
@@ -75,7 +76,7 @@ Until real interviews/artifacts close them, keep these \`UNKNOWN\`:
 11. Does the same workflow/product repeat at a second institution?
 12. Does the proposed differentiation matter to the operator/buyer?
 
-The first operational data dependency is tracked in **#292**. Public evidence that BUCard/dining reports exist is not evidence that the team can export or semantically reconcile service-level rows. CS1 admission remains **#82** via \`scripts/cs1_service_truth_artifact_intake.py\`.
+The first operational data dependency is tracked in **#292**. Public evidence that BUCard/dining reports exist is not evidence that the team can export or semantically reconcile service-level rows. CS1 admission remains **#82** via `scripts/cs1_service_truth_artifact_intake.py`.
 
 ## Cross-role handoff
 
@@ -91,7 +92,7 @@ The first operational data dependency is tracked in **#292**. Public evidence th
 
 ## Cumulative contribution flow
 
-\`\`\`text
+```text
 new source
   ↓
 dedupe by canonical URL / DOI / report identity
@@ -109,7 +110,7 @@ map to H1–H6 / buyer / measurement / repeatability questions
 turn finding into a neutral interview prompt or falsifier
   ↓
 only after a real interview: promote narrow E-INT evidence
-\`\`\`
+```
 
 Do not silently delete old sources. Mark them stale/superseded/conflicted and point to the newer source. Preserve contradictory evidence.
 
