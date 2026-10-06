@@ -556,12 +556,12 @@ These are **secondary target-selection sources**, not PMR/interview evidence.
 - Boundary: record names do not prove field semantics, actual workflow use, decision timing, reservation-to-production coupling or measured outcomes.
 - Maps to: H1, H2, H3, H4, SECOND_SITE, OPERATIONS.
 
-### S-TR-012 — BANÜ mandatory reservation rollout
+### S-TR-012 — BANÜ off-central-campus MYO mandatory reservation rollout
 - Type: official university.
 - Publisher: Bandırma Onyedi Eylül University SKS.
-- URL: https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94013
-- Published/updated: 2026-10-01; announced effective date 2026-10-05.
-- Use: reservation-first counter-archetype. The notice says the announced vocational-school scope is fully reservation-based and users without reservations will not receive meal service; stated goals include planning/resource efficiency and food-waste reduction.
+- URL: https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-MERKEZ-YERLESKE-DISINDAKI-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94035
+- Current notice updated: 2026-10-02; announced effective date 2026-10-05.
+- Use: reservation-first counter-archetype. The current notice says the announced **off-central-campus vocational-school scope** is fully reservation-based and users without reservations will not receive meal service; stated goals include planning/resource efficiency and food-waste reduction.
 - Boundary: stated goals are not achieved outcomes; reservation cutoff/no-show/order logic, residual uncertainty and actual waste impact require primary evidence.
 - Maps to: H1, H2, H3, H6, SECOND_SITE, FALSIFIER.
 

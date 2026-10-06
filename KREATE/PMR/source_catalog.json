@@ -1960,10 +1960,10 @@
     },
     {
       "id": "S-TR-012",
-      "title": "BANÜ vocational-school mandatory dining reservation rollout — 5 Oct 2026",
+      "title": "BANÜ off-central-campus vocational-school mandatory dining reservation rollout — 5 Oct 2026",
       "type": "OFFICIAL_UNIVERSITY",
       "publisher": "Bandırma Onyedi Eylül University Health, Culture and Sports Department",
-      "url": "https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94013",
+      "url": "https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-MERKEZ-YERLESKE-DISINDAKI-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94035",
       "accessed_at": "2026-10-06",
       "authority": "first_party_official",
       "hypotheses": [
@@ -1975,7 +1975,7 @@
         "FALSIFIER"
       ],
       "supports": [
-        "official notice states vocational-school dining becomes fully reservation-based from 5 Oct 2026",
+        "official notice states dining at vocational schools outside the central campus becomes fully reservation-based from 5 Oct 2026",
         "official notice states users without reservation will not receive meal service in the announced scope",
         "official rationale explicitly links reservation to more accurate daily planning, effective resource use and reducing food waste",
         "supports selecting BANÜ as a reservation-first counter-archetype that can falsify a generic forecasting wedge"

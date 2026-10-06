@@ -171,7 +171,7 @@ This shortlist is secondary-source routing evidence only. **No row in `INTERVIEW
 ### P0-B — reservation-first counter-archetype: Bandırma Onyedi Eylül University (BANÜ)
 
 **Why this site is informative**
-- an official 1 October 2026 notice states that, effective 5 October 2026, all vocational-school dining service is completely reservation-based;
+- an official notice updated 2 October 2026 states that, effective 5 October 2026, dining at all vocational schools **outside the central campus** is completely reservation-based;
 - the notice explicitly says users without a reservation will not receive meal service;
 - the university frames the change around more accurate daily planning, effective resource use and reducing food waste.
 
@@ -190,11 +190,11 @@ This makes BANÜ a deliberately adversarial counter-archetype: demand is partial
 6. Test whether BOUNCAMPUS has any useful decision left to improve, or whether the reservation workflow largely substitutes for it.
 
 **Kill test**
-- if mandatory reservation makes final demand known early enough and operational variance is negligible, a generic forecasting wedge should be killed for this archetype;
+- if mandatory reservation in the announced off-central-campus MYO scope makes final demand known early enough and operational variance is negligible, a generic forecasting wedge should be killed for this archetype;
 - any remaining opportunity must be narrower (no-show uncertainty, cross-site allocation, menu/preference effects, late operational exceptions, or another demonstrated control point).
 
 **Official sources**
-- https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94013
+- https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-MERKEZ-YERLESKE-DISINDAKI-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94035
 - https://sksdb.bandirma.edu.tr/
 
 **Execution state:** Gmail draft prepared; **NOT SENT**.
