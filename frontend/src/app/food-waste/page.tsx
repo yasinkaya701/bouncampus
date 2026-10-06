@@ -141,7 +141,7 @@ export default function FoodWastePage() {
               <SidebarItem icon={Gauge} label={t('Kontrol paneli', 'Dashboard')} />
               <SidebarItem icon={Activity} label={t('Sinyaller', 'Signals')} detail={t('Veri kaynakları ve sağlık', 'Data sources & health')} />
               <SidebarItem icon={Database} label={t('Kanıt defteri', 'Evidence ledger')} detail={t('Resmi veri ve provenance', 'Official data & provenance')} />
-              <SidebarItem icon={ClipboardCheck} label={t('Pilot protokolü', 'Pilot protocol')} detail={t('Tasarım ve başarı kriterleri', 'Design & success criteria')} />
+              <SidebarItem icon={ClipboardCheck} label={t('Önerilen pilot protokolü', 'Proposed pilot protocol')} detail={t('Tasarım ve başarı kriterleri', 'Design & success criteria')} />
               <SidebarItem icon={History} label={t('Karar geçmişi', 'Decision history')} detail={t('Önceki öneriler', 'Past recommendations')} />
             </div>
 
@@ -219,7 +219,7 @@ export default function FoodWastePage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3 sm:justify-end">
-                  <ReadinessBadge readiness={readinessLabel} />
+                  <ReadinessBadge readiness={readinessLabel} t={t} />
                   <div className="hidden border-l border-[#dde2dd] pl-3 text-right text-[8px] leading-4 text-[#727a73] sm:block">
                     <div>{t('Son güncelleme', 'Last updated')}</div>
                     <div className="font-medium text-[#384139]">{updatedAt ? updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'}</div>
@@ -250,9 +250,9 @@ export default function FoodWastePage() {
                 />
                 <MetricCard
                   icon={Leaf}
-                  label={t('Pilot başarı eşiği', 'Pilot success gate')}
+                  label={t('Önerilen pilot hedefi', 'Illustrative pilot target')}
                   value={`≥ ${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`}
-                  footer={t('Ön kayıtlı hedef · gerçekleşmiş sonuç değil', 'Pre-registered target · not achieved result')}
+                  footer={t('Önerilen hedef · gerçekleşmiş sonuç değil', 'Illustrative target · not achieved result')}
                   trend={t('ölçülecek', 'to be measured')}
                 />
               </section>
@@ -326,8 +326,8 @@ export default function FoodWastePage() {
                       <div className="mt-5 grid gap-2 sm:grid-cols-3">
                         <ActionButton
                           icon={CheckCircle2}
-                          title={t('Pilot için onayla', 'Approve for pilot')}
-                          detail={band ? `${band.recommendedTarget.toLocaleString(numberLocale)} ${t('öğün ile ilerle', 'meals')}` : t('Bağlam bekleniyor', 'Context pending')}
+                          title={t('Danışmanlık senaryosunu hazır işaretle', 'Mark advisory scenario ready')}
+                          detail={band ? `${band.recommendedTarget.toLocaleString(numberLocale)} ${t('öğünlük planlama adayı', 'meal planning candidate')}` : t('Bağlam bekleniyor', 'Context pending')}
                           active={operatorDecision === 'PILOT_APPROVED'}
                           disabled={!canApprovePilot}
                           onClick={() => setOperatorDecision('PILOT_APPROVED')}
@@ -381,13 +381,13 @@ export default function FoodWastePage() {
 
                   <article className="rounded-xl border border-[#dfe3df] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,18,0.03)]">
                     <div className="flex items-center justify-between gap-2">
-                      <h2 className="text-[14px] font-semibold tracking-[-0.02em]">{t('Pilot sözleşmesi', 'Pilot contract')}</h2>
+                      <h2 className="text-[14px] font-semibold tracking-[-0.02em]">{t('Önerilen pilot protokolü', 'Proposed pilot protocol')}</h2>
                       <span className="inline-flex items-center gap-1 rounded-md bg-[#e7f6dc] px-2 py-1 text-[8px] font-semibold text-[#37651d]"><span className="h-1.5 w-1.5 rounded-full bg-[#2f8c28]" /> {t('Ön kayıtlı', 'Pre-registered')}</span>
                     </div>
                     <div className="mt-4 grid grid-cols-3 divide-x divide-[#e5e8e5]">
-                      <PilotMetric value={`${FOOD_WASTE_PILOT_PROTOCOL.durationDays} ${t('GÜN', 'DAYS')}`} label={t('Pilot süresi', 'Pilot duration')} />
-                      <PilotMetric value={`≥ ${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} label={t('Atık azaltma hedefi', 'Waste reduction target')} />
-                      <PilotMetric value={`≥ ${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}`} label={t('Kol başına servis', 'Services per arm')} />
+                      <PilotMetric value={`${FOOD_WASTE_PILOT_PROTOCOL.durationDays} ${t('GÜN', 'DAYS')}`} label={t('Önerilen süre', 'Proposed duration')} />
+                      <PilotMetric value={`≥ ${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} label={t('Önerilen atık azaltma hedefi', 'Illustrative waste-reduction target')} />
+                      <PilotMetric value={`≥ ${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}`} label={t('Önerilen kol başına servis', 'Proposed services per arm')} />
                     </div>
                     <div className="mt-4 flex items-start gap-2 border-t border-[#e7eae7] pt-3 text-[9px] leading-4 text-[#5e685f]">
                       <BarChart3 size={13} className="mt-0.5 shrink-0 text-[#326047]" />
@@ -403,8 +403,8 @@ export default function FoodWastePage() {
                     <div className="mt-4 space-y-0">
                       <TimelineRow done={Boolean(band)} time={updatedAt ? updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'} title={t('Sinyaller yakalandı', 'Signals captured')} detail={signals.length ? `${healthySignals} / ${signals.length} ${t('girdi mevcut', 'inputs available')}` : t('Bekleniyor', 'Pending')} />
                       <TimelineRow done={Boolean(band)} time={updatedAt ? updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'} title={t('Model çalışması tamamlandı', 'Model run completed')} detail={band ? `${band.recommendedTarget.toLocaleString(numberLocale)} · ${band.signalCoveragePct}%` : t('Bekleniyor', 'Pending')} />
-                      <TimelineRow done={operatorDecision !== 'HOLD'} time={operatorDecision === 'HOLD' ? t('Bekliyor', 'Pending') : '—'} title={t('Operatör incelemesi', 'Operator review')} detail={operatorDecision === 'PILOT_APPROVED' ? t('Pilot onaylandı', 'Pilot approved') : operatorDecision === 'EDIT_REQUIRED' ? t('Düzenleme istendi', 'Edit requested') : t('İlerlemek için onay gerekli', 'Approval required to proceed')} />
-                      <TimelineRow last done={false} time="—" title={t('Mutfak dispatch', 'Kitchen dispatch')} detail={t('Pilot boyunca otomatik dispatch kapalı', 'Automatic dispatch disabled during pilot')} />
+                      <TimelineRow done={operatorDecision !== 'HOLD'} time={operatorDecision === 'HOLD' ? t('Bekliyor', 'Pending') : '—'} title={t('Operatör incelemesi', 'Operator review')} detail={operatorDecision === 'PILOT_APPROVED' ? t('Danışmanlık senaryosu hazır işaretlendi', 'Advisory scenario marked ready') : operatorDecision === 'EDIT_REQUIRED' ? t('Düzenleme istendi', 'Edit requested') : t('İlerlemek için inceleme gerekli', 'Review required to proceed')} />
+                      <TimelineRow last done={false} time="—" title={t('Mutfak dispatch', 'Kitchen dispatch')} detail={t('Otomatik dispatch kapalı; kurumsal pilot onayı anlamına gelmez', 'Automatic dispatch is disabled; this does not imply institutional pilot approval')} />
                     </div>
                   </article>
                 </aside>
@@ -447,7 +447,7 @@ function SidebarItem({
   );
 }
 
-function ReadinessBadge({ readiness }: { readiness: DecisionReadiness }) {
+function ReadinessBadge({ readiness, t }: { readiness: DecisionReadiness; t: (tr: string, en: string) => string }) {
   const styles: Record<DecisionReadiness, string> = {
     PILOT_READY: 'border-[#cce8ae] bg-[#e8f8d9] text-[#285717]',
     REVIEW_REQUIRED: 'border-[#ead8a8] bg-[#fbf3d8] text-[#795923]',
@@ -456,7 +456,7 @@ function ReadinessBadge({ readiness }: { readiness: DecisionReadiness }) {
   return (
     <div className={`inline-flex h-7 items-center gap-2 rounded-md border px-3 text-[9px] font-semibold tracking-[0.03em] ${styles[readiness]}`}>
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
-      {readiness.replaceAll('_', ' ')}
+      {readiness === 'PILOT_READY' ? t('PROTOTİP KAPISI GEÇTİ', 'PROTOTYPE GATE PASS') : readiness.replaceAll('_', ' ')}
     </div>
   );
 }
