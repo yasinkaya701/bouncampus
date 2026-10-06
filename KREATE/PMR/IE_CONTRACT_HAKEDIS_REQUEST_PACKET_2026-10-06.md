@@ -26,6 +26,18 @@ Execution consequence:
 - route procurement/payment-process artifact ownership in parallel to İdari ve Mali İşler;
 - keep payable quantity, exact signer sequence, freeze/change rights, penalties, economic beneficiary and software buyer authority unresolved until directly evidenced.
 
+## Canonical first-party routing chain
+
+The current source map separates five distinct first-party surfaces:
+
+- `S-BU-026` — Food Service Executive Board directive: food-specific BUCard and hakediş governance.
+- `S-BU-027` — Tahakkuk branch: institutional hakediş-payment route.
+- `S-BU-028` — IMID contact: fallback routing.
+- `S-BU-029` — Procurement branch: tender/specification document route.
+- `S-BU-030` — 2025 Administration Activity Report: Control Organization → KİK56.0/H → relevant Spending Authority → hakediş preparation.
+
+#358 must reconcile these formal surfaces using one real current food-service acceptance/hakediş package. Do not infer that any one branch alone owns the payable quantity, signatory chain, or software-buying decision.
+
 ## Authoritative artifacts to retrieve
 
 Priority order:
