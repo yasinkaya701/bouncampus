@@ -73,6 +73,15 @@ Food Services / SKS
 
 Ask each person to identify the next artifact owner rather than assuming job titles equal decision ownership.
 
+### Formal food-service governance cross-check
+
+- **S-BU-031 — Food Service Executive Board directive**
+  - BUCard Office/BİDB is the formal dining BUCard operation, reporting and digital-data-custody route.
+  - Food Service Executive Board + Inspection and Acceptance Commission are named participants for meal hakediş payment orders/accrual.
+  - SKS + Administrative and Financial Affairs are the formal meal-service procurement route.
+  - use: route #292/#358 to the correct institutional surfaces and ask for the actual report/hakediş package.
+  - boundary: job/process ownership does not establish export permission, payable quantity, exact signatory chain or product buyer.
+
 ## Signal-owner map
 
 | Signal / artifact | Public clue | Actual owner/status |
