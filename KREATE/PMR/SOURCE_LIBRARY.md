@@ -540,3 +540,38 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
 - Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
 - Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
+
+## IE second-site falsifier cases — 2026-10-06
+
+These are **secondary target-selection sources**, not PMR/interview evidence.
+
+### S-TR-011 — BAİBÜ operational dining forms
+- Type: official university.
+- Publisher: Bolu Abant İzzet Baysal University SKS.
+- URL: https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri-kullanilan-formlar/9853
+- Related:
+  - https://sksdb.ibu.edu.tr/tr/page/beslenme-hizmetleri/9713
+  - https://sksdb.ibu.edu.tr/tr/page/dahili-iletisim/9732
+- Use: mature-operation interview target; public record names include daily production/consumption and meals-sent-to-units forms across a multi-site contracted dining surface.
+- Boundary: record names do not prove field semantics, actual workflow use, decision timing, reservation-to-production coupling or measured outcomes.
+- Maps to: H1, H2, H3, H4, SECOND_SITE, OPERATIONS.
+
+### S-TR-012 — BANÜ mandatory reservation rollout
+- Type: official university.
+- Publisher: Bandırma Onyedi Eylül University SKS.
+- URL: https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94013
+- Published/updated: 2026-10-01; announced effective date 2026-10-05.
+- Use: reservation-first counter-archetype. The notice says the announced vocational-school scope is fully reservation-based and users without reservations will not receive meal service; stated goals include planning/resource efficiency and food-waste reduction.
+- Boundary: stated goals are not achieved outcomes; reservation cutoff/no-show/order logic, residual uncertainty and actual waste impact require primary evidence.
+- Maps to: H1, H2, H3, H6, SECOND_SITE, FALSIFIER.
+
+### S-TR-013 — Kayseri University dining operating-model contrast
+- Type: official university.
+- Publisher: Kayseri University SKS.
+- URL: https://sksd.kayseri.edu.tr/tr/i/12-1/sosyal-isletmeler-ve-yemekhaneler-sube-mudurlugu
+- Related:
+  - S-TR-006 — university-wide reservation expansion.
+  - https://sksd.kayseri.edu.tr/tr/akademik-personel
+- Use: within-institution comparison: central-campus own-kitchen production versus district-campus prepared-meal procurement after reservation expansion.
+- Boundary: does not establish freeze points, decision owner, contract economics, service outcomes or production response to reservations.
+- Maps to: H1, H3, H5, SECOND_SITE, OPERATIONS.
