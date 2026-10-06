@@ -47,6 +47,15 @@ daily quantity freeze/change rights
 production/order record owner
 ~~~
 
+### Food-specific governance directive
+
+`S-BU-031` adds a current first-party food-specific governance statement that must be preserved separately from the general acceptance chain:
+
+- Article 5(2)(f): the Food Service Executive Board carries out meal hakediş payment orders/accrual together with the Inspection and Acceptance Commission.
+- Article 9: meal-service procurement is carried out by SKS together with Administrative and Financial Affairs.
+
+Do not collapse this automatically into the general `Control Organization → KİK56.0/H → Spending Authority → hakediş preparation` sequence from `S-BU-030`. One #358 objective is now to obtain a real current food-service hakediş/acceptance package or source-owner walkthrough that reconciles the two formal descriptions.
+
 ## Authoritative artifacts to retrieve
 
 Priority order:
