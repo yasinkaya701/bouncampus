@@ -261,3 +261,10 @@ Return only decision-changing deltas:
 - **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
 
 Do not send generic research summaries back to PMR-A.
+
+
+## Evidence-unlock contract — 2026-10-06
+
+Use [PRIMARY_EVIDENCE_UNLOCK_MATRIX.md](PRIMARY_EVIDENCE_UNLOCK_MATRIX.md) before promoting any #292/#358 result downstream. The matrix separates report existence, exportability, reconciliation, served-truth admission, outcome linkage, contract semantics, freeze rights, risk ownership, measurement gaps and buyer authority into distinct gates.
+
+A downstream agent should receive **gate ID + provenance + source-native field/wording**, not a generalized conclusion.
