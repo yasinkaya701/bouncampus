@@ -42,8 +42,10 @@
         "S-BU-010",
         "S-BU-014",
         "S-BU-026",
-        "S-BU-030",
-        "S-BU-027"
+        "S-BU-027",
+        "S-BU-028",
+        "S-BU-029",
+        "S-BU-030"
       ],
       "required_outputs": [
         "authoritative current admin/technical spec retrieval status",
