@@ -9,11 +9,12 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 ## Read first
 
 1. [PMR_KNOWLEDGE_BASE_2026-10-06.md](PMR_KNOWLEDGE_BASE_2026-10-06.md) — current cumulative synthesis, Boğaziçi facts, unresolved questions, and interview priorities.
-2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 53 verified/reference records across parallel PMR agents.
+2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 62 verified/reference records across parallel PMR agents.
 3. [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) — human-readable companion to the canonical catalog, including source use and explicit inference boundaries.
 4. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — hypothesis/claim → secondary support → forbidden inference → exact primary-evidence gap.
 5. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — canonical PDF/XLSX/image/data provenance and reuse-status manifest.
 6. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/CS1/CS2/EE/EHB shared append and consumption protocol.
+7. [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md) — operational/public/sandbox data surfaces, source semantics and dataset-promotion gates.
 7. [SOURCE_REGISTRY_2026-10-06.json](SOURCE_REGISTRY_2026-10-06.json) — earlier master snapshot retained for provenance; do not treat it as the append target.
 8. [ASSET_AND_MEDIA_INDEX_2026-10-06.md](ASSET_AND_MEDIA_INDEX_2026-10-06.md) — earlier master asset snapshot retained for provenance.
 9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
@@ -126,6 +127,10 @@ Prefer, in order:
 6. general articles only as navigation clues.
 
 Every meaningful claim should remain falsifiable and traceable.
+
+## Active operational-data dependency
+
+Issue **#292** owns acquisition/reconciliation of privacy-preserving BUCard/SKS aggregate service truth for CS1 issue **#82**. The verified dataset is not currently present. Historical repository-generated cafeteria/occupancy/weather/preferences rows remain sandbox-only and must not be promoted into measured service truth. When a real source-owned artifact arrives, route it through `scripts/cs1_service_truth_artifact_intake.py` and preserve source identity, exact input hash and admission result. See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md).
 
 
 ## Cross-agent consolidation status
