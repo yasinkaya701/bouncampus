@@ -66,6 +66,22 @@ Interpretation boundary:
 
 These facts sharpen PMR around where a decision-support tool would enter: university-side contract/acceptance, contractor-side operations, or a future procurement/specification cycle.
 
+### Unit-price contract form
+
+The public notice states that bids are formed from **each work item's quantity × offered unit price** and that the resulting agreement is a **unit-price contract**.
+
+This is a major PMR constraint, but not yet a settlement answer.
+
+We still need to learn:
+
+- the actual unit-price schedule by work item;
+- which quantity becomes payable/accepted;
+- whether payment follows produced, delivered, served, accepted or another reconciled count;
+- how package/second/additional meals and corrections enter hakediş;
+- whether daily/campus allocations can change without changing the contractual item quantity.
+
+The same notice describes a 5,000-meal/day bidder-capacity threshold as one-half of the administration's stated daily meal need. Treat that as **procurement capacity context only**, not measured actual daily demand.
+
 ## Do not infer settlement from the headline contract
 
 The public result is sufficient for **scope, contractor and procurement-route context**. It is not sufficient for:
