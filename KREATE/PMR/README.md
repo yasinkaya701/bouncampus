@@ -18,12 +18,13 @@ This directory is the canonical entry point for KREATE Primary Market Research. 
 5. [source_catalog.json](source_catalog.json) — machine-readable stable-ID catalog.
 6. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — source-to-hypothesis firewall and exact PMR gaps.
 7. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — asset/license/provenance policy.
-8. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/EE-EHB/CS1/CS2 reuse and append contract.\n9. [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md) — public/context signals vs source-owned operational truth and dataset promotion gates.
+8. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/EE-EHB/CS1/CS2 reuse and append contract.
+9. [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md) — public/context signals vs source-owned operational truth and dataset promotion gates.
 
 ### Real PMR execution
-9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral tests and reject/support criteria.
-10. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
-11. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
+10. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral tests and reject/support criteria.
+11. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
+12. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
 
 ### VPMR research layer
 13. [../VPMR/README.md](../VPMR/README.md) — verifiable secondary-research layer.
