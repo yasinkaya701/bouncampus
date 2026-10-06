@@ -99,8 +99,8 @@ This maps the existing `EA-01..EA-06` queue onto current cross-role work so agen
 | **EA-01 REACHABLE_DECISION** | IE + #358 where contract/operations documents expose authority | Who changes quantity/allocation, what can change, and the last reversible freeze time for one recent service | If no meaningful post-signal action exists, modify/kill the wedge. |
 | **EA-02 SOURCE_EXPORTABILITY** | IE #292 | Owner-generated privacy-preserving aggregate export/schema and availability time | If only unjustified person-level raw logs are available, reject that path for the pilot. |
 | **EA-03 SEMANTIC_MAPPING_VERIFIED** | IE #292 + CS1 admission | Mapping from reported count to operational truth, including corrections/exceptions | Keep target fail-closed until reconciled. |
-| **EA-04 PHYSICAL_OUTCOME_MEASURABLE** | EE; EHB only if a proven sensing gap remains | Stage boundary, unit, method, timing, QA and shortage/surplus outcome | No causal waste claim without credible prospective measurement. |
-| **EA-05 REPORTING_RECONCILIATION** | IE / Food Services / sustainability reporting owner | Current produced/consumed/discarded definitions and reporting frequency | Keep as governance context if it cannot reconcile to a service-level decision. |
+| **EA-04 PHYSICAL_OUTCOME_MEASURABLE** | EE via #322; EHB #119 only if a proven sensing gap remains | Stage boundary, unit, method, timing, QA and shortage/surplus outcome | No causal waste claim without credible prospective measurement. |
+| **EA-05 REPORTING_RECONCILIATION** | IE + CS1 via #82 / #322 and the reporting owner | Current produced/consumed/discarded definitions and reporting frequency | Keep as governance context if it cannot reconcile to a service-level decision. |
 | **EA-06 INCENTIVE_AND_AUTHORITY_MAP** | IE #358 | Accepted-service/hakediş quantity, approval/signature path, corrections, relevant penalties/flexibility | Do not claim savings/WTP/buyer incentive until this is real. |
 
 ### Cross-role dependency compression
