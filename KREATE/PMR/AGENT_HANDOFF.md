@@ -155,3 +155,10 @@ The public procurement surface is now anchored by **S-PROC-001 (IKN 2025/1727143
 - measurement hardware remains subordinate to stage-separated truth need.
 
 See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md), and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Integration discipline
+
+Feature integration path: `agent/ie/* → role/ie-customer-discovery → master`.
+
+Do not bypass the role lane for PMR research deltas. After a feature PR merges into the role branch and exact-head checks pass, refresh the role against current master if necessary, then use the role→master integration PR.
