@@ -226,7 +226,7 @@ function EvidenceStep({ t }: { t: (tr: string, en: string) => string }) {
       <h2 className="mt-3 text-[34px] font-black tracking-[-0.05em] text-slate-950">{t('Başarıyı model değil, gelecekteki ölçüm ilan edebilir.', 'Only prospective measurement can declare success.')}</h2>
       <p className="mt-3 max-w-3xl text-[10px] leading-5 text-slate-500">{t('Bu ekran çalıştırılmış bir pilot sonucu göstermiyor; henüz uygulanmamış, yanlışlanabilir bir ölçüm protokolünü gösteriyor.', 'This screen does not show an executed pilot result; it shows a proposed, falsifiable measurement protocol that has not yet been run.')}</p>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <BigMetric label={t('Ana KPI', 'Primary KPI')} value={t('kg / 100 öğün', 'kg / 100 meals')} tag="PRE_REGISTERED" />
+        <BigMetric label={t('Ana KPI', 'Primary KPI')} value={t('kg / 100 öğün', 'kg / 100 meals')} tag="PROPOSED_PROTOCOL" />
         <BigMetric label={t('Hedef', 'Target')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}%`} tag="ILLUSTRATIVE_TARGET_NOT_RESULT" />
         <BigMetric label={t('Minimum kanıt', 'Minimum evidence')} value={`${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}+${FOOD_WASTE_PILOT_PROTOCOL.successGate.minimumMeasuredServicesPerArm}`} tag="CONTROL+INTERVENTION" />
       </div>
