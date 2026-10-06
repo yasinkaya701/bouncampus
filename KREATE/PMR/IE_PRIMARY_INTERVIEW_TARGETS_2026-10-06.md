@@ -44,6 +44,8 @@ Current public evidence supports the referral sequence:
 
 Aygül Demir is publicly listed as a principal member of the current dining control organization (`S-BU-014`). This makes the control role a high-information target, but **no outreach, scheduling or completed interview is claimed here**.
 
+`S-BU-031` adds a formal question for this interview lane: how do the Food Service Executive Board + Inspection and Acceptance Commission duties for meal hakediş payment orders/accrual connect to the Control Organization → KİK56.0/H → Spending Authority flow in practice?
+
 ### Primary objective
 Resolve who accepts service, which quantity/record matters contractually, and whether a recommendation can legally or operationally alter the relevant decision.
 
