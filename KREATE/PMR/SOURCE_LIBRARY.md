@@ -528,3 +528,39 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - **S-ACAD-019** — institutional catering intervention evidence; no local causal transfer.
 
 Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Access, acceptance and payment-routing expansion — 2026-10-06
+
+### BUCard / BİDB
+
+- **S-BU-021** — BİDB Service Inventory: source-backed BUCard technical/service-owner route; SKS+BİDB appear on cafeteria card services; not export approval.
+- **S-BU-022** — official BUCard portal: dining/payment context and BUCard Office route.
+- **S-BU-023** — BUCampus Version Notes: user-facing turnstile/card-reader passage history exists; not an API or `actual_served` label.
+- **S-BU-024** — BUVPN announcement: institutional access boundary only.
+- **S-BU-025** — 2024 intersession reservation workflow: special-regime reservations recur; still not always-on demand truth.
+
+### Procurement / hakediş / control
+
+- **S-BU-026** — İhale ve Satınalma Şube Müdürlüğü: official procurement/tender routing surface.
+- **S-BU-027** — Tahakkuk Şube Müdürlüğü: official page explicitly includes hakediş payments.
+- **S-BU-028** — IMID contact routing.
+- **S-BU-029** — historical General Secretariat activity-report acceptance/control precedent; retained as historical only.
+- **S-BU-030** — 2025 Administration Activity Report: current institutional control/acceptance workflow, including KİK56.0/H → Spending Authority for hakediş preparation and monthly 2025 food-service acceptance context.
+
+The important remaining unknown is no longer “does an acceptance/hakediş workflow exist?” It is **which food-service operational quantity and source artifact becomes payable under the current contract**.
+
+
+## Governance / formal-owner expansion — 2026-10-06
+
+### S-BU-031 — Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf
+- Use: authoritative governance routing for dining BUCard report/data custody, meal hakediş process participants, and SKS + İMİD procurement routing.
+- Decision delta:
+  - Article 7 assigns dining BUCard operation/control, reporting to Food Services governance, and digital-data retention to BUCard Office/BİDB.
+  - Article 5(2)(f) places meal hakediş payment orders/accrual with the Food Service Executive Board together with the Inspection and Acceptance Commission.
+  - Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs.
+- Boundary: does **not** prove export permission, passage = served meal, payable quantity/unit, routine production freeze/change rights, penalties, savings, WTP, or software buyer authority.
+- Reconciliation note: preserve this directive-level hakediş actor statement alongside S-BU-030's general Control Organization → KİK56.0/H → Spending Authority workflow; #358 must obtain the current food-service hakediş package/source-owner walkthrough before collapsing these into one chain.
