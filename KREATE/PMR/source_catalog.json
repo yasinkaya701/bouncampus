@@ -1876,6 +1876,29 @@
         "special intersession workflow is not evidence of an always-on reservation process or a general production cutoff",
         "reservation count is intent, not served demand"
       ]
+    },
+    {
+      "id": "S-BU-026",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — Kurumsal ve İhale/Satınalma route",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University İdari ve Mali İşler Daire Başkanlığı",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/kurumsal/2107",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H3",
+        "H5",
+        "H6"
+      ],
+      "supports": [
+        "official IMID surface lists İhale ve Satınalma Şube Müdürlüğü as a unit",
+        "official general procurement-routing contact is imid@bogazici.edu.tr with phone 0 (212) 359 70 89",
+        "provides a first-party owner-routing path for authoritative procurement documents"
+      ],
+      "limitations": [
+        "does not prove IMID owns operational meal-quantity decisions or hakediş semantics for IKN 2025/1727143",
+        "does not expose the current technical/admin specification bundle or settlement clauses"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
