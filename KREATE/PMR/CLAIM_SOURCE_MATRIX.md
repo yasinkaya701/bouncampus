@@ -34,6 +34,12 @@ Source IDs resolve through [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) and [source_ca
 | **Menu survey votes are a demand label** | **Unsupported.** BUCampus provides an authenticated weekly preference-vote workflow. | S-BU-013 | Attendance, meal pickup or causal lift. | Treat as optional preference feature only after export/timing semantics are verified. |
 | **Public service schedule defines the controllable production decision** | Published campus meal windows define operating context. | S-BU-016, S-BU-012 | Quantity freeze, batch/replenishment process, production commitment or campus allocation rights. | Reconstruct one recent service with Food Services, control organization and contractor. |
 
+
+| **BİDB/BUCard is the source-backed technical acquisition route for passage records** | BİDB service inventory lists BUCard as a BİDB service; turnstile/card-reader faults route to BİDB; cafeteria BUCard services span SKS + BİDB. | S-BU-021, S-BU-022 | Export approval, cafeteria-reader mapping, report schema, retention or service semantics. | #292 aggregate export request + SKS semantic reconciliation. |
+| **A machine-readable passage-event surface exists** | BUCampus documents user-facing passage history from turnstiles/card readers. | S-BU-023 | API/export access, immutable history, reader taxonomy or whether events correspond to meals. | Ask BİDB which source system powers Geçişlerim and whether privacy-safe aggregate reporting exists. |
+| **Reservation is an always-on campus-wide demand system** | **Unsupported.** Official 2024 intersession and 2026 holiday notices show reservations recur in special operating regimes. | S-BU-025, S-BU-006 | Normal-term coverage, production-control use, snapshot retention/exportability. | Interview SKS/TEMAŞ and obtain reservation-state snapshots where active. |
+| **Current tender specifications are publicly verified in this repo** | **Unsupported.** Public notice/result and EKAP document route are verified, but underlying current specification bundle is not yet retrieved. | S-PROC-001, S-PROC-002 | Current hakediş, penalty, acceptance and quantity-change clauses. | #358 authoritative artifact retrieval; no prior-contract clause carryover. |
+
 ## Promotion rule
 
 A row moves from **secondary-supported hypothesis** to **PMR-supported/contradicted** only when:

@@ -1655,10 +1655,12 @@
         "CONTRACT"
       ],
       "supports": [
-        "predecessor procurement cancellation after specification objections required changes"
+        "predecessor procurement cancellation after specification objections required changes",
+        "public cancellation notice states objections to tender documents required specification changes, but an EKAP addendum could not be issued at the tender date so the tender authority cancelled the procurement"
       ],
       "limitations": [
-        "does not identify changed clauses or current contract interpretation"
+        "does not identify changed clauses or current contract interpretation",
+        "the public cancellation notice does not identify which specific clauses changed; predecessor-vs-current document diff still requires the underlying specifications"
       ]
     },
     {
@@ -1766,6 +1768,113 @@
       ],
       "limitations": [
         "historical decision/clauses are not evidence that 2026–2027 technical specifications are identical; retrieve current EKAP documents before current-contract claims"
+      ]
+    },
+    {
+      "id": "S-BU-021",
+      "title": "Bilgi İşlem Daire Başkanlığı — Hizmet Envanteri",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Information Technology Department",
+      "url": "https://bilgiislem.bogazici.edu.tr/tr/pages/hizmet-envanteri/3513",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "DATA_OWNER"
+      ],
+      "supports": [
+        "BUCard is listed as an Information Technology Department service with bucard@bogazici.edu.tr contact",
+        "cafeteria BUCard top-up/refund services list SKS and Information Technology Department as responsible/service units",
+        "door-card-reader and turnstile faults are routed to Information Technology Department"
+      ],
+      "limitations": [
+        "service ownership does not prove research/export approval, report schema, retention, cafeteria-reader mapping or service-level data access"
+      ]
+    },
+    {
+      "id": "S-BU-022",
+      "title": "Kimlik BUCard",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://bucard.bogazici.edu.tr/",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS"
+      ],
+      "supports": [
+        "BUCard is a campus identity and payment card used in dining halls and other campus services",
+        "official BUCard contact route is bucard@bogazici.edu.tr and the BUCard Office"
+      ],
+      "limitations": [
+        "card-service use does not establish dining transaction exportability, report semantics or one-card-event equals one served meal"
+      ]
+    },
+    {
+      "id": "S-BU-023",
+      "title": "BUCampus Version Notes",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Information Technology Department",
+      "url": "https://bilgiislem.bogazici.edu.tr/tr/pages/versiyon-notlari/8610",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "BUCampus v1.1.2 exposes user-facing passage history from turnstiles and card readers",
+        "BUCampus exposes package-meal menus, meal-survey results, events and academic calendar context"
+      ],
+      "limitations": [
+        "user-facing history proves an event surface exists, not that a privacy-safe aggregate export/API is available",
+        "passage records can include non-dining readers and require cafeteria/service semantic reconciliation",
+        "meal-survey votes remain preference signals rather than served-demand labels"
+      ]
+    },
+    {
+      "id": "S-BU-024",
+      "title": "YENİ BUVPN SİSTEMİ",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Information Technology Department",
+      "url": "https://bilgiislem.bogazici.edu.tr/tr/announcements/yeni-buvpn-sistemi/2511",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "ACCESS",
+        "PRIVACY"
+      ],
+      "supports": [
+        "BUCard is among applications documented as reachable only through BUVPN in the institutional access context"
+      ],
+      "limitations": [
+        "VPN access does not imply the team has authorization, credentials or export rights"
+      ]
+    },
+    {
+      "id": "S-BU-025",
+      "title": "Ara Tatil Yemek Hizmeti Hakkında",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/ara-tatil-yemek-hizmeti-hakkinda",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "reservation workflow was used across multiple campuses during Jan-Feb 2024 intersession services",
+        "reservations were made through kart.boun.edu.tr by a pre-service cutoff",
+        "published operational rule says reservation counts below 15 could trigger packaged service"
+      ],
+      "limitations": [
+        "special intersession workflow is not evidence of an always-on reservation process or a general production cutoff",
+        "reservation count is intent, not served demand"
       ]
     }
   ],
