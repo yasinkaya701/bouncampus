@@ -106,6 +106,34 @@ That gives a concrete next desk artifact task: obtain both predecessor and curre
 
 See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
 
+## Acceptance / hakediş workflow now narrowed
+
+The 2025 official university administration report (**S-BU-030**) materially narrows the workflow:
+
+1. Control Organization operates under the service general conditions, signed contract and technical specification.
+2. The contractor submits the completed service for acceptance with required documents.
+3. Control Organization performs preliminary review.
+4. If acceptable, it prepares **KİK56.0/H — Hizmet İşleri Kabul Teklif Belgesi**.
+5. That document is submitted to the relevant **Harcama Yetkilisi** for hakediş preparation.
+6. The same report says 2025 food-service work was performed **ay bazında** and acceptance-proposal documents were prepared as services were performed.
+7. **S-BU-027** gives an official institutional route for hakediş payments through the Tahakkuk branch.
+
+This is a meaningful reduction in uncertainty, but it still does **not** answer the economic-control question:
+
+> Which operational quantity — ordered, produced, delivered, served, accepted, or another reconciled quantity — is multiplied by which unit price for the food-service hakediş?
+
+That remains a #358 artifact/source-owner question.
+
+### Current routing surfaces
+
+| Need | Source-backed route | Still unresolved |
+| --- | --- | --- |
+| current tender/spec bundle | S-BU-026 Procurement branch + IKN 2025/1727143 | exact bundle retrieval/access |
+| service conformity / acceptance | S-BU-014 current Control Organization; S-BU-030 process | food-contract acceptance fields and daily evidence |
+| hakediş preparation chain | S-BU-030 KİK56.0/H → Spending Authority | exact Spending Authority identity and payable count |
+| payment processing | S-BU-027 Tahakkuk branch | exact payment-package schema and reconciliation fields |
+| contractor planning | S-PROC-001 identifies TEMAŞ | local operations owner, production freeze and revision rights |
+
 ## Do not infer settlement from the headline contract
 
 The public result is sufficient for **scope, contractor and procurement-route context**. It is not sufficient for:
