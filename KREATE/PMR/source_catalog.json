@@ -1902,6 +1902,32 @@
         "does not expose awarded unit prices or sufficiently complete descriptions for the additional monthly schedule rows",
         "does not establish payable or accepted quantity, daily or campus allocation, penalties, change rights, contractor margin, software budget, or savings"
       ]
+    },
+    {
+      "id": "S-BU-026",
+      "title": "Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "DATA_OWNER",
+        "CONTRACT",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "Article 7 places the BUCard Office within BİDB and assigns it operation/control of the dining BUCard system, reporting to the Food Services Board and Food Services Branch, and retention of digital data",
+        "Article 5(f) states the Food Services Board and the Inspection/Acceptance Commission jointly carry out meal-hakediş payment orders and accrual",
+        "Article 8 states dining-service charge transactions are processed through dining-hall payment turnstiles and distinguishes second-meal handling",
+        "Article 9 states meal-service procurement is carried out by SKS together with Administrative and Financial Affairs and requires separate student/personnel invoices"
+      ],
+      "limitations": [
+        "the directive does not prove research/export authorization, report grain, retention period or that one BUCard event equals one physically served meal",
+        "the hakediş workflow actor statement does not establish which quantity/unit is payable, exact signer sequence, freeze/change rights, penalty mechanics, economic beneficiary or software buyer authority"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."

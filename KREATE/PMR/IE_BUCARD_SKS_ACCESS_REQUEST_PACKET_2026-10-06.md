@@ -18,7 +18,18 @@ The request must stay aggregate. Do not request or retain student/staff identity
 3. **Dining control / contractor operations** — owner route for produced quantities, allocation, shortage/early-sellout and surplus/waste records.
 4. **CS1 intake** — only after source provenance and reconciliation are explicit; canonical intake is `scripts/cs1_service_truth_artifact_intake.py`.
 
-Public source IDs supporting the routing hypothesis: `S-BU-021`, `S-BU-022`, `S-BU-023`. These sources do **not** prove export authorization or report semantics.
+Public source IDs supporting the route: `S-BU-021`, `S-BU-022`, `S-BU-023`, and `S-BU-026`. These sources do **not** prove export authorization or report semantics.
+
+## Governance-backed owner-route refinement
+
+The current official **Yemek Hizmeti Yürütme Kurulu Yönergesi** (`S-BU-026`, Article 7) goes beyond a contact-page inference: it places the BUCard Office inside BİDB, assigns operation/control of the dining BUCard system, requires reporting to the Food Services Board and Food Services Branch, and requires retention of digital data.
+
+Operational consequence for #292:
+- ask BUCard/BİDB first for the existing dining-report surface, report names/schema/version semantics, and aggregate/export capability;
+- ask whether the mandated retained digital data preserve historical report snapshots or only the latest corrected state;
+- ask Food Services/SKS to reconcile what each reported count means and which report/version is operationally final.
+
+Boundary unchanged: governance ownership is **not** permission to access/export data, and a dining turnstile/payment event is **not** automatically `actual_served`.
 
 ## Minimum aggregate export requested
 
