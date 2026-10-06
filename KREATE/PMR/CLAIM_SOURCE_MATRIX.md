@@ -28,6 +28,12 @@ Source IDs resolve through [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) and [source_ca
 | **Published aggregate waste fields are clean service truth** | **Unsupported.** The public monthly series is aggregate and the 2025 table contains internally unreconciled field semantics in at least August/October. | S-BU-002, S-BU-009 | A corrected accounting identity, campus×meal labels, waste stage or causal mechanism. | Preserve published values; obtain source-owner data dictionary/field semantics through #292 before operational use. |
 | **Policy/sustainability context implies a buyer** | Türkiye food-waste policy/guidance and UI GreenMetric make prevention, measurement and evidence institutionally legible. | S-POL-001, S-POL-002, S-POL-003 | Budget, buyer authority, ranking effect, willingness to pay or procurement path. | Interview economic buyer/approver and contract/procurement owner. |
 
+
+| **Current food-service contractor / procurement surface is identifiable** | Public procurement result context for IKN 2025/1727143 identifies a current two-year Boğaziçi food-service contract and TEMAŞ as contractor. | S-PROC-001 | Daily quantity owner, unit prices, hakediş rule, penalties, flexibility, API/data access or willingness to adopt. | Retrieve authoritative EKAP specifications/contract; interview SKS/control/TEMAŞ/procurement owners around one recent service. |
+| **BUCard passage data can be treated as clean served-meal truth** | **Unsupported.** Official FAQ shows correction/refund troubleshooting is tied to date/time/campus/turnstile; QR access also exists. | S-BU-015 | Transaction-to-meal equivalence, retries, refunds, duplicate handling, second meals, late corrections or final report semantics. | #292 source-owner reconciliation + real aggregate export. |
+| **Menu survey votes are a demand label** | **Unsupported.** BUCampus provides an authenticated weekly preference-vote workflow. | S-BU-013 | Attendance, meal pickup or causal lift. | Treat as optional preference feature only after export/timing semantics are verified. |
+| **Public service schedule defines the controllable production decision** | Published campus meal windows define operating context. | S-BU-016, S-BU-012 | Quantity freeze, batch/replenishment process, production commitment or campus allocation rights. | Reconstruct one recent service with Food Services, control organization and contractor. |
+
 ## Promotion rule
 
 A row moves from **secondary-supported hypothesis** to **PMR-supported/contradicted** only when:
