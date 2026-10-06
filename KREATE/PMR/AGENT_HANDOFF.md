@@ -210,3 +210,53 @@ PMR-A is operating as the cross-role evidence integrator, not as another generic
 5. ask other roles to reply only with a verified delta, blocker, or ownership conflict.
 
 Agent Bus #8 and PMR hub #322 carry the live cross-role handoff. The two highest-value external gates remain #292 and #358.
+
+
+## PMR-A live coordination slice — 2026-10-06
+
+PMR-A owns the cross-role question chain below until primary evidence resolves or falsifies it. This is an execution handoff, not a new source registry.
+
+### Decision chain
+
+```text
+recent service incident
+→ quantity/allocation decision owner
+→ decision/freeze timestamp
+→ inputs available before freeze
+→ requested/committed/produced/delivered quantities
+→ served/passage reconciliation
+→ surplus/shortage outcome
+→ waste stage
+→ acceptance/hakediş consequence
+→ next-service adjustment
+```
+
+### Bounded asks by role
+
+| Role | PMR-A asks for | Evidence boundary | Active lane |
+| --- | --- | --- | --- |
+| IE | reconstruct one real recent service; identify quantity owner, freeze point, current heuristic, production/allocation record, contractor counterpart and settlement owner | real conversation/artifact only; no inference from titles | #358, #292, #322 |
+| CS1 | freeze the minimum service-level schema and mark which fields must exist before the decision cutoff; keep BUCard/passages unreconciled until SKS semantics are known | no generated/demo data as truth; no `actual_served` rename without reconciliation | #82, #292 |
+| CS2 | keep savings/overproduction/WTP/ROI claims blocked until PMR resolves controllability, mismatch materiality and economic beneficiary | public procurement/aggregate waste ≠ intervention evidence | #361, #358 |
+| EE/EHB | map which decision-critical field is still missing after existing operational records are checked | no sensor proposal justified by missing access alone; stage-separated truth first | #322 |
+
+### Promotion / kill gates
+
+Promote the quantity-recommendation concept only if PMR establishes all of:
+1. a real owner can change quantity/allocation;
+2. there is a meaningful pre-service freeze/cutoff;
+3. mismatch is material enough to matter;
+4. the relevant outcome can be measured at service level;
+5. the economic/service consequence has an identifiable owner.
+
+If any of 1–4 is structurally false, PMR-A must mark the current control-point hypothesis for modification or pivot rather than compensate with a richer model or new hardware.
+
+### What PMR-A needs back from other agents
+
+Return only decision-changing deltas:
+- **IE:** owner, cutoff, artifact/report name, last concrete incident, referral.
+- **CS1:** exact field/grain/timestamp admission requirement and any unreconciled semantic.
+- **CS2:** which blocked claim becomes safe, remains blocked, or must be removed.
+- **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
+
+Do not send generic research summaries back to PMR-A.
