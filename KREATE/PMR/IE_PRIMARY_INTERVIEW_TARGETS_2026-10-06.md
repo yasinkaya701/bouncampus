@@ -37,6 +37,13 @@ Reconstruct one recent meal service from initial quantity planning through final
 
 ## IE-02 — Control / acceptance / procurement / hakediş
 
+### Source-backed routing note
+
+Current public evidence supports the referral sequence:
+`Dining Control Organization → Procurement branch → exact Spending Authority → Tahakkuk payment route`.
+
+Aygül Demir is publicly listed as a principal member of the current dining control organization (`S-BU-014`). This makes the control role a high-information target, but **no outreach, scheduling or completed interview is claimed here**.
+
 ### Primary objective
 Resolve who accepts service, which quantity/record matters contractually, and whether a recommendation can legally or operationally alter the relevant decision.
 
