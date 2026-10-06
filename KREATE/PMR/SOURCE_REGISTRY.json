@@ -1,0 +1,325 @@
+{
+  "schema_version": "PMR_SOURCE_REGISTRY_V1",
+  "updated_at": "2026-10-06",
+  "owner": "IE",
+  "evidence_firewall": "Registry membership does not make a source REAL_PMR or E-INT evidence. Public/academic/method sources are preparation/context only unless a separate admissible claim is promoted through KREATE/EVIDENCE.md.",
+  "dedupe_key_order": [
+    "doi",
+    "canonical_url",
+    "publisher_report_identity"
+  ],
+  "sources": [
+    {
+      "id": "SRC-BU-001",
+      "title": "Boğaziçi University SKS 2025 Activity Report / 2026–2027 Goals",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University — Sağlık, Kültür ve Spor Daire Başkanlığı",
+      "canonical_url": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096",
+      "formats": [
+        "HTML"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_WEB",
+      "narrow_use": "Institutional dining scale/context: six dining halls, approximately 6,000 daily meals, package-meal and feedback program context.",
+      "does_not_prove": "Service-level demand, production quantities, root cause of food waste, decision ownership, export access, product adoption or willingness to pay.",
+      "pmr_question_tags": [
+        "H1",
+        "H2",
+        "H4",
+        "H5"
+      ]
+    },
+    {
+      "id": "SRC-BU-002",
+      "title": "Campus food waste tracking — 2025",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University — Kurumsal Veri / Sustainability",
+      "canonical_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "formats": [
+        "HTML",
+        "TABLE"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_WEB",
+      "narrow_use": "Official aggregate baseline: 2025 monthly food-waste totals and public dining-hall capacity/service context.",
+      "does_not_prove": "That overproduction caused the waste, service-level intervention effect, campus×meal waste truth, or a model saving.",
+      "pmr_question_tags": [
+        "H2",
+        "H4"
+      ],
+      "repo_snapshot": "KREATE/PMR/data/bogazici_food_waste_2025_official.csv"
+    },
+    {
+      "id": "SRC-BU-003",
+      "title": "Healthy and affordable food choices",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University — Kurumsal Veri / Sustainability",
+      "canonical_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/234-healthy-and-affordable-food-choices/1314",
+      "formats": [
+        "HTML"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "CURRENT_REPO_VERIFIED_SOURCE_IN_ISSUE_82",
+      "narrow_use": "Public context on centralized food preparation and pre-service menu/nutrition/portion information.",
+      "does_not_prove": "Which role sets service-level quantity, whether campus allocation is adjustable, or whether service-level production/outcome data are exportable.",
+      "pmr_question_tags": [
+        "H1",
+        "H4",
+        "H5"
+      ]
+    },
+    {
+      "id": "SRC-BU-004",
+      "title": "Boğaziçi University Dining Hall official site and menus",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University — Yemek Hizmetleri",
+      "canonical_url": "https://yemekhane.bogazici.edu.tr/",
+      "formats": [
+        "HTML",
+        "MENU"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "CURRENT_REPO_VERIFIED_SOURCE_IN_ISSUE_82",
+      "narrow_use": "Public pre-service menu context and operational navigation.",
+      "does_not_prove": "Actual served demand, internal production quantity, forecast method, or historical export access.",
+      "pmr_question_tags": [
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-BU-005",
+      "title": "Kilyos meal reservation notice — 20 May 2026",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University — Yemek Hizmetleri",
+      "canonical_url": "https://yemekhane.bogazici.edu.tr/node/493",
+      "formats": [
+        "HTML"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "CURRENT_REPO_VERIFIED_SOURCE_IN_ISSUE_82",
+      "narrow_use": "Shows that a reservation-intent workflow existed for a specific Kilyos holiday-service period.",
+      "does_not_prove": "That the same cutoff, coverage or reservation semantics apply campus-wide or outside that cited period; reservation is not served demand.",
+      "pmr_question_tags": [
+        "H1",
+        "H3",
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-BU-006",
+      "title": "Boğaziçi University Academic Calendar",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University",
+      "canonical_url": "https://akademiktakvim.bogazici.edu.tr/",
+      "formats": [
+        "HTML",
+        "CALENDAR"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "CURRENT_REPO_VERIFIED_SOURCE_IN_ISSUE_82",
+      "narrow_use": "Decision-time-known academic/calendar context for future backtests when snapshot timing is preserved.",
+      "does_not_prove": "Demand causality or forecast lift.",
+      "pmr_question_tags": [
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-BU-007",
+      "title": "Boğaziçi University Sustainability Reports",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Boğaziçi University — Kurumsal Veri",
+      "canonical_url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/surdurulebilirlik-raporlari/1063",
+      "formats": [
+        "HTML",
+        "PDF_LINKS"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_WEB",
+      "narrow_use": "Canonical entry point for Sustainability 2025/2024 and GHG Inventory 2025 institutional reports.",
+      "does_not_prove": "Food-service causal workflow, persona, buyer, pilot effect or demand mismatch.",
+      "pmr_question_tags": [
+        "H2",
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-POL-001",
+      "title": "Türkiye’s National Strategy Document on Prevention, Reduction and Monitoring of Food Loss and Waste and Action Plan",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "Republic of Türkiye Ministry of Agriculture and Forestry / FAO",
+      "canonical_url": "https://www.tarimorman.gov.tr/ABDGM/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/G%C4%B1dan%C4%B1%20Koru%20Strateji%20Belgesi%20ve%20Eylem%20Plan%C4%B1.pdf",
+      "formats": [
+        "PDF"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_SEARCH_RESULT_AND_OFFICIAL_PUBLICATION_INDEX",
+      "narrow_use": "National policy context prioritizing prevention/reduction, measurement/monitoring and multi-stakeholder action.",
+      "does_not_prove": "Boğaziçi root cause, buyer intent or BOUNCAMPUS impact.",
+      "pmr_question_tags": [
+        "POLICY",
+        "H2",
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-STD-001",
+      "title": "UI GreenMetric Sustainable University Rankings — Guideline 2026",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "UI GreenMetric / Universitas Indonesia",
+      "canonical_url": "https://uigreenmetric.com/resources/university/guidelines/2026/english",
+      "formats": [
+        "HTML",
+        "PDF"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_WEB_AND_PDF",
+      "asset_urls": [
+        "https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf"
+      ],
+      "narrow_use": "Why-now institutional context: 2026 includes Governance and Digitalization and explicit sustainability evidence requirements.",
+      "does_not_prove": "A university will buy BOUNCAMPUS, that ranking improves, or that the product satisfies any indicator.",
+      "pmr_question_tags": [
+        "BUYER_CONTEXT",
+        "POLICY"
+      ]
+    },
+    {
+      "id": "SRC-ACA-001",
+      "title": "Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste",
+      "source_class": "ACADEMIC",
+      "authority": "Journal of Cleaner Production",
+      "canonical_url": "https://doi.org/10.1016/j.jclepro.2023.140265",
+      "formats": [
+        "ARTICLE"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_BIBLIOGRAPHY",
+      "bibliographic_note": "Rodrigues, M.; Miguéis, V.; Freitas, S.; Machado, T. Journal of Cleaner Production 435 (2024), 140265.",
+      "narrow_use": "Mechanism plausibility and benchmark design: compare ML against transparent/operator-style baselines using real catering data.",
+      "does_not_prove": "Transferable Boğaziçi performance, causal waste savings or need for ML.",
+      "pmr_question_tags": [
+        "H2",
+        "H4",
+        "H6"
+      ]
+    },
+    {
+      "id": "SRC-ACA-002",
+      "title": "Preventing food waste in subsidy-based university dining systems: An artificial neural network-aided model under uncertainty",
+      "source_class": "ACADEMIC",
+      "authority": "Waste Management & Research / PubMed",
+      "canonical_url": "https://pubmed.ncbi.nlm.nih.gov/33971773/",
+      "formats": [
+        "ARTICLE",
+        "ABSTRACT"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_WEB",
+      "doi": "10.1177/0734242X211017974",
+      "narrow_use": "University-dining mechanism evidence for reservation/show-no-show uncertainty and joint waste/shortage trade-offs.",
+      "does_not_prove": "Identical reservation workflow, economics, model performance or shortage penalty at Boğaziçi.",
+      "pmr_question_tags": [
+        "H2",
+        "H3",
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-ACA-003",
+      "title": "Food Waste Management Practices and Barriers to Progress in U.S. University Foodservice",
+      "source_class": "ACADEMIC",
+      "authority": "International Journal of Environmental Research and Public Health / PMC",
+      "canonical_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9180560/",
+      "formats": [
+        "OPEN_ACCESS_ARTICLE"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "VERIFIED_WEB",
+      "doi": "10.3390/ijerph19116512",
+      "narrow_use": "External context that demand forecasting and smaller-batch production are common prevention practices, while measurement practices vary.",
+      "does_not_prove": "Boğaziçi cause, workflow, priority, measurement maturity or adoption.",
+      "pmr_question_tags": [
+        "H1",
+        "H2",
+        "H4",
+        "H6"
+      ]
+    },
+    {
+      "id": "SRC-ACA-004",
+      "title": "Systematic literature review of food waste in educational institutions",
+      "source_class": "ACADEMIC",
+      "authority": "International Journal of Contemporary Hospitality Management",
+      "canonical_url": "https://doi.org/10.1108/IJCHM-07-2020-0672",
+      "formats": [
+        "ARTICLE"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "BIBLIOGRAPHIC_REFERENCE_REUSED_FROM_CURRENT_RESEARCH",
+      "narrow_use": "Multi-causal framing: avoid reducing educational food waste to a single forecasting explanation without stage/root-cause evidence.",
+      "does_not_prove": "Any Boğaziçi-specific causal share.",
+      "pmr_question_tags": [
+        "H2",
+        "H4"
+      ]
+    },
+    {
+      "id": "SRC-METHOD-001",
+      "title": "Disciplined Entrepreneurship — Primary Market Research",
+      "source_class": "METHOD_REFERENCE",
+      "authority": "Disciplined Entrepreneurship",
+      "canonical_url": "https://www.d-eship.com/wp-content/uploads/2019/03/Disciplined_Entrepreneurship_-_Primary_Market_Research.pdf",
+      "formats": [
+        "PDF"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "CURRENT_MASTER_METHOD_REFERENCE",
+      "narrow_use": "Interview method: direct customer interaction, qualitative discovery, neutral/open-ended questioning and referral loops.",
+      "does_not_prove": "Any market fact or customer validation.",
+      "pmr_question_tags": [
+        "METHOD"
+      ]
+    },
+    {
+      "id": "SRC-MEAS-001",
+      "title": "UNEP Food Waste Index Report 2024",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "United Nations Environment Programme",
+      "canonical_url": "https://www.unep.org/resources/publication/food-waste-index-report-2024",
+      "formats": [
+        "HTML",
+        "PDF"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "REUSED_FROM_CURRENT_MASTER_RESEARCH",
+      "asset_urls": [
+        "https://wedocs.unep.org/bitstream/handle/20.500.11822/45230/food_waste_index_report_2024.pdf"
+      ],
+      "narrow_use": "Measurement-method reference for food-service waste and prospective pilot boundary design.",
+      "does_not_prove": "Boğaziçi waste-stage composition or that a particular hardware method is required.",
+      "pmr_question_tags": [
+        "H4",
+        "MEASUREMENT"
+      ]
+    },
+    {
+      "id": "SRC-MEAS-002",
+      "title": "US EPA Wasted Food Scale",
+      "source_class": "PUBLIC_OFFICIAL",
+      "authority": "United States Environmental Protection Agency",
+      "canonical_url": "https://www.epa.gov/sustainable-management-food/wasted-food-scale",
+      "formats": [
+        "HTML",
+        "VISUAL"
+      ],
+      "accessed_at": "2026-10-06",
+      "verification": "REUSED_FROM_CURRENT_MASTER_RESEARCH",
+      "narrow_use": "Prevention/source-reduction hierarchy context and visual reference.",
+      "does_not_prove": "That production forecasting is the dominant prevention lever at Boğaziçi.",
+      "pmr_question_tags": [
+        "H2",
+        "MEASUREMENT"
+      ]
+    }
+  ]
+}
