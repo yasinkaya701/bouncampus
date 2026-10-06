@@ -48,9 +48,13 @@
       "id": "EA-04",
       "gate": "PHYSICAL_OUTCOME_MEASURABLE",
       "owner": [
-        "EE"
+        "EE",
+        "EHB"
       ],
-      "issue_refs": [],
+      "issue_refs": [
+        322,
+        119
+      ],
       "status": "OPEN",
       "unlocks": "prospective surplus/waste/shortage measurement"
     },
@@ -58,9 +62,13 @@
       "id": "EA-05",
       "gate": "REPORTING_RECONCILIATION",
       "owner": [
-        "IE"
+        "IE",
+        "CS1"
       ],
-      "issue_refs": [],
+      "issue_refs": [
+        82,
+        322
+      ],
       "status": "OPEN",
       "unlocks": "governance-to-service reconciliation when decision relevant"
     },
