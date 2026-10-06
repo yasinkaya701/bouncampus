@@ -25,6 +25,12 @@ retrieved_at
 quality_flag
 ```
 
+### 2024 published-total warning
+
+The 12 published 2024 monthly `Total Food Waste` rows sum to **50,994 kg**, while the same official page and one-page PDF print a yearly total of **50,993 kg**.
+
+The snapshot preserves the monthly rows exactly as published. Do not alter one month to force the printed total.
+
 ### 2025 semantic warning
 
 The official 2025 table states that delivered-to-İSTAÇ amounts are included in total food-waste amounts, but:
