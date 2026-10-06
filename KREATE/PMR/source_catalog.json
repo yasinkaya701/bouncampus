@@ -1716,6 +1716,53 @@
       "limitations": [
         "issue plan is not evidence that access or export exists"
       ]
+    },
+    {
+      "id": "S-PROC-003",
+      "title": "Boğaziçi 2024–2025 food-service procurement — IKN 2023/1144278",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "EKAP-derived public tender mirror",
+      "url": "https://ekapveri.com/ihale/ekap-2023-1144278/",
+      "accessed_at": "2026-10-06",
+      "authority": "public_procurement_record_mirror",
+      "identifier": "IKN 2023/1144278",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "H6",
+        "CONTRACT",
+        "INCUMBENT"
+      ],
+      "supports": [
+        "historical two-year Boğaziçi food-service procurement; public result identifies TEMAŞ as contractor for 2024–2025",
+        "historical scope covers six campuses"
+      ],
+      "limitations": [
+        "historical contract terms cannot be assumed unchanged for 2026–2027",
+        "does not establish current unit prices, acceptance, penalties or quantity flexibility"
+      ]
+    },
+    {
+      "id": "S-PROC-004",
+      "title": "Archived KİK decision on Boğaziçi 2024–2025 food-service tender — 2023/UH.I-1542",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "Kamu İhale Kurulu decision archive mirror",
+      "url": "https://arsiv.kikkararlari.com/index.php?Itemid=9&id=74668&option=com_content&task=view",
+      "accessed_at": "2026-10-06",
+      "authority": "public_decision_archive_mirror",
+      "identifier": "2023/UH.I-1542",
+      "hypotheses": [
+        "H1",
+        "H6",
+        "CONTRACT",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "historical technical-specification context: North Campus kitchen production, backup-kitchen continuity requirements and service topology were material contract topics"
+      ],
+      "limitations": [
+        "historical decision/clauses are not evidence that 2026–2027 technical specifications are identical; retrieve current EKAP documents before current-contract claims"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
