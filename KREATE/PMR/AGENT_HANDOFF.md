@@ -162,3 +162,101 @@ See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_
 Feature integration path: `agent/ie/* → role/ie-customer-discovery → master`.
 
 Do not bypass the role lane for PMR research deltas. After a feature PR merges into the role branch and exact-head checks pass, refresh the role against current master if necessary, then use the role→master integration PR.
+
+
+## Primary-evidence acquisition handoff — 2026-10-06
+
+New owner-routing evidence is canonical:
+
+- **S-BU-021:** BİDB service inventory → BUCard technical ownership/contact; SKS+BİDB cafeteria-card services; BİDB turnstile/card-reader support.
+- **S-BU-023:** BUCampus user-facing passage history proves an event-history surface exists.
+- **S-BU-025:** reservation recurs across special operating regimes; it is still not an always-on demand label.
+- **S-PROC-002:** predecessor procurement cancellation reason is explicit; clause identity remains unresolved.
+
+**IE**
+- work #292 and #358 from [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md);
+- stop broad browsing unless a source changes an owner, artifact, clause or falsifier.
+
+**CS1**
+- do not promote Geçişlerim/event existence to `actual_served`;
+- admission still requires aggregate export, source IDs, timing and SKS reconciliation.
+
+**CS2**
+- may describe a source-backed data-owner route and an open contract-artifact acquisition path;
+- may not claim integration/access or current penalty/hakediş mechanics.
+
+**EE/EHB**
+- passage-event evidence reduces pressure for premature sensing; new hardware still requires a demonstrated measurement gap.
+
+
+## PMR-A execution sync — 2026-10-06
+
+PMR-A is operating as the cross-role evidence integrator, not as another generic research lane.
+
+### Current execution focus
+
+- **IE / #292:** obtain a privacy-preserving `campus × meal_period × service_date` BUCard/SKS export plus reconciliation semantics. Event-history existence is not `actual_served`; do not claim `VERIFIED_EXPORTABLE` without source-owner evidence.
+- **IE / #358:** retrieve the authoritative current IKN **2025/1727143** admin/technical specs, unit-price schedule, correction notice/zeyilname, acceptance/hakediş schema, penalty/SLA language, production request/order form and reconciliation report. Resolve payable count, signer/owner, last reversible quantity freeze, record precedence, and overproduction/shortage risk ownership.
+- **CS1 / #82:** keep the canonical `SERVICE_TRUTH_V1` intake ready and fail closed on public, aggregate, unreconciled or generated sandbox rows.
+- **CS2 / #361:** consume only verified deltas into KEEP/MODIFY/KILL decisions. Savings, WTP, buyer identity, economic beneficiary and accepted-quantity changeability remain blocked until primary evidence resolves them.
+- **EE / EHB:** first map existing scale/manual records and the exact waste-stage field that is actually missing. Do not open hardware work solely because PMR has an unresolved data field.
+
+### PMR-A coordination rule
+
+1. no duplicate source dump or broad-browsing lane;
+2. preserve contradictions and source boundaries;
+3. route every new fact to the exact decision/claim it changes;
+4. create no `E-INT-*` record without a real completed conversation;
+5. ask other roles to reply only with a verified delta, blocker, or ownership conflict.
+
+Agent Bus #8 and PMR hub #322 carry the live cross-role handoff. The two highest-value external gates remain #292 and #358.
+
+
+## PMR-A live coordination slice — 2026-10-06
+
+PMR-A owns the cross-role question chain below until primary evidence resolves or falsifies it. This is an execution handoff, not a new source registry.
+
+### Decision chain
+
+```text
+recent service incident
+→ quantity/allocation decision owner
+→ decision/freeze timestamp
+→ inputs available before freeze
+→ requested/committed/produced/delivered quantities
+→ served/passage reconciliation
+→ surplus/shortage outcome
+→ waste stage
+→ acceptance/hakediş consequence
+→ next-service adjustment
+```
+
+### Bounded asks by role
+
+| Role | PMR-A asks for | Evidence boundary | Active lane |
+| --- | --- | --- | --- |
+| IE | reconstruct one real recent service; identify quantity owner, freeze point, current heuristic, production/allocation record, contractor counterpart and settlement owner | real conversation/artifact only; no inference from titles | #358, #292, #322 |
+| CS1 | freeze the minimum service-level schema and mark which fields must exist before the decision cutoff; keep BUCard/passages unreconciled until SKS semantics are known | no generated/demo data as truth; no `actual_served` rename without reconciliation | #82, #292 |
+| CS2 | keep savings/overproduction/WTP/ROI claims blocked until PMR resolves controllability, mismatch materiality and economic beneficiary | public procurement/aggregate waste ≠ intervention evidence | #361, #358 |
+| EE/EHB | map which decision-critical field is still missing after existing operational records are checked | no sensor proposal justified by missing access alone; stage-separated truth first | #322 |
+
+### Promotion / kill gates
+
+Promote the quantity-recommendation concept only if PMR establishes all of:
+1. a real owner can change quantity/allocation;
+2. there is a meaningful pre-service freeze/cutoff;
+3. mismatch is material enough to matter;
+4. the relevant outcome can be measured at service level;
+5. the economic/service consequence has an identifiable owner.
+
+If any of 1–4 is structurally false, PMR-A must mark the current control-point hypothesis for modification or pivot rather than compensate with a richer model or new hardware.
+
+### What PMR-A needs back from other agents
+
+Return only decision-changing deltas:
+- **IE:** owner, cutoff, artifact/report name, last concrete incident, referral.
+- **CS1:** exact field/grain/timestamp admission requirement and any unreconciled semantic.
+- **CS2:** which blocked claim becomes safe, remains blocked, or must be removed.
+- **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
+
+Do not send generic research summaries back to PMR-A.

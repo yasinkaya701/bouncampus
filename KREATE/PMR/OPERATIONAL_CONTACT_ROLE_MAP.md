@@ -21,6 +21,15 @@ Do not pre-assign "quantity owner", "buyer", "data owner" or "approver" from a j
 
 ### BUCard / service-count reconciliation
 
+- **S-BU-021:** current BİDB service inventory lists BUCard as a BİDB service and gives `bucard@bogazici.edu.tr`; cafeteria top-up/refund lists SKS + BİDB; turnstile/card-reader faults route to BİDB.
+- **S-BU-022:** official BUCard portal confirms dining-hall use and BUCard Office/contact route.
+- **S-BU-023:** BUCampus exposes user-facing turnstile/card-reader passage history.
+- **S-BU-024:** institutional notice places BUCard among applications requiring BUVPN in that access context.
+
+This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB/BUCard + SKS reconciliation path. It still does not prove export approval.
+
+### Existing Food Services correction context
+
 - Source: `S-BU-015`
 - Official FAQ references overcharge/refund issues with date, time, campus and turnstile information and notes BUCampus QR access.
 - Interview objective: find the authoritative privacy-safe aggregate report and clarify retries, refunds/reversals, second meals, package meals, late corrections and report finalization.
@@ -45,7 +54,7 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | academic calendar | S-BU-019 | public/versioned context |
 | student events | S-BU-018 | public context; attendance generally unknown |
 | BUBizden entitlement | S-BU-017 | app workflow exists; not served-demand truth |
-| BUCard/turnstile corrections | S-BU-015 | correction context public; aggregate report owner pending #292 |
+| BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
 | acceptance/hakediş | S-PROC-001 gives procurement route only | authoritative clause/report pending PMR |
@@ -62,3 +71,5 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 7. Comparable second institution.
 
 For every conversation, use [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) and promote only narrow supported/contradicted claims.
+
+See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md) for the exact minimal artifact/request packet.
