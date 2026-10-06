@@ -194,6 +194,27 @@ Useful first-party routes now in the catalog:
 
 These are **interview-routing evidence**, not proof that any named public role owns the specific decision.
 
+## First-party governance, acceptance and payment route
+
+Current first-party university evidence now narrows the institutional chain without resolving the economic/quantity semantics:
+
+- `S-BU-026` (Yemek Hizmeti Yürütme Kurulu Yönergesi): Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Muayene Kabul Komisyonu; Article 7 places dining BUCard operation/reporting/data retention with the BUCard Office/BİDB; Article 9 routes meal-service procurement through SKS + İMİD.
+- `S-BU-027`: the official İhale ve Satınalma unit is the first-party procurement/tender route.
+- `S-BU-028`: the official Tahakkuk unit explicitly lists tender, direct-procurement, transfer and hakediş payments.
+- `S-BU-029`: the official İMİD contact surface provides fallback institutional routing.
+- `S-BU-030` (2025 Administration Activity Report): the Control Organization works under the signed contract/technical specification, performs preliminary acceptance, prepares KİK56.0/H when service is acceptable, and submits it to the relevant Spending Authority for hakediş preparation; the report explicitly includes food-service procurement in this recurring service-control surface.
+
+This materially narrows **who to ask**, not **what the contract pays for**. Still unresolved for IKN `2025/1727143`:
+
+- exact food-contract Spending Authority identity;
+- actual KİK56.0/H / hakediş package fields;
+- payable/accepted quantity and unit;
+- production/allocation freeze and change rights;
+- shortage/excess responsibility and penalties;
+- economic beneficiary and software-buying authority.
+
+Do not collapse procurement, acceptance, tahakkuk/payment processing, operational quantity control and software buying into one role.
+
 ## Contract-PMR question set
 
 Ask for one recent concrete service first, then reconstruct the documents and decisions:
