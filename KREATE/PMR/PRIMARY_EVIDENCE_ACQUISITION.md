@@ -4,6 +4,15 @@
 **Purpose:** convert the highest-value PMR unknowns into minimal, privacy-preserving artifact requests.  
 **Boundary:** this packet is an acquisition plan. It is **not** evidence that access has been granted.
 
+## Execution attachments
+
+Use these focused execution sheets when contacting source owners:
+
+- [IE_BUCARD_SKS_ACCESS_REQUEST_PACKET_2026-10-06.md](IE_BUCARD_SKS_ACCESS_REQUEST_PACKET_2026-10-06.md) — ready-to-send privacy-preserving BUCard/BİDB request, SKS reconciliation checklist, response classification and provenance log.
+- [IE_CONTRACT_HAKEDIS_REQUEST_PACKET_2026-10-06.md](IE_CONTRACT_HAKEDIS_REQUEST_PACKET_2026-10-06.md) — current-contract artifact request, one-service reconstruction table, decision-rights map and #358 completion gates.
+
+These are execution aids for this canonical packet, not new evidence registries.
+
 ## Lane A — BUCard / BİDB aggregate service truth
 
 ### Publicly verified routing
