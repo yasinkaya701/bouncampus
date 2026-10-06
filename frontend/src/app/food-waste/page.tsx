@@ -67,14 +67,14 @@ type FoodApi = {
 type OperatorDecision = 'HOLD' | 'PILOT_APPROVED' | 'EDIT_REQUIRED';
 
 type SignalView = DemandSignal & {
-  source: 'OFFICIAL_SNAPSHOT' | 'EXTERNAL_LIVE';
+  source: 'OFFICIAL_CONTEXT' | 'EXTERNAL_CONTEXT';
 };
 
 const signalSource: Record<DemandSignal['id'], SignalView['source']> = {
-  schedule: 'OFFICIAL_SNAPSHOT',
-  weather: 'EXTERNAL_LIVE',
-  menu: 'EXTERNAL_LIVE',
-  calendar: 'OFFICIAL_SNAPSHOT',
+  schedule: 'OFFICIAL_CONTEXT',
+  weather: 'EXTERNAL_CONTEXT',
+  menu: 'OFFICIAL_CONTEXT',
+  calendar: 'OFFICIAL_CONTEXT',
 };
 
 const signalIcon: Record<DemandSignal['id'], typeof CalendarDays> = {
