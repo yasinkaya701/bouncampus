@@ -145,3 +145,6 @@ Do not create a third registry. Extend `source_catalog.json` + `SOURCE_LIBRARY.m
 - [../VPMR/AGENT_HANDOFF.md](../VPMR/AGENT_HANDOFF.md) — cross-agent recut/dedupe rules
 
 `source_catalog.json` remains the canonical cumulative PMR catalog. VPMR IDs are a provenance-oriented companion namespace; do not create a third registry.
+
+
+Public-data snapshots: [data/README.md](data/README.md) and [data/bogazici_food_waste_public_snapshot.csv](data/bogazici_food_waste_public_snapshot.csv).
