@@ -35,11 +35,12 @@ Statuses:
 | A-011 | Winnow Foresight announcement | https://www.winnowsolutions.com/resources/news/introducing-winnow-foresight-a-new-way-to-prevent-food-waste-and-improve-guest-satisfaction-with-ai-powered-forecasting | HTML/images | LINK_ONLY | Vendor content; do not copy screenshots/logos without permission | Competitive red-team |
 | A-012 | stale agent PMR target-map branch | https://github.com/yasinkaya701/bouncampus/tree/agent/campus-data-geo/bogazici-pmr-target-map | Git branch | INTERNAL_PROVENANCE | Internal repository history | Selective source/target salvage |
 | A-013 | stale deep PMR/market branch | https://github.com/yasinkaya701/bouncampus/tree/research/kreate-deep-pmr-market-20261004 | Git branch | INTERNAL_PROVENANCE | Internal repository history | Research backlog / selective salvage |
-| A-014 | merged PMR/market red-team PR #213 | https://github.com/yasinkaya701/bouncampus/pull/213 | Git PR | INTERNAL_PROVENANCE | Merged repository provenance | Current-master research lineage |\n| A-015 | Boğaziçi 2026–2027 academic calendar | https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf | PDF | LINK_ONLY | Official university PDF; redistribution terms not established here | Versionable calendar/context feature reference |
-| A-016 | Boğaziçi SDG-2 sustainability report | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf | PDF | LINK_ONLY | Official university media-store report; prefer project-redrawn charts from cited values | Local sustainability / dining visual reference |
-| A-017 | Fatemi et al. 2024 campus-canteen intervention | https://link.springer.com/article/10.1186/s40066-024-00488-y | HTML/PDF | COPY_CANDIDATE | Open-access article; verify figure-specific credits before reuse | Root-cause / direct-weighing visual and pilot-method precedent |
-| A-018 | Türkiye Ministry mass-catering hygiene guidance | https://www.tarimorman.gov.tr/GKGM/Menu/132/ | HTML/PDF index | LINK_ONLY | Government official index; use current linked guide and retain source/version | Safety/operating guardrail reference |
-| A-019 | Boğaziçi student events calendar | https://takvim.bogazici.edu.tr/tr/events/students | HTML | LINK_ONLY | Official source; event presence ≠ attendance magnitude | Public event/context signal reference |
+| A-014 | merged PMR/market red-team PR #213 | https://github.com/yasinkaya701/bouncampus/pull/213 | Git PR | INTERNAL_PROVENANCE | Merged repository provenance | Current-master research lineage |
+
+| A-015 | Boğaziçi 2025 food-waste XLSX | https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx | XLSX | LINK_ONLY | Official university artifact; retain original URL, retrieval date and field/unit semantics | Raw public waste-data artifact |
+| A-016 | Boğaziçi University Sustainability Report 2025 | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf | PDF | LINK_ONLY | Official university report; public availability does not imply unrestricted redistribution | Institutional sustainability context |
+| A-017 | Boğaziçi official cafeteria visual | https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png | PNG | LINK_ONLY | Official-hosted image; reuse rights not established here | Visual context only; do not infer sensor/workflow geometry |
+| A-018 | İzmir Bakırçay University Akıllı Kampüs Ara Raporu | https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf | PDF | LINK_ONLY | Official university-hosted report; verify reuse terms before copying | Smart-campus dining/utilization/planning precedent |
 
 ## Image-use rule
 
@@ -69,16 +70,3 @@ transformation = none | crop | redraw | derived-chart
 ```
 
 No binary currently becomes evidence merely by being committed to the repository.
-
-
-## Recommended team-owned visuals
-
-Prefer these over copied vendor/report graphics:
-
-1. **PMR evidence ladder** — secondary context → testable hypothesis → real incident interview → source-owned operational data → measured pilot → impact claim.
-2. **Dining decision loop** — signals → quantity/allocation decision → freeze point → production/service → served/surplus/waste → next cycle.
-3. **Data-truth boundary** — `GENERATED_SANDBOX -X-> measured benchmark`; `SOURCE-OWNED EXPORT -> semantic reconciliation -> CS1 intake -> eligible measured evidence`.
-4. **Root-cause tree** — production surplus / preparation loss / service-allocation mismatch / plate waste / menu acceptance / safety constraints / measurement artifact.
-5. **Stakeholder decision map** — Food Services ↔ contractor ops ↔ BİD/BUCard ↔ measurement owner ↔ procurement/finance, with unresolved questions on each edge.
-
-Every project-created chart should put source ID(s), data year and boundary note directly in the caption.

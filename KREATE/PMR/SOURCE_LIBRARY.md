@@ -229,63 +229,214 @@ Current P0:
 6. Establish a service-level truth-data path with timestamps and semantics.
 
 
-## Additive source tranche — 2026-10-06 research-hub consolidation
+---
 
-These entries were added after cross-checking the concurrent IE source-hub work. They fill gaps rather than replacing existing canonical entries.
+# Cross-agent source expansion — 2026-10-06
 
-### S-PMR-004 — Y Combinator: How to Talk to Users
-- Type: customer-discovery method.
-- URL: https://www.ycombinator.com/library/6g-how-to-talk-to-users
-- Use: reinforces incident-first interviewing, past behavior and existing workaround questions instead of product pitching/hypotheticals.
-- Boundary: method only; not customer validation.
+These sources were added after reconciling the master PMR knowledge base, the IE role source library, and parallel PMR research. They are part of the same cumulative catalog; they do **not** create new PMR/interview evidence.
 
-### S-BU-007 — Food Services contact page
-- Type: official university contact surface.
-- URL: https://yemekhane.bogazici.edu.tr/iletisim
-- Use: official route for workflow-discovery outreach.
-- Boundary: a public contact route is not consent, an interview, endorsement or proof of authority.
+## PMR method expansion
 
-### S-BU-008 — Food Services staff page
-- Type: official university role map.
-- URL: https://yemekhane.bogazici.edu.tr/people
-- Use: identify plausible dining-governance/operations participants and request referral to the actual quantity owner.
-- Boundary: title ≠ daily production authority or buyer ownership.
+### S-PMR-004 — How entrepreneurs can conduct primary market research
+- Type: PMR_METHOD
+- Publisher: MIT Martin Trust Center for MIT Entrepreneurship
+- URL: https://entrepreneurship.mit.edu/news/entrepreneurs-can-conduct-primary-market-research/
+- Use: direct customer-learning discipline; interview preparation.
+- Boundary: method only; does not validate BOUNCAMPUS.
+- Maps to: PMR_METHOD.
 
-### S-BU-009 — Student Events Calendar
-- Type: official public calendar.
-- URL: https://takvim.bogazici.edu.tr/tr/events/students
-- Use: candidate anomaly/context feature for campus attendance.
-- Boundary: event listing does not establish attendance magnitude or meal-demand effect.
+### S-PMR-005 — Disciplined Entrepreneurship: questions for startup success
+- Type: PMR_METHOD
+- Publisher: MIT Sloan
+- URL: https://mitsloan.mit.edu/ideas-made-to-matter/disciplined-entrepreneurship-6-questions-startup-success
+- Use: customer-first segmentation and venture framing.
+- Boundary: does not establish willingness to buy in this market.
+- Maps to: H5, H6.
 
-### S-BU-010 — Academic Calendar 2026–2027
-- Type: official PDF.
-- PDF: https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf
-- Use: versionable term/exam/no-class context.
-- Boundary: context feature only; must be aligned to what was knowable before the real decision cutoff.
+## Boğaziçi report expansion
 
-### S-TR-005 — Ministry food-service hygiene/good-practice guidance
-- Type: government official guidance index.
-- URL: https://www.tarimorman.gov.tr/GKGM/Menu/132/
-- Use: food-safety/holding/storage/service guardrails for PMR questions and human-in-the-loop recommendations.
-- Boundary: national guidance does not establish Boğaziçi workflow or contract rules.
+### S-BU-007 — Sustainability Reports index
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University
+- URL: https://kurumsalveri.bogazici.edu.tr/tr/pages/surdurulebilirlik-raporlari/1063
+- Use: canonical report/version discovery.
+- Boundary: does not establish operational workflow facts absent from the reports.
+- Maps to: H4.
 
-### S-ACAD-007 — Fatemi et al. (2024), campus-canteen quasi-experimental study
-- Article: https://link.springer.com/article/10.1186/s40066-024-00488-y
-- Use: direct-weighing/intervention precedent and strong reminder that portion size, taste/quality and consumer behavior can drive waste.
-- Boundary: study-specific effects do not transfer to Boğaziçi and the intervention is not equivalent to production forecasting.
+### S-BU-008 — Boğaziçi University Sustainability Report 2025
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf
+- Use: institutional sustainability context and provenance.
+- Boundary: not PMR; does not prove product demand, buyer authority or pilot permission.
+- Maps to: H4, H5.
 
-### S-ACAD-008 — Özokcu & Özdemir (2026), Türkiye university-cafeteria plate-waste drivers
-- Article: https://link.springer.com/article/10.1007/s44274-025-00509-y
-- Use: Turkey-specific evidence that portion size, taste/palatability and other situational factors matter for plate waste.
-- Boundary: plate-waste drivers do not prove overproduction is the dominant local cause.
+## Measurement/public guidance expansion
 
-### S-INT-004 — TEMAŞ contractor-side PMR branch
-- Branch: `research/kreate-contractor-gtm-clean-20261005`
-- Use: contractor-role, economic-beneficiary and repeatability question backlog.
-- Rule: stale/internal synthesis; selectively salvage and reverify. Do not treat public company material as contractor validation.
+### S-MEAS-004 — Prevent Wasted Food Through Source Reduction
+- Type: STANDARD
+- Publisher: U.S. EPA
+- URL: https://www.epa.gov/sustainable-management-food/prevent-wasted-food-through-source-reduction
+- Use: upstream prevention concepts and intervention framing.
+- Boundary: does not establish local causal effect or savings.
+- Maps to: H2, H6.
 
-### S-INT-005 — Issue #292: BUCard/SKS aggregate service-truth acquisition
-- URL: https://github.com/yasinkaya701/bouncampus/issues/292
-- Use: current cross-role dependency for privacy-preserving `campus × meal-period × service-date` service truth and semantic reconciliation.
-- Boundary: the verified dataset is not yet present; generated rows cannot substitute for it.
-- CS1 intake when a real artifact arrives: `scripts/cs1_service_truth_artifact_intake.py`.
+### S-MEAS-005 — Resources for Assessing Wasted Food
+- Type: STANDARD
+- Publisher: U.S. EPA
+- URL: https://www.epa.gov/sustainable-management-food/resources-assessing-wasted-food
+- Use: measurement and audit resource index.
+- Boundary: does not establish site-specific measurement validity.
+- Maps to: H4.
+
+## Academic mechanism expansion
+
+### S-ACAD-007 — Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste
+- Type: ACADEMIC
+- Publisher: Journal of Cleaner Production
+- URL: https://www.sciencedirect.com/science/article/pii/S0959652623044232
+- Use: multi-site catering forecasting precedent; surplus versus unmet-demand trade-off.
+- Boundary: reported study/model effects do not transfer to BOUNCAMPUS.
+- Maps to: H2, H3, H6.
+
+### S-ACAD-008 — Understanding drivers of consumer level food waste in a university cafeteria
+- Type: ACADEMIC
+- Publisher: Springer Nature
+- URL: https://link.springer.com/article/10.1007/s44274-025-00509-y
+- Use: alternative consumer and meal-level waste drivers.
+- Boundary: does not show the same drivers dominate Boğaziçi.
+- Maps to: H2.
+
+### S-ACAD-009 — Higher-education food-waste intervention systematic review
+- Type: ACADEMIC
+- Publisher: ScienceDirect
+- URL: https://www.sciencedirect.com/science/article/pii/S2772912524000538
+- Use: intervention landscape and context/evaluation heterogeneity.
+- Boundary: does not prove forecasting is the best local intervention.
+- Maps to: H2, H6.
+
+### S-ACAD-010 — University canteen portion and waste study
+- Type: ACADEMIC
+- Publisher: Sustainability (MDPI)
+- URL: https://www.mdpi.com/2071-1050/16/10/4317
+- Use: direct weighing/portion context; portioning as alternative waste mechanism.
+- Boundary: does not establish local prevalence or causality.
+- Maps to: H2, H4.
+
+### S-ACAD-011 — Machine-vision food-waste intervention in university cafeterias
+- Type: ACADEMIC
+- Publisher: Applied Sciences (MDPI)
+- URL: https://www.mdpi.com/2076-3417/15/9/5036
+- Use: automated vision comparison; privacy/design trade-off prompt.
+- Boundary: does not validate identity-heavy sensing for BOUNCAMPUS.
+- Maps to: H4, PRIVACY.
+
+### S-ACAD-012 — School catering forecasting and plate-tracking study
+- Type: ACADEMIC
+- Publisher: Resources, Conservation & Recycling
+- URL: https://www.sciencedirect.com/science/article/pii/S0921344921006066
+- Use: adjacent institutional serving-waste mechanism evidence.
+- Boundary: school-setting effect sizes and workflow do not automatically transfer to universities.
+- Maps to: H2, H4.
+
+## Cross-university workflow expansion
+
+### S-TR-005 — Yemekhane Rezervasyon Sistemi
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Recep Tayyip Erdoğan University
+- URL: https://sks.erdogan.edu.tr/tr/news-detail/yemekhane-rezervasyon-sistemi/4787
+- Use: reservation-before-production archetype; explicit cutoff/freeze-point interview prompt.
+- Boundary: does not establish Boğaziçi workflow.
+- Maps to: H1, H2, H3.
+
+### S-TR-006 — Yemekhane Rezervasyon Sistemi Duyurusu
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Kayseri University
+- URL: https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu
+- Use: current multi-campus reservation-led planning archetype.
+- Boundary: does not establish local buyer economics or demand.
+- Maps to: H1, H2, H3.
+
+### S-TR-007 — Beslenme hizmetleri ve rezervasyon sistemi bilgilendirmesi
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Afyonkarahisar Health Sciences University
+- URL: https://skultur.afsu.edu.tr/ogrenciye-beslenme-hizmetleri-ve-rezervasyon-sistemi-hakkinda-bilgilendirme-yapildi/
+- Use: weekly reservation/planning archetype; resource-efficiency rationale.
+- Boundary: does not prove the same workflow is suitable at Boğaziçi.
+- Maps to: H1, H2, H6.
+
+### S-TR-008 — Beslenme Olanakları
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Anadolu University
+- URL: https://abp.anadolu.edu.tr/tr/ogrenci/beslenmeolanaklari
+- Use: large-scale dining/reservation context; comparative PMR target.
+- Boundary: does not establish decision rights, forecast error or adoption.
+- Maps to: H1, H4, H5.
+
+### S-TR-009 — MyMeal
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Altınbaş University
+- URL: https://software.altinbas.edu.tr/mymeal/index_tr.html
+- Use: university-developed reservation/tracking alternative.
+- Boundary: does not prove forecasting or waste-causality capability.
+- Maps to: H6, COMPETITION.
+
+### S-TR-010 — Akıllı Kampüs Projesi Ara Raporu
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: İzmir Bakırçay University
+- URL: https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf
+- Use: cafeteria utilization and food-purchasing planning precedent; course/reservation/occupancy signal integration precedent.
+- Boundary: does not establish current architecture, transferability or customer requirement.
+- Maps to: H2, H4, COMPETITION.
+
+## Competitor expansion
+
+### S-COMP-005 — Winnow and Hilton announce Winnow Foresight
+- Type: VENDOR
+- Publisher: Winnow
+- URL: https://www.winnowsolutions.com/resources/news/winnow-and-hilton-announce-winnow-foresight-a-mobile-first-ai-powered-forecasting-tool-designed-to-predict-kitchen-demand-and-prevent-food-waste
+- Use: current Sep 2026 AI production-forecasting positioning.
+- Boundary: vendor claim; not independent performance or university/Türkiye fit.
+- Maps to: H6, COMPETITION.
+
+### S-COMP-006 — Food Waste Tracking
+- Type: VENDOR
+- Publisher: Leanpath
+- URL: https://www.leanpath.com/products/food-waste-tracking/
+- Use: current measurement/analytics capability reference.
+- Boundary: does not prove it solves the target pre-freeze decision.
+- Maps to: COMPETITION.
+
+## Privacy / data-governance expansion
+
+### S-PRIV-001 — General Principles in Processing of Personal Data
+- Type: PRIVACY_GUIDANCE
+- Publisher: KVKK
+- URL: https://www.kvkk.gov.tr/Icerik/6606/General-Principles-in-Processing-of-Personal-Data
+- Use: data-minimization and proportionality design boundary.
+- Boundary: not legal advice and not deployment approval.
+- Maps to: H4, H6, PRIVACY.
+
+### S-PRIV-002 — Obligation to inform
+- Type: PRIVACY_GUIDANCE
+- Publisher: KVKK
+- URL: https://www.kvkk.gov.tr/Icerik/6641/Obligation-to-inform
+- Use: deployment privacy-checklist input.
+- Boundary: does not establish that a particular notice/process is sufficient.
+- Maps to: H4, H6, PRIVACY.
+
+### S-PRIV-003 — KVKK Decision 2020/212
+- Type: PRIVACY_GUIDANCE
+- Publisher: KVKK
+- URL: https://www.kvkk.gov.tr/Icerik/6892/2020-212
+- Use: camera/audio proportionality design reference.
+- Boundary: does not approve TrayGate or a campus-camera setup.
+- Maps to: H4, PRIVACY.
+
+### S-PRIV-004 — Guideline on Considerations in the Processing of Biometric Data
+- Type: PRIVACY_GUIDANCE
+- Publisher: KVKK
+- URL: https://www.kvkk.gov.tr/Icerik/7462/Guideline-on-Considerations-in-The-Processing-of-Biometric-Data
+- Use: supports avoiding biometric shortcuts when aggregate signals suffice.
+- Boundary: not a legal opinion for a particular institution.
+- Maps to: H4, PRIVACY.
