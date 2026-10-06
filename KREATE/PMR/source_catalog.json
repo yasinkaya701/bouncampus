@@ -111,7 +111,9 @@
       ],
       "assets": {
         "official_2025_xlsx": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx"
-      }
+      },
+      "local_snapshot": "KREATE/PMR/data/bogazici_food_waste_public_snapshot.csv",
+      "data_quality_note": "The page states delivered-to-İSTAÇ waste is included in total food waste, yet August reports 1,502 kg total vs 3,550 kg delivered and October reports 1,334 kg total vs 4,850 kg delivered. Preserve published values and reconcile with the source owner."
     },
     {
       "id": "S-BU-003",
@@ -1128,7 +1130,9 @@
       "limitations": [
         "aggregate reporting is not service truth",
         "does not establish waste cause or intervention effect"
-      ]
+      ],
+      "local_snapshot": "KREATE/PMR/data/bogazici_food_waste_public_snapshot.csv",
+      "data_quality_note": "The 12 published 2024 monthly Total Food Waste rows sum to 50,994 kg while the same official page/PDF prints 50,993 kg. Preserve both as published; do not repair silently."
     },
     {
       "id": "S-POL-001",
@@ -1230,6 +1234,65 @@
       ],
       "limitations": [
         "does not establish any Boğaziçi-specific causal share"
+      ]
+    },
+    {
+      "id": "S-ACAD-015",
+      "title": "Food waste management: an example from university refectory",
+      "type": "ACADEMIC",
+      "publisher": "British Food Journal",
+      "url": "https://doi.org/10.1108/BFJ-09-2020-0802",
+      "doi": "10.1108/BFJ-09-2020-0802",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "Türkiye university plate-waste mechanism and awareness context"
+      ],
+      "limitations": [
+        "plate-waste evidence is not production-surplus or forecast-error causality"
+      ]
+    },
+    {
+      "id": "S-ACAD-016",
+      "title": "Determination of the Amount of Food Waste and Improving Meals to Reduce Food Waste in the University Refectory",
+      "type": "ACADEMIC",
+      "publisher": "Aydın Gastronomy",
+      "url": "https://dergipark.org.tr/tr/pub/aydingas/article/1503134",
+      "asset_url": "https://dergipark.org.tr/tr/download/article-file/4013917",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "university-refectory food-waste measurement and meal-improvement intervention context"
+      ],
+      "limitations": [
+        "site-specific result; use as alternative-cause/falsification pressure, not Boğaziçi causal evidence"
+      ]
+    },
+    {
+      "id": "S-ACAD-017",
+      "title": "Food waste reduction and its environmental consequences: a quasi-experimental study in a campus canteen",
+      "type": "ACADEMIC",
+      "publisher": "Agriculture & Food Security",
+      "url": "https://link.springer.com/article/10.1186/s40066-024-00488-y",
+      "doi": "10.1186/s40066-024-00488-y",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "direct campus-canteen waste measurement",
+        "taste, food quality, portion size and menu variety as alternative waste causes"
+      ],
+      "limitations": [
+        "different campus/intervention; does not establish Boğaziçi waste-stage causal mix"
       ]
     }
   ],

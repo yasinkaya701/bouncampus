@@ -473,3 +473,28 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - Use: supports avoiding biometric shortcuts when aggregate signals suffice.
 - Boundary: not a legal opinion for a particular institution.
 - Maps to: H4, PRIVACY.
+
+## Additional H2 falsification sources
+
+### S-ACAD-015 — Food waste management: an example from university refectory
+- Type: peer-reviewed academic
+- DOI: https://doi.org/10.1108/BFJ-09-2020-0802
+- Use: Türkiye university plate-waste / awareness mechanism.
+- Boundary: plate waste is not production-surplus or forecast-error evidence.
+- Maps to: H2.
+
+### S-ACAD-016 — University refectory food-waste / meal-improvement study
+- Type: peer-reviewed academic
+- Article: https://dergipark.org.tr/tr/pub/aydingas/article/1503134
+- PDF: https://dergipark.org.tr/tr/download/article-file/4013917
+- Use: food-waste measurement plus meal-improvement intervention context.
+- Boundary: site-specific; not Boğaziçi PMR/pilot evidence.
+- Maps to: H2.
+
+### S-ACAD-017 — Fatemi et al. campus-canteen quasi-experiment
+- Type: peer-reviewed open-access academic
+- Article: https://link.springer.com/article/10.1186/s40066-024-00488-y
+- DOI: https://doi.org/10.1186/s40066-024-00488-y
+- Use: direct measurement and evidence that taste, food quality, portion size and menu variety can materially drive waste.
+- Boundary: different campus/intervention; does not establish Boğaziçi causal mix.
+- Maps to: H2.

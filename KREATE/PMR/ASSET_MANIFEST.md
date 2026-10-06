@@ -48,6 +48,8 @@ Statuses:
 | A-022 | Türkiye national food loss/waste strategy | https://faolex.fao.org/docs/pdf/tur209489.pdf | PDF | LINK_ONLY | Official policy archive/reference | National policy context |
 | A-023 | UI GreenMetric Guideline 2026 | https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf | PDF | LINK_ONLY | First-party guideline; keep as external reference | Sustainability-evidence / governance context |
 
+| A-024 | University refectory food-waste / meal-improvement article | https://dergipark.org.tr/tr/download/article-file/4013917 | PDF | LINK_ONLY | Academic PDF; preserve article/journal provenance and verify reuse terms before copying | H2 falsification / intervention reference |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
