@@ -23,6 +23,10 @@ Source IDs resolve through [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) and [source_ca
 | **Buyer will pay because meal volume/waste is large** | **Unsupported.** Public scale and procurement context alone cannot prove WTP. | S-BU-001, S-BU-002 | Economic beneficiary, budget owner, procurement friction or price. | Contract/economic-buyer interview; current software/process cost and purchase criteria. |
 | **Model performance should be the next priority** | **Not yet.** Literature shows many candidate methods; the main uncertainty remains the reachable decision and truth data. | S-ACAD-001…S-ACAD-006, S-INT-001 | Local usefulness. | Resolve H1–H5 and obtain real chronological service labels first. |
 
+
+| **Published aggregate waste fields are clean service truth** | **Unsupported.** The public monthly series is aggregate and the 2025 table contains internally unreconciled field semantics in at least August/October. | S-BU-002, S-BU-009 | A corrected accounting identity, campus×meal labels, waste stage or causal mechanism. | Preserve published values; obtain source-owner data dictionary/field semantics through #292 before operational use. |
+| **Policy/sustainability context implies a buyer** | Türkiye food-waste policy/guidance and UI GreenMetric make prevention, measurement and evidence institutionally legible. | S-POL-001, S-POL-002, S-POL-003 | Budget, buyer authority, ranking effect, willingness to pay or procurement path. | Interview economic buyer/approver and contract/procurement owner. |
+
 ## Promotion rule
 
 A row moves from **secondary-supported hypothesis** to **PMR-supported/contradicted** only when:

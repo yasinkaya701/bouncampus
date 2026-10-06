@@ -9,7 +9,8 @@
     "ACADEMIC",
     "VENDOR",
     "INTERNAL_PROVENANCE",
-    "PRIVACY_GUIDANCE"
+    "PRIVACY_GUIDANCE",
+    "OFFICIAL_POLICY"
   ],
   "sources": [
     {
@@ -105,8 +106,12 @@
         "public aggregate food-waste context"
       ],
       "limitations": [
-        "does not establish waste stage or causal mechanism"
-      ]
+        "does not establish waste stage or causal mechanism",
+        "2025 public monthly table contains unreconciled field semantics: August and October delivered-to-ISTAC values exceed displayed monthly total; preserve published values and reconcile with source owner"
+      ],
+      "assets": {
+        "official_2025_xlsx": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx"
+      }
     },
     {
       "id": "S-BU-003",
@@ -1099,6 +1104,133 @@
       ],
       "accessed_at": "2026-10-06",
       "license_note": "link/reference only unless reuse terms are separately verified"
+    },
+    {
+      "id": "S-BU-009",
+      "title": "Boğaziçi Impact - Campus Food Waste Tracking (historical)",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "assets": {
+        "pdf_2024": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf",
+        "pdf_2023": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf"
+      },
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "historical aggregate food-waste context",
+        "cross-year public reporting trail"
+      ],
+      "limitations": [
+        "aggregate reporting is not service truth",
+        "does not establish waste cause or intervention effect"
+      ]
+    },
+    {
+      "id": "S-POL-001",
+      "title": "Türkiye food-service food-waste prevention guide",
+      "type": "OFFICIAL_POLICY",
+      "publisher": "Republic of Türkiye Ministry of Agriculture and Forestry / FAO / Metro Türkiye",
+      "url": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "Türkiye-specific food-service prevention and measurement context"
+      ],
+      "limitations": [
+        "does not establish Boğaziçi root cause, workflow or project impact"
+      ]
+    },
+    {
+      "id": "S-POL-002",
+      "title": "Türkiye national strategy on prevention, reduction and monitoring of food loss and waste",
+      "type": "OFFICIAL_POLICY",
+      "publisher": "Republic of Türkiye Ministry of Agriculture and Forestry / FAOLEX",
+      "url": "https://faolex.fao.org/docs/pdf/tur209489.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "official_policy_archive",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "WHY_NOW"
+      ],
+      "supports": [
+        "national prevention, reduction and monitoring policy context"
+      ],
+      "limitations": [
+        "does not establish local causal mechanism, buyer intent or BOUNCAMPUS impact"
+      ]
+    },
+    {
+      "id": "S-POL-003",
+      "title": "UI GreenMetric Sustainable University Rankings Guideline 2026",
+      "type": "OFFICIAL_POLICY",
+      "publisher": "UI GreenMetric / Universitas Indonesia",
+      "url": "https://uigreenmetric.com/resources/university/guidelines/2026/english",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_standard_body",
+      "assets": {
+        "pdf": "https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf"
+      },
+      "hypotheses": [
+        "WHY_NOW"
+      ],
+      "supports": [
+        "2026 sustainability evidence, waste, governance and digitalization context"
+      ],
+      "limitations": [
+        "does not prove willingness to buy",
+        "does not prove ranking improvement from BOUNCAMPUS"
+      ]
+    },
+    {
+      "id": "S-ACAD-013",
+      "title": "Food Waste Management Practices and Barriers to Progress in U.S. University Foodservice",
+      "type": "ACADEMIC",
+      "publisher": "International Journal of Environmental Research and Public Health",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9180560/",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "university foodservice demand-forecasting, smaller-batch and measurement-practice context"
+      ],
+      "limitations": [
+        "U.S. sample does not establish Boğaziçi practice or priorities"
+      ]
+    },
+    {
+      "id": "S-ACAD-014",
+      "title": "Systematic literature review of food waste in educational institutions",
+      "type": "ACADEMIC",
+      "publisher": "International Journal of Contemporary Hospitality Management",
+      "url": "https://doi.org/10.1108/IJCHM-07-2020-0672",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "multi-causal educational food-waste framing and alternative-cause pressure"
+      ],
+      "limitations": [
+        "does not establish any Boğaziçi-specific causal share"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
