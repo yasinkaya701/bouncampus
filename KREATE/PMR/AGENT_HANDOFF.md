@@ -131,3 +131,34 @@ The research base is now strong enough that more generic browsing has low inform
 - identifies a directly relevant current incumbent.
 
 Otherwise, effort should move to real PMR.
+
+
+## Contract / operations handoff — 2026-10-06
+
+The public procurement surface is now anchored by **S-PROC-001 (IKN 2025/1727143)** and the operational routing layer by **S-BU-010, S-BU-011, S-BU-014, S-BU-015**.
+
+**IE**
+- route Food Services → control organization → TEMAŞ local operations → BUCard/report owner → procurement/acceptance;
+- obtain one recent-service workflow before asking hypothetical product questions;
+- own retrieval/status of technical/admin specs and hakediş/acceptance semantics.
+
+**CS1**
+- use S-BU-015 as a reason to fail closed on unreconciled BUCard/passages, not as evidence an export exists;
+- candidate public features S-BU-013 / S-BU-018 / S-BU-019 remain features only after timing/version checks.
+
+**CS2**
+- may state a current public contractor/procurement surface exists;
+- must not infer unit economics, buyer incentive, WTP or savings from headline contract value.
+
+**EE/EHB**
+- do not interpret contract scope as proof a new sensor is required;
+- measurement hardware remains subordinate to stage-separated truth need.
+
+See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md), and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Integration discipline
+
+Feature integration path: `agent/ie/* → role/ie-customer-discovery → master`.
+
+Do not bypass the role lane for PMR research deltas. After a feature PR merges into the role branch and exact-head checks pass, refresh the role against current master if necessary, then use the role→master integration PR.

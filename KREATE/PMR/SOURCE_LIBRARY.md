@@ -498,3 +498,32 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - Use: direct measurement and evidence that taste, food quality, portion size and menu variety can materially drive waste.
 - Boundary: different campus/intervention; does not establish Boğaziçi causal mix.
 - Maps to: H2.
+
+
+## Contract, operational routing and source-surface expansion — 2026-10-06
+
+### Public operational routing
+
+- **S-BU-010** — Food Services contact page. Use for official access routing only.
+- **S-BU-011** — Food Services staff page. Use to identify role surfaces; titles are not proof of decision ownership.
+- **S-BU-014** — official dining cooking/distribution control organization. High-value target for acceptance/control workflow PMR.
+- **S-BU-015** — Food Services FAQ. BUCard correction troubleshooting is tied to date/time/campus/turnstile context; strengthens the need for semantic reconciliation under #292.
+- **S-BU-016** — campus/service windows. Context feature/topology, not demand.
+- **S-BU-013** — authenticated BUCampus weekly menu-preference survey. Preference intent, not served demand.
+- **S-BU-018 / S-BU-019** — event/calendar context candidates; preserve decision-time snapshots.
+- **S-BU-017** — daily meal-support entitlement workflow; entitlement is not pickup/served demand.
+- **S-BU-012** — sustainability and meal-service context.
+
+### Public procurement
+
+- **S-PROC-001** — current 2026–2027 Boğaziçi food-service procurement, IKN 2025/1727143. Public result context identifies current contractor and headline scope/quantities; retrieve authoritative EKAP documents before clause-level claims.
+- **S-PROC-002** — cancelled predecessor IKN 2025/1335958. Use only to locate changed specifications and ask which clauses matter; do not infer a technology/waste cause.
+
+### Additional method / measurement / falsification
+
+- **S-PMR-006** — YC user-interview method reference.
+- **S-MEAS-006…008** — regulatory/sector food-service measurement and operations context.
+- **S-ACAD-018** — machine-vision waste-recognition precedent; no local camera/mass/privacy transfer.
+- **S-ACAD-019** — institutional catering intervention evidence; no local causal transfer.
+
+Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
