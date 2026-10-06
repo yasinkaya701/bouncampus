@@ -34,6 +34,19 @@ The repository now has:
 - competitor evidence showing generic “AI demand forecasting” and broad waste dashboards are not defensible novelty claims;
 - a provenance-first PMR source catalog and claim firewall.
 
+### Source-backed owner/process narrowing — 2026-10-06
+
+First-party Boğaziçi sources now narrow several routes:
+
+- `S-BU-021`: BUCard is a BİDB service; cafeteria card services span SKS + BİDB; turnstile/card-reader support routes to BİDB.
+- `S-BU-023`: BUCampus exposes a user-facing turnstile/card-reader passage-history surface.
+- `S-BU-026`: Procurement branch is the source-backed tender/specification route.
+- `S-BU-014`: current Dining Cooking/Distribution Control Organization roster; Aygül Demir is a principal member.
+- `S-BU-030`: 2025 Administration Activity Report supports Control Organization review → KİK56.0/H → relevant Spending Authority → hakediş preparation.
+- `S-BU-027`: Tahakkuk branch explicitly handles hakediş payments.
+
+This reduces routing uncertainty only. Export access, exact food-contract Spending Authority, payable count, current unit-price schedule, quantity freeze and economic-risk allocation remain unverified.
+
 ### Still unknown and promotion-blocking
 
 The following remain **UNKNOWN** until primary evidence exists:
@@ -65,7 +78,7 @@ For one recent meal service, reconstruct this chain with names/roles and timesta
 | Replenishment | Can a later batch / substitute menu recover a shortage? | recent incident and lead time | UNKNOWN |
 | Service count | Which record represents served demand? | BUCard/turnstile/QR report + correction semantics | UNKNOWN; see #292 |
 | Surplus / waste | Which record separates edible surplus, prep loss and plate waste? | scale log / disposal form / manual sheet | UNKNOWN |
-| Acceptance | Which record is accepted for contract performance? | acceptance / control / hakediş document | UNKNOWN; see #358 |
+| Acceptance | Which record is accepted for contract performance? | acceptance / control / hakediş document | PARTLY NARROWED: KİK56.0/H → Spending Authority workflow known; exact food-contract fields/count remain UNKNOWN; see #358 |
 | Settlement | Which quantity drives payment? | unit-price schedule + hakediş rule | UNKNOWN |
 | Override | Who may reject a recommendation and why? | authority chain + recent override example | UNKNOWN |
 
@@ -90,7 +103,7 @@ Keep these roles separate even if one person eventually fills multiple roles.
 | Economic beneficiary | Captures avoided cost / service benefit | UNKNOWN |
 | Economic buyer | Has budget/procurement authority | UNKNOWN |
 | Pilot approver | Can authorize a bounded test | UNKNOWN |
-| Data owner | Can provide required service-level record | UNKNOWN |
+| Data owner | Can provide required service-level record | BİDB/BUCard technical route source-backed; release/export authority still UNKNOWN |
 | Semantic owner | Can explain what fields/counts actually mean | UNKNOWN |
 | Veto holder | Can block for contract, food safety, privacy, IT or operations | UNKNOWN |
 
