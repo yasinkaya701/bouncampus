@@ -1,0 +1,63 @@
+{
+  "manifest_version": "DATA_PROVENANCE_V1",
+  "claim_boundary": "These repository datasets are historical generator outputs or derived sandbox fixtures. They are not measured operational truth, do not prove external-source accuracy or live access, and are ineligible as service-truth, measured benchmark, pilot-readiness, savings, or impact evidence.",
+  "historical_generator": {
+    "source_kind": "HISTORICAL_REPOSITORY_GENERATOR",
+    "introducing_commit": "ac6ebaa6bd6cb9dd3247ecec3e90ec6dfb946aef",
+    "historical_path": "backend/app/data/generator.py",
+    "current_archived_path": "legacy/backend/synthetic-training/generator.py",
+    "generation_type": "DETERMINISTIC_OR_SEEDED_SYNTHETIC_SANDBOX"
+  },
+  "datasets": {
+    "occupancy_history.csv": {
+      "evidence_class": "GENERATED_SANDBOX",
+      "method_eligibility": "SANDBOX_ONLY",
+      "measured_truth_eligible": false,
+      "service_truth_eligible": false,
+      "benchmark_eligible": false,
+      "source_kind": "HISTORICAL_REPOSITORY_GENERATOR",
+      "generation_semantics": "Repository-generated occupancy history derived from timetable/configuration inputs and generator assumptions rather than verified measured occupancy telemetry.",
+      "verified_operational_fields": []
+    },
+    "energy_consumption.csv": {
+      "evidence_class": "GENERATED_SANDBOX",
+      "method_eligibility": "SANDBOX_ONLY",
+      "measured_truth_eligible": false,
+      "service_truth_eligible": false,
+      "benchmark_eligible": false,
+      "source_kind": "HISTORICAL_REPOSITORY_GENERATOR",
+      "generation_semantics": "Repository-generated energy history produced from generator formulas and modeled campus context rather than a verified building-meter export.",
+      "verified_operational_fields": []
+    },
+    "cafeteria_sales.csv": {
+      "evidence_class": "GENERATED_SANDBOX",
+      "method_eligibility": "SANDBOX_ONLY",
+      "measured_truth_eligible": false,
+      "service_truth_eligible": false,
+      "benchmark_eligible": false,
+      "source_kind": "HISTORICAL_REPOSITORY_GENERATOR",
+      "generation_semantics": "Synthetic cafeteria rows generated from hard-coded base_demand by cafeteria and meal, a weekend multiplier, prepared approximately 1.15 * base_demand, sold = base_demand, and wasted = prepared - sold. This is not a verified POS, BUCard, serving-line, or reconciled served-meal export.",
+      "verified_operational_fields": []
+    },
+    "user_food_preferences.csv": {
+      "evidence_class": "GENERATED_SANDBOX",
+      "method_eligibility": "SANDBOX_ONLY",
+      "measured_truth_eligible": false,
+      "service_truth_eligible": false,
+      "benchmark_eligible": false,
+      "source_kind": "HISTORICAL_REPOSITORY_GENERATOR",
+      "generation_semantics": "Synthetic user/preference fixture generated for repository demonstration and model-development purposes; it is not an operational preference export or person-level evidence source.",
+      "verified_operational_fields": []
+    },
+    "weather_history.csv": {
+      "evidence_class": "GENERATED_SANDBOX",
+      "method_eligibility": "SANDBOX_ONLY",
+      "measured_truth_eligible": false,
+      "service_truth_eligible": false,
+      "benchmark_eligible": false,
+      "source_kind": "HISTORICAL_REPOSITORY_GENERATOR",
+      "generation_semantics": "Repository-generated weather history produced by the historical synthetic-data generator. It is not an immutable archived forecast snapshot and must not be used as decision-time forecast truth.",
+      "verified_operational_fields": []
+    }
+  }
+}
