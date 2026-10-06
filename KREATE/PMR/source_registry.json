@@ -33,7 +33,9 @@
       ],
       "artifact_type": "web",
       "use": "Official institutional food-waste and dining context.",
-      "does_not_prove": "Service-level causality, quantity decision rights, adoption or product-market fit."
+      "does_not_prove": "Service-level causality, quantity decision rights, adoption or product-market fit.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE/CS2"
     },
     {
       "id": "SRC-BU-002",
@@ -48,7 +50,9 @@
       ],
       "artifact_type": "xlsx",
       "use": "Official downloadable waste artifact linked from the university page.",
-      "does_not_prove": "Meal-level cause, waste-stage split or produced/served counts."
+      "does_not_prove": "Meal-level cause, waste-stage split or produced/served counts.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE/CS2"
     },
     {
       "id": "SRC-BU-003",
@@ -63,7 +67,9 @@
       ],
       "artifact_type": "pdf",
       "use": "Institutional sustainability context and source trail.",
-      "does_not_prove": "PMR, buyer authority or pilot permission."
+      "does_not_prove": "PMR, buyer authority or pilot permission.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE/CS2"
     },
     {
       "id": "SRC-BU-004",
@@ -77,7 +83,9 @@
       ],
       "artifact_type": "web",
       "use": "Canonical landing page for sustainability reports.",
-      "does_not_prove": "Any operational fact not explicitly documented."
+      "does_not_prove": "Any operational fact not explicitly documented.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE/CS2"
     },
     {
       "id": "SRC-BU-005",
@@ -91,7 +99,9 @@
       ],
       "artifact_type": "image",
       "use": "Visual context only.",
-      "does_not_prove": "Sensor feasibility, waste stage or queue geometry."
+      "does_not_prove": "Sensor feasibility, waste stage or queue geometry.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE/CS2"
     },
     {
       "id": "SRC-PMR-001",
@@ -110,7 +120,9 @@
       ],
       "artifact_type": "pdf",
       "use": "Primary-market-research method basis.",
-      "does_not_prove": "Any BOUNCAMPUS customer conclusion."
+      "does_not_prove": "Any BOUNCAMPUS customer conclusion.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-PMR-002",
@@ -129,7 +141,9 @@
       ],
       "artifact_type": "web",
       "use": "Current PMR guidance entry point.",
-      "does_not_prove": "Product-market fit."
+      "does_not_prove": "Product-market fit.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-PMR-003",
@@ -148,7 +162,9 @@
       ],
       "artifact_type": "web",
       "use": "Customer-research discipline.",
-      "does_not_prove": "A substitute for interviews."
+      "does_not_prove": "A substitute for interviews.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-PMR-004",
@@ -163,7 +179,9 @@
       ],
       "artifact_type": "web",
       "use": "Customer-first segmentation and venture framing.",
-      "does_not_prove": "Willingness to buy in this market."
+      "does_not_prove": "Willingness to buy in this market.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-MEAS-001",
@@ -178,7 +196,9 @@
       ],
       "artifact_type": "web",
       "use": "International food-waste measurement framework.",
-      "does_not_prove": "Local waste cause or site feasibility."
+      "does_not_prove": "Local waste cause or site feasibility.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "EE/CS2"
     },
     {
       "id": "SRC-MEAS-002",
@@ -192,7 +212,9 @@
       ],
       "artifact_type": "pdf",
       "use": "Direct methodology artifact.",
-      "does_not_prove": "Validated sensor accuracy or pilot outcome."
+      "does_not_prove": "Validated sensor accuracy or pilot outcome.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "EE/CS2"
     },
     {
       "id": "SRC-MEAS-003",
@@ -206,7 +228,9 @@
       ],
       "artifact_type": "web",
       "use": "Prevention/source-reduction hierarchy.",
-      "does_not_prove": "BOUNCAMPUS impact."
+      "does_not_prove": "BOUNCAMPUS impact.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "EE/CS2"
     },
     {
       "id": "SRC-MEAS-004",
@@ -221,7 +245,9 @@
       ],
       "artifact_type": "web",
       "use": "Operational prevention concepts.",
-      "does_not_prove": "Local causal effect or business case."
+      "does_not_prove": "Local causal effect or business case.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "EE/CS2"
     },
     {
       "id": "SRC-MEAS-005",
@@ -235,7 +261,9 @@
       ],
       "artifact_type": "web",
       "use": "Measurement/audit resource index.",
-      "does_not_prove": "Site-specific validity."
+      "does_not_prove": "Site-specific validity.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "EE/CS2"
     },
     {
       "id": "SRC-ACAD-001",
@@ -251,7 +279,9 @@
       ],
       "artifact_type": "paper",
       "use": "University dining demand features and ML precedent.",
-      "does_not_prove": "Transferable accuracy, savings or feature value at Boğaziçi."
+      "does_not_prove": "Transferable accuracy, savings or feature value at Boğaziçi.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-002",
@@ -268,7 +298,9 @@
       ],
       "artifact_type": "paper",
       "use": "Multi-site catering forecasting and demand/waste trade-off precedent.",
-      "does_not_prove": "Expected BOUNCAMPUS effect or local economics."
+      "does_not_prove": "Expected BOUNCAMPUS effect or local economics.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-003",
@@ -284,7 +316,9 @@
       ],
       "artifact_type": "paper",
       "use": "Reservation/show/no-show and asymmetric waste/shortage-cost precedent.",
-      "does_not_prove": "Boğaziçi process, costs or achievable reduction."
+      "does_not_prove": "Boğaziçi process, costs or achievable reduction.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-004",
@@ -299,7 +333,9 @@
       ],
       "artifact_type": "paper",
       "use": "Turkish institutional daily demand-forecasting precedent.",
-      "does_not_prove": "Novelty or current market demand."
+      "does_not_prove": "Novelty or current market demand.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-005",
@@ -315,7 +351,9 @@
       ],
       "artifact_type": "paper",
       "use": "Recent institutional turnstile-based forecasting comparison.",
-      "does_not_prove": "Boğaziçi data availability or model promotion."
+      "does_not_prove": "Boğaziçi data availability or model promotion.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-006",
@@ -330,7 +368,9 @@
       ],
       "artifact_type": "paper",
       "use": "Alternative consumer/meal-level food-waste drivers.",
-      "does_not_prove": "Same drivers dominate Boğaziçi."
+      "does_not_prove": "Same drivers dominate Boğaziçi.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-007",
@@ -346,7 +386,9 @@
       ],
       "artifact_type": "paper",
       "use": "Intervention landscape and evaluation heterogeneity.",
-      "does_not_prove": "Forecasting is the best local intervention."
+      "does_not_prove": "Forecasting is the best local intervention.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-008",
@@ -362,7 +404,9 @@
       ],
       "artifact_type": "paper",
       "use": "Direct weighing/portion context and alternative waste causes.",
-      "does_not_prove": "Local prevalence."
+      "does_not_prove": "Local prevalence.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-009",
@@ -378,7 +422,9 @@
       ],
       "artifact_type": "paper",
       "use": "Automated-vision comparison and privacy/design trade-off.",
-      "does_not_prove": "Identity-heavy sensing is appropriate for BOUNCAMPUS."
+      "does_not_prove": "Identity-heavy sensing is appropriate for BOUNCAMPUS.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-ACAD-010",
@@ -393,7 +439,9 @@
       ],
       "artifact_type": "paper",
       "use": "Adjacent institutional serving-waste evidence.",
-      "does_not_prove": "University transferability or expected effect."
+      "does_not_prove": "University transferability or expected effect.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS1/CS2"
     },
     {
       "id": "SRC-TGT-001",
@@ -410,7 +458,9 @@
       ],
       "artifact_type": "web",
       "use": "Mature second-site operating archetype and PMR target.",
-      "does_not_prove": "Unmet forecasting problem or willingness to buy."
+      "does_not_prove": "Unmet forecasting problem or willingness to buy.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-TGT-002",
@@ -426,7 +476,9 @@
       ],
       "artifact_type": "web",
       "use": "Reservation-before-production and freeze-point archetype.",
-      "does_not_prove": "Same process at Boğaziçi."
+      "does_not_prove": "Same process at Boğaziçi.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-TGT-003",
@@ -443,7 +495,9 @@
       ],
       "artifact_type": "web",
       "use": "Current reservation-led campus planning archetype.",
-      "does_not_prove": "Local economics or demand."
+      "does_not_prove": "Local economics or demand.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-TGT-004",
@@ -460,7 +514,9 @@
       ],
       "artifact_type": "web",
       "use": "Weekly reservation/planning archetype.",
-      "does_not_prove": "Same workflow is suitable elsewhere."
+      "does_not_prove": "Same workflow is suitable elsewhere.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-TGT-005",
@@ -476,7 +532,9 @@
       ],
       "artifact_type": "web",
       "use": "Large-scale dining/reservation context and comparative PMR target.",
-      "does_not_prove": "Decision rights, forecast error or adoption."
+      "does_not_prove": "Decision rights, forecast error or adoption.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-TGT-006",
@@ -491,7 +549,9 @@
       ],
       "artifact_type": "web",
       "use": "Existing university-developed meal reservation/tracking alternative.",
-      "does_not_prove": "Forecasting/waste causality or external deployment."
+      "does_not_prove": "Forecasting/waste causality or external deployment.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-TGT-007",
@@ -507,7 +567,9 @@
       ],
       "artifact_type": "pdf",
       "use": "Smart-campus food purchasing/utilization/occupancy planning precedent.",
-      "does_not_prove": "Current architecture, transferability or customer requirement."
+      "does_not_prove": "Current architecture, transferability or customer requirement.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "IE"
     },
     {
       "id": "SRC-COMP-001",
@@ -523,7 +585,9 @@
       ],
       "artifact_type": "web",
       "use": "Current vendor production-forecasting positioning; kills generic novelty claim.",
-      "does_not_prove": "Independent performance, university fit or Turkish procurement fit."
+      "does_not_prove": "Independent performance, university fit or Turkish procurement fit.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/IE"
     },
     {
       "id": "SRC-COMP-002",
@@ -538,7 +602,9 @@
       ],
       "artifact_type": "web",
       "use": "Vendor-described item-level production-plan workflow.",
-      "does_not_prove": "Equivalent capability in every segment."
+      "does_not_prove": "Equivalent capability in every segment.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/IE"
     },
     {
       "id": "SRC-COMP-003",
@@ -553,7 +619,9 @@
       ],
       "artifact_type": "web",
       "use": "Current university food-waste competitor reference.",
-      "does_not_prove": "Independent outcomes or exact feature gap."
+      "does_not_prove": "Independent outcomes or exact feature gap.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/IE"
     },
     {
       "id": "SRC-COMP-004",
@@ -567,7 +635,9 @@
       ],
       "artifact_type": "web",
       "use": "Current measurement/analytics capability reference.",
-      "does_not_prove": "Solves target pre-freeze decision."
+      "does_not_prove": "Solves target pre-freeze decision.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/IE"
     },
     {
       "id": "SRC-COMP-005",
@@ -582,7 +652,9 @@
       ],
       "artifact_type": "web",
       "use": "Turkish university sustainability/data/audit platform reference.",
-      "does_not_prove": "Daily food-production decision depth or preference for BOUNCAMPUS."
+      "does_not_prove": "Daily food-production decision depth or preference for BOUNCAMPUS.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/IE"
     },
     {
       "id": "SRC-PRIV-001",
@@ -598,7 +670,9 @@
       ],
       "artifact_type": "web",
       "use": "Data-minimization/proportionality design boundary.",
-      "does_not_prove": "Legal approval of a specific deployment."
+      "does_not_prove": "Legal approval of a specific deployment.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/EE"
     },
     {
       "id": "SRC-PRIV-002",
@@ -614,7 +688,9 @@
       ],
       "artifact_type": "web",
       "use": "Deployment privacy-checklist input.",
-      "does_not_prove": "A specific notice/process is sufficient."
+      "does_not_prove": "A specific notice/process is sufficient.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/EE"
     },
     {
       "id": "SRC-PRIV-003",
@@ -629,7 +705,9 @@
       ],
       "artifact_type": "web",
       "use": "Camera/audio proportionality design reference.",
-      "does_not_prove": "Approval of TrayGate or campus camera deployment."
+      "does_not_prove": "Approval of TrayGate or campus camera deployment.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/EE"
     },
     {
       "id": "SRC-PRIV-004",
@@ -644,7 +722,9 @@
       ],
       "artifact_type": "web",
       "use": "Avoid biometric shortcuts when aggregate signals suffice.",
-      "does_not_prove": "A legal opinion for a particular institution."
+      "does_not_prove": "A legal opinion for a particular institution.",
+      "verified_at": "2026-10-06",
+      "owner_lane": "CS2/EE"
     }
   ]
 }
