@@ -149,6 +149,16 @@ Useful first-party routes now in the catalog:
 
 These are **interview-routing evidence**, not proof that any named public role owns the specific decision.
 
+## First-party procurement-document route
+
+The official Boğaziçi **İdari ve Mali İşler Daire Başkanlığı** surface lists an **İhale ve Satınalma Şube Müdürlüğü** and provides the general route `imid@bogazici.edu.tr` / `0 (212) 359 70 89`.
+
+Source: `S-BU-026`.
+
+Use this as the first-party routing path for the authoritative IKN `2025/1727143` document bundle and the acceptance/hakediş owner. It does **not** establish that İMİD itself owns meal-production quantity, settlement semantics, software procurement authority or economic benefit.
+
+A 2026-10-06 indexed document search still surfaced the EKAP announcement/result and secondary tender mirrors rather than the current technical/admin specification text. Keep the current bundle in `RETRIEVAL_REQUIRED` until an authoritative artifact is actually received.
+
 ## Contract-PMR question set
 
 Ask for one recent concrete service first, then reconstruct the documents and decisions:
