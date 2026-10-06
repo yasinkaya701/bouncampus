@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "artifact": "CS2_RUBRIC_CLOSURE_INTERVIEW_PORTFOLIO",
+  "date": "2026-10-06",
+  "evidence_class": "EXECUTION_PLAN_NOT_INTERVIEW_EVIDENCE",
+  "observed_repository_state": {
+    "e_int_records": 0,
+    "interview_tracker_slots": 16,
+    "completed_interview_slots": 0,
+    "pmr_rubric_weight_percent": 40,
+    "ie_request_ready_workstreams": 2,
+    "ie_request_ready_is_primary_evidence": false
+  },
+  "non_duplication": {
+    "ie": [
+      "#292 service-truth/export/reconciliation",
+      "#358 contract/spec/hakedis/acceptance",
+      "recent-service operational reconstruction"
+    ],
+    "cs2": [
+      "product adoption threshold",
+      "buyer/pilot approval",
+      "switching friction",
+      "second-site repeatability"
+    ]
+  },
+  "cs2_slots": [
+    {
+      "id": "CS2-01",
+      "target": "actual decision user / approver",
+      "decision_test": "can and will a named operator act before freeze?",
+      "priority": 1
+    },
+    {
+      "id": "CS2-02",
+      "target": "economic buyer / pilot approver",
+      "decision_test": "is there a credible pilot and purchase path?",
+      "priority": 2
+    },
+    {
+      "id": "CS2-03",
+      "target": "contractor-side operations / adoption counterpart",
+      "decision_test": "where does the product enter workflow and incentives?",
+      "priority": 3
+    },
+    {
+      "id": "CS2-04",
+      "target": "second-site institutional dining operator/buyer",
+      "decision_test": "does the same product boundary repeat beyond Bogazici?",
+      "priority": 4
+    }
+  ],
+  "promotion_rule": "No PMR validation claim without a real completed interview artifact and narrow E-INT evidence row.",
+  "highest_priority": "CS2-01"
+}
