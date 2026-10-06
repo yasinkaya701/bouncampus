@@ -131,3 +131,11 @@ The research base is now strong enough that more generic browsing has low inform
 - identifies a directly relevant current incumbent.
 
 Otherwise, effort should move to real PMR.
+
+## 2026-10-06 cross-agent fan-in status
+
+Concurrent PMR branches/PRs were mined rather than wholesale merged. Unique source-level value from the broader PMR hub efforts was re-keyed into this canonical `S-*` catalog, including official Boğaziçi XLSX/PDF assets, historical public snapshots, cross-site reservation archetypes, additional academic falsifiers, policy/why-now material and KVKK privacy guidance.
+
+The repository now has one PMR source namespace on the IE lane. Do not reopen parallel `SRC-*` or `PMR-SRC-*` catalogs for the same sources; preserve old branch IDs only as provenance aliases when needed.
+
+The public 2024–2025 Boğaziçi snapshot under `KREATE/PMR/data/` is secondary aggregate context. Issue #292 remains the real service-level aggregate acquisition/reconciliation path and #82 remains the CS1 admission gate.
