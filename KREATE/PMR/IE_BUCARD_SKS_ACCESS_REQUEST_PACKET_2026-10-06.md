@@ -20,6 +20,15 @@ The request must stay aggregate. Do not request or retain student/staff identity
 
 Public source IDs supporting the routing hypothesis: `S-BU-021`, `S-BU-022`, `S-BU-023`. These sources do **not** prove export authorization or report semantics.
 
+### Verified technical routing details
+
+Public owner-routing evidence now supports:
+
+- `S-BU-021`: BUCard is a BİDB service; public contact route is `bucard@bogazici.edu.tr`; cafeteria top-up/refund spans SKS + BİDB; turnstile/card-reader support routes to BİDB.
+- `S-BU-023`: BUCampus exposes user-facing turnstile/card-reader passage history under **Geçişlerim**.
+
+This justifies asking BİDB which source system/report powers the passage history and whether it can generate an aggregate cafeteria-only export. It does **not** establish permission or exportability.
+
 ## Minimum aggregate export requested
 
 Preferred grain: exactly one row per:
