@@ -38,6 +38,8 @@ They must not be relabeled as customer validation, willingness to pay, Boğaziç
 | [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) | What secondary evidence supports, what it cannot establish, and the exact PMR gap |
 | [ASSET_MANIFEST.md](ASSET_MANIFEST.md) | PDF/image/data asset links, reuse status, provenance and repo-copy policy |
 | [AGENT_HANDOFF.md](AGENT_HANDOFF.md) | Cross-agent ownership, consumption and append rules |
+| [data/README.md](data/README.md) | Public snapshot semantics, limitations and source-quality warnings |
+| [data/bogazici_food_waste_public_snapshot.csv](data/bogazici_food_waste_public_snapshot.csv) | Verbatim 2024–2025 official monthly public data extract; not service truth |
 
 ## Stable source IDs
 
