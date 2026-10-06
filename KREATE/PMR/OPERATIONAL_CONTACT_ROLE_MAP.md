@@ -44,6 +44,35 @@ Issue **#292** remains the active acquisition lane.
 
 Do not use generic company contacts as evidence of the Boğaziçi account owner; ask Food Services/control/procurement participants for the correct local referral.
 
+### Procurement / contract document route
+
+- **S-BU-026 — İhale ve Satınalma Şube Müdürlüğü**
+  - official procurement/tender process route;
+  - current public manager: Bahadır Şahin;
+  - use: current IKN 2025/1727143 specification/document retrieval and procurement-process questions.
+- **S-BU-027 — Tahakkuk Şube Müdürlüğü**
+  - official branch states it performs hakediş payments;
+  - current public manager: Yakup Korkmaz;
+  - use: identify the payment package, required acceptance artifacts and payable-count source.
+- **S-BU-030 — 2025 Administration Activity Report**
+  - confirms Control Organization → KİK56.0/H → relevant Spending Authority → hakediş workflow.
+- **S-BU-014 — current Control Organization roster**
+  - Aygül Demir is publicly listed among principal members.
+  - This is a **routing fact only**. No interview is marked completed without real notes.
+
+### PMR referral sequence for #358
+
+~~~text
+Food Services / SKS
+→ current Dining Control Organization
+→ Procurement branch (specifications / tender documents)
+→ relevant Spending Authority
+→ Tahakkuk branch (hakediş payment package)
+→ TEMAŞ local operations / planning
+~~~
+
+Ask each person to identify the next artifact owner rather than assuming job titles equal decision ownership.
+
 ## Signal-owner map
 
 | Signal / artifact | Public clue | Actual owner/status |
@@ -57,7 +86,7 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
-| acceptance/hakediş | S-PROC-001 gives procurement route only | authoritative clause/report pending PMR |
+| acceptance/hakediş | S-BU-030 confirms KİK56.0/H → Spending Authority workflow; S-BU-027 is hakediş-payment route | payable count, exact food-contract Spending Authority and current clause semantics still pending #358 |
 | contractor production planning | S-PROC-001 identifies TEMAŞ | local owner/workflow pending PMR |
 
 ## Interview order
