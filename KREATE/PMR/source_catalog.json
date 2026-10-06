@@ -10,7 +10,8 @@
     "VENDOR",
     "INTERNAL_PROVENANCE",
     "PRIVACY_GUIDANCE",
-    "OFFICIAL_POLICY"
+    "OFFICIAL_POLICY",
+    "PUBLIC_PROCUREMENT"
   ],
   "sources": [
     {
@@ -1293,6 +1294,478 @@
       ],
       "limitations": [
         "different campus/intervention; does not establish Boğaziçi waste-stage causal mix"
+      ]
+    },
+    {
+      "id": "S-PMR-006",
+      "title": "How to Talk to Users",
+      "type": "PMR_METHOD",
+      "publisher": "Y Combinator",
+      "url": "https://www.ycombinator.com/library/6g-how-to-talk-to-users",
+      "accessed_at": "2026-10-06",
+      "authority": "methodology",
+      "hypotheses": [
+        "PMR_METHOD"
+      ],
+      "supports": [
+        "behavior-first customer interview discipline"
+      ],
+      "limitations": [
+        "method only; does not validate BOUNCAMPUS hypotheses"
+      ]
+    },
+    {
+      "id": "S-BU-010",
+      "title": "Food Services contact page",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/iletisim",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official Food Services office contact route"
+      ],
+      "limitations": [
+        "does not prove decision or buyer authority"
+      ]
+    },
+    {
+      "id": "S-BU-011",
+      "title": "Food Services staff page",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/people",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch-manager and office-staff role map"
+      ],
+      "limitations": [
+        "job title does not prove quantity/data/buyer ownership"
+      ]
+    },
+    {
+      "id": "S-BU-012",
+      "title": "Sustainable food choices on campus",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Institutional Data Management",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/233-sustainable-food-choices-on-campus/1313",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "campus-specific meal-service windows and sustainability/inspection context"
+      ],
+      "limitations": [
+        "does not reveal production quantity, forecast process or buyer intent"
+      ]
+    },
+    {
+      "id": "S-BU-013",
+      "title": "Boğaziçi Dining Menu Survey",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/menu-anketi",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "authenticated weekly BUCampus preference-signal workflow"
+      ],
+      "limitations": [
+        "preference intent is not attendance or served demand; exportability unverified"
+      ]
+    },
+    {
+      "id": "S-BU-014",
+      "title": "Dining cooking and distribution control organization",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://bogazici.edu.tr/tr/pages/universite-yonetim-kurulu-kurul-ve-komisyonla/246",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "H6"
+      ],
+      "supports": [
+        "official dining cooking/distribution control role surface"
+      ],
+      "limitations": [
+        "committee membership does not prove daily quantity or settlement authority"
+      ]
+    },
+    {
+      "id": "S-BU-015",
+      "title": "Food Services Frequently Asked Questions",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS"
+      ],
+      "supports": [
+        "BUCard correction/refund troubleshooting uses date/time/campus/turnstile context; BUCampus QR access exists"
+      ],
+      "limitations": [
+        "does not establish authoritative service-count report or export access"
+      ]
+    },
+    {
+      "id": "S-BU-016",
+      "title": "Food Services service windows",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/yemek-servislerimiz",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H4"
+      ],
+      "supports": [
+        "campus-by-meal-period service-window topology"
+      ],
+      "limitations": [
+        "schedule is context, not production quantity or service truth"
+      ]
+    },
+    {
+      "id": "S-BU-017",
+      "title": "BUBizden meal-support application",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Food Services",
+      "url": "https://yemekhane.bogazici.edu.tr/bubizden-uygulamasi",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "mobile-app entitlement workflow for one daily meal-support right"
+      ],
+      "limitations": [
+        "entitlement is not pickup or served demand"
+      ]
+    },
+    {
+      "id": "S-BU-018",
+      "title": "Student Events Calendar",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://takvim.bogazici.edu.tr/tr/events/students",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "known-ahead event calendar candidate"
+      ],
+      "limitations": [
+        "event listing does not establish attendance or causal demand effect"
+      ]
+    },
+    {
+      "id": "S-BU-019",
+      "title": "Academic Calendar 2026–2027",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "versioned term/exam/break/holiday artifact"
+      ],
+      "limitations": [
+        "calendar context is not demand causality"
+      ]
+    },
+    {
+      "id": "S-MEAS-006",
+      "title": "Sıfır Atık Yönetmeliği official announcement",
+      "type": "STANDARD",
+      "publisher": "Republic of Türkiye Ministry of Environment, Urbanization and Climate Change",
+      "url": "https://cygm.csb.gov.tr/sifir-atik-yonetmeligi-resmi-gazetede-yayimlanarak-yururluge-girmistir.-duyuru-383053",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "WHY_NOW"
+      ],
+      "supports": [
+        "Türkiye waste-management regulatory context"
+      ],
+      "limitations": [
+        "does not establish food-service causality or product need"
+      ]
+    },
+    {
+      "id": "S-MEAS-007",
+      "title": "Hospitality and Food Service guidance",
+      "type": "STANDARD",
+      "publisher": "WRAP",
+      "url": "https://www.wrap.ngo/resources/guide/hospitality-and-food-service",
+      "accessed_at": "2026-10-06",
+      "authority": "sector_guidance",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "food-service prevention/measurement/action guidance"
+      ],
+      "limitations": [
+        "not a Boğaziçi baseline or mandatory local standard"
+      ]
+    },
+    {
+      "id": "S-MEAS-008",
+      "title": "Food-service hygiene and good-practice guidance index",
+      "type": "STANDARD",
+      "publisher": "Republic of Türkiye Ministry of Agriculture and Forestry",
+      "url": "https://www.tarimorman.gov.tr/GKGM/Menu/132/",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H6",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "Türkiye food-service hygiene/good-practice guidance discovery"
+      ],
+      "limitations": [
+        "does not establish exact Boğaziçi/TEMAŞ process"
+      ]
+    },
+    {
+      "id": "S-ACAD-018",
+      "title": "Strategies for Automated Identification of Food Waste in University Cafeterias: A Machine Vision Recognition Approach",
+      "type": "ACADEMIC",
+      "publisher": "Applied Sciences",
+      "url": "https://doi.org/10.3390/app15095036",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H4",
+        "MEASUREMENT",
+        "PRIVACY"
+      ],
+      "supports": [
+        "machine-vision food-waste identification precedent"
+      ],
+      "limitations": [
+        "does not validate local geometry, privacy, mass estimation or TrayGate accuracy"
+      ]
+    },
+    {
+      "id": "S-ACAD-019",
+      "title": "Testing interventions to reduce food waste in school catering",
+      "type": "ACADEMIC",
+      "publisher": "Resources, Conservation and Recycling",
+      "url": "https://doi.org/10.1016/j.resconrec.2021.105997",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2",
+        "H6"
+      ],
+      "supports": [
+        "institutional-catering intervention evidence"
+      ],
+      "limitations": [
+        "does not transfer causal effect to Boğaziçi"
+      ]
+    },
+    {
+      "id": "S-PROC-001",
+      "title": "Boğaziçi University 2026–2027 food-service procurement — IKN 2025/1727143",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "EKAP-derived public tender mirror",
+      "url": "https://ekapveri.com/ihale/ekap-2025-1727143/",
+      "accessed_at": "2026-10-06",
+      "authority": "public_procurement_record_mirror",
+      "identifier": "IKN 2025/1727143",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "H6",
+        "CONTRACT",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "current two-year Boğaziçi food-service procurement scope and contractor discovery",
+        "public notice requires bidder capacity report sufficient for at least 5,000 meals/day (qualification threshold, not actual production)",
+        "public notice states economically most advantageous offer is determined on price basis",
+        "public result reports 14 bids, 7 valid bids, contract dated 25.12.2025 and TEMAŞ as contractor",
+        "public notice states bids are submitted as item quantity × unit price and the awarded contract is a unit-price contract",
+        "public notice describes 5,000 meals/day capacity as one-half of the administration's stated daily meal need for bidder qualification"
+      ],
+      "limitations": [
+        "does not reveal unit-price schedule, hakediş, penalties or service-level quantity mechanics",
+        "5,000 meals/day is a bidder qualification threshold, not evidence of actual daily production or committed quantity",
+        "unit-price contract form does not reveal the actual unit-price schedule or which operational count is accepted for payment",
+        "the notice's daily-need framing is procurement/capacity context, not measured actual served demand"
+      ],
+      "assets": {
+        "official_lookup": "https://ekap.kik.gov.tr/EKAP/",
+        "result_mirror": "https://www.ihaledetay.com/2025-1727143"
+      }
+    },
+    {
+      "id": "S-PROC-002",
+      "title": "Cancelled predecessor food-service procurement — IKN 2025/1335958",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "EKAP-derived public tender mirror",
+      "url": "https://ekapveri.com/ihale/ekap-2025-1335958/",
+      "accessed_at": "2026-10-06",
+      "authority": "public_procurement_record_mirror",
+      "identifier": "IKN 2025/1335958",
+      "hypotheses": [
+        "H5",
+        "H6",
+        "CONTRACT"
+      ],
+      "supports": [
+        "predecessor procurement cancellation after specification objections required changes"
+      ],
+      "limitations": [
+        "does not identify changed clauses or current contract interpretation"
+      ]
+    },
+    {
+      "id": "S-BU-020",
+      "title": "Boğaziçi University SDG 2 publication",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/18--yayin-20250910-094806.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "WHY_NOW"
+      ],
+      "supports": [
+        "institutional SDG2 / food sustainability reporting context"
+      ],
+      "limitations": [
+        "does not establish service-level waste causality, current operational workflow or product impact"
+      ]
+    },
+    {
+      "id": "S-INT-004",
+      "title": "TEMAŞ public-pain / PMR role-map stale research branch",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "bouncampus repository",
+      "url": "https://github.com/yasinkaya701/bouncampus/tree/research/kreate-contractor-gtm-clean-20261005",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_provenance",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "H6",
+        "CONTRACT"
+      ],
+      "supports": [
+        "historical contractor/role research source mine"
+      ],
+      "limitations": [
+        "stale internal synthesis; do not merge wholesale or treat as external authority"
+      ]
+    },
+    {
+      "id": "S-INT-005",
+      "title": "Issue #292 — privacy-preserving BUCard dining export + SKS reconciliation",
+      "type": "INTERNAL_PROVENANCE",
+      "publisher": "bouncampus repository",
+      "url": "https://github.com/yasinkaya701/bouncampus/issues/292",
+      "accessed_at": "2026-10-06",
+      "authority": "internal_work_item",
+      "hypotheses": [
+        "H4",
+        "ACCESS"
+      ],
+      "supports": [
+        "canonical live acquisition/reconciliation dependency"
+      ],
+      "limitations": [
+        "issue plan is not evidence that access or export exists"
+      ]
+    },
+    {
+      "id": "S-PROC-003",
+      "title": "Boğaziçi 2024–2025 food-service procurement — IKN 2023/1144278",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "EKAP-derived public tender mirror",
+      "url": "https://ekapveri.com/ihale/ekap-2023-1144278/",
+      "accessed_at": "2026-10-06",
+      "authority": "public_procurement_record_mirror",
+      "identifier": "IKN 2023/1144278",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "H6",
+        "CONTRACT",
+        "INCUMBENT"
+      ],
+      "supports": [
+        "historical two-year Boğaziçi food-service procurement; public result identifies TEMAŞ as contractor for 2024–2025",
+        "historical scope covers six campuses"
+      ],
+      "limitations": [
+        "historical contract terms cannot be assumed unchanged for 2026–2027",
+        "does not establish current unit prices, acceptance, penalties or quantity flexibility"
+      ]
+    },
+    {
+      "id": "S-PROC-004",
+      "title": "Archived KİK decision on Boğaziçi 2024–2025 food-service tender — 2023/UH.I-1542",
+      "type": "PUBLIC_PROCUREMENT",
+      "publisher": "Kamu İhale Kurulu decision archive mirror",
+      "url": "https://arsiv.kikkararlari.com/index.php?Itemid=9&id=74668&option=com_content&task=view",
+      "accessed_at": "2026-10-06",
+      "authority": "public_decision_archive_mirror",
+      "identifier": "2023/UH.I-1542",
+      "hypotheses": [
+        "H1",
+        "H6",
+        "CONTRACT",
+        "OPERATIONS"
+      ],
+      "supports": [
+        "historical technical-specification context: North Campus kitchen production, backup-kitchen continuity requirements and service topology were material contract topics"
+      ],
+      "limitations": [
+        "historical decision/clauses are not evidence that 2026–2027 technical specifications are identical; retrieve current EKAP documents before current-contract claims"
       ]
     }
   ],
