@@ -26,6 +26,18 @@ Execution consequence:
 - route procurement/payment-process artifact ownership in parallel to İdari ve Mali İşler;
 - keep payable quantity, exact signer sequence, freeze/change rights, penalties, economic beneficiary and software buyer authority unresolved until directly evidenced.
 
+## Source-backed current routing chain
+
+Current first-party routing is now:
+
+- `S-BU-026`: food-specific governance directive — Board + Inspection/Acceptance Commission for meal hakediş payment-order/accrual work.
+- `S-BU-027`: Procurement branch — current tender/specification acquisition route.
+- `S-BU-028`: Tahakkuk branch — institutional hakediş-payment route.
+- `S-BU-029`: IMID contact/routing surface.
+- `S-BU-030`: general acceptance workflow — Control Organization → KİK56.0/H → relevant Spending Authority → hakediş preparation.
+
+The unresolved task is to reconcile these formal surfaces using one real current food-service acceptance/hakediş package. Do not infer that any one branch alone owns the payable quantity or software-buying decision.
+
 ## Authoritative artifacts to retrieve
 
 Priority order:
