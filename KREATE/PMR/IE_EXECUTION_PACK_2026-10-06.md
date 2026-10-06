@@ -44,6 +44,7 @@ First-party Boğaziçi sources now narrow several routes:
 - `S-BU-014`: current Dining Cooking/Distribution Control Organization roster; Aygül Demir is a principal member.
 - `S-BU-030`: 2025 Administration Activity Report supports Control Organization review → KİK56.0/H → relevant Spending Authority → hakediş preparation.
 - `S-BU-027`: Tahakkuk branch explicitly handles hakediş payments.
+- `S-BU-031`: current Food Service Executive Board directive assigns dining BUCard operation/reporting/data retention to BUCard Office/BİDB and identifies the Food Service Executive Board + Inspection and Acceptance Commission as meal-hakediş process participants.
 
 This reduces routing uncertainty only. Export access, exact food-contract Spending Authority, payable count, current unit-price schedule, quantity freeze and economic-risk allocation remain unverified.
 
