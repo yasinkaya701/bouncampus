@@ -56,6 +56,8 @@ Statuses:
 
 | A-028 | Boğaziçi University 2025 Administration Activity Report | https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf | PDF | LINK_ONLY | Official university report; preserve exact URL/version | Control Organization, KİK56.0/H acceptance and hakediş routing evidence |
 
+| A-029 | Boğaziçi Food Service Executive Board directive | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf | PDF | LINK_ONLY | Official university directive; preserve exact version/URL | BUCard data custody, meal hakediş governance and procurement-route evidence |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
