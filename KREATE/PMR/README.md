@@ -19,6 +19,8 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
 10. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
 11. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
+12. [IE_EXECUTION_PACK_2026-10-06.md](IE_EXECUTION_PACK_2026-10-06.md) — IE decision-rights, incentive, buyer, data-handoff and acceptance-gate execution pack.
+13. [IE_PRIMARY_INTERVIEW_TARGETS_2026-10-06.md](IE_PRIMARY_INTERVIEW_TARGETS_2026-10-06.md) — four non-overlapping, falsifier-driven IE interview missions; planning only, not evidence.
 
 Relevant current-master research:
 - [../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md](../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md)
@@ -154,3 +156,7 @@ Public-data snapshots: [data/README.md](data/README.md) and [data/bogazici_food_
 - [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) — 2026–2027 procurement/TEMAŞ context and contract-PMR questions.
 
 - [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md) — Official routing surfaces for Food Services, control, BUCard and contractor PMR.
+
+Decision/pilot pre-registrations:
+- [../EXPERIMENTS/IE_DINING_DECISION_ECONOMICS_V1.md](../EXPERIMENTS/IE_DINING_DECISION_ECONOMICS_V1.md) — asymmetric surplus/shortage decision model with evidence and abstention boundaries.
+- [../EXPERIMENTS/IE_DINING_PILOT_PROTOCOL_V1.md](../EXPERIMENTS/IE_DINING_PILOT_PROTOCOL_V1.md) — stage-specific waste KPI, service guardrails, matched/blocked pilot design and claim firewall.
