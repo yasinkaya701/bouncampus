@@ -13,6 +13,7 @@ At this base:
 
 - `KREATE/EVIDENCE.md` contains no `E-INT-*` interview evidence IDs.
 - `KREATE/PMR/INTERVIEW_TRACKER.md` still has all 16 target slots in `TODO`.
+- IE's canonical acquisition tracker is now `REQUEST_READY` for #292/#358, but prepared request routes are not completed outreach, interviews, export access, or primary evidence.
 - Public waste, procurement, competitor and workflow research cannot substitute for customer/problem/persona evidence.
 - Technical prototypes and pilot protocols cannot establish adoption, willingness to pay, buyer identity or workflow fit.
 - The KREATE rubric assigns **40%** to PMR, making real interview evidence the highest-leverage remaining application input.
