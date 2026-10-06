@@ -36,6 +36,18 @@ This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB
 
 Issue **#292** remains the active acquisition lane.
 
+### Procurement, payment and acceptance chain
+
+- **S-BU-026:** current Food Services governance directive narrows the institutional process: meal hakediş payment-order/accrual work is carried out by the Food Services Board together with the Muayene Kabul Komisyonu; meal-service procurement is routed through SKS + İMİD.
+- **S-BU-027:** official İhale ve Satınalma unit — authoritative procurement/tender-document routing.
+- **S-BU-028:** official Tahakkuk unit — first-party payment/hakediş processing route.
+- **S-BU-029:** official İMİD contact surface — fallback institutional routing.
+- **S-BU-030:** 2025 Administration Activity Report — Control Organization performs preliminary service acceptance, prepares KİK56.0/H, and submits it to the relevant Spending Authority for hakediş preparation.
+
+Interview/acquisition objective: identify the **exact food-contract Spending Authority**, actual hakediş artifact, payable/accepted quantity basis, and who can change production/allocation before the operational freeze.
+
+Do not promote this institutional chain into a claim that any one unit is the software buyer, savings beneficiary, quantity owner or final contract signatory.
+
 ### TEMAŞ contractor operations
 
 - Procurement anchor: `S-PROC-001`
@@ -57,7 +69,7 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
-| acceptance/hakediş | S-PROC-001 gives procurement route only | authoritative clause/report pending PMR |
+| acceptance/hakediş | S-BU-026, S-BU-028, S-BU-030 narrow governance/payment/acceptance routing | exact food-contract Spending Authority + payable quantity + actual hakediş artifact pending #358 |
 | contractor production planning | S-PROC-001 identifies TEMAŞ | local owner/workflow pending PMR |
 
 ## Interview order
