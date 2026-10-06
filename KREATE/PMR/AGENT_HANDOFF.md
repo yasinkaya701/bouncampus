@@ -187,3 +187,13 @@ New owner-routing evidence is canonical:
 
 **EE/EHB**
 - passage-event evidence reduces pressure for premature sensing; new hardware still requires a demonstrated measurement gap.
+
+
+### #358 workflow narrowing
+
+Official university evidence now supports:
+`Control Organization → KİK56.0/H → relevant Spending Authority → hakediş preparation` (S-BU-030), with Tahakkuk as a source-backed institutional hakediş-payment route (S-BU-027).
+
+Do not call the remaining contract question solved. The **payable operational count**, exact food-contract Spending Authority, current unit-price schedule, penalty/correction rules, and production freeze remain unresolved.
+
+Aygül Demir is source-backed as a current principal member of the dining control organization (S-BU-014). This makes her a high-value interview route, but there is currently **no repo evidence of a completed interview**, so INTERVIEW_TRACKER remains unchanged.
