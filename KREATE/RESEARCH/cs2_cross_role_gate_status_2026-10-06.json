@@ -28,7 +28,8 @@
         292
       ],
       "status": "OPEN_EXTERNAL",
-      "unlocks": "privacy-minimized aggregate service data path"
+      "unlocks": "privacy-minimized aggregate service data path",
+      "route_progress": "NAMED_FIRST_PARTY_REPORT_SURFACES_IDENTIFIED__EXPORT_SCHEMA_GRAIN_FINALITY_AND_PERMISSION_STILL_REQUIRED"
     },
     {
       "id": "EA-03",
@@ -42,7 +43,8 @@
         82
       ],
       "status": "OPEN_EXTERNAL",
-      "unlocks": "eligible target/service truth"
+      "unlocks": "eligible target/service truth",
+      "route_progress": "REPORT_SURFACES_IDENTIFIED__REAL_AGGREGATE_ROWS_AND_SKS_SEMANTIC_RECONCILIATION_STILL_REQUIRED"
     },
     {
       "id": "EA-04",
@@ -82,7 +84,8 @@
         358
       ],
       "status": "OPEN_EXTERNAL",
-      "unlocks": "buyer/beneficiary/settlement claim boundaries"
+      "unlocks": "buyer/beneficiary/settlement claim boundaries",
+      "route_progress": "OWNER_AND_ACCEPTANCE_ROUTES_NARROWED__PAYABLE_QUANTITY_FREEZE_CHANGE_RIGHTS_PENALTIES_BUYER_AND_ECONOMICS_STILL_REQUIRED"
     }
   ],
   "portfolio": [
@@ -136,7 +139,30 @@
     "buyer willingness_to_pay",
     "contract incentive alignment"
   ],
-  "base_role_sha": "750000523e9b27ba780dc7f60f147ac0549e745e",
+  "base_role_sha": "50e0990c27792e6a51cf25371f21a746aed87ff6",
   "claim_policy_source": "KREATE/PMR/CS2_APPLICATION_CLAIM_GATE_2026-10-06.md",
-  "scope_boundary": "PRODUCT_PORTFOLIO_AND_CROSS_ROLE_GATES_ONLY__APPLICATION_CLAIM_WORDING_OWNED_BY_CLAIM_GATE"
+  "scope_boundary": "PRODUCT_PORTFOLIO_AND_CROSS_ROLE_GATES_ONLY__APPLICATION_CLAIM_WORDING_OWNED_BY_CLAIM_GATE",
+  "latest_route_inputs": [
+    {
+      "source_id": "S-BU-026",
+      "effect": "narrows BUCard/reporting and acceptance-hakedis owner routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-027",
+      "effect": "names existing BUCard dining report surfaces for a targeted #292 request",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-028",
+      "effect": "narrows IMID procurement routing",
+      "closes_gate": false
+    },
+    {
+      "source_id": "S-BU-030",
+      "effect": "adds acceptance-flow/reporting route context",
+      "closes_gate": false
+    }
+  ],
+  "route_update_rule": "ROUTE_DISCOVERY_IS_NOT_EXPORT_ACCESS_SERVICE_TRUTH_SETTLEMENT_ECONOMICS_OR_PRIMARY_INTERVIEW_EVIDENCE"
 }
