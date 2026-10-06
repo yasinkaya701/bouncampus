@@ -542,9 +542,19 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
 
 
-## Procurement, payment and acceptance owner routes — 2026-10-06
 
-### S-BU-027 — İhale ve Satınalma Şube Müdürlüğü
+## Named BUCard reports + procurement/payment/acceptance owner routes — 2026-10-06
+
+### S-BU-027 — Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University Information Technology Department
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf
+- Use: first-party confirmation that BUCard has a **Yemekhane anlık rapor**, **günlük geçiş raporları**, package-meal fields and a **personel yemek raporu**.
+- Decision delta: #292 can request the schema/version/finality/export semantics of named existing report surfaces instead of asking whether an aggregate dining report exists at all.
+- Boundary: existence does not prove export permission, API availability, service-date × campus × meal-period grain, stable IDs, finality, or passage/package count = physically served meal.
+- Maps to: H4, ACCESS, DATA_OWNER, MODEL_METHOD.
+
+### S-BU-028 — İhale ve Satınalma Şube Müdürlüğü
 - Type: OFFICIAL_UNIVERSITY
 - Publisher: Boğaziçi University Administrative and Financial Affairs
 - URL: https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117
@@ -552,7 +562,7 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Boundary: general branch responsibility is not proof of the exact IKN 2025/1727143 document owner, product buyer, payable quantity or contract semantics.
 - Maps to: H5, CONTRACT, ACCESS.
 
-### S-BU-028 — Tahakkuk Şube Müdürlüğü
+### S-BU-029 — Tahakkuk Şube Müdürlüğü
 - Type: OFFICIAL_UNIVERSITY
 - Publisher: Boğaziçi University Administrative and Financial Affairs
 - URL: https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119
@@ -560,7 +570,7 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Boundary: payment processing does not establish the current food contract's payable unit/count, acceptance basis, signatory chain, savings beneficiary or software budget.
 - Maps to: H5, CONTRACT, ACCESS.
 
-### S-BU-029 — İdari ve Mali İşler Daire Başkanlığı — İletişim
+### S-BU-030 — İdari ve Mali İşler Daire Başkanlığı — İletişim
 - Type: OFFICIAL_UNIVERSITY
 - Publisher: Boğaziçi University Administrative and Financial Affairs
 - URL: https://imid.bogazici.edu.tr/tr/pages/iletisim/2116
@@ -568,7 +578,7 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Boundary: contact metadata only; not decision-ownership or contract evidence.
 - Maps to: H5, ACCESS.
 
-### S-BU-030 — Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process
+### S-BU-031 — Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process
 - Type: OFFICIAL_UNIVERSITY
 - Publisher: Boğaziçi University
 - URL: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
