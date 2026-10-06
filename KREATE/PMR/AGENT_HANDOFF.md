@@ -187,3 +187,26 @@ New owner-routing evidence is canonical:
 
 **EE/EHB**
 - passage-event evidence reduces pressure for premature sensing; new hardware still requires a demonstrated measurement gap.
+
+
+## PMR-A execution sync — 2026-10-06
+
+PMR-A is operating as the cross-role evidence integrator, not as another generic research lane.
+
+### Current execution focus
+
+- **IE / #292:** obtain a privacy-preserving `campus × meal_period × service_date` BUCard/SKS export plus reconciliation semantics. Event-history existence is not `actual_served`; do not claim `VERIFIED_EXPORTABLE` without source-owner evidence.
+- **IE / #358:** retrieve the authoritative current IKN **2025/1727143** admin/technical specs, unit-price schedule, correction notice/zeyilname, acceptance/hakediş schema, penalty/SLA language, production request/order form and reconciliation report. Resolve payable count, signer/owner, last reversible quantity freeze, record precedence, and overproduction/shortage risk ownership.
+- **CS1 / #82:** keep the canonical `SERVICE_TRUTH_V1` intake ready and fail closed on public, aggregate, unreconciled or generated sandbox rows.
+- **CS2 / #361:** consume only verified deltas into KEEP/MODIFY/KILL decisions. Savings, WTP, buyer identity, economic beneficiary and accepted-quantity changeability remain blocked until primary evidence resolves them.
+- **EE / EHB:** first map existing scale/manual records and the exact waste-stage field that is actually missing. Do not open hardware work solely because PMR has an unresolved data field.
+
+### PMR-A coordination rule
+
+1. no duplicate source dump or broad-browsing lane;
+2. preserve contradictions and source boundaries;
+3. route every new fact to the exact decision/claim it changes;
+4. create no `E-INT-*` record without a real completed conversation;
+5. ask other roles to reply only with a verified delta, blocker, or ownership conflict.
+
+Agent Bus #8 and PMR hub #322 carry the live cross-role handoff. The two highest-value external gates remain #292 and #358.
