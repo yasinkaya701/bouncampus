@@ -40,6 +40,11 @@ Source IDs resolve through [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) and [source_ca
 | **Reservation is an always-on campus-wide demand system** | **Unsupported.** Official 2024 intersession and 2026 holiday notices show reservations recur in special operating regimes. | S-BU-025, S-BU-006 | Normal-term coverage, production-control use, snapshot retention/exportability. | Interview SKS/TEMAŞ and obtain reservation-state snapshots where active. |
 | **Current tender specifications are publicly verified in this repo** | **Unsupported.** Public notice/result and EKAP document route are verified, but underlying current specification bundle is not yet retrieved. | S-PROC-001, S-PROC-002 | Current hakediş, penalty, acceptance and quantity-change clauses. | #358 authoritative artifact retrieval; no prior-contract clause carryover. |
 
+
+| **The institutional acceptance-to-hakediş path is partly known** | 2025 university report states Control Organization performs preliminary acceptance review, prepares KİK56.0/H and submits it to the relevant Spending Authority for hakediş preparation; Tahakkuk branch officially handles hakediş payments. | S-BU-030, S-BU-027 | Exact food-contract Spending Authority, payable quantity/count, unit-price schedule, current penalty/correction clauses. | #358 current contract artifacts + one real hakediş/acceptance package or source-owner walkthrough. |
+| **Aygül Demir is a relevant control-workflow interview route** | Current university control-organization page lists Aygül Demir among principal dining-control members. | S-BU-014 | Interview occurrence, exact personal responsibilities, decision rights or reported facts. | Only update INTERVIEW_TRACKER after real outreach/scheduling/completion; never fabricate E-INT evidence. |
+| **Procurement and hakediş owner routes are now source-backed** | Official IMID pages identify Procurement and Tahakkuk branches and their current public managers; Tahakkuk explicitly handles hakediş payments. | S-BU-026, S-BU-027, S-BU-028 | Contract-specific ownership, approval chain or product buyer. | Use routes for #358 artifact/referral acquisition and verify each owner in conversation. |
+
 ## Promotion rule
 
 A row moves from **secondary-supported hypothesis** to **PMR-supported/contradicted** only when:
