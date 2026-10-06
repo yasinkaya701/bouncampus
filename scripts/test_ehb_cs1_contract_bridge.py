@@ -6,7 +6,11 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
+import sys
 import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from backend.app.decision import dining_count_truth, traygate
 from backend.app.edge.ehb_delivery import PersistentDeliveryController
