@@ -1,0 +1,96 @@
+{
+  "schema_version": "IE_EXTERNAL_ACQUISITION_STATUS_V1",
+  "updated_at": "2026-10-06T15:05:00+03:00",
+  "evidence_boundary": "Prepared requests and public routing are not primary operational evidence.",
+  "active_issues": [
+    292,
+    358
+  ],
+  "parent_dependencies": [
+    82
+  ],
+  "lanes": [
+    {
+      "issue": 292,
+      "key": "bucard_aggregate_export",
+      "owner_route": "BUCard/BİDB",
+      "contact": "bucard@bogazici.edu.tr",
+      "status": "READY_TO_SEND",
+      "privacy_scope": "aggregate campus_id x meal_period x service_date only",
+      "prohibited_fields": [
+        "card_number",
+        "person_id",
+        "student_id",
+        "national_id",
+        "name",
+        "balance",
+        "individual_transaction_history"
+      ],
+      "required_fields": [
+        "service_date",
+        "campus_id",
+        "meal_period",
+        "reported_service_or_passage_count",
+        "package_meal_count",
+        "report_generated_at",
+        "source_report_id"
+      ],
+      "blocker": "No real export/access decision or reconciled count semantics yet."
+    },
+    {
+      "issue": 292,
+      "key": "food_services_reconciliation",
+      "owner_route": "Yemek Hizmetleri Şube Müdürlüğü",
+      "contact": "yemekhane@bogazici.edu.tr",
+      "status": "READY_TO_SEND",
+      "blocker": "Need one real recent-service reconstruction and authoritative count-finality semantics."
+    },
+    {
+      "issue": 292,
+      "key": "production_allocation_truth",
+      "owner_route": "Food Services + TEMAŞ local operations referral",
+      "contact": null,
+      "status": "OWNER_UNKNOWN",
+      "blocker": "No source-owned produced/allocated/surplus record owner confirmed."
+    },
+    {
+      "issue": 358,
+      "key": "current_contract_specs",
+      "owner_route": "SKS/procurement/acceptance owner",
+      "contact": "sks@bogazici.edu.tr",
+      "status": "REQUEST_READY",
+      "ikn": "2025/1727143",
+      "requested_artifacts": [
+        "administrative_specification",
+        "technical_specification",
+        "unit_price_bid_schedule",
+        "final_contract_relevant_acceptance_clauses",
+        "penalty_sla_clauses",
+        "acceptance_hakedis_schema",
+        "daily_production_request_order_form",
+        "daily_reconciliation_acceptance_report"
+      ],
+      "blocker": "Authoritative current specification and settlement semantics not yet obtained."
+    },
+    {
+      "issue": 358,
+      "key": "temas_local_operations",
+      "owner_route": "Food Services/control/procurement referral",
+      "contact": null,
+      "status": "REFERRAL_NEEDED",
+      "blocker": "Generic contractor contact is not evidence of the Boğaziçi account owner."
+    }
+  ],
+  "canonical_handoff": {
+    "cs1_intake": "scripts/cs1_service_truth_artifact_intake.py",
+    "pmr_runbook": "KREATE/PMR/IE_EXTERNAL_ACQUISITION_RUNBOOK.md",
+    "data_inventory": "KREATE/PMR/DATA_SOURCE_INVENTORY.md",
+    "contract_research": "KREATE/PMR/PROCUREMENT_CONTRACT_RESEARCH.md",
+    "contact_map": "KREATE/PMR/OPERATIONAL_CONTACT_ROLE_MAP.md"
+  },
+  "agent_requests": {
+    "cs1": "Return only missing minimum fields or reconciliation semantics beyond #292/#82.",
+    "cs2": "Return only contract/procurement facts that materially change #358 scope.",
+    "ee_ehb": "Return only decision-critical fields that cannot plausibly be sourced from current operational records."
+  }
+}
