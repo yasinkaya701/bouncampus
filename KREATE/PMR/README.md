@@ -9,11 +9,13 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 ## Read first
 
 1. [PMR_KNOWLEDGE_BASE_2026-10-06.md](PMR_KNOWLEDGE_BASE_2026-10-06.md) — current cumulative synthesis, Boğaziçi facts, unresolved questions, and interview priorities.
-2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 53 verified/reference records across parallel PMR agents.
+2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 68 verified/reference records across parallel PMR agents.
 3. [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) — human-readable companion to the canonical catalog, including source use and explicit inference boundaries.
 4. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — hypothesis/claim → secondary support → forbidden inference → exact primary-evidence gap.
 5. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — canonical PDF/XLSX/image/data provenance and reuse-status manifest.
 6. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/CS1/CS2/EE/EHB shared append and consumption protocol.
+7. [SOURCE_ID_MIGRATION.md](SOURCE_ID_MIGRATION.md) — legacy parallel-agent IDs mapped to canonical `S-*` IDs.
+8. [data/README.md](data/README.md) / [public snapshot CSV](data/bogazici_food_waste_public_snapshot.csv) — auditable aggregate 2024–2025 public-data snapshot with semantic warnings.
 7. [SOURCE_REGISTRY_2026-10-06.json](SOURCE_REGISTRY_2026-10-06.json) — earlier master snapshot retained for provenance; do not treat it as the append target.
 8. [ASSET_AND_MEDIA_INDEX_2026-10-06.md](ASSET_AND_MEDIA_INDEX_2026-10-06.md) — earlier master asset snapshot retained for provenance.
 9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
