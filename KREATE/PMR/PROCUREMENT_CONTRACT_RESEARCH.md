@@ -35,6 +35,21 @@ The key product question is therefore:
 
 > Which party can change which quantity, before which freeze point, using which source-owned record, and who economically benefits or bears risk when quantity is wrong?
 
+## Historical contractor continuity / clause provenance
+
+Public procurement history shows TEMAŞ also appears as the awarded contractor for the preceding **2024–2025** Boğaziçi food-service procurement (IKN 2023/1144278).
+
+Source: `S-PROC-003`.
+
+An archived procurement-decision record for that prior tender (`S-PROC-004`) exposes useful historical technical-specification context, including North Campus kitchen production and continuity/backup-kitchen requirements.
+
+This changes PMR targeting in two ways:
+
+1. TEMAŞ appears to be an **incumbent across consecutive contract periods**, so the team should ask about an existing working relationship and established planning/acceptance routines rather than assuming a new-vendor onboarding context.
+2. Historical specifications show that production location, continuity capacity and operational control can be contractually explicit.
+
+Strict boundary: **do not copy prior-period clauses into the current contract model**. They are question generators only until the 2025/1727143 technical/admin specifications are retrieved.
+
 ## Tender mechanics visible in the public notice
 
 The public notice/result mirror additionally records:
