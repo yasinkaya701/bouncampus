@@ -56,8 +56,8 @@ export default function DashboardPage() {
 
               <p className="mt-7 max-w-2xl text-[13px] leading-6 text-[#626a63] sm:text-[14px]">
                 {t(
-                  'BOUNCAMPUS, Boğaziçi’nin yayımlanmış yemek atığı verisini talep bağlamı ve model tahminiyle bir araya getirir. Sistem karar vermez; mutfak sorumlusuna kaynakları, belirsizliği ve güvenli üretim bandını aynı anda gösterir.',
-                  'BOUNCAMPUS combines Boğaziçi’s published food-waste evidence with demand context and model estimates. It does not make the decision; it gives the kitchen operator the sources, uncertainty and a safe production band in one place.',
+                  'BOUNCAMPUS, Boğaziçi’nin yayımlanmış yemek atığı verisini talep bağlamı ve model tahminiyle bir araya getirir. Sistem karar vermez; mutfak sorumlusuna kaynakları, belirsizliği ve sınırları açık bir planlama bandını aynı anda gösterir.',
+                  'BOUNCAMPUS combines Boğaziçi’s published food-waste evidence with demand context and model estimates. It does not make the decision; it gives the kitchen operator the sources, uncertainty and an explicitly bounded planning band in one place.',
                 )}
               </p>
 
@@ -119,7 +119,7 @@ export default function DashboardPage() {
       <section>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="bc-eyebrow">{t('Ölçülmüş problem', 'Measured problem')}</div>
+            <div className="bc-eyebrow">{t('Yayımlanmış baz çizgi', 'Published baseline')}</div>
             <h2 className="mt-2 max-w-3xl text-[34px] font-black leading-[1] tracking-[-0.055em] text-[#111712] sm:text-[44px]">
               {t('Önce baz çizgisini kabul et. Sonra yalnız pilotta kanıtlayabildiğin etkiyi sahiplen.', 'Start with the baseline. Claim only the impact you can prove in the pilot.')}
             </h2>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
         <div className="mt-7 grid border-y border-[#111712]/10 sm:grid-cols-2 lg:grid-cols-4">
           <MetricCell label={t('2025 resmi atık', 'Official 2025 waste')} value={FOOD_WASTE_BASELINE.year2025WasteKg.toLocaleString(numberLocale)} suffix="kg" />
           <MetricCell label={t('2024 → 2025', '2024 → 2025')} value={`−${YEAR_OVER_YEAR_REDUCTION_PCT.toFixed(1)}`} suffix="%" />
-          <MetricCell label={t('Pilot başarı kapısı', 'Pilot success gate')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}`} suffix="%" footnote={t('hedef · sonuç değil', 'target · not result')} />
+          <MetricCell label={t('Önerilen pilot hedefi', 'Illustrative pilot target')} value={`≥${FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct}`} suffix="%" footnote={t('önerilen hedef · sonuç değil', 'illustrative target · not result')} />
           <MetricCell label={t('Otomatik dispatch', 'Automatic dispatch')} value={t('Kapalı', 'Off')} footnote={t('insan onayı gerekli', 'human approval required')} />
         </div>
       </section>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
           <LoopStep n="01" title={t('Gözle', 'Observe')} detail={t('Resmi atık geçmişi ve karar bağlamını topla.', 'Collect the official waste baseline and decision context.')} />
           <LoopStep n="02" title={t('Tahmin et', 'Forecast')} detail={t('Tek sayı yerine belirsizliği görünür bir üretim bandı üret.', 'Produce an uncertainty-visible production band, not a magic number.')} />
           <LoopStep n="03" title={t('İnsan onayı', 'Human gate')} detail={t('Operatör onaylar, düzenler veya bekletir. Sistem otomatik emir göndermez.', 'The operator approves, edits or holds. The system never auto-dispatches.')} />
-          <LoopStep n="04" title={t('Ölç ve öğren', 'Measure & learn')} detail={t('Pilot sonucunu kg / 100 servis edilen öğün ile kontrol koluna karşı ölç.', 'Measure pilot outcome as kg / 100 served meals against a control arm.')} />
+          <LoopStep n="04" title={t('Ölç ve öğren', 'Measure & learn')} detail={t('Servis edilen öğün paydası uzlaştırılırsa, önerilen pilotu kg / 100 öğün ve hizmet riskiyle ölç.', 'If the served-meal denominator is reconciled, measure the proposed pilot with kg / 100 meals and service-risk guardrails.')} />
         </div>
       </section>
 
