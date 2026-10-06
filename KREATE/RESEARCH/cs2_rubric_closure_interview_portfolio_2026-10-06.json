@@ -7,7 +7,9 @@
     "e_int_records": 0,
     "interview_tracker_slots": 16,
     "completed_interview_slots": 0,
-    "pmr_rubric_weight_percent": 40
+    "pmr_rubric_weight_percent": 40,
+    "ie_request_ready_workstreams": 2,
+    "ie_request_ready_is_primary_evidence": false
   },
   "non_duplication": {
     "ie": [
