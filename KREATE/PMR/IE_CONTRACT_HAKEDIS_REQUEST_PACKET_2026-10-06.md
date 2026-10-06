@@ -6,6 +6,18 @@
 **Current procurement anchor:** IKN `2025/1727143`  
 **Evidence status:** acquisition/checklist artifact only; public tender context does not establish current contract interpretation.
 
+## Verified route facts — canonical IDs
+
+Do not spend outreach time re-proving these public facts:
+
+- **S-BU-028:** Procurement is a first-party route for tender/specification documents.
+- **S-BU-029:** Tahakkuk handles institutional hakediş payments.
+- **S-BU-031:** the generic service-acceptance chain includes Control Organization preliminary review → `KİK56.0/H` → relevant Spending Authority for hakediş preparation; the 2025 report also describes monthly food-service acceptance.
+- **S-BU-030:** use the general İMİD route only when the exact owner cannot be reached.
+- the current EKAP controls for IKN `2025/1727143` resolve to a stable official document route, but the authoritative payload remains uncollected in this environment.
+
+Focus the request on **current food-contract field semantics**: exact payable/accepted quantity, unit-price item mapping, correction/reconciliation fields, actual Spending Authority/sign-off chain, production-order owner, and freeze/change rights.
+
 ## Objective
 
 Resolve the operational and economic control point around meal quantity:
