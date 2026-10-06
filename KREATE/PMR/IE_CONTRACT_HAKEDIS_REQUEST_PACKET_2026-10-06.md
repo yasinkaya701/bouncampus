@@ -14,6 +14,15 @@ Resolve the operational and economic control point around meal quantity:
 
 The current public procurement trail is useful for routing and scope, but it is not enough to infer unit prices, payable quantity, minimum purchase, shortage penalties, waste economics, contractor margin, or savings.
 
+## Owner-route refinement from the current university directive
+
+The official **Boğaziçi Üniversitesi Yemek Hizmetleri Yönergesi** (`S-BU-026`) states that meal-service procurement is carried out by **SKS together with İdari ve Mali İşler Daire Başkanlığı**; it also requires separate student and personnel invoicing. This is a source-routing fact, not current hakediş semantics.
+
+Execution consequence:
+- route current technical/service-control questions to Food Services/SKS;
+- route procurement/payment-process artifact ownership in parallel to İdari ve Mali İşler;
+- keep hakediş signer, payable quantity, acceptance chain, economic beneficiary and software buyer authority unresolved until directly evidenced.
+
 ## Authoritative artifacts to retrieve
 
 Priority order:
