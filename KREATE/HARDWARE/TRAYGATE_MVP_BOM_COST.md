@@ -51,7 +51,7 @@ Excluding optional cooling:
 - high estimate: **USD 265**.
 
 With up to USD 10 cooling allowance:
-- planning envelope: **USD 165-275 per prototype station**.
+- planning envelope: **USD 165-265 per prototype station**.
 
 Evidence class: `CALCULATION` from the table above. This is deliberately a range, not a procurement quote.
 
@@ -129,6 +129,18 @@ These exclusions must accompany any quoted prototype cost.
 | Enclosure cost after cleanability/IP requirements | unverified | retain range until mechanical concept is selected |
 | microSD wear from queue writes | unverified | use high-endurance media and test queue pattern in #299 |
 
+## Sourcing alternates and change gates
+
+| Function | Baseline | Allowed alternate | Change gate |
+|---|---|---|---|
+| Capture compute | Raspberry Pi 5 1GB | Pi 5 2GB/4GB when measured workload requires more memory | profile final capture/runtime workload; update cost envelope |
+| RGB camera | Camera Module 3 standard | Camera Module 3 Wide when measured installation clearance cannot support standard-lens geometry | rerun tray-plane coverage math and obtain CS1 capture-distribution review |
+| Storage | 64GB high-endurance microSD | equivalent traceable high-endurance media with equal-or-greater capacity | validate queue-write endurance and power-loss recovery |
+| Tray trigger | short-range ToF / break-beam / photoelectric class | another listed trigger class | bench-test wet/steam/reflection behavior before freeze |
+| PSU | official Raspberry Pi 27W PSU | electrically compliant, traceable equivalent | verify voltage/current, connector, thermal behavior, and local safety requirements before deployment |
+
+Alternates are not automatic substitutions: camera, compute, trigger, storage, and power changes must preserve the validated interface and rerun the affected acceptance checks.
+
 ## Procurement rule
 
 Before purchase:
@@ -144,7 +156,7 @@ The BOM is not complete merely because parts are orderable. Promotion beyond des
 ## Decision summary
 
 For hackathon/MVP planning:
-- use **USD 165-275** for one RGB capture prototype station;
+- use **USD 165-265** for one RGB capture prototype station;
 - budget at least **~USD +65** if moving from 1GB to 4GB Pi 5 for local inference, before inference-specific extras;
 - keep depth hardware out of the base BOM until RGB evaluation demonstrates a justified need.
 
