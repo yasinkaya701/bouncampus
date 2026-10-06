@@ -8,7 +8,8 @@
     "STANDARD",
     "ACADEMIC",
     "VENDOR",
-    "INTERNAL_PROVENANCE"
+    "INTERNAL_PROVENANCE",
+    "GUIDANCE"
   ],
   "sources": [
     {
@@ -105,7 +106,9 @@
       ],
       "limitations": [
         "does not establish waste stage or causal mechanism"
-      ]
+      ],
+      "local_snapshot": "KREATE/PMR/data/bogazici_food_waste_public_snapshot.csv",
+      "data_quality_note": "2025 public table contains August and October rows where delivered-to-İSTAÇ exceeds displayed monthly total despite the page stating delivered amounts are included in totals; preserve as published and reconcile semantics with source owner."
     },
     {
       "id": "S-BU-003",
@@ -582,6 +585,148 @@
       ],
       "limitations": [
         "materially stale; selectively salvage source-level facts only"
+      ]
+    },
+    {
+      "id": "S-BU-007",
+      "title": "Boğaziçi University 2024 Campus Food Waste Tracking / official report",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+      "asset_url": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "official_university",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "historical public monthly food-waste context",
+        "cross-year reporting-source audit"
+      ],
+      "limitations": [
+        "aggregate monthly reporting is not service-level truth or causal overproduction evidence"
+      ]
+    },
+    {
+      "id": "S-MEAS-004",
+      "title": "Otel, Restoran ve Diğer Toplu Tüketim Yerlerinde Gıda İsrafı ile Mücadele Kılavuzu",
+      "type": "GUIDANCE",
+      "publisher": "T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye",
+      "url": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "official_national_guidance",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "Türkiye food-service waste separation, measurement, prevention and planning guidance"
+      ],
+      "limitations": [
+        "guidance does not establish Boğaziçi workflow, causality or achieved impact"
+      ]
+    },
+    {
+      "id": "S-MEAS-005",
+      "title": "Hospitality and Food Service food-waste guidance",
+      "type": "GUIDANCE",
+      "publisher": "WRAP",
+      "url": "https://www.wrap.ngo/resources/guide/hospitality-and-food-service",
+      "accessed_at": "2026-10-06",
+      "authority": "specialist_guidance",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "practical food-service measurement and reduction workflow"
+      ],
+      "limitations": [
+        "UK-oriented guidance; local operational and legal fit must be verified"
+      ]
+    },
+    {
+      "id": "S-ACAD-007",
+      "title": "Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste",
+      "type": "ACADEMIC",
+      "publisher": "Journal of Cleaner Production",
+      "url": "https://doi.org/10.1016/j.jclepro.2023.140265",
+      "doi": "10.1016/j.jclepro.2023.140265",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2",
+        "H3"
+      ],
+      "supports": [
+        "forecast-vs-baseline comparison",
+        "waste and unmet-demand trade-off across three catering-service case datasets"
+      ],
+      "limitations": [
+        "external confidential datasets; reported consequences are not Boğaziçi field results"
+      ]
+    },
+    {
+      "id": "S-ACAD-008",
+      "title": "Food waste reduction and its environmental consequences: a quasi-experimental study in a campus canteen",
+      "type": "ACADEMIC",
+      "publisher": "Agriculture & Food Security",
+      "url": "https://link.springer.com/article/10.1186/s40066-024-00488-y",
+      "doi": "10.1186/s40066-024-00488-y",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "plate-waste intervention evidence",
+        "taste, food quality, portion size and menu variety as alternative waste causes"
+      ],
+      "limitations": [
+        "different campus/intervention; does not identify Boğaziçi waste-stage causal mix"
+      ]
+    },
+    {
+      "id": "S-ACAD-009",
+      "title": "Food waste management: an example from university refectory",
+      "type": "ACADEMIC",
+      "publisher": "British Food Journal",
+      "url": "https://doi.org/10.1108/BFJ-09-2020-0802",
+      "doi": "10.1108/BFJ-09-2020-0802",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "Türkiye university plate-waste mechanism and awareness context"
+      ],
+      "limitations": [
+        "plate-waste evidence is not evidence of production-surplus or forecast-error causality"
+      ]
+    },
+    {
+      "id": "S-ACAD-010",
+      "title": "Determination of the Amount of Food Waste and Improving Meals to Reduce Food Waste in the University Refectory",
+      "type": "ACADEMIC",
+      "publisher": "Aydın Gastronomy",
+      "url": "https://dergipark.org.tr/tr/pub/aydingas/article/1503134",
+      "asset_url": "https://dergipark.org.tr/tr/download/article-file/4013917",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2"
+      ],
+      "supports": [
+        "university-refectory food-waste measurement and meal-improvement intervention context"
+      ],
+      "limitations": [
+        "site-specific; use as falsification/alternative-cause pressure, not Boğaziçi causal evidence"
       ]
     }
   ]
