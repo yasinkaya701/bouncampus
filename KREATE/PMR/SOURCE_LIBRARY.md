@@ -527,3 +527,15 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - **S-ACAD-019** — institutional catering intervention evidence; no local causal transfer.
 
 Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Current governance / owner-route delta — 2026-10-06
+
+### S-BU-026 — Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/275-yemek-hizmetleri-yonergesi-20251103-152153.pdf
+- Use: authoritative owner-routing for dining BUCard reporting/data custody, meal-service procurement, and the hakediş payment-order/accrual workflow.
+- Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
+- Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
+- Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
