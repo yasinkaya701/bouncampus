@@ -440,3 +440,46 @@ These sources were added after reconciling the master PMR knowledge base, the IE
 - Use: supports avoiding biometric shortcuts when aggregate signals suffice.
 - Boundary: not a legal opinion for a particular institution.
 - Maps to: H4, PRIVACY.
+
+## Public-data provenance and H2 falsification additions
+
+### S-BU-009 — Boğaziçi 2024 Campus Food Waste Tracking
+- Type: official university data page + PDF
+- Page: https://impact.bogazici.edu.tr/221-campus-food-waste-tracking
+- PDF: https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf
+- Use: cross-year public reporting context and source-quality audit.
+- Data-quality note: the 12 monthly published `Total Food Waste` values sum to **50,994 kg**, while the same official page/PDF prints **50,993 kg**.
+- Boundary: aggregate monthly waste is not service-level production/served/surplus truth and does not identify forecast-error causality.
+- Maps to: H2, H4.
+
+### S-MEAS-006 — Türkiye toplu tüketim gıda-israfı kılavuzu
+- Type: official national / sector guidance
+- Publisher: T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye
+- PDF: https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf
+- Use: Türkiye food-service waste separation, measurement, prevention and planning context.
+- Boundary: guidance is not evidence of Boğaziçi workflow or impact.
+- Maps to: H2, H4, H6.
+
+### S-ACAD-013 — Food waste management: an example from university refectory
+- Type: peer-reviewed academic
+- DOI: https://doi.org/10.1108/BFJ-09-2020-0802
+- Use: Türkiye university plate-waste / awareness mechanism.
+- Boundary: plate waste is not production-surplus or forecast-error evidence.
+- Maps to: H2.
+
+### S-ACAD-014 — University refectory food-waste / meal-improvement study
+- Type: peer-reviewed academic
+- Article: https://dergipark.org.tr/tr/pub/aydingas/article/1503134
+- PDF: https://dergipark.org.tr/tr/download/article-file/4013917
+- Use: additional alternative-cause/intervention pressure around meal quality and waste.
+- Boundary: site-specific; not Boğaziçi PMR/pilot evidence.
+- Maps to: H2.
+
+### S-ACAD-015 — Fatemi et al. campus-canteen quasi-experiment
+- Type: peer-reviewed open-access academic
+- Article: https://link.springer.com/article/10.1186/s40066-024-00488-y
+- DOI: https://doi.org/10.1186/s40066-024-00488-y
+- Use: direct waste measurement plus evidence that taste, food quality, portion size and menu variety can drive waste.
+- Boundary: different campus/intervention; does not establish Boğaziçi causal mix.
+- Maps to: H2.
+
