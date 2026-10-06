@@ -41,6 +41,10 @@ Statuses:
 | A-016 | Boğaziçi University Sustainability Report 2025 | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf | PDF | LINK_ONLY | Official university report; public availability does not imply unrestricted redistribution | Institutional sustainability context |
 | A-017 | Boğaziçi official cafeteria visual | https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png | PNG | LINK_ONLY | Official-hosted image; reuse rights not established here | Visual context only; do not infer sensor/workflow geometry |
 | A-018 | İzmir Bakırçay University Akıllı Kampüs Ara Raporu | https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf | PDF | LINK_ONLY | Official university-hosted report; verify reuse terms before copying | Smart-campus dining/utilization/planning precedent |
+| A-019 | Boğaziçi 2026–2027 academic calendar | https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf | PDF | LINK_ONLY | Official university PDF; redistribution terms not established here | Versionable calendar/context reference |
+| A-020 | Fatemi et al. 2024 campus-canteen intervention | https://link.springer.com/article/10.1186/s40066-024-00488-y | HTML/PDF | COPY_CANDIDATE | Open-access article; verify figure-specific credits/license before binary reuse | Direct-weighing / alternative-root-cause / intervention precedent |
+| A-021 | Türkiye Ministry mass-catering hygiene guidance index | https://www.tarimorman.gov.tr/GKGM/Menu/132/ | HTML/PDF index | LINK_ONLY | Government official index; retain current linked guide/version | Safety and operational-guardrail reference |
+| A-022 | Boğaziçi student events calendar | https://takvim.bogazici.edu.tr/tr/events/students | HTML | LINK_ONLY | Official source; event presence is not attendance magnitude | Public event/context signal reference |
 
 ## Image-use rule
 
@@ -70,3 +74,16 @@ transformation = none | crop | redraw | derived-chart
 ```
 
 No binary currently becomes evidence merely by being committed to the repository.
+
+
+## Recommended team-owned visuals
+
+Prefer project-created diagrams over copied vendor/report graphics:
+
+1. **PMR evidence ladder:** secondary context → falsifiable hypothesis → real incident interview → source-owned operational artifact → measured pilot → impact claim.
+2. **Dining decision loop:** signals → quantity/allocation decision → freeze point → production/service → served/surplus/waste → next cycle.
+3. **Data-truth boundary:** `GENERATED_SANDBOX -X-> measured benchmark`; `SOURCE-OWNED EXPORT → semantic reconciliation → CS1 intake → eligible measured evidence`.
+4. **Root-cause tree:** production surplus / preparation loss / service-allocation mismatch / plate waste / menu acceptance / safety constraints / measurement artifact.
+5. **Stakeholder decision map:** Food Services ↔ contractor ops ↔ BİD/BUCard ↔ measurement owner ↔ procurement/finance, with unresolved questions on each edge.
+
+For every project-created chart, put source ID(s), data year and the relevant inference boundary in the caption.
