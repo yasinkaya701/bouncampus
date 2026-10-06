@@ -98,6 +98,32 @@ current contract/acceptance clauses: RETRIEVAL_REQUIRED
 
 Do not backfill current clauses from the 2023/2024–2025 procurement.
 
+#### Resolved official EKAP acquisition route — 2026-10-06
+
+A fresh retrieval pass resolved the mirror's document buttons to the official EKAP citizen-document endpoint and exposed the stable tender document identifier:
+
+~~~text
+IKN: 2025/1727143
+official EKAP ihaleId:
+8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc
+~~~
+
+Resolved routes:
+
+- current tender document bundle (`İhale Dokümanı`):
+  `https://ekap.kik.gov.tr/EKAP/Ortak/VatandasIlanGoruntuleme.aspx?ddac=true&aramaDownload=true&ihaleId=8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc&wots=false&Iszylnm=false`
+- bundle exposed by the mirror as `Teknik Şartname Hariç Doküman`:
+  `https://ekap.kik.gov.tr/EKAP/Ortak/VatandasIlanGoruntuleme.aspx?ddac=true&aramaDownload=true&ihaleId=8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc&wots=true&Iszylnm=false`
+- current EKAP search route:
+  `https://ekapv2.kik.gov.tr/ekap/search/2025_1727143`
+
+Discovery route:
+`https://ekapveri.com/ihale/ekap-2025-1727143/`
+
+The browser environment could resolve the redirect target but could not fetch the official document payload. Therefore this is a **routing improvement**, not artifact retrieval. Keep the authoritative documents at `RETRIEVAL_REQUIRED` until a human/authorized environment successfully downloads the bundle and records title/version/checksum.
+
+The mirror also explicitly labels the current tender with `Düzeltme İlanı: Var`. Do not infer the affected clause. The correction/zeyilname history remains a separate required acquisition artifact.
+
 ### Predecessor cancellation is now explicit
 
 For **IKN 2025/1335958**, the public cancellation notice states that objections to the tender documents required changes to some specification provisions, but an EKAP addendum could not be issued at the tender date, so the tender was cancelled.
