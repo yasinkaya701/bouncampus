@@ -37,6 +37,15 @@ Statuses:
 | A-013 | stale deep PMR/market branch | https://github.com/yasinkaya701/bouncampus/tree/research/kreate-deep-pmr-market-20261004 | Git branch | INTERNAL_PROVENANCE | Internal repository history | Research backlog / selective salvage |
 | A-014 | merged PMR/market red-team PR #213 | https://github.com/yasinkaya701/bouncampus/pull/213 | Git PR | INTERNAL_PROVENANCE | Merged repository provenance | Current-master research lineage |
 
+
+| A-015 | Boğaziçi 2025 official food-waste workbook | https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx | XLSX | LINK_ONLY | Official source; preserve raw semantics and retrieval date | Public aggregate source artifact |
+| A-016 | Boğaziçi Sustainability Report 2025 | https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf | PDF | LINK_ONLY | Official report; redistribution terms not established | Institutional context/source trail |
+| A-017 | Boğaziçi official cafeteria visual | https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png | PNG | LINK_ONLY | Official-hosted image; do not infer geometry/workflow from one visual | Visual context only |
+| A-018 | Türkiye food-service food-waste prevention guide | https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf | PDF | LINK_ONLY | Ministry/FAO/Metro guide; verify reuse terms before copying | Türkiye-specific prevention/measurement context |
+| A-019 | UI GreenMetric Guideline 2026 | https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf | PDF | LINK_ONLY | First-party guideline; keep as external evidence context | Sustainability-evidence / governance context |
+| A-020 | Boğaziçi food-waste report 2024 | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf | PDF | LINK_ONLY | Official historical report | Historical aggregate context |
+| A-021 | Boğaziçi food-waste report 2023 | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf | PDF | LINK_ONLY | Official historical report | Historical aggregate context |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
