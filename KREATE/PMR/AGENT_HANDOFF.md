@@ -131,3 +131,13 @@ The research base is now strong enough that more generic browsing has low inform
 - identifies a directly relevant current incumbent.
 
 Otherwise, effort should move to real PMR.
+
+
+## Parallel PMR hub convergence — 2026-10-06
+
+Multiple agents created PMR registries in the same execution window. Convergence rule:
+- `source_catalog.json` + `SOURCE_LIBRARY.md` are the canonical append targets.
+- Dated master registries remain immutable provenance snapshots.
+- Unique source/data/assets from PR #315 and PR #320 are salvaged under canonical `S-*` IDs.
+- Do not merge a duplicate registry wholesale after its unique sources have been migrated.
+- Preserve source anomalies and contradictions; do not normalize them into fake operational truth.
