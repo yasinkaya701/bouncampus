@@ -151,6 +151,21 @@ That gives a concrete next desk artifact task: obtain both predecessor and curre
 
 See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
 
+## Acceptance / hakediş workflow — canonical sources
+
+The first-party institutional chain is now bounded by three canonical sources:
+
+- **S-BU-028** — Procurement branch: first-party route for the current tender/specification document bundle.
+- **S-BU-029** — Tahakkuk branch: first-party route for institutional hakediş-payment processing.
+- **S-BU-031** — 2025 Administration Activity Report: Control Organization reviews contracted service acceptance, prepares **KİK56.0/H — Hizmet İşleri Kabul Teklif Belgesi**, and submits it to the relevant **Harcama Yetkilisi** for hakediş preparation. The same report states 2025 food-service work was performed monthly and acceptance documents were prepared as services were performed.
+- **S-BU-030** — general İMİD contact route only, for referral when the exact document owner is unknown.
+
+This closes the generic question of whether a formal acceptance/payment route exists. It does **not** answer the current-contract economic question:
+
+> Which quantity under IKN 2025/1727143 — ordered, produced, delivered, served, accepted, or another reconciled quantity — becomes payable against which unit-price item and source artifact?
+
+Keep that question at `RETRIEVAL_REQUIRED / PRIMARY_CONFIRMATION_REQUIRED` until the current contract/specification and an actual acceptance/hakediş package are obtained.
+
 ## Do not infer settlement from the headline contract
 
 The public result is sufficient for **scope, contractor and procurement-route context**. It is not sufficient for:
