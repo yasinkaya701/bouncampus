@@ -51,7 +51,7 @@ type FoodApi = {
   };
 };
 
-type DemoHealth = 'LOADING' | 'LIVE' | 'PARTIAL' | 'FALLBACK';
+type DemoHealth = 'LOADING' | 'ACTIONABLE' | 'PARTIAL' | 'FALLBACK';
 
 const STEP_SECONDS = [16, 20, 18, 22, 14];
 
@@ -72,7 +72,7 @@ export default function JuryModePage() {
         const payload = await response.json() as FoodApi;
         setFood(payload);
         const productionBand = payload.demandContext?.productionBand;
-        setHealth(payload.demandContext?.available && payload.demandContext?.actionable && productionBand ? 'LIVE' : 'PARTIAL');
+        setHealth(payload.demandContext?.available && payload.demandContext?.actionable && productionBand ? 'ACTIONABLE' : 'PARTIAL');
       })
       .catch(() => {
         setFood(null);
@@ -87,7 +87,7 @@ export default function JuryModePage() {
   }, []);
 
   const band = food?.demandContext?.productionBand ?? null;
-  const canPilot = health === 'LIVE' && band?.decisionReadiness === 'PILOT_READY';
+  const canPilot = health === 'ACTIONABLE' && band?.decisionReadiness === 'PILOT_READY';
   const elapsed = useMemo(() => STEP_SECONDS.slice(0, step).reduce((sum, value) => sum + value, 0), [step]);
   const nf = (value: number) => Math.round(value).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US');
 
@@ -138,7 +138,7 @@ export default function JuryModePage() {
         <div className="flex justify-end gap-2">
           <button type="button" disabled={step === 0} onClick={previous} className="rounded-xl border border-slate-900/10 bg-white px-4 py-3 text-[9px] font-black text-slate-600 disabled:opacity-30">{t('Geri', 'Back')}</button>
           {step < 4 ? (
-            <button type="button" onClick={next} className="inline-flex items-center gap-2 rounded-xl bg-[#071c33] px-5 py-3 text-[9px] font-black text-white">{t('Sonraki kanıt', 'Next proof')} <ArrowRight size={12} /></button>
+            <button type="button" onClick={next} className="inline-flex items-center gap-2 rounded-xl bg-[#071c33] px-5 py-3 text-[9px] font-black text-white">{t('Sonraki kanıt', 'Next evidence')} <ArrowRight size={12} /></button>
           ) : (
             <button type="button" onClick={() => setStep(0)} className="rounded-xl bg-[#173f67] px-5 py-3 text-[9px] font-black text-white">{t('90 saniyeyi sıfırla', 'Reset 90 seconds')}</button>
           )}
@@ -257,14 +257,14 @@ function DemoHealthPanel({ health, band, t }: { health: DemoHealth; band: Produc
   return (
     <div className="grid gap-2 rounded-[20px] border border-slate-900/10 bg-[#f7f9f6] p-4 sm:grid-cols-3">
       <HealthItem label={t('Resmi baz çizgi', 'Official baseline')} value="READY" good />
-      <HealthItem label={t('Canlı bağlam', 'Live context')} value={health} good={health === 'LIVE'} />
+      <HealthItem label={t('Karar bağlamı', 'Decision context')} value={health} good={health === 'ACTIONABLE'} />
       <HealthItem label={t('Prototip aksiyon kapısı', 'Prototype action gate')} value={band?.decisionReadiness === 'PILOT_READY' ? t('GEÇTİ', 'PASS') : band?.decisionReadiness ?? 'WITHHOLD'} good={band?.decisionReadiness === 'PILOT_READY'} />
     </div>
   );
 }
 
 function HealthBadge({ health, t }: { health: DemoHealth; t: (tr: string, en: string) => string }) {
-  const cls = health === 'LIVE' ? 'bg-emerald-400/15 text-emerald-200' : health === 'LOADING' ? 'bg-white/10 text-white/55' : 'bg-amber-400/15 text-amber-200';
+  const cls = health === 'ACTIONABLE' ? 'bg-emerald-400/15 text-emerald-200' : health === 'LOADING' ? 'bg-white/10 text-white/55' : 'bg-amber-400/15 text-amber-200';
   const label = health === 'FALLBACK' ? t('FAIL-SAFE MOD', 'FAIL-SAFE MODE') : health;
   return <div className={`rounded-full px-3 py-2 font-mono text-[8px] font-black ${cls}`}>{label}</div>;
 }
