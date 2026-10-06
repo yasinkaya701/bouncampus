@@ -13,7 +13,9 @@
         "S-BU-015",
         "S-BU-021",
         "S-BU-022",
-        "S-BU-023"
+        "S-BU-023",
+        "S-BU-026",
+        "S-BU-031"
       ],
       "required_grain": "campus_id x meal_period x service_date",
       "required_outputs": [
