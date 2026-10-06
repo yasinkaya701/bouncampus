@@ -14,6 +14,39 @@ Resolve the operational and economic control point around meal quantity:
 
 The current public procurement trail is useful for routing and scope, but it is not enough to infer unit prices, payable quantity, minimum purchase, shortage penalties, waste economics, contractor margin, or savings.
 
+## Source-backed routing and known acceptance chain
+
+The route is no longer generic:
+
+- `S-BU-026` — **İhale ve Satınalma Şube Müdürlüğü**: official procurement/tender route; current public manager Bahadır Şahin.
+- `S-BU-014` — current Dining Cooking/Distribution Control Organization; Aygül Demir is publicly listed among principal members.
+- `S-BU-030` — **2025 Administration Activity Report**: Control Organization preliminary review → KİK56.0/H Service Works Acceptance Proposal → relevant Spending Authority → hakediş preparation.
+- `S-BU-027` — **Tahakkuk Şube Müdürlüğü**: official branch explicitly handles hakediş payments; current public manager Yakup Korkmaz.
+- `S-BU-028` — IMID general routing/contact.
+
+Known institutional chain:
+
+~~~text
+contract / technical specification
+→ contractor service
+→ Control Organization review
+→ KİK56.0/H acceptance proposal
+→ relevant Spending Authority
+→ hakediş preparation
+→ Tahakkuk payment route
+~~~
+
+Unknown and still required from #358:
+
+~~~text
+payable operational count
+exact food-contract Spending Authority
+current unit-price schedule
+current penalty/correction clauses
+daily quantity freeze/change rights
+production/order record owner
+~~~
+
 ## Authoritative artifacts to retrieve
 
 Priority order:
@@ -72,6 +105,16 @@ Access status values:
 10. What is the operational/contractual consequence of shortage, early sellout, late service or quality failure?
 11. Is there a minimum/committed quantity or capacity obligation that changes the optimization boundary?
 12. Could a human-reviewed decision-support recommendation legally and operationally affect quantity before the relevant freeze?
+
+### Route-specific request targets
+
+**Procurement branch:** ask for the current IKN 2025/1727143 administrative specification, technical specification, unit-price schedule and contract/draft-contract retrieval route.
+
+**Control Organization:** ask for one recent service's acceptance evidence and which fields/documents lead into KİK56.0/H.
+
+**Spending Authority referral:** ask the Control Organization / Procurement branch to identify the exact food-contract Harcama Yetkilisi rather than inferring it.
+
+**Tahakkuk branch:** ask which documents and quantity fields must be present in the hakediş payment package and which source record supports the payable quantity.
 
 ## Ready-to-send artifact request text
 
