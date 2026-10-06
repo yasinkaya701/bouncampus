@@ -540,3 +540,33 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
 - Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
 - Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
+
+
+## IE source-namespace reconciliation — 2026-10-06
+
+The following IDs are reserved canonically to prevent cross-agent semantic collisions. These are routing/report-surface facts, not primary PMR completion.
+
+### S-BU-027 — BİDB Faaliyet Raporu 2025
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf
+- Use: first-party confirmation of the BUCard dining live report, daily passage reports, package-meal fields and personnel meal report.
+- Boundary: no export permission, report-grain/finality, stable-ID or `actual_served` claim.
+
+### S-BU-028 — İMİD / İhale ve Satınalma route
+- URL: https://imid.bogazici.edu.tr/tr/pages/kurumsal/2107
+- Use: first-party current procurement-document/owner routing.
+- Boundary: not operational quantity ownership, payable-count semantics, buyer authority or WTP.
+
+### S-BU-029 — Tahakkuk Şube Müdürlüğü
+- URL: https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119
+- Use: first-party hakediş-payment routing.
+- Boundary: general branch responsibility does not establish this food contract's payable unit, signer chain, freeze or incentives.
+
+### S-BU-030 — İMİD contact route
+- URL: https://imid.bogazici.edu.tr/tr/pages/iletisim/2116
+- Use: official Procurement/Tahakkuk/general İMİD contact routing.
+- Boundary: contact route only.
+
+### S-BU-031 — 2025 Administration Activity Report / Control Organization acceptance flow
+- URL: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
+- Use: first-party institutional acceptance-flow context, including KİK56.0/H proposal routing to the relevant spending authority.
+- Boundary: not current IKN payable-count, exact spending-authority identity, freeze point or actual hakediş artifact.

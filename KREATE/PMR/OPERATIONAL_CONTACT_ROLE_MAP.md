@@ -25,6 +25,8 @@ Do not pre-assign "quantity owner", "buyer", "data owner" or "approver" from a j
 - **S-BU-022:** official BUCard portal confirms dining-hall use and BUCard Office/contact route.
 - **S-BU-023:** BUCampus exposes user-facing turnstile/card-reader passage history.
 - **S-BU-024:** institutional notice places BUCard among applications requiring BUVPN in that access context.
+- **S-BU-026:** current dining governance directive assigns dining-BUCard operation/control, required Food Services reporting and digital-data retention to the BUCard Office.
+- **S-BU-027:** BİDB 2025 activity report names BUCard dining live, daily-passage and personnel-meal report surfaces.
 
 This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB/BUCard + SKS reconciliation path. It still does not prove export approval.
 
@@ -35,6 +37,17 @@ This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB
 - Interview objective: find the authoritative privacy-safe aggregate report and clarify retries, refunds/reversals, second meals, package meals, late corrections and report finalization.
 
 Issue **#292** remains the active acquisition lane.
+
+### Procurement / payment / acceptance routing
+
+- **S-BU-028:** official İMİD surface provides the İhale ve Satınalma procurement-document/owner route.
+- **S-BU-029:** Tahakkuk branch provides the hakediş-payment routing surface.
+- **S-BU-030:** official İMİD contact page provides branch/general contact routing.
+- **S-BU-031:** first-party 2025 administration report describes the institutional Control Organization → KİK56.0/H acceptance-proposal → relevant spending-authority path.
+
+Acquisition objective: retrieve the current IKN `2025/1727143` admin/technical specifications, correction/addendum, unit-price schedule, actual acceptance/hakediş artifact, quantity basis and actor chain.
+
+Boundary: this routing bundle still does not establish the current food contract's payable quantity/unit, exact spending authority, freeze point, penalties, buyer authority or incentive allocation.
 
 ### TEMAŞ contractor operations
 
@@ -57,7 +70,7 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
-| acceptance/hakediş | S-PROC-001 gives procurement route only | authoritative clause/report pending PMR |
+| acceptance/hakediş | S-PROC-001 + S-BU-026 + S-BU-028…031 narrow governance/document/payment/acceptance routes | authoritative payable-quantity/clause/report semantics still pending #358 |
 | contractor production planning | S-PROC-001 identifies TEMAŞ | local owner/workflow pending PMR |
 
 ## Interview order

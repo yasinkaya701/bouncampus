@@ -1928,6 +1928,121 @@
         "the directive does not prove research/export authorization, report grain, retention period or that one BUCard event equals one physically served meal",
         "the hakediş workflow actor statement does not establish which quantity/unit is payable, exact signer sequence, freeze/change rights, penalty mechanics, economic beneficiary or software buyer authority"
       ]
+    },
+    {
+      "id": "S-BU-027",
+      "title": "Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Information Technology Department",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "DATA_OWNER",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "BİDB reports a BUCard dining live-report page and says package-meal counts were added to that page",
+        "BİDB reports daily passage reports were updated to include package-meal information",
+        "BİDB reports a personnel meal report with a breakfast field and calculation updates",
+        "BİDB reports BUCard Mobile deployment at dining halls/package distribution points and reader/software changes"
+      ],
+      "limitations": [
+        "report existence does not prove research/export authorization, report grain, API availability, historical snapshot retention, finality or stable report IDs",
+        "daily passage and package-meal report fields are not automatically physically served-meal truth and still require Food Services/SKS reconciliation"
+      ]
+    },
+    {
+      "id": "S-BU-028",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — Kurumsal / İhale ve Satınalma route",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University İdari ve Mali İşler Daire Başkanlığı",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/kurumsal/2107",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H3",
+        "H5",
+        "H6",
+        "CONTRACT",
+        "ACCESS"
+      ],
+      "supports": [
+        "official IMID surface lists İhale ve Satınalma Şube Müdürlüğü as a unit",
+        "provides a first-party routing path for authoritative procurement documents and owner clarification"
+      ],
+      "limitations": [
+        "does not prove IMID owns operational meal-quantity decisions, payable-quantity semantics or hakediş signer sequence for IKN 2025/1727143",
+        "does not establish software buyer authority, economic beneficiary, unit prices, savings or willingness to pay"
+      ]
+    },
+    {
+      "id": "S-BU-029",
+      "title": "Tahakkuk Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch states it performs tender, direct-procurement, transfer and hakediş payments"
+      ],
+      "limitations": [
+        "general hakediş-payment responsibility does not establish the food contract's payable unit, accepted count, signatory chain, freeze point or incentive allocation"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/iletisim/2116",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official phone routing for Procurement and Tahakkuk branches and general IMID contact"
+      ],
+      "limitations": [
+        "contact information is routing evidence only"
+      ]
+    },
+    {
+      "id": "S-BU-031",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "Control Organization works under service general conditions, signed contracts and technical specifications and is responsible to the relevant spending authority",
+        "after preliminary acceptance review, Control Organization prepares KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant spending authority for hakediş preparation",
+        "2025 report states food-service procurement was performed monthly and acceptance-proposal documents were prepared as services were performed"
+      ],
+      "limitations": [
+        "does not identify the current food contract's payable count, awarded unit-price schedule, exact spending-authority identity, daily production freeze or shortage/excess economics",
+        "does not substitute for the current IKN 2025/1727143 technical/admin specifications or an actual hakediş artifact"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."

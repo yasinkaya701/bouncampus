@@ -26,6 +26,15 @@ Execution consequence:
 - route procurement/payment-process artifact ownership in parallel to İdari ve Mali İşler;
 - keep payable quantity, exact signer sequence, freeze/change rights, penalties, economic beneficiary and software buyer authority unresolved until directly evidenced.
 
+### First-party procurement / payment / acceptance routes
+
+- `S-BU-028`: İMİD / İhale ve Satınalma route for authoritative procurement-document ownership.
+- `S-BU-029`: Tahakkuk branch route; its general mandate includes hakediş payments.
+- `S-BU-030`: official İMİD contact route.
+- `S-BU-031`: 2025 administration report describes an institutional Control Organization → KİK56.0/H acceptance proposal → relevant spending-authority flow.
+
+Use these to ask for the current IKN artifact and the exact actor chain. Do **not** promote the generic institutional flow to a current-contract payable-count, exact signer, freeze, penalty or buyer claim.
+
 ## Authoritative artifacts to retrieve
 
 Priority order:

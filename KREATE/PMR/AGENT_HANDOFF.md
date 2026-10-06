@@ -261,3 +261,20 @@ Return only decision-changing deltas:
 - **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
 
 Do not send generic research summaries back to PMR-A.
+
+
+## Source namespace reconciliation — 2026-10-06
+
+Canonical IE routing/report IDs are intentionally fixed to avoid cross-agent semantic collisions:
+
+- `S-BU-027` — BİDB 2025 activity report / named dining report surfaces;
+- `S-BU-028` — İMİD / İhale ve Satınalma route;
+- `S-BU-029` — Tahakkuk route;
+- `S-BU-030` — İMİD contact route;
+- `S-BU-031` — 2025 administration report / Control Organization acceptance flow.
+
+**CS1:** S-BU-027 narrows the report request but is not SERVICE_TRUTH_V1.  
+**CS2:** S-BU-028…031 narrow contract-owner routing but do not unlock buyer/WTP/savings/payable-count claims.  
+**EE/EHB:** no sensing implication follows from these routing facts.
+
+Prepared requests remain requests; no outreach, export access, interview completion or contract interpretation is implied.

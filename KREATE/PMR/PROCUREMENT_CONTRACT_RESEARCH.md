@@ -194,6 +194,17 @@ Useful first-party routes now in the catalog:
 
 These are **interview-routing evidence**, not proof that any named public role owns the specific decision.
 
+## First-party procurement / payment / acceptance routes
+
+The public tender surface is now paired with four first-party owner-routing sources:
+
+- **S-BU-028** — İMİD / İhale ve Satınalma route for authoritative procurement-document ownership;
+- **S-BU-029** — Tahakkuk branch, whose general mandate includes hakediş payments;
+- **S-BU-030** — official IMID contact route;
+- **S-BU-031** — 2025 administration report describing an institutional Control Organization → KİK56.0/H acceptance-proposal → relevant spending-authority flow.
+
+This changes execution: #358 can target named institutional routes for the missing current artifacts instead of treating procurement/acceptance ownership as generic. It does **not** establish the current food contract's accepted/payable quantity, exact spending authority, signer sequence, daily freeze, penalties, economic beneficiary or software purchasing authority.
+
 ## Contract-PMR question set
 
 Ask for one recent concrete service first, then reconstruct the documents and decisions:
