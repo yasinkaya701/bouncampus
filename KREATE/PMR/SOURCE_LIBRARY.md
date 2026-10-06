@@ -540,3 +540,38 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
 - Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
 - Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
+
+
+## Procurement, payment and acceptance owner routes — 2026-10-06
+
+### S-BU-027 — İhale ve Satınalma Şube Müdürlüğü
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University Administrative and Financial Affairs
+- URL: https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117
+- Use: first-party route for tender/procurement ownership and authoritative document acquisition.
+- Boundary: general branch responsibility is not proof of the exact IKN 2025/1727143 document owner, product buyer, payable quantity or contract semantics.
+- Maps to: H5, CONTRACT, ACCESS.
+
+### S-BU-028 — Tahakkuk Şube Müdürlüğü
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University Administrative and Financial Affairs
+- URL: https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119
+- Use: first-party route for hakediş/payment-process artifacts; the unit explicitly lists tender, direct-procurement, transfer and hakediş payments.
+- Boundary: payment processing does not establish the current food contract's payable unit/count, acceptance basis, signatory chain, savings beneficiary or software budget.
+- Maps to: H5, CONTRACT, ACCESS.
+
+### S-BU-029 — İdari ve Mali İşler Daire Başkanlığı — İletişim
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University Administrative and Financial Affairs
+- URL: https://imid.bogazici.edu.tr/tr/pages/iletisim/2116
+- Use: official institutional routing for İMİD and its procurement/payment units.
+- Boundary: contact metadata only; not decision-ownership or contract evidence.
+- Maps to: H5, ACCESS.
+
+### S-BU-030 — Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University
+- URL: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
+- Use: current institutional acceptance-process evidence. The report states that the Control Organization works under the general service conditions, signed contracts and technical specifications; after preliminary acceptance it prepares KİK56.0/H and submits it to the relevant Spending Authority for hakediş preparation. The report explicitly includes food-service procurement among recurring services under this control surface.
+- Boundary: does not identify the current food contract's payable count, exact Spending Authority identity, daily freeze/change rights, shortage/excess economics, WTP or software buyer; current IKN artifacts remain required.
+- Maps to: H1, H5, CONTRACT, ACCEPTANCE.
