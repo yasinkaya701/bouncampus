@@ -1,0 +1,650 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-10-06",
+  "purpose": "Cumulative secondary-source registry supporting PMR preparation. Public/academic/vendor sources are never promoted to interview evidence without a real completed interview.",
+  "evidence_classes": [
+    "PUBLIC SOURCE",
+    "ACADEMIC SOURCE",
+    "VENDOR SOURCE",
+    "PUBLIC PROCUREMENT",
+    "INTERVIEW EVIDENCE",
+    "TECHNICAL TEST",
+    "REPO ARTIFACT",
+    "HYPOTHESIS",
+    "UNKNOWN"
+  ],
+  "statuses": [
+    "VERIFIED",
+    "CANDIDATE",
+    "STALE",
+    "SUPERSEDED"
+  ],
+  "sources": [
+    {
+      "id": "SRC-BU-001",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Boğaziçi University",
+      "title": "Campus Food Waste Tracking",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "web",
+      "use": "Official institutional food-waste and dining context.",
+      "does_not_prove": "Service-level causality, quantity decision rights, adoption or product-market fit."
+    },
+    {
+      "id": "SRC-BU-002",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Boğaziçi University",
+      "title": "2025 food-waste XLSX",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "xlsx",
+      "use": "Official downloadable waste artifact linked from the university page.",
+      "does_not_prove": "Meal-level cause, waste-stage split or produced/served counts."
+    },
+    {
+      "id": "SRC-BU-003",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Boğaziçi University",
+      "title": "Sustainability Report 2025",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf",
+      "maps_to": [
+        "H4",
+        "H5"
+      ],
+      "artifact_type": "pdf",
+      "use": "Institutional sustainability context and source trail.",
+      "does_not_prove": "PMR, buyer authority or pilot permission."
+    },
+    {
+      "id": "SRC-BU-004",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Boğaziçi University",
+      "title": "Sustainability Reports index",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/surdurulebilirlik-raporlari/1063",
+      "maps_to": [
+        "H4"
+      ],
+      "artifact_type": "web",
+      "use": "Canonical landing page for sustainability reports.",
+      "does_not_prove": "Any operational fact not explicitly documented."
+    },
+    {
+      "id": "SRC-BU-005",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Boğaziçi University",
+      "title": "Official cafeteria visual",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png",
+      "maps_to": [
+        "H4"
+      ],
+      "artifact_type": "image",
+      "use": "Visual context only.",
+      "does_not_prove": "Sensor feasibility, waste stage or queue geometry."
+    },
+    {
+      "id": "SRC-PMR-001",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Disciplined Entrepreneurship",
+      "title": "Primary Market Research PDF",
+      "url": "https://www.d-eship.com/wp-content/uploads/2019/03/Disciplined_Entrepreneurship_-_Primary_Market_Research.pdf",
+      "maps_to": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6"
+      ],
+      "artifact_type": "pdf",
+      "use": "Primary-market-research method basis.",
+      "does_not_prove": "Any BOUNCAMPUS customer conclusion."
+    },
+    {
+      "id": "SRC-PMR-002",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Disciplined Entrepreneurship",
+      "title": "PMR step",
+      "url": "https://www.d-eship.com/step1a/",
+      "maps_to": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Current PMR guidance entry point.",
+      "does_not_prove": "Product-market fit."
+    },
+    {
+      "id": "SRC-PMR-003",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "MIT Martin Trust Center for MIT Entrepreneurship",
+      "title": "How entrepreneurs can conduct primary market research",
+      "url": "https://entrepreneurship.mit.edu/news/entrepreneurs-can-conduct-primary-market-research/",
+      "maps_to": [
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Customer-research discipline.",
+      "does_not_prove": "A substitute for interviews."
+    },
+    {
+      "id": "SRC-PMR-004",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "MIT Sloan",
+      "title": "Disciplined Entrepreneurship: questions for startup success",
+      "url": "https://mitsloan.mit.edu/ideas-made-to-matter/disciplined-entrepreneurship-6-questions-startup-success",
+      "maps_to": [
+        "H5",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Customer-first segmentation and venture framing.",
+      "does_not_prove": "Willingness to buy in this market."
+    },
+    {
+      "id": "SRC-MEAS-001",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "UNEP",
+      "title": "Food Waste Index Report 2024",
+      "url": "https://www.unep.org/resources/publication/food-waste-index-report-2024",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "web",
+      "use": "International food-waste measurement framework.",
+      "does_not_prove": "Local waste cause or site feasibility."
+    },
+    {
+      "id": "SRC-MEAS-002",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "UNEP",
+      "title": "Food Waste Index Report 2024 full PDF",
+      "url": "https://wedocs.unep.org/bitstream/handle/20.500.11822/45230/food_waste_index_report_2024.pdf",
+      "maps_to": [
+        "H4"
+      ],
+      "artifact_type": "pdf",
+      "use": "Direct methodology artifact.",
+      "does_not_prove": "Validated sensor accuracy or pilot outcome."
+    },
+    {
+      "id": "SRC-MEAS-003",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "US EPA",
+      "title": "Wasted Food Scale",
+      "url": "https://www.epa.gov/sustainable-management-food/wasted-food-scale",
+      "maps_to": [
+        "H2"
+      ],
+      "artifact_type": "web",
+      "use": "Prevention/source-reduction hierarchy.",
+      "does_not_prove": "BOUNCAMPUS impact."
+    },
+    {
+      "id": "SRC-MEAS-004",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "US EPA",
+      "title": "Prevent wasted food through source reduction",
+      "url": "https://www.epa.gov/sustainable-management-food/prevent-wasted-food-through-source-reduction",
+      "maps_to": [
+        "H2",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Operational prevention concepts.",
+      "does_not_prove": "Local causal effect or business case."
+    },
+    {
+      "id": "SRC-MEAS-005",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "US EPA",
+      "title": "Resources for assessing wasted food",
+      "url": "https://www.epa.gov/sustainable-management-food/resources-assessing-wasted-food",
+      "maps_to": [
+        "H4"
+      ],
+      "artifact_type": "web",
+      "use": "Measurement/audit resource index.",
+      "does_not_prove": "Site-specific validity."
+    },
+    {
+      "id": "SRC-ACAD-001",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Sustainability (MDPI)",
+      "title": "Reducing Food Waste in Campus Dining: A Data-Driven Approach to Demand Prediction and Sustainability",
+      "year": 2025,
+      "url": "https://doi.org/10.3390/su17020379",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "paper",
+      "use": "University dining demand features and ML precedent.",
+      "does_not_prove": "Transferable accuracy, savings or feature value at Boğaziçi."
+    },
+    {
+      "id": "SRC-ACAD-002",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Journal of Cleaner Production",
+      "title": "Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste",
+      "year": 2024,
+      "url": "https://www.sciencedirect.com/science/article/pii/S0959652623044232",
+      "maps_to": [
+        "H2",
+        "H3",
+        "H6"
+      ],
+      "artifact_type": "paper",
+      "use": "Multi-site catering forecasting and demand/waste trade-off precedent.",
+      "does_not_prove": "Expected BOUNCAMPUS effect or local economics."
+    },
+    {
+      "id": "SRC-ACAD-003",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "PubMed indexed study",
+      "title": "Preventing food waste in subsidy-based university dining systems: ANN-aided model under uncertainty",
+      "year": 2021,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/33971773/",
+      "maps_to": [
+        "H2",
+        "H3"
+      ],
+      "artifact_type": "paper",
+      "use": "Reservation/show/no-show and asymmetric waste/shortage-cost precedent.",
+      "does_not_prove": "Boğaziçi process, costs or achievable reduction."
+    },
+    {
+      "id": "SRC-ACAD-004",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "DergiPark",
+      "title": "Yemekhane için Yapay Zeka Teknikleri Kullanımı ile Günlük Talep Tahmini",
+      "year": 2018,
+      "url": "https://dergipark.org.tr/tr/pub/ejosat/article/397549",
+      "maps_to": [
+        "H2"
+      ],
+      "artifact_type": "paper",
+      "use": "Turkish institutional daily demand-forecasting precedent.",
+      "does_not_prove": "Novelty or current market demand."
+    },
+    {
+      "id": "SRC-ACAD-005",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "DergiPark",
+      "title": "Machine Learning Techniques for Cafeteria Demand Forecasting: An Institutional Case",
+      "year": 2025,
+      "url": "https://dergipark.org.tr/en/pub/opusjsr/article/1649256",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "paper",
+      "use": "Recent institutional turnstile-based forecasting comparison.",
+      "does_not_prove": "Boğaziçi data availability or model promotion."
+    },
+    {
+      "id": "SRC-ACAD-006",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Springer Nature",
+      "title": "Understanding drivers of consumer level food waste in a university cafeteria",
+      "year": 2026,
+      "url": "https://link.springer.com/article/10.1007/s44274-025-00509-y",
+      "maps_to": [
+        "H2"
+      ],
+      "artifact_type": "paper",
+      "use": "Alternative consumer/meal-level food-waste drivers.",
+      "does_not_prove": "Same drivers dominate Boğaziçi."
+    },
+    {
+      "id": "SRC-ACAD-007",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "ScienceDirect",
+      "title": "Higher-education food-waste intervention systematic review",
+      "year": 2024,
+      "url": "https://www.sciencedirect.com/science/article/pii/S2772912524000538",
+      "maps_to": [
+        "H2",
+        "H6"
+      ],
+      "artifact_type": "paper",
+      "use": "Intervention landscape and evaluation heterogeneity.",
+      "does_not_prove": "Forecasting is the best local intervention."
+    },
+    {
+      "id": "SRC-ACAD-008",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Sustainability (MDPI)",
+      "title": "University canteen portion/waste study",
+      "year": 2024,
+      "url": "https://www.mdpi.com/2071-1050/16/10/4317",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "paper",
+      "use": "Direct weighing/portion context and alternative waste causes.",
+      "does_not_prove": "Local prevalence."
+    },
+    {
+      "id": "SRC-ACAD-009",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Applied Sciences (MDPI)",
+      "title": "Machine-vision food-waste intervention in university cafeterias",
+      "year": 2025,
+      "url": "https://www.mdpi.com/2076-3417/15/9/5036",
+      "maps_to": [
+        "H4",
+        "privacy"
+      ],
+      "artifact_type": "paper",
+      "use": "Automated-vision comparison and privacy/design trade-off.",
+      "does_not_prove": "Identity-heavy sensing is appropriate for BOUNCAMPUS."
+    },
+    {
+      "id": "SRC-ACAD-010",
+      "class": "ACADEMIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Resources, Conservation & Recycling",
+      "title": "School catering forecasting / plate-tracking study",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0921344921006066",
+      "maps_to": [
+        "H2",
+        "H4"
+      ],
+      "artifact_type": "paper",
+      "use": "Adjacent institutional serving-waste evidence.",
+      "does_not_prove": "University transferability or expected effect."
+    },
+    {
+      "id": "SRC-TGT-001",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "İstanbul Technical University",
+      "title": "Beslenme Hizmetleri",
+      "url": "https://www.sks.itu.edu.tr/hizmetlerimiz/beslenme-hizmetleri",
+      "maps_to": [
+        "H1",
+        "H4",
+        "H5",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Mature second-site operating archetype and PMR target.",
+      "does_not_prove": "Unmet forecasting problem or willingness to buy."
+    },
+    {
+      "id": "SRC-TGT-002",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Recep Tayyip Erdoğan University",
+      "title": "Yemekhane Rezervasyon Sistemi",
+      "url": "https://sks.erdogan.edu.tr/tr/news-detail/yemekhane-rezervasyon-sistemi/4787",
+      "maps_to": [
+        "H1",
+        "H2",
+        "H3"
+      ],
+      "artifact_type": "web",
+      "use": "Reservation-before-production and freeze-point archetype.",
+      "does_not_prove": "Same process at Boğaziçi."
+    },
+    {
+      "id": "SRC-TGT-003",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Kayseri University",
+      "title": "Yemekhane Rezervasyon Sistemi Duyurusu",
+      "year": 2026,
+      "url": "https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu",
+      "maps_to": [
+        "H1",
+        "H2",
+        "H3"
+      ],
+      "artifact_type": "web",
+      "use": "Current reservation-led campus planning archetype.",
+      "does_not_prove": "Local economics or demand."
+    },
+    {
+      "id": "SRC-TGT-004",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Afyonkarahisar Health Sciences University",
+      "title": "Beslenme hizmetleri ve rezervasyon sistemi bilgilendirmesi",
+      "year": 2026,
+      "url": "https://skultur.afsu.edu.tr/ogrenciye-beslenme-hizmetleri-ve-rezervasyon-sistemi-hakkinda-bilgilendirme-yapildi/",
+      "maps_to": [
+        "H1",
+        "H2",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Weekly reservation/planning archetype.",
+      "does_not_prove": "Same workflow is suitable elsewhere."
+    },
+    {
+      "id": "SRC-TGT-005",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Anadolu University",
+      "title": "Beslenme Olanakları",
+      "url": "https://abp.anadolu.edu.tr/tr/ogrenci/beslenmeolanaklari",
+      "maps_to": [
+        "H1",
+        "H4",
+        "H5"
+      ],
+      "artifact_type": "web",
+      "use": "Large-scale dining/reservation context and comparative PMR target.",
+      "does_not_prove": "Decision rights, forecast error or adoption."
+    },
+    {
+      "id": "SRC-TGT-006",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Altınbaş University",
+      "title": "MyMeal",
+      "url": "https://software.altinbas.edu.tr/mymeal/index_tr.html",
+      "maps_to": [
+        "competition",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Existing university-developed meal reservation/tracking alternative.",
+      "does_not_prove": "Forecasting/waste causality or external deployment."
+    },
+    {
+      "id": "SRC-TGT-007",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "İzmir Bakırçay University",
+      "title": "Akıllı Kampüs Projesi Ara Raporu",
+      "url": "https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf",
+      "maps_to": [
+        "H2",
+        "H4",
+        "competition"
+      ],
+      "artifact_type": "pdf",
+      "use": "Smart-campus food purchasing/utilization/occupancy planning precedent.",
+      "does_not_prove": "Current architecture, transferability or customer requirement."
+    },
+    {
+      "id": "SRC-COMP-001",
+      "class": "VENDOR SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Winnow",
+      "title": "Winnow and Hilton announce Winnow Foresight",
+      "date": "2026-09-29",
+      "url": "https://www.winnowsolutions.com/resources/news/winnow-and-hilton-announce-winnow-foresight-a-mobile-first-ai-powered-forecasting-tool-designed-to-predict-kitchen-demand-and-prevent-food-waste",
+      "maps_to": [
+        "competition",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Current vendor production-forecasting positioning; kills generic novelty claim.",
+      "does_not_prove": "Independent performance, university fit or Turkish procurement fit."
+    },
+    {
+      "id": "SRC-COMP-002",
+      "class": "VENDOR SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Winnow",
+      "title": "Introducing Winnow Foresight",
+      "date": "2026-09-28",
+      "url": "https://www.winnowsolutions.com/resources/news/introducing-winnow-foresight-a-new-way-to-prevent-food-waste-and-improve-guest-satisfaction-with-ai-powered-forecasting?hs_amp=true",
+      "maps_to": [
+        "competition"
+      ],
+      "artifact_type": "web",
+      "use": "Vendor-described item-level production-plan workflow.",
+      "does_not_prove": "Equivalent capability in every segment."
+    },
+    {
+      "id": "SRC-COMP-003",
+      "class": "VENDOR SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Leanpath",
+      "title": "College & University",
+      "url": "https://www.leanpath.com/industries/college-university/",
+      "maps_to": [
+        "competition",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Current university food-waste competitor reference.",
+      "does_not_prove": "Independent outcomes or exact feature gap."
+    },
+    {
+      "id": "SRC-COMP-004",
+      "class": "VENDOR SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Leanpath",
+      "title": "Food Waste Tracking",
+      "url": "https://www.leanpath.com/products/food-waste-tracking/",
+      "maps_to": [
+        "competition"
+      ],
+      "artifact_type": "web",
+      "use": "Current measurement/analytics capability reference.",
+      "does_not_prove": "Solves target pre-freeze decision."
+    },
+    {
+      "id": "SRC-COMP-005",
+      "class": "VENDOR SOURCE",
+      "status": "VERIFIED",
+      "publisher": "Emissary",
+      "title": "Emissary Campus",
+      "url": "https://emissary.com.tr/tr/cozumler/emissary-campus",
+      "maps_to": [
+        "competition",
+        "H6"
+      ],
+      "artifact_type": "web",
+      "use": "Turkish university sustainability/data/audit platform reference.",
+      "does_not_prove": "Daily food-production decision depth or preference for BOUNCAMPUS."
+    },
+    {
+      "id": "SRC-PRIV-001",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "KVKK",
+      "title": "General Principles in Processing of Personal Data",
+      "url": "https://www.kvkk.gov.tr/Icerik/6606/General-Principles-in-Processing-of-Personal-Data",
+      "maps_to": [
+        "H4",
+        "H6",
+        "privacy"
+      ],
+      "artifact_type": "web",
+      "use": "Data-minimization/proportionality design boundary.",
+      "does_not_prove": "Legal approval of a specific deployment."
+    },
+    {
+      "id": "SRC-PRIV-002",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "KVKK",
+      "title": "Obligation to inform",
+      "url": "https://www.kvkk.gov.tr/Icerik/6641/Obligation-to-inform",
+      "maps_to": [
+        "H4",
+        "H6",
+        "privacy"
+      ],
+      "artifact_type": "web",
+      "use": "Deployment privacy-checklist input.",
+      "does_not_prove": "A specific notice/process is sufficient."
+    },
+    {
+      "id": "SRC-PRIV-003",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "KVKK",
+      "title": "Decision 2020/212",
+      "url": "https://www.kvkk.gov.tr/Icerik/6892/2020-212",
+      "maps_to": [
+        "H4",
+        "privacy"
+      ],
+      "artifact_type": "web",
+      "use": "Camera/audio proportionality design reference.",
+      "does_not_prove": "Approval of TrayGate or campus camera deployment."
+    },
+    {
+      "id": "SRC-PRIV-004",
+      "class": "PUBLIC SOURCE",
+      "status": "VERIFIED",
+      "publisher": "KVKK",
+      "title": "Guideline on Considerations in the Processing of Biometric Data",
+      "url": "https://www.kvkk.gov.tr/Icerik/7462/Guideline-on-Considerations-in-The-Processing-of-Biometric-Data",
+      "maps_to": [
+        "H4",
+        "privacy"
+      ],
+      "artifact_type": "web",
+      "use": "Avoid biometric shortcuts when aggregate signals suffice.",
+      "does_not_prove": "A legal opinion for a particular institution."
+    }
+  ]
+}
