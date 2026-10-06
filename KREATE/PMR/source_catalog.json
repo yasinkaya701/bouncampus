@@ -8,7 +8,9 @@
     "STANDARD",
     "ACADEMIC",
     "VENDOR",
-    "INTERNAL_PROVENANCE"
+    "INTERNAL_PROVENANCE",
+    "OFFICIAL_POLICY",
+    "PRIVACY_GUIDANCE"
   ],
   "sources": [
     {
@@ -104,8 +106,12 @@
         "public aggregate food-waste context"
       ],
       "limitations": [
-        "does not establish waste stage or causal mechanism"
-      ]
+        "does not establish waste stage or causal mechanism",
+        "published 2025 monthly rows contain unreconciled semantics: August and October delivered-to-ISTAC values exceed displayed monthly total; preserve as published and ask source owner"
+      ],
+      "assets": {
+        "official_2025_xlsx": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/2025%20Y%C4%B1l%C4%B1%20At%C4%B1k%20Bilgisi%281%29.xlsx"
+      }
     },
     {
       "id": "S-BU-003",
@@ -582,6 +588,322 @@
       ],
       "limitations": [
         "materially stale; selectively salvage source-level facts only"
+      ]
+    },
+    {
+      "id": "S-BU-007",
+      "title": "Boğaziçi Impact - Campus Food Waste Tracking (historical)",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://impact.bogazici.edu.tr/221-campus-food-waste-tracking",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "assets": {
+        "pdf_2024": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf",
+        "pdf_2023": "https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf"
+      },
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "historical aggregate food-waste context",
+        "cross-year public reporting trail"
+      ],
+      "limitations": [
+        "aggregate reporting is not service truth",
+        "does not establish waste cause or intervention effect"
+      ]
+    },
+    {
+      "id": "S-BU-008",
+      "title": "Boğaziçi Sustainability Reports index and Sustainability Report 2025",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/surdurulebilirlik-raporlari/1063",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "assets": {
+        "sustainability_2025_pdf": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/183-bogazici-university-sustainability-2025-yayin-20251104-115151.pdf"
+      },
+      "hypotheses": [
+        "H4",
+        "H5",
+        "WHY_NOW"
+      ],
+      "supports": [
+        "institutional sustainability reporting context",
+        "official report provenance"
+      ],
+      "limitations": [
+        "does not establish dining workflow",
+        "does not establish buyer authority or pilot permission"
+      ]
+    },
+    {
+      "id": "S-POL-001",
+      "title": "Türkiye food-service food-waste prevention guide",
+      "type": "OFFICIAL_POLICY",
+      "publisher": "Republic of Türkiye Ministry of Agriculture and Forestry / FAO / Metro Türkiye",
+      "url": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "Türkiye-specific food-service prevention and measurement context"
+      ],
+      "limitations": [
+        "does not establish Boğaziçi root cause, workflow or product impact"
+      ]
+    },
+    {
+      "id": "S-POL-002",
+      "title": "Türkiye national strategy on prevention, reduction and monitoring of food loss and waste",
+      "type": "OFFICIAL_POLICY",
+      "publisher": "Republic of Türkiye Ministry of Agriculture and Forestry / FAOLEX",
+      "url": "https://faolex.fao.org/docs/pdf/tur209489.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "official_policy_archive",
+      "hypotheses": [
+        "H2",
+        "H4",
+        "WHY_NOW"
+      ],
+      "supports": [
+        "national prevention, reduction and monitoring policy context"
+      ],
+      "limitations": [
+        "does not establish local causal mechanism, buyer intent or BOUNCAMPUS impact"
+      ]
+    },
+    {
+      "id": "S-POL-003",
+      "title": "UI GreenMetric Sustainable University Rankings Guideline 2026",
+      "type": "OFFICIAL_POLICY",
+      "publisher": "UI GreenMetric / Universitas Indonesia",
+      "url": "https://uigreenmetric.com/resources/university/guidelines/2026/english",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_standard_body",
+      "assets": {
+        "pdf": "https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf"
+      },
+      "hypotheses": [
+        "WHY_NOW"
+      ],
+      "supports": [
+        "2026 sustainability evidence, waste, governance and digitalization context"
+      ],
+      "limitations": [
+        "does not prove university willingness to buy",
+        "does not prove ranking improvement from BOUNCAMPUS"
+      ]
+    },
+    {
+      "id": "S-TR-005",
+      "title": "Recep Tayyip Erdoğan University dining reservation system",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Recep Tayyip Erdoğan University",
+      "url": "https://sks.erdogan.edu.tr/tr/news-detail/yemekhane-rezervasyon-sistemi/4787",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H6"
+      ],
+      "supports": [
+        "reservation-before-service planning archetype for cross-site PMR"
+      ],
+      "limitations": [
+        "not Boğaziçi evidence",
+        "cutoff and settlement semantics require site-specific verification"
+      ]
+    },
+    {
+      "id": "S-TR-006",
+      "title": "Kayseri University dining reservation system announcement",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Kayseri University",
+      "url": "https://sksd.kayseri.edu.tr/tr/duyuru-detay/10301/yemekhane-rezervasyon-sistemi-duyurusu",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H3",
+        "H6"
+      ],
+      "supports": [
+        "another university reservation-led planning archetype"
+      ],
+      "limitations": [
+        "not Boğaziçi evidence",
+        "does not establish same buyer or workflow"
+      ]
+    },
+    {
+      "id": "S-TR-007",
+      "title": "Altınbaş University MyMeal",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Altınbaş University",
+      "url": "https://software.altinbas.edu.tr/mymeal/index_tr.html",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_operational",
+      "hypotheses": [
+        "H4",
+        "H6",
+        "DIFFERENTIATION"
+      ],
+      "supports": [
+        "existing university-developed meal reservation/tracking alternative"
+      ],
+      "limitations": [
+        "public page does not establish capability parity, adoption level or procurement economics"
+      ]
+    },
+    {
+      "id": "S-ACAD-007",
+      "title": "Machine learning models for short-term demand forecasting in food catering services: A solution to reduce food waste",
+      "type": "ACADEMIC",
+      "publisher": "Journal of Cleaner Production",
+      "url": "https://doi.org/10.1016/j.jclepro.2023.140265",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2",
+        "H3",
+        "H4",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "multi-site catering forecast-vs-baseline precedent using real catering data"
+      ],
+      "limitations": [
+        "reported performance and waste-reduction results are not transferable Boğaziçi expectations"
+      ]
+    },
+    {
+      "id": "S-ACAD-008",
+      "title": "Food Waste Management Practices and Barriers to Progress in U.S. University Foodservice",
+      "type": "ACADEMIC",
+      "publisher": "International Journal of Environmental Research and Public Health",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9180560/",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H1",
+        "H2",
+        "H4",
+        "H6"
+      ],
+      "supports": [
+        "university foodservice prevention, demand-forecasting, smaller-batch and measurement-practice context"
+      ],
+      "limitations": [
+        "U.S. sample does not establish Boğaziçi practice or priorities"
+      ]
+    },
+    {
+      "id": "S-ACAD-009",
+      "title": "Systematic literature review of food waste in educational institutions",
+      "type": "ACADEMIC",
+      "publisher": "International Journal of Contemporary Hospitality Management",
+      "url": "https://doi.org/10.1108/IJCHM-07-2020-0672",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed",
+      "hypotheses": [
+        "H2",
+        "H4"
+      ],
+      "supports": [
+        "multi-causal educational food-waste framing and alternative-cause pressure"
+      ],
+      "limitations": [
+        "does not establish any Boğaziçi-specific causal share"
+      ]
+    },
+    {
+      "id": "S-ACAD-010",
+      "title": "Machine-vision food-waste intervention in university cafeterias",
+      "type": "ACADEMIC",
+      "publisher": "Applied Sciences",
+      "url": "https://www.mdpi.com/2076-3417/15/9/5036",
+      "accessed_at": "2026-10-06",
+      "authority": "peer_reviewed_open_access",
+      "hypotheses": [
+        "H4",
+        "H6",
+        "MEASUREMENT"
+      ],
+      "supports": [
+        "automated vision measurement/intervention precedent and design trade-offs"
+      ],
+      "limitations": [
+        "does not validate TrayGate, local accuracy, privacy acceptability or mass estimation"
+      ]
+    },
+    {
+      "id": "S-PRIV-001",
+      "title": "General Principles in Processing of Personal Data",
+      "type": "PRIVACY_GUIDANCE",
+      "publisher": "KVKK",
+      "url": "https://www.kvkk.gov.tr/Icerik/6606/General-Principles-in-Processing-of-Personal-Data",
+      "accessed_at": "2026-10-06",
+      "authority": "official_regulator",
+      "hypotheses": [
+        "H4",
+        "H6",
+        "PRIVACY"
+      ],
+      "supports": [
+        "data-minimization, proportionality and purpose-limitation design boundary"
+      ],
+      "limitations": [
+        "not project-specific legal advice or approval"
+      ]
+    },
+    {
+      "id": "S-PRIV-002",
+      "title": "Obligation to inform",
+      "type": "PRIVACY_GUIDANCE",
+      "publisher": "KVKK",
+      "url": "https://www.kvkk.gov.tr/Icerik/6641/Obligation-to-inform",
+      "accessed_at": "2026-10-06",
+      "authority": "official_regulator",
+      "hypotheses": [
+        "H4",
+        "H6",
+        "PRIVACY"
+      ],
+      "supports": [
+        "deployment privacy/information-duty checklist context"
+      ],
+      "limitations": [
+        "not project-specific legal advice or a lawful-basis determination"
+      ]
+    },
+    {
+      "id": "S-PRIV-003",
+      "title": "Guideline on Considerations in the Processing of Biometric Data",
+      "type": "PRIVACY_GUIDANCE",
+      "publisher": "KVKK",
+      "url": "https://www.kvkk.gov.tr/Icerik/7462/Guideline-on-Considerations-in-The-Processing-of-Biometric-Data",
+      "accessed_at": "2026-10-06",
+      "authority": "official_regulator",
+      "hypotheses": [
+        "H4",
+        "PRIVACY"
+      ],
+      "supports": [
+        "avoid unnecessary biometric/person-level sensing where aggregate signals suffice"
+      ],
+      "limitations": [
+        "does not mean the current architecture processes biometric data"
       ]
     }
   ]
