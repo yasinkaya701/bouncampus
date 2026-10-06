@@ -36,6 +36,16 @@ This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB
 
 Issue **#292** remains the active acquisition lane.
 
+### Current-contract acceptance and payment routing
+
+- **S-BU-026:** official İhale ve Satınalma branch — authoritative procurement/document-routing surface.
+- **S-BU-030:** official 2025 Administration Activity Report — Control Organization → `KİK56.0/H` → relevant Spending Authority for hakediş preparation.
+- **S-BU-027:** official Tahakkuk branch — institutional hakediş-payment processing route.
+
+Acquisition objective for #358: retrieve the current IKN `2025/1727143` bundle and one real acceptance/hakediş package, then identify the exact payable quantity field, unit-price item, sign-off owner, correction/reconciliation path, and quantity freeze/change rights.
+
+These are routing/process facts only. They do **not** establish the food contract's payable count, meal unit price, software buyer, savings, or who bears surplus/shortage economics.
+
 ### TEMAŞ contractor operations
 
 - Procurement anchor: `S-PROC-001`
