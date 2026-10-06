@@ -1,0 +1,513 @@
+{
+  "schema_version": "1.0",
+  "name": "BOUNCAMPUS VPMR source registry",
+  "curated_at": "2026-10-06",
+  "truth_boundary": "Secondary/public/academic/standard sources support context and hypothesis design. They do not count as interview PMR, customer validation, pilot evidence, or local model performance.",
+  "sources": [
+    {
+      "id": "VPMR-SRC-001",
+      "title": "Campus food waste tracking",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/221-campus-food-waste-tracking/1310",
+      "can_support": [
+        "official campus food-waste baseline",
+        "monthly aggregate context"
+      ],
+      "cannot_support": [
+        "service-level overproduction labels",
+        "causal attribution of waste"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-002",
+      "title": "2025 SKS activity report",
+      "publisher": "Boğaziçi University SKS",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://sks.bogazici.edu.tr/tr/pages/faaliyet-raporu/7096",
+      "can_support": [
+        "dining operation scale",
+        "public aggregate meal/dining-hall context"
+      ],
+      "cannot_support": [
+        "campus-meal service truth"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-003",
+      "title": "Healthy and affordable food choices",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://kurumsalveri.bogazici.edu.tr/tr/pages/234-healthy-and-affordable-food-choices/1314",
+      "can_support": [
+        "central-kitchen context",
+        "portion/nutrition planning context"
+      ],
+      "cannot_support": [
+        "quantity decision owner",
+        "freeze time",
+        "service-level outcome"
+      ],
+      "hypotheses": [
+        "H-002",
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-004",
+      "title": "Dining menu",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://yemekhane.bogazici.edu.tr/",
+      "can_support": [
+        "public menu context"
+      ],
+      "cannot_support": [
+        "realized demand"
+      ],
+      "hypotheses": [
+        "H-002",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-005",
+      "title": "Menu survey",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://yemekhane.bogazici.edu.tr/menu-anketi",
+      "can_support": [
+        "menu preference workflow"
+      ],
+      "cannot_support": [
+        "attendance reservation",
+        "served demand"
+      ],
+      "hypotheses": [
+        "H-002",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-006",
+      "title": "Kilyos meal reservation notice (20 May 2026)",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://yemekhane.bogazici.edu.tr/node/493",
+      "can_support": [
+        "existence of a reservation workflow for the cited campus/period"
+      ],
+      "cannot_support": [
+        "universal reservation policy"
+      ],
+      "hypotheses": [
+        "H-002",
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-007",
+      "title": "Academic calendar",
+      "publisher": "Boğaziçi University",
+      "class": "ARCHIVED_DECISION_INPUT",
+      "url": "https://akademiktakvim.bogazici.edu.tr/",
+      "can_support": [
+        "calendar/regime features known in advance"
+      ],
+      "cannot_support": [
+        "demand outcome"
+      ],
+      "hypotheses": [
+        "H-002",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-008",
+      "title": "Dining FAQ",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://yemekhane.bogazici.edu.tr/sikca-sorulan-sorular-0",
+      "can_support": [
+        "public clues about date/time/campus/turnstile context"
+      ],
+      "cannot_support": [
+        "data access",
+        "retention",
+        "served-meal equivalence"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verification_status": "REVERIFY_BEFORE_APPLICATION"
+    },
+    {
+      "id": "VPMR-SRC-009",
+      "title": "BUCampus v1.1.2 announcement",
+      "publisher": "Boğaziçi University IT",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://bilgiislem.bogazici.edu.tr/tr/news/kampus/2/bucampusun-yeni-versiyonu-yayinda/3351",
+      "can_support": [
+        "existence of menu voting/calendar product surfaces"
+      ],
+      "cannot_support": [
+        "backend export/API availability"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verification_status": "REVERIFY_BEFORE_APPLICATION"
+    },
+    {
+      "id": "VPMR-SRC-010",
+      "title": "2025 Administration Activity Report",
+      "publisher": "Boğaziçi University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu(3).pdf",
+      "can_support": [
+        "administrative/contracted service context"
+      ],
+      "cannot_support": [
+        "daily quantity semantics without exact clause/owner verification"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-005"
+      ],
+      "verification_status": "PAGE_LEVEL_RECHECK_REQUIRED"
+    },
+    {
+      "id": "VPMR-SRC-011",
+      "title": "Food Waste Index Report 2024",
+      "publisher": "UNEP",
+      "class": "STANDARD_METHOD",
+      "url": "https://www.unep.org/resources/publication/food-waste-index-report-2024",
+      "asset_url": "https://wedocs.unep.org/handle/20.500.11822/45230",
+      "can_support": [
+        "food-service measurement methodology",
+        "global reporting context"
+      ],
+      "cannot_support": [
+        "Boğaziçi measured result"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-012",
+      "title": "Food Loss and Waste Accounting and Reporting Standard",
+      "publisher": "WRI / FLW Protocol",
+      "class": "STANDARD_METHOD",
+      "url": "https://www.wri.org/research/food-loss-and-waste-accounting-and-reporting-standard",
+      "pdf": "https://flwprotocol.org/wp-content/uploads/2017/05/FLW_Standard_final_2016.pdf",
+      "can_support": [
+        "inventory scope/boundary/reporting discipline"
+      ],
+      "cannot_support": [
+        "claim of implementation/compliance"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-013",
+      "title": "Guidance on FLW Quantification Methods",
+      "publisher": "FLW Protocol",
+      "class": "STANDARD_METHOD",
+      "url": "https://flwprotocol.org/wp-content/uploads/2017/06/FLW-Protocol_Guidance-on-FLW-Quantification-Methods.pdf",
+      "can_support": [
+        "measurement method selection"
+      ],
+      "cannot_support": [
+        "local measurement result"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-014",
+      "title": "Measuring and reporting food waste in hospitality and food service",
+      "publisher": "WRAP",
+      "class": "STANDARD_METHOD",
+      "url": "https://www.wrap.ngo/resources/guide/measuring-and-reporting-food-waste-hospitality-and-food-service",
+      "can_support": [
+        "practical measurement/reporting protocol design"
+      ],
+      "cannot_support": [
+        "Boğaziçi result"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-015",
+      "title": "Wasted Food Scale",
+      "publisher": "US EPA",
+      "class": "STANDARD_METHOD",
+      "url": "https://www.epa.gov/sustainable-management-food/wasted-food-scale",
+      "can_support": [
+        "prevention hierarchy"
+      ],
+      "cannot_support": [
+        "Turkish legal mandate",
+        "Boğaziçi outcome"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-016",
+      "title": "Resources for Assessing Wasted Food",
+      "publisher": "US EPA",
+      "class": "STANDARD_METHOD",
+      "url": "https://www.epa.gov/sustainable-management-food/resources-assessing-wasted-food",
+      "can_support": [
+        "practical assessment/log design"
+      ],
+      "cannot_support": [
+        "local measured outcome"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-017",
+      "title": "Reducing Food Waste in Campus Dining: A Data-Driven Approach",
+      "publisher": "MDPI Sustainability",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://www.mdpi.com/2071-1050/17/2/379",
+      "can_support": [
+        "technical plausibility of contextual campus modeling"
+      ],
+      "cannot_support": [
+        "expected Boğaziçi model score",
+        "local causal effect"
+      ],
+      "hypotheses": [
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-018",
+      "title": "Understanding the drivers of consumer level food waste in a university cafeteria",
+      "publisher": "Springer",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://link.springer.com/article/10.1007/s44274-025-00509-y",
+      "pdf": "https://link.springer.com/content/pdf/10.1007/s44274-025-00509-y.pdf",
+      "can_support": [
+        "Turkish university consumer-level driver analogue"
+      ],
+      "cannot_support": [
+        "production-surplus causal claim"
+      ],
+      "hypotheses": [
+        "H-003"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-019",
+      "title": "Every plate counts: Evaluation of a food waste reduction campaign",
+      "publisher": "Resources, Conservation & Recycling",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://doi.org/10.1016/j.resconrec.2019.104316",
+      "can_support": [
+        "campus intervention-evaluation analogue"
+      ],
+      "cannot_support": [
+        "Boğaziçi intervention effect"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-020",
+      "title": "Smaller servings vs information intervention",
+      "publisher": "Resources, Conservation & Recycling",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://doi.org/10.1016/j.resconrec.2020.104786",
+      "can_support": [
+        "alternative causal lever: portion size"
+      ],
+      "cannot_support": [
+        "forecasting as dominant lever"
+      ],
+      "hypotheses": [
+        "H-003"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-021",
+      "title": "Food Choice and Waste in University Dining Commons",
+      "publisher": "MDPI Sustainability",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://www.mdpi.com/2071-1050/13/4/2129",
+      "can_support": [
+        "multi-campus dining-waste observation analogue"
+      ],
+      "cannot_support": [
+        "local operational semantics"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-022",
+      "title": "Plate Food Waste in Food Services: systematic review/meta-analysis",
+      "publisher": "MDPI Foods",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://doi.org/10.3390/foods13111739",
+      "can_support": [
+        "broad food-service plate-waste context"
+      ],
+      "cannot_support": [
+        "unserved surplus equivalence"
+      ],
+      "hypotheses": [
+        "H-003"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-023",
+      "title": "Automated food waste identification in university cafeterias using machine vision",
+      "publisher": "MDPI Applied Sciences",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://www.mdpi.com/2076-3417/15/4/1814",
+      "can_support": [
+        "computer-vision measurement feasibility analogue"
+      ],
+      "cannot_support": [
+        "certified local mass measurement"
+      ],
+      "hypotheses": [
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-024",
+      "title": "Historical Forecast API",
+      "publisher": "Open-Meteo",
+      "class": "ARCHIVED_DECISION_INPUT",
+      "url": "https://open-meteo.com/en/docs/historical-forecast-api",
+      "can_support": [
+        "historical forecast input known at a decision horizon"
+      ],
+      "cannot_support": [
+        "hindsight actual weather masquerading as forecast"
+      ],
+      "hypotheses": [
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-025",
+      "title": "Food Demand Forecasting dataset mirror",
+      "publisher": "GitHub community mirror / Genpact challenge data",
+      "class": "REFERENCE_DATASET",
+      "url": "https://github.com/ashishpatel26/Food-Demand-Forecasting",
+      "can_support": [
+        "sandbox forecasting pipeline tests"
+      ],
+      "cannot_support": [
+        "Boğaziçi model performance",
+        "waste labels",
+        "PMR"
+      ],
+      "hypotheses": [],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-026",
+      "title": "Foodservice methodology",
+      "publisher": "ReFED",
+      "class": "STANDARD_METHOD",
+      "url": "https://insights-engine.refed.org/methodology/foodservice",
+      "can_support": [
+        "US foodservice surplus/waste methodology reference"
+      ],
+      "cannot_support": [
+        "local customer validation"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-004"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-027",
+      "title": "Insights Engine",
+      "publisher": "ReFED",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://insights-engine.refed.org/",
+      "can_support": [
+        "external benchmark/solution context"
+      ],
+      "cannot_support": [
+        "local market validation"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-003"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-028",
+      "title": "Solutions Database",
+      "publisher": "ReFED",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://insights-engine.refed.org/solution-database",
+      "can_support": [
+        "intervention landscape"
+      ],
+      "cannot_support": [
+        "local implementation feasibility"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    }
+  ]
+}

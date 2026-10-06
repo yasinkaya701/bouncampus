@@ -133,3 +133,15 @@ Every meaningful claim should remain falsifiable and traceable.
 On 2026-10-06, parallel PMR agents produced overlapping knowledge-base branches/PRs. The current canonical surfaces above reconcile the master knowledge base from PR #318, the IE-role source library from PR #319, and additional verified unique sources found during the same research wave. Duplicate integration PR #320 was intentionally closed rather than merged. Coordination continues in issue #322.
 
 Do not create a third registry. Extend `source_catalog.json` + `SOURCE_LIBRARY.md` and use `ASSET_MANIFEST.md` for files/media.
+## VPMR verifiable research layer
+
+`KREATE/VPMR/` is the additive verifiable-secondary-research layer for source provenance, data/decision-input boundaries, PDFs/visuals and agent handoff. It complements — and does not replace — this canonical PMR catalog.
+
+- [../VPMR/README.md](../VPMR/README.md) — scope and evidence boundary
+- [../VPMR/SOURCE_REGISTRY.md](../VPMR/SOURCE_REGISTRY.md) / [../VPMR/source_registry.json](../VPMR/source_registry.json) — canonical-link source registry
+- [../VPMR/DATASETS.md](../VPMR/DATASETS.md) — public/reference/private-required data inventory
+- [../VPMR/PMR_GUIDE.md](../VPMR/PMR_GUIDE.md) — research-to-interview conversion
+- [../VPMR/VISUALS_AND_PDFS.md](../VPMR/VISUALS_AND_PDFS.md) — PDF/visual provenance
+- [../VPMR/AGENT_HANDOFF.md](../VPMR/AGENT_HANDOFF.md) — cross-agent recut/dedupe rules
+
+`source_catalog.json` remains the canonical cumulative PMR catalog. VPMR IDs are a provenance-oriented companion namespace; do not create a third registry.
