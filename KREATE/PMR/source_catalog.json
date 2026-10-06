@@ -1931,6 +1931,32 @@
     },
     {
       "id": "S-BU-027",
+      "title": "Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Information Technology Department",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf",
+      "asset_type": "pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H4",
+        "ACCESS",
+        "DATA_OWNER",
+        "MODEL_METHOD"
+      ],
+      "supports": [
+        "BİDB reports a BUCard dining live-report page and says package-meal counts were added to that page",
+        "BİDB reports daily passage reports were updated to include package-meal information",
+        "BİDB reports a personnel meal report with a breakfast field and calculation updates",
+        "BİDB reports BUCard Mobile deployment at dining halls/package distribution points and reader/software changes"
+      ],
+      "limitations": [
+        "report existence does not prove research/export authorization, report grain, API availability, historical snapshot retention, finality or stable report IDs",
+        "daily passage and package-meal report fields are not automatically physically served-meal truth and still require Food Services/SKS reconciliation"
+      ]
+    },
+    {
+      "id": "S-BU-028",
       "title": "İhale ve Satınalma Şube Müdürlüğü",
       "type": "OFFICIAL_UNIVERSITY",
       "publisher": "Boğaziçi University Administrative and Financial Affairs",
@@ -1953,7 +1979,7 @@
       ]
     },
     {
-      "id": "S-BU-028",
+      "id": "S-BU-029",
       "title": "Tahakkuk Şube Müdürlüğü",
       "type": "OFFICIAL_UNIVERSITY",
       "publisher": "Boğaziçi University Administrative and Financial Affairs",
@@ -1975,7 +2001,7 @@
       ]
     },
     {
-      "id": "S-BU-029",
+      "id": "S-BU-030",
       "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
       "type": "OFFICIAL_UNIVERSITY",
       "publisher": "Boğaziçi University Administrative and Financial Affairs",
@@ -1994,7 +2020,7 @@
       ]
     },
     {
-      "id": "S-BU-030",
+      "id": "S-BU-031",
       "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
       "type": "OFFICIAL_UNIVERSITY",
       "publisher": "Boğaziçi University",
