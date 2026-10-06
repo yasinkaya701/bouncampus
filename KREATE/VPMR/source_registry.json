@@ -508,6 +508,212 @@
         "H-006"
       ],
       "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-029",
+      "title": "Otel, Restoran ve Diğer Toplu Tüketim Yerlerinde Gıda İsrafı ile Mücadele Kılavuzu",
+      "publisher": "T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye",
+      "class": "STANDARD_METHOD",
+      "url": "https://www.tarimorman.gov.tr/abdgm/link/68/yayinlarimiz",
+      "pdf": "https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf",
+      "can_support": [
+        "Türkiye-specific institutional food-service waste prevention context",
+        "separation/measurement/planning/service prevention practices"
+      ],
+      "cannot_support": [
+        "Boğaziçi measured outcome",
+        "proof that forecast error is the dominant local waste cause"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-004",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-030",
+      "title": "KİK 2026/UH.I-2269 — Kırıkkale University Malzemeli Yemek Hizmeti",
+      "publisher": "Kamu İhale Kurumu / EKAP",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=0b6db2bdc4dcba60ddf7cb70334f72bf03b482e26ad51295bd12345ea082c52b",
+      "can_support": [
+        "official Turkish university procurement precedent where contractor determines daily quantity using prior meal counts",
+        "payment based on actually consumed meals",
+        "administration not responsible for excess production",
+        "shortage and demand-variation risk can be contractually asymmetric"
+      ],
+      "cannot_support": [
+        "Boğaziçi/TEMAŞ contract semantics",
+        "Boğaziçi buyer or decision owner"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-002",
+        "H-005",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06",
+      "published_at": "2026-08-26"
+    },
+    {
+      "id": "VPMR-SRC-031",
+      "title": "KİK university dining precedent — production quantity and turnstile-based payment",
+      "publisher": "Kamu İhale Kurumu / EKAP",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://ekap.kik.gov.tr/EKAP/Vatandas/KurulKararGoster.aspx?KararId=9611128e0826cb5014a4ac6f4dfc5a19d9efd22c609d58c78f14a636b0ac7250&KararMetni=bc6844c56eeb209fc60f05e3a7cc8b7abfe3b86dc04f193fe56fbb6d02a60da7",
+      "can_support": [
+        "official precedent where daily production quantity is set by contractor with administration approval and notified at least one day before",
+        "turnstile/mobile/ticket records can be settlement inputs"
+      ],
+      "cannot_support": [
+        "Boğaziçi event semantics",
+        "claim that one passage always equals one consumed meal in Boğaziçi"
+      ],
+      "hypotheses": [
+        "H-002",
+        "H-004",
+        "H-005"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-032",
+      "title": "İTÜ SAY Sistemi Rezervasyon İşlemi Detayları",
+      "publisher": "İstanbul Technical University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://sksv2.mozaik-test.itu.edu.tr/docs/librariesprovider73/default-document-library/it%C3%BC-say-sistemi-kullan%C4%B1m-detaylar%C4%B1.pdf?sfvrsn=0",
+      "can_support": [
+        "reservation-to-production planning precedent",
+        "published 48-hour preparation constraint",
+        "day/cafeteria/meal reservation semantics"
+      ],
+      "cannot_support": [
+        "current Boğaziçi reservation coverage",
+        "Boğaziçi freeze time"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-002",
+        "H-004",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-033",
+      "title": "İTÜ food-waste prevention and production-planning program",
+      "publisher": "İstanbul Technical University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://sustainability.itu.edu.tr/tr/itu-kafeteryalari-ve-yemek-hizmetleri-gida-israfini-onlemeye-yonelik-ozel-programlar-saglamaktadir",
+      "can_support": [
+        "Turkish university precedent using academic calendar, course/exam schedule, menu options, weather and historical meal counts in production estimation",
+        "documented replenishment/contingency behavior"
+      ],
+      "cannot_support": [
+        "Boğaziçi feature value",
+        "Boğaziçi current heuristic"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-002",
+        "H-003",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06"
+    },
+    {
+      "id": "VPMR-SRC-034",
+      "title": "GTÜ dining services — production planning and unexpected demand",
+      "publisher": "Gebze Technical University",
+      "class": "PUBLIC_CONTEXT",
+      "url": "https://www.gtu.edu.tr/kategori/5904/0/display.aspx",
+      "can_support": [
+        "current 2026 Turkish university precedent using historical consumption and daily user counts in production planning",
+        "early sell-out and rapid replenishment as an operational shortage pattern"
+      ],
+      "cannot_support": [
+        "Boğaziçi workflow",
+        "Boğaziçi willingness to pay"
+      ],
+      "hypotheses": [
+        "H-001",
+        "H-002",
+        "H-003",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06",
+      "updated_at": "2026-09-10"
+    },
+    {
+      "id": "VPMR-SRC-035",
+      "title": "Machine learning models for short-term demand forecasting in food catering services",
+      "publisher": "Journal of Cleaner Production / Elsevier",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0959652623044232",
+      "doi": "10.1016/j.jclepro.2023.140265",
+      "can_support": [
+        "multi-canteen catering demand-forecasting precedent",
+        "need to compare ML against operational/baseline forecasts",
+        "joint surplus and unmet-demand evaluation"
+      ],
+      "cannot_support": [
+        "transfer of reported waste-reduction percentages to Boğaziçi",
+        "local model utility before admitted service truth"
+      ],
+      "hypotheses": [
+        "H-003",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06",
+      "published_at": "2024-01-05"
+    },
+    {
+      "id": "VPMR-SRC-036",
+      "title": "Demand Forecasting for Food Production Using Machine Learning Algorithms: A Case Study of University Refectory",
+      "publisher": "Technical Gazette / Hrčak",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://hrcak.srce.hr/en/clanak/446387",
+      "doi": "10.17559/TV-20230117000232",
+      "can_support": [
+        "university-refectory demand forecasting precedent",
+        "calendar and meal-ingredient features as candidate inputs"
+      ],
+      "cannot_support": [
+        "Boğaziçi performance",
+        "novelty claim for calendar/menu-aware forecasting"
+      ],
+      "hypotheses": [
+        "H-006"
+      ],
+      "verified_on": "2026-10-06",
+      "published_at": "2023-10-25"
+    },
+    {
+      "id": "VPMR-SRC-037",
+      "title": "Machine Learning Techniques for Cafeteria Demand Forecasting: An Institutional Case",
+      "publisher": "OPUS Journal of Society Research / Dergipark",
+      "class": "ACADEMIC_ANALOGUE",
+      "url": "https://dergipark.org.tr/en/pub/opusjsr/article/1649256",
+      "doi": "10.26466/opusjsr.1649256",
+      "can_support": [
+        "institutional turnstile-demand forecasting precedent",
+        "multi-resolution demand modeling precedent"
+      ],
+      "cannot_support": [
+        "Boğaziçi turnstile access or field semantics",
+        "transfer of reported metrics/impact"
+      ],
+      "hypotheses": [
+        "H-004",
+        "H-006"
+      ],
+      "verified_on": "2026-10-06",
+      "published_at": "2025-05-31"
     }
+  ],
+  "notes": [
+    "Markdown and JSON registries are generated from the same stable IDs after 2026-10-06 reconciliation.",
+    "PDF/data assets may be indexed separately without receiving their own source ID when they are alternate representations of the same source."
   ]
 }

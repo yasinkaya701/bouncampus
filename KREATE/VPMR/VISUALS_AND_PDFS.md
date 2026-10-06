@@ -54,3 +54,13 @@ For time-sensitive web pages, a future agent may preserve a dated screenshot **o
 ## Why binaries are not vendored in this initial pass
 
 The source pages/PDFs are stable and directly linkable, while binary copying creates license, staleness and repository-size risk. The registry therefore keeps canonical links and explicit reuse notes; a later evidence snapshot can vendor a file only when reproducibility requires it.
+## Türkiye-specific policy / operations PDFs
+
+- [T.C. Tarım ve Orman Bakanlığı / FAO / Metro Türkiye — Otel, Restoran ve Diğer Toplu Tüketim Yerlerinde Gıda İsrafı ile Mücadele Kılavuzu (PDF)](https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf) — 97-page Türkiye-specific guide covering separation/measurement, planning, service and prevention. Link rather than vendor until reuse terms are reviewed.
+- [İTÜ SAY reservation workflow PDF](https://sksv2.mozaik-test.itu.edu.tr/docs/librariesprovider73/default-document-library/it%C3%BC-say-sistemi-kullan%C4%B1m-detaylar%C4%B1.pdf?sfvrsn=0) — operational reservation/production-planning precedent; link only.
+
+## Open academic full-text / article pages added in the procurement-policy pass
+
+- [Acı & Yergök (2023) — university refectory demand forecasting](https://hrcak.srce.hr/en/clanak/446387) — article page includes full-text PDF.
+- [Aydın, Balcıoğlu & Sezen (2025) — institutional cafeteria demand forecasting](https://dergipark.org.tr/en/pub/opusjsr/article/1649256) — publisher page with PDF.
+- [Rodrigues et al. (2024) — catering demand forecasting](https://www.sciencedirect.com/science/article/pii/S0959652623044232) — publisher page; access/reuse depends on publisher terms.
