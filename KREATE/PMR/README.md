@@ -19,6 +19,8 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
 10. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
 11. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
+12. [data/README.md](data/README.md) — public snapshot semantics, anomaly flags and forbidden uses.
+13. [data/bogazici_food_waste_public_snapshot.csv](data/bogazici_food_waste_public_snapshot.csv) — verbatim 2024–2025 published monthly extract; aggregate context only.
 
 Relevant current-master research:
 - [../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md](../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md)
