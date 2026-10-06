@@ -121,6 +121,17 @@ Public notice/result establish:
 
 None of these reveals the payable operational count or hakediş formula.
 
+### Corrected procurement/payment source IDs
+
+The canonical current mapping is:
+- `S-BU-026` — food-service governance directive;
+- `S-BU-027` — Procurement branch;
+- `S-BU-028` — Tahakkuk branch;
+- `S-BU-029` — IMID contact;
+- `S-BU-030` — 2025 Administration Activity Report acceptance workflow.
+
+This resolves provenance routing only. It does not resolve payable quantity, exact Spending Authority, production freeze, penalty/correction mechanics, economic-risk owner or buyer/WTP.
+
 ### Document retrieval status
 
 | Artifact | Public route | Status | What it can resolve |
