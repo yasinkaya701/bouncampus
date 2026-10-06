@@ -82,25 +82,6 @@ We still need to learn:
 
 The same notice describes a 5,000-meal/day bidder-capacity threshold as one-half of the administration's stated daily meal need. Treat that as **procurement capacity context only**, not measured actual daily demand.
 
-### Public schedule mirror: line-item ambiguity
-
-A second EKAP-derived public mirror (`S-PROC-005`) confirms the current tender's **unit-price contract** form and exposes three identifiable meal rows:
-
-- 380,000 student breakfasts;
-- 2,500,000 student meals;
-- 250,000 staff meals.
-
-The same public schedule surface also exposes **additional monthly rows** whose descriptions are not sufficiently visible in the mirror to determine what they represent. The public surface is therefore **not complete enough to reconstruct the awarded unit-price schedule or settlement model**.
-
-Operational implication:
-
-- do not assume the three meal rows are the only priced work items;
-- do not infer that campus allocation, staffing, service, equipment or other monthly obligations are absent merely because their descriptions are not visible in the mirror;
-- do not use the public schedule to derive awarded unit prices, contractor margin, meal cost or savings;
-- retrieve the authoritative EKAP administrative/technical specification, unit-price bid schedule and contract/acceptance documents before clause-level or economic claims.
-
-This ambiguity strengthens, rather than closes, #358.
-
 ### Retrieval attempt status
 
 The public tender mirror exposes links that redirect to the official EKAP tender-document route for **IKN 2025/1727143**. The current environment can resolve the route but cannot retrieve the underlying document bundle.
@@ -117,6 +98,32 @@ current contract/acceptance clauses: RETRIEVAL_REQUIRED
 
 Do not backfill current clauses from the 2023/2024–2025 procurement.
 
+#### Resolved official EKAP acquisition route — 2026-10-06
+
+A fresh retrieval pass resolved the mirror's document buttons to the official EKAP citizen-document endpoint and exposed the stable tender document identifier:
+
+~~~text
+IKN: 2025/1727143
+official EKAP ihaleId:
+8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc
+~~~
+
+Resolved routes:
+
+- current tender document bundle (`İhale Dokümanı`):
+  `https://ekap.kik.gov.tr/EKAP/Ortak/VatandasIlanGoruntuleme.aspx?ddac=true&aramaDownload=true&ihaleId=8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc&wots=false&Iszylnm=false`
+- bundle exposed by the mirror as `Teknik Şartname Hariç Doküman`:
+  `https://ekap.kik.gov.tr/EKAP/Ortak/VatandasIlanGoruntuleme.aspx?ddac=true&aramaDownload=true&ihaleId=8a0a0df8b81eaca6a907dc1db667be87d30732baf3af5797db5e5db12c7b3edc&wots=true&Iszylnm=false`
+- current EKAP search route:
+  `https://ekapv2.kik.gov.tr/ekap/search/2025_1727143`
+
+Discovery route:
+`https://ekapveri.com/ihale/ekap-2025-1727143/`
+
+The browser environment could resolve the redirect target but could not fetch the official document payload. Therefore this is a **routing improvement**, not artifact retrieval. Keep the authoritative documents at `RETRIEVAL_REQUIRED` until a human/authorized environment successfully downloads the bundle and records title/version/checksum.
+
+The mirror also explicitly labels the current tender with `Düzeltme İlanı: Var`. Do not infer the affected clause. The correction/zeyilname history remains a separate required acquisition artifact.
+
 ### Predecessor cancellation is now explicit
 
 For **IKN 2025/1335958**, the public cancellation notice states that objections to the tender documents required changes to some specification provisions, but an EKAP addendum could not be issued at the tender date, so the tender was cancelled.
@@ -124,6 +131,46 @@ For **IKN 2025/1335958**, the public cancellation notice states that objections 
 That gives a concrete next desk artifact task: obtain both predecessor and current authoritative specification bundles and make a clause-level diff. The cancellation notice does **not** identify the changed clauses.
 
 See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
+
+## Acceptance / hakediş workflow now narrowed
+
+The 2025 official university administration report (**S-BU-030**) materially narrows the workflow:
+
+1. Control Organization operates under the service general conditions, signed contract and technical specification.
+2. The contractor submits the completed service for acceptance with required documents.
+3. Control Organization performs preliminary review.
+4. If acceptable, it prepares **KİK56.0/H — Hizmet İşleri Kabul Teklif Belgesi**.
+5. That document is submitted to the relevant **Harcama Yetkilisi** for hakediş preparation.
+6. The same report says 2025 food-service work was performed **ay bazında** and acceptance-proposal documents were prepared as services were performed.
+7. **S-BU-027** gives an official institutional route for hakediş payments through the Tahakkuk branch.
+
+This is a meaningful reduction in uncertainty, but it still does **not** answer the economic-control question:
+
+> Which operational quantity — ordered, produced, delivered, served, accepted, or another reconciled quantity — is multiplied by which unit price for the food-service hakediş?
+
+That remains a #358 artifact/source-owner question.
+
+### Current routing surfaces
+
+| Need | Source-backed route | Still unresolved |
+| --- | --- | --- |
+| current tender/spec bundle | S-BU-026 Procurement branch + IKN 2025/1727143 | exact bundle retrieval/access |
+| service conformity / acceptance | S-BU-014 current Control Organization; S-BU-030 process | food-contract acceptance fields and daily evidence |
+| hakediş preparation chain | S-BU-030 KİK56.0/H → Spending Authority | exact Spending Authority identity and payable count |
+| payment processing | S-BU-027 Tahakkuk branch | exact payment-package schema and reconciliation fields |
+| contractor planning | S-PROC-001 identifies TEMAŞ | local operations owner, production freeze and revision rights |
+
+## Current food-service governance directive — additional hakediş actors
+
+The current university Food Service Executive Board directive (**S-BU-031**) adds a first-party, food-specific governance fact that should be preserved separately from the general acceptance chain:
+
+- Article 5(2)(f): the Food Service Executive Board performs meal hakediş payment orders/accrual **together with the Inspection and Acceptance Commission**.
+- Article 7: BUCard Office/BİDB operates and controls the dining BUCard system, reports to the Food Service Executive Board and Food Services Branch, and retains digital data.
+- Article 9: meal-service procurement is carried out through SKS + Administrative and Financial Affairs.
+
+This does not replace **S-BU-030**. Instead, #358 must reconcile how the food-specific Board + Inspection/Acceptance Commission duties connect to the general Control Organization → KİK56.0/H → Spending Authority → hakediş preparation flow.
+
+Still unresolved: payable operational count/unit, exact current signatory chain, routine production freeze/change rights, penalty/correction semantics, economic-risk owner, buyer/WTP.
 
 ## Do not infer settlement from the headline contract
 
