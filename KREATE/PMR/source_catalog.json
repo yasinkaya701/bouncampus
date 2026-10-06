@@ -1902,6 +1902,96 @@
         "does not expose awarded unit prices or sufficiently complete descriptions for the additional monthly schedule rows",
         "does not establish payable or accepted quantity, daily or campus allocation, penalties, change rights, contractor margin, software budget, or savings"
       ]
+    },
+    {
+      "id": "S-BU-026",
+      "title": "İhale ve Satınalma Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/ihale-ve-satinalma-sube-mudurlugu/2117",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official university branch responsible for procurement/tender processes under public procurement rules",
+        "current public branch manager is Bahadır Şahin with direct institutional contact route"
+      ],
+      "limitations": [
+        "branch responsibility does not prove this manager personally owns IKN 2025/1727143 documents or product-buying authority",
+        "does not reveal contract-specific payment, acceptance or quantity semantics"
+      ]
+    },
+    {
+      "id": "S-BU-027",
+      "title": "Tahakkuk Şube Müdürlüğü",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/tahakkuk-sube-mudurlugu/2119",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "CONTRACT",
+        "ECONOMIC_BUYER",
+        "ACCESS"
+      ],
+      "supports": [
+        "official branch states it performs tender, direct-procurement, transfer and hakediş payments",
+        "current public branch manager is Yakup Korkmaz with direct institutional contact route"
+      ],
+      "limitations": [
+        "general hakediş-payment responsibility does not establish the food contract's payable unit, acceptance count, signatory chain or incentive allocation"
+      ]
+    },
+    {
+      "id": "S-BU-028",
+      "title": "İdari ve Mali İşler Daire Başkanlığı — İletişim",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University Administrative and Financial Affairs",
+      "url": "https://imid.bogazici.edu.tr/tr/pages/iletisim/2116",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official",
+      "hypotheses": [
+        "H5",
+        "ACCESS"
+      ],
+      "supports": [
+        "official phone routing for Procurement and Tahakkuk branches and general IMID contact"
+      ],
+      "limitations": [
+        "contact information is routing evidence only"
+      ]
+    },
+    {
+      "id": "S-BU-030",
+      "title": "Boğaziçi University 2025 Administration Activity Report — Control Organization / acceptance process",
+      "type": "OFFICIAL_UNIVERSITY",
+      "publisher": "Boğaziçi University",
+      "url": "https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf",
+      "accessed_at": "2026-10-06",
+      "authority": "first_party_official_report",
+      "hypotheses": [
+        "H1",
+        "H5",
+        "CONTRACT",
+        "ACCEPTANCE",
+        "ECONOMIC_BUYER"
+      ],
+      "supports": [
+        "Control Organization works under service general conditions, signed contracts and technical specifications and is responsible to the relevant spending authority",
+        "after preliminary acceptance review, Control Organization prepares KİK56.0/H Service Works Acceptance Proposal and submits it to the relevant spending authority for hakediş preparation",
+        "2025 report states food-service procurements were performed on a monthly basis and acceptance proposal documents were prepared as services were performed",
+        "service deficiencies affecting functionality are reported to relevant authorities"
+      ],
+      "limitations": [
+        "report describes institutional acceptance/hakediş workflow but does not identify the food contract's payable count, unit-price schedule, exact spending-authority identity, daily production freeze or shortage/excess economics",
+        "it does not substitute for the current IKN 2025/1727143 technical/admin specifications or actual hakediş artifact"
+      ]
     }
   ],
   "consolidation_note": "Cross-agent consolidation of PR #318, IE role PMR library (#319), and additional verified sources from PMR research hub work. source_catalog.json is the cumulative machine-readable catalog; dated SOURCE_REGISTRY_2026-10-06.json remains an earlier snapshot."
