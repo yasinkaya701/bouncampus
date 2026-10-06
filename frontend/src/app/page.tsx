@@ -161,7 +161,7 @@ export default function DashboardPage() {
           <div>
             <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#b9da72]">{t('Güven sınırı', 'Truth boundary')}</div>
             <h2 className="mt-3 text-[34px] font-black leading-[1] tracking-[-0.05em] sm:text-[43px]">
-              {t('Gerçek veri, snapshot ve model çıktısı aynı şey değil.', 'Live evidence, snapshots and model output are not the same thing.')}
+              {t('Kaynak verisi, snapshot ve model çıktısı aynı şey değil.', 'Source data, snapshots and model output are not the same thing.')}
             </h2>
           </div>
           <div className="divide-y divide-white/12 border-y border-white/12">
