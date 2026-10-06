@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0",
+  "artifact": "CS2_CROSS_ROLE_GATE_STATUS",
+  "date": "2026-10-06",
+  "base_master_sha": "8930e7861d5e6391dac8ec692c0efbbc43bea423",
+  "evidence_class": "PRODUCT_SYNTHESIS_NOT_PRIMARY_EVIDENCE",
+  "product_decision": "KEEP_CONDITIONALLY",
+  "core_hypothesis": "Human-reviewed pre-freeze institutional dining quantity/allocation decision support with privacy-minimized aggregate signals and prospective outcome verification.",
+  "gates": [
+    {
+      "id": "EA-01",
+      "gate": "REACHABLE_DECISION",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [
+        358
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "reachable control point and pilot timing"
+    },
+    {
+      "id": "EA-02",
+      "gate": "SOURCE_EXPORTABILITY",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [
+        292
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "privacy-minimized aggregate service data path"
+    },
+    {
+      "id": "EA-03",
+      "gate": "SEMANTIC_MAPPING_VERIFIED",
+      "owner": [
+        "IE",
+        "CS1"
+      ],
+      "issue_refs": [
+        292,
+        82
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "eligible target/service truth"
+    },
+    {
+      "id": "EA-04",
+      "gate": "PHYSICAL_OUTCOME_MEASURABLE",
+      "owner": [
+        "EE"
+      ],
+      "issue_refs": [],
+      "status": "OPEN",
+      "unlocks": "prospective surplus/waste/shortage measurement"
+    },
+    {
+      "id": "EA-05",
+      "gate": "REPORTING_RECONCILIATION",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [],
+      "status": "OPEN",
+      "unlocks": "governance-to-service reconciliation when decision relevant"
+    },
+    {
+      "id": "EA-06",
+      "gate": "INCENTIVE_AND_AUTHORITY_MAP",
+      "owner": [
+        "IE"
+      ],
+      "issue_refs": [
+        358
+      ],
+      "status": "OPEN_EXTERNAL",
+      "unlocks": "buyer/beneficiary/settlement claim boundaries"
+    }
+  ],
+  "portfolio": [
+    {
+      "surface": "human_reviewed_quantity_decision_support",
+      "decision": "KEEP_CONDITIONAL"
+    },
+    {
+      "surface": "generic_ai_forecasting_positioning",
+      "decision": "KILL_AS_POSITIONING"
+    },
+    {
+      "surface": "generic_sustainability_dashboard",
+      "decision": "KILL_AS_WEDGE"
+    },
+    {
+      "surface": "generic_waste_tracking_as_differentiation",
+      "decision": "KILL_AS_DIFFERENTIATION"
+    },
+    {
+      "surface": "reservation_menu_calendar_weather_features",
+      "decision": "HOLD_PENDING_REAL_DATA"
+    },
+    {
+      "surface": "bucard_turnstile_counts",
+      "decision": "HOLD_PENDING_SEMANTIC_ADMISSION"
+    },
+    {
+      "surface": "new_sensing_hardware",
+      "decision": "HOLD_BEHIND_MEASUREMENT_GAP"
+    },
+    {
+      "surface": "contract_procurement_evidence_layer",
+      "decision": "SUPPORTING_CAPABILITY"
+    },
+    {
+      "surface": "complex_modeling",
+      "decision": "DEFER_UNTIL_BASELINE_GATE"
+    }
+  ],
+  "compressed_truth_packages": [
+    "decision_rights_and_freeze_time",
+    "aggregate_service_truth_and_semantics",
+    "outcome_measurement_and_economics"
+  ],
+  "no_claims_until_gates_close": [
+    "measured waste reduction",
+    "cost savings",
+    "carbon reduction",
+    "operator/model superiority",
+    "buyer willingness_to_pay",
+    "contract incentive alignment"
+  ]
+}
