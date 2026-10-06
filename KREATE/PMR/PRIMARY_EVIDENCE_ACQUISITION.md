@@ -29,8 +29,13 @@ These are execution aids for this canonical packet, not new evidence registries.
 - **S-BU-015 — Food Services FAQ**
   - overcharge/refund troubleshooting asks for date, time, campus and turnstile;
   - QR can also be used at dining turnstiles.
+- **S-BU-026 — Yemek Hizmeti Yürütme Kurulu Yönergesi**
+  - Article 7 places the BUCard Office within BİDB and assigns operation/control of the dining BUCard system;
+  - the BUCard Office is required to report to the Food Services Board and Food Services Branch and retain digital data;
+  - Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission;
+  - Article 9 identifies SKS + Administrative and Financial Affairs as the meal-service procurement route.
 
-This is enough to narrow the owner route. It is **not** enough to mark any dataset `VERIFIED_EXPORTABLE`.
+This now narrows the technical/report owner route beyond a service-contact hypothesis: the current university directive assigns dining-BUCard reporting/data-custody duties to the BUCard Office. It is **not** enough to mark any dataset `VERIFIED_EXPORTABLE`, determine report grain, or equate a turnstile/payment event with a physically served meal.
 
 ### Minimal first request
 
@@ -151,6 +156,14 @@ changed clauses → operational consequence → interview question
 ~~~
 
 Do **not** assume any clause changed until the two authoritative bundles are compared.
+
+### Current owner-route refinement
+
+**S-BU-026** adds first-party governance facts for #358:
+- meal-service procurement is carried out through **SKS + Administrative and Financial Affairs**;
+- meal-hakediş payment orders/accrual are carried out by the **Food Services Board together with the Inspection/Acceptance Commission**.
+
+Route current specification/service-control questions through Food Services/SKS, and route the exact acceptance/hakediş artifact and quantity basis through the Board + Inspection/Acceptance path. Keep payable quantity, exact signer sequence, freeze/change rights, penalties, economic beneficiary and software buyer authority unresolved until source-owned evidence confirms them.
 
 ### Contract-owner questions
 

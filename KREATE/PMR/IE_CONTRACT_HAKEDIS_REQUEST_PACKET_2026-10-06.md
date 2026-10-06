@@ -14,6 +14,18 @@ Resolve the operational and economic control point around meal quantity:
 
 The current public procurement trail is useful for routing and scope, but it is not enough to infer unit prices, payable quantity, minimum purchase, shortage penalties, waste economics, contractor margin, or savings.
 
+## Owner-route refinement from the current university directive
+
+The official **Boğaziçi Üniversitesi Yemek Hizmeti Yürütme Kurulu Yönergesi** (`S-BU-026`) provides two authoritative routing facts:
+- meal-service procurement is carried out by **SKS together with İdari ve Mali İşler Daire Başkanlığı**;
+- meal-hakediş payment orders/accrual are carried out by the **Yemek Hizmeti Yürütme Kurulu together with the Muayene Kabul Komisyonu**.
+
+Execution consequence:
+- route current technical/service-control questions to Food Services/SKS;
+- request the exact acceptance/muayene-kabul form, hakediş payment-order/accrual artifact, quantity basis and correction chain from the Board + Muayene Kabul route;
+- route procurement/payment-process artifact ownership in parallel to İdari ve Mali İşler;
+- keep payable quantity, exact signer sequence, freeze/change rights, penalties, economic beneficiary and software buyer authority unresolved until directly evidenced.
+
 ## Authoritative artifacts to retrieve
 
 Priority order:
@@ -22,7 +34,7 @@ Priority order:
 2. current technical specification;
 3. unit-price bid schedule / work-item schedule;
 4. final contract clauses relevant to quantity, acceptance, payment and service level;
-5. acceptance / hakediş form or schema;
+5. acceptance / muayene-kabul / hakediş form or schema, including the payment-order/accrual quantity basis;
 6. daily production request/order form;
 7. daily reconciliation / acceptance report;
 8. correction/additional-meal/second-meal/package-meal procedure if separate;
