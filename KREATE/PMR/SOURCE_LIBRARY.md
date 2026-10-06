@@ -556,12 +556,12 @@ These are **secondary target-selection sources**, not PMR/interview evidence.
 - Boundary: record names do not prove field semantics, actual workflow use, decision timing, reservation-to-production coupling or measured outcomes.
 - Maps to: H1, H2, H3, H4, SECOND_SITE, OPERATIONS.
 
-### S-TR-012 — BANÜ off-central-campus MYO mandatory reservation rollout
+### S-TR-012 — BANÜ mandatory reservation rollout
 - Type: official university.
 - Publisher: Bandırma Onyedi Eylül University SKS.
 - URL: https://sksdb.bandirma.edu.tr/tr/sksdb/d/UNIVERSITEMIZ-MERKEZ-YERLESKE-DISINDAKI-TUM-MESLEK-YUKSEKOKULLARINDA-REZERVASYONLU-YEMEK-HIZMETINE-GECIYOR-94035
-- Current notice updated: 2026-10-02; announced effective date 2026-10-05.
-- Use: reservation-first counter-archetype. The current notice says the announced **off-central-campus vocational-school scope** is fully reservation-based and users without reservations will not receive meal service; stated goals include planning/resource efficiency and food-waste reduction.
+- Published/updated: 2026-10-01; announced effective date 2026-10-05.
+- Use: reservation-first counter-archetype. The notice says the announced vocational-school scope is fully reservation-based and users without reservations will not receive meal service; stated goals include planning/resource efficiency and food-waste reduction.
 - Boundary: stated goals are not achieved outcomes; reservation cutoff/no-show/order logic, residual uncertainty and actual waste impact require primary evidence.
 - Maps to: H1, H2, H3, H6, SECOND_SITE, FALSIFIER.
 
@@ -598,3 +598,12 @@ These routes are first-party owner/routing evidence. They do **not** resolve the
 - Official PDF: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
 - Use: first-party institutional acceptance-flow evidence. The Control Organization performs preliminary acceptance review and, when suitable, prepares the KİK56.0/H Service Works Acceptance Proposal for the relevant Spending Authority so hakediş can be prepared; the report includes food-service procurement among recurring service works.
 - Boundary: this does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily freeze/change rights or shortage/excess economics.
+
+
+### S-BU-031 — BİDB Faaliyet Raporu 2025 / named dining report surfaces
+- Type: official university report.
+- Publisher: Boğaziçi University Information Technology Department.
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf
+- Use: confirms named existing BUCard reporting surfaces: dining live report, daily passage reports, package-meal fields and personnel meal report.
+- Boundary: report existence does not prove export permission, report grain/finality/versioning, stable source IDs, or passage/package count = physically served meals.
+- Maps to: H4, ACCESS, DATA_OWNER, MODEL_METHOD.

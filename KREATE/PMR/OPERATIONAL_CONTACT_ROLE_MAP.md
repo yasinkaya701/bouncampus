@@ -25,6 +25,8 @@ Do not pre-assign "quantity owner", "buyer", "data owner" or "approver" from a j
 - **S-BU-022:** official BUCard portal confirms dining-hall use and BUCard Office/contact route.
 - **S-BU-023:** BUCampus exposes user-facing turnstile/card-reader passage history.
 - **S-BU-024:** institutional notice places BUCard among applications requiring BUVPN in that access context.
+- **S-BU-026:** current dining governance directive assigns dining-BUCard operation/control, required Food Services reporting and digital-data retention to the BUCard Office.
+- **S-BU-031:** BİDB 2025 activity report names BUCard dining live, daily-passage and personnel-meal report surfaces.
 
 This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB/BUCard + SKS reconciliation path. It still does not prove export approval.
 
@@ -54,7 +56,7 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | academic calendar | S-BU-019 | public/versioned context |
 | student events | S-BU-018 | public context; attendance generally unknown |
 | BUBizden entitlement | S-BU-017 | app workflow exists; not served-demand truth |
-| BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
+| BUCard/turnstile/report reconciliation | S-BU-015, S-BU-021, S-BU-023, S-BU-026, S-BU-031 | BİDB/BUCard owner + named report surfaces now source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
 | acceptance/hakediş | S-PROC-001 gives procurement route only | authoritative clause/report pending PMR |

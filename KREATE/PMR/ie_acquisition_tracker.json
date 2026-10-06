@@ -13,7 +13,9 @@
         "S-BU-015",
         "S-BU-021",
         "S-BU-022",
-        "S-BU-023"
+        "S-BU-023",
+        "S-BU-026",
+        "S-BU-031"
       ],
       "required_grain": "campus_id x meal_period x service_date",
       "required_outputs": [
@@ -68,40 +70,6 @@
         "headline contract value / listed meals == unit meal price",
         "historical clauses == current clauses",
         "unit-price contract form == payable operational count"
-      ]
-    },
-    {
-      "issue": 322,
-      "name": "IE-04 second-site repeatability falsifier",
-      "state": "REQUEST_READY",
-      "routes": [
-        "S-TR-011",
-        "S-TR-012",
-        "S-TR-013"
-      ],
-      "priority_targets": [
-        "P0 BAIBU mature multi-site contracted operation",
-        "P0 BANU reservation-first off-central-campus vocational-school scope",
-        "P1 Kayseri University own-kitchen vs procured-meal migration backup"
-      ],
-      "required_outputs": [
-        "verified quantity decision owner",
-        "last reversible production/allocation cutoff",
-        "reservation-to-production coupling",
-        "recent surplus and shortage incident",
-        "current baseline/system",
-        "economic beneficiary/buyer path",
-        "same-product and same-sales-motion verdict"
-      ],
-      "downstream": [
-        "CS2",
-        "CS1"
-      ],
-      "forbidden_inference": [
-        "prepared Gmail draft == outreach",
-        "public reservation policy == measured waste reduction",
-        "second-site public workflow == Boğaziçi service truth",
-        "stated planning goal == verified reservation-to-production coupling"
       ]
     }
   ]
