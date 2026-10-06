@@ -33,3 +33,7 @@ A row moves from **secondary-supported hypothesis** to **PMR-supported/contradic
 5. contradictory evidence is preserved.
 
 No number of web sources substitutes for this promotion gate.
+| **Published aggregate waste fields require semantic reconciliation** | Boğaziçi's 2025 public table is valuable context but contains rows whose displayed field relationship is internally inconsistent. | S-BU-002, S-BU-007 | A corrected value, service-level waste, waste-stage cause or accounting identity. | Ask source owner for data dictionary/field semantics; preserve published values unchanged until reconciled. |
+| **Aggregate-first architecture is the default privacy boundary** | KVKK official guidance supports purpose limitation/proportionality and caution around unnecessary person-level/biometric processing. | S-PRIV-001, S-PRIV-002, S-PRIV-003 | Legal approval for this project or proof that a particular dataset may be processed. | Confirm actual fields, purpose, owner, retention and lawful institutional path; prefer privacy-preserving aggregate export under #292. |
+| **Sustainability policy creates a why-now context** | Türkiye food-waste guidance/strategy and UI GreenMetric 2026 make prevention, measurement, evidence and digital governance institutionally legible. | S-POL-001, S-POL-002, S-POL-003 | Buyer intent, budget, ranking impact or willingness to pay. | Interview economic buyer/approver and procurement/contract owner. |
+
