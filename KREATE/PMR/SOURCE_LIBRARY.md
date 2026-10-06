@@ -575,3 +575,15 @@ These are **secondary target-selection sources**, not PMR/interview evidence.
 - Use: within-institution comparison: central-campus own-kitchen production versus district-campus prepared-meal procurement after reservation expansion.
 - Boundary: does not establish freeze points, decision owner, contract economics, service outcomes or production response to reservations.
 - Maps to: H1, H3, H5, SECOND_SITE, OPERATIONS.
+
+
+## Canonical BUCard / procurement / hakediş namespace — 2026-10-06
+
+- **S-BU-026** — current Food Service Executive Board governance directive already canonical in this branch.
+- **S-BU-027** — BİDB 2025 Activity Report: names BUCard dining live, daily-passage and personnel-meal report surfaces. Use for #292 report acquisition; report existence is not service truth.
+- **S-BU-028** — official Procurement branch. First-party route for current tender/specification artifacts.
+- **S-BU-029** — official Tahakkuk branch. First-party route for hakediş payment package/owner referral.
+- **S-BU-030** — official İMİD contact page. General routing fallback only.
+- **S-BU-031** — official 2025 Administration Activity Report. Supports Control Organization → `KİK56.0/H` → relevant Spending Authority for hakediş preparation and states 2025 food-service work was performed monthly.
+
+Namespace boundary: these IDs are semantic identities, not interchangeable contact aliases. None proves current payable meal count, exact unit price, export authorization, savings, WTP, or measured impact.
