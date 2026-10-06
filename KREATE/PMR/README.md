@@ -9,7 +9,7 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 ## Read first
 
 1. [PMR_KNOWLEDGE_BASE_2026-10-06.md](PMR_KNOWLEDGE_BASE_2026-10-06.md) — current cumulative synthesis, Boğaziçi facts, unresolved questions, and interview priorities.
-2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 53 verified/reference records across parallel PMR agents.
+2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 85 verified/reference records across parallel PMR agents.
 3. [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) — human-readable companion to the canonical catalog, including source use and explicit inference boundaries.
 4. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — hypothesis/claim → secondary support → forbidden inference → exact primary-evidence gap.
 5. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — canonical PDF/XLSX/image/data provenance and reuse-status manifest.
@@ -154,3 +154,5 @@ Public-data snapshots: [data/README.md](data/README.md) and [data/bogazici_food_
 - [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) — 2026–2027 procurement/TEMAŞ context and contract-PMR questions.
 
 - [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md) — Official routing surfaces for Food Services, control, BUCard and contractor PMR.
+- [IE_EXTERNAL_ACQUISITION_RUNBOOK.md](IE_EXTERNAL_ACQUISITION_RUNBOOK.md) — execution packet for #292/#358: routing, request text, privacy boundary, reconciliation questions and close gates.
+- [IE_EXTERNAL_ACQUISITION_STATUS.json](IE_EXTERNAL_ACQUISITION_STATUS.json) — machine-readable acquisition state; prepared/request-ready states are explicitly non-evidence.
