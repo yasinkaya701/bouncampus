@@ -19,7 +19,7 @@ This file separates public context/features from the source-owned operational tr
 
 | ID | Surface | Grain / candidate fields | Class | Status | PMR / modeling use |
 | --- | --- | --- | --- | --- | --- |
-| DS-001 | Boğaziçi campus food-waste tracking (S-BU-002) | monthly/annual published totals/categories | PUBLIC_AGGREGATE_OUTCOME | available; semantics partial | scale/context; ask stage/boundary/date semantics |
+| DS-001 | Boğaziçi campus food-waste tracking (S-BU-002, S-BU-011) | monthly/annual published totals/categories; local verbatim snapshot: `data/bogazici_food_waste_public_snapshot.csv` | PUBLIC_AGGREGATE_OUTCOME | available; **published 2024/2025 reconciliation anomalies documented** | scale/context; source-quality test; ask stage/boundary/date semantics |
 | DS-002 | Dining menu (S-BU-004) | service date, meal period, dishes/options | PUBLIC_CONTEXT | available | candidate known-ahead feature; never a demand label |
 | DS-003 | Academic calendar (S-BU-005/S-BU-010) | dates, term/exam/break/holiday states | PUBLIC_CONTEXT | available | known-ahead context feature |
 | DS-004 | Student events (S-BU-009) | date/type/name; attendance usually absent | PUBLIC_CONTEXT | available | anomaly feature candidate; effect unknown |
