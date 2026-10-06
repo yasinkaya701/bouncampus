@@ -25,6 +25,7 @@ Do not pre-assign "quantity owner", "buyer", "data owner" or "approver" from a j
 - **S-BU-022:** official BUCard portal confirms dining-hall use and BUCard Office/contact route.
 - **S-BU-023:** BUCampus exposes user-facing turnstile/card-reader passage history.
 - **S-BU-024:** institutional notice places BUCard among applications requiring BUVPN in that access context.
+- **S-BU-027:** BİDB 2025 Activity Report names existing `BUCard Yemekhane anlık rapor`, `günlük geçiş raporları` and `personel yemek raporu` surfaces.
 
 This moves the route from a generic "ask IT" hypothesis to a source-backed BİDB/BUCard + SKS reconciliation path. It still does not prove export approval.
 
@@ -39,10 +40,10 @@ Issue **#292** remains the active acquisition lane.
 ### Procurement, payment and acceptance chain
 
 - **S-BU-026:** current Food Services governance directive narrows the institutional process: meal hakediş payment-order/accrual work is carried out by the Food Services Board together with the Muayene Kabul Komisyonu; meal-service procurement is routed through SKS + İMİD.
-- **S-BU-027:** official İhale ve Satınalma unit — authoritative procurement/tender-document routing.
-- **S-BU-028:** official Tahakkuk unit — first-party payment/hakediş processing route.
-- **S-BU-029:** official İMİD contact surface — fallback institutional routing.
-- **S-BU-030:** 2025 Administration Activity Report — Control Organization performs preliminary service acceptance, prepares KİK56.0/H, and submits it to the relevant Spending Authority for hakediş preparation.
+- **S-BU-028:** official İhale ve Satınalma unit — authoritative procurement/tender-document routing.
+- **S-BU-029:** official Tahakkuk unit — first-party payment/hakediş processing route.
+- **S-BU-030:** official İMİD contact surface — fallback institutional routing.
+- **S-BU-031:** 2025 Administration Activity Report — Control Organization performs preliminary service acceptance, prepares KİK56.0/H, and submits it to the relevant Spending Authority for hakediş preparation.
 
 Interview/acquisition objective: identify the **exact food-contract Spending Authority**, actual hakediş artifact, payable/accepted quantity basis, and who can change production/allocation before the operational freeze.
 
@@ -66,10 +67,10 @@ Do not use generic company contacts as evidence of the Boğaziçi account owner;
 | academic calendar | S-BU-019 | public/versioned context |
 | student events | S-BU-018 | public context; attendance generally unknown |
 | BUBizden entitlement | S-BU-017 | app workflow exists; not served-demand truth |
-| BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023 | BİDB/BUCard technical route now source-backed; aggregate export + service semantics still pending #292 |
+| BUCard/turnstile corrections | S-BU-015, S-BU-021, S-BU-023, S-BU-027 | BİDB/BUCard route + named report surfaces source-backed; aggregate export + service semantics still pending #292 |
 | production/allocation | — | pending PMR |
 | stage-separated waste | — | pending PMR / measurement |
-| acceptance/hakediş | S-BU-026, S-BU-028, S-BU-030 narrow governance/payment/acceptance routing | exact food-contract Spending Authority + payable quantity + actual hakediş artifact pending #358 |
+| acceptance/hakediş | S-BU-026, S-BU-029, S-BU-031 narrow governance/payment/acceptance routing | exact food-contract Spending Authority + payable quantity + actual hakediş artifact pending #358 |
 | contractor production planning | S-PROC-001 identifies TEMAŞ | local owner/workflow pending PMR |
 
 ## Interview order
