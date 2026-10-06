@@ -15,3 +15,7 @@ The 2025 source displays months where `delivered_to_istac_kg > total_food_waste_
 Preserve the published values. Do not clamp/recompute a “corrected” total or infer an accounting identity until the source owner clarifies field semantics through the institutional acquisition/reconciliation path (#292).
 
 Use this snapshot for provenance checks, cross-year context and interview questions about reporting semantics—not for impact claims.
+
+## 2024 printed-total reconciliation
+
+The 12 published 2024 monthly `total_food_waste_kg` rows sum to **50,994 kg**, while the same official page/PDF prints **50,993 kg** as the annual total. The snapshot preserves the monthly values exactly as published. Do not modify a month to force the printed annual total; carry the 1 kg discrepancy as a source-owner reconciliation question.
