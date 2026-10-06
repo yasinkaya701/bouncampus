@@ -598,3 +598,13 @@ These routes are first-party owner/routing evidence. They do **not** resolve the
 - Official PDF: https://mediastore.cc.bogazici.edu.tr/web/userfiles/files/Bo%C4%9Fazi%C3%A7i%20%C3%9Cniversitesi%202025%20Y%C4%B1l%C4%B1%20%C4%B0dare%20Faaliyet%20Raporu%283%29.pdf
 - Use: first-party institutional acceptance-flow evidence. The Control Organization performs preliminary acceptance review and, when suitable, prepares the KİK56.0/H Service Works Acceptance Proposal for the relevant Spending Authority so hakediş can be prepared; the report includes food-service procurement among recurring service works.
 - Boundary: this does not identify the current food contract's payable count, exact Spending Authority, unit-price schedule, daily freeze/change rights or shortage/excess economics.
+
+
+### S-BU-031 — Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025
+- Type: OFFICIAL_UNIVERSITY.
+- Publisher: Boğaziçi University Information Technology Department.
+- Official PDF: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf
+- Use: first-party confirmation that BUCard already has named dining report surfaces: a dining live report, daily passage reports, and a personnel meal report; the report also documents package-meal and breakfast-related fields.
+- Decision delta: #292 should ask for these existing reports' exact grain, field dictionary, version/finality rules, stable report IDs and privacy-preserving export path instead of asking whether any dining report exists.
+- Boundary: report existence does **not** prove export permission, API access, historical retention behavior, finality, or that passage/package counts equal physically served meals.
+- Maps to: H4, ACCESS, DATA_OWNER, MODEL_METHOD.
