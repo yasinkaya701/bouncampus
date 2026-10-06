@@ -35,6 +35,7 @@ This file separates public context/features from source-owned operational truth 
 | DS-012 | BİDB Service Inventory (S-BU-021) | service owner/responsible-unit/contact metadata | ACCESS_EVIDENCE | available | narrows BUCard/SKS/BİDB acquisition route; not data access |
 | DS-013 | BUCampus Geçişlerim surface (S-BU-023) | user-facing turnstile/card-reader passage history | ACCESS_EVIDENCE | available | proves event-history surface exists; reader scope/exportability/reconciliation unknown |
 | DS-014 | Intersession reservation workflow (S-BU-025) | reservation by service/date/campus special regime | PUBLIC_CONTEXT / PENDING_INTERNAL | public workflow known; snapshots/export unknown | decision-time intent signal candidate only |
+| DS-015 | BİDB named dining report surfaces (S-BU-027) | BUCard dining live report, daily passage reports, personnel meal report; package-meal/breakfast fields documented | ACCESS_EVIDENCE | report surfaces verified first-party; grain/export/finality unknown | acquisition target names for #292; not service labels |
 
 ### Public ownership / event-surface evidence
 
@@ -42,8 +43,10 @@ The acquisition route is now narrower:
 
 - **S-BU-021:** BİDB service inventory lists BUCard as a BİDB service; cafeteria BUCard top-up/refund includes SKS + BİDB; turnstile/card-reader faults route to BİDB.
 - **S-BU-023:** BUCampus documents a user-facing history of turnstile/card-reader passages.
+- **S-BU-026:** current university directive assigns dining BUCard operation/control, Food Services reporting and digital-data retention to the BUCard Office under BİDB.
+- **S-BU-027:** BİDB 2025 Activity Report names existing BUCard dining live, daily-passage and personnel-meal report surfaces.
 
-These sources support **owner routing and the existence of an event surface only**. They do not establish research access, cafeteria-reader separation, retention, aggregate export, or `actual_served` semantics.
+These sources support **owner routing and the existence of event/report surfaces only**. They do not establish research access, cafeteria-reader separation, retention, aggregate export, or `actual_served` semantics.
 
 See [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md).
 
