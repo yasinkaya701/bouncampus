@@ -103,6 +103,17 @@ This maps the existing `EA-01..EA-06` queue onto current cross-role work so agen
 | **EA-05 REPORTING_RECONCILIATION** | IE + CS1 via #82 / #322 and the reporting owner | Current produced/consumed/discarded definitions and reporting frequency | Keep as governance context if it cannot reconcile to a service-level decision. |
 | **EA-06 INCENTIVE_AND_AUTHORITY_MAP** | IE #358 | Accepted-service/hakediş quantity, approval/signature path, corrections, relevant penalties/flexibility | Do not claim savings/WTP/buyer incentive until this is real. |
 
+### Latest IE route progress — route narrowing, not gate closure
+
+The latest first-party IE source routing reduces acquisition ambiguity without satisfying the underlying CS2 gates:
+
+- **S-BU-026** narrows the institutional owner path for BUCard/reporting and the food-service acceptance/hakediş actor set. This improves who to ask; it does **not** establish export permission, payable quantity, freeze/change rights, penalties, buyer identity or economics.
+- **S-BU-027** names existing BUCard dining report surfaces, including a cafeteria instant report, daily passage reports and a personnel meal report. This changes EA-02 from “does any report exist?” to “obtain the named report schema/grain/version/finality/exportability,” but **EA-02 remains OPEN_EXTERNAL**.
+- Report existence is not service truth. Until real aggregate rows and SKS semantic reconciliation exist, **EA-03 remains OPEN_EXTERNAL** and BUCard/passages stay inadmissible as `actual_served` by assumption.
+- **S-BU-028** and **S-BU-030** narrow procurement/acceptance routing. They do not reveal the accepted/payable operational quantity, freeze point, correction rights, penalties, WTP or value capture, so **EA-06 remains OPEN_EXTERNAL**.
+
+CS2 consequence: spend the next primary-evidence cycle on retrieving and reconciling these named artifacts, not on broad new secondary research or on promoting stronger application claims.
+
 ### Cross-role dependency compression
 
 For the next CS2 decision cycle, the six gates effectively compress into three external truth packages:
