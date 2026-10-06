@@ -540,3 +540,13 @@ Detailed implications live in [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.m
 - Decision delta: Article 7 places the BUCard Office within BİDB and assigns dining BUCard system operation/control, reporting to the Food Services Board/Branch, and digital-data retention. Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission. Article 9 places meal-service procurement across SKS + Administrative and Financial Affairs and requires separate student/personnel invoices.
 - Boundary: does **not** prove export permission, report grain, passage = served meal, accepted/payable quantity, exact hakediş signer sequence, freeze/change rights, penalties, WTP, savings, or software buyer authority.
 - Maps to: H4, ACCESS, DATA_OWNER, CONTRACT, OPERATIONS.
+
+
+### S-BU-027 — Bilgi İşlem Daire Başkanlığı Faaliyet Raporu 2025
+- Type: OFFICIAL_UNIVERSITY
+- Publisher: Boğaziçi University Information Technology Department
+- URL: https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/1503-bilgi-islem-daire-baskanligi-20260227-153040.pdf
+- Use: first-party confirmation that BUCard has a dining live-report page, daily passage reports, package-meal fields, and a personnel meal report.
+- Decision delta: #292 can now ask for these named existing report surfaces rather than a hypothetical export product.
+- Boundary: report existence does **not** prove export permission, report grain/finality/versioning, stable source IDs, or that passage/package counts equal physically served meals.
+- Maps to: H4, ACCESS, DATA_OWNER, MODEL_METHOD.

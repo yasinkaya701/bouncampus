@@ -34,6 +34,10 @@ These are execution aids for this canonical packet, not new evidence registries.
   - the BUCard Office is required to report to the Food Services Board and Food Services Branch and retain digital data;
   - Article 5(f) places meal-hakediş payment orders/accrual with the Food Services Board together with the Inspection/Acceptance Commission;
   - Article 9 identifies SKS + Administrative and Financial Affairs as the meal-service procurement route.
+- **S-BU-027 — BİDB Faaliyet Raporu 2025**
+  - names an existing BUCard dining live-report page;
+  - states daily passage reports include package-meal information;
+  - names a personnel meal report with a breakfast field.
 
 This now narrows the technical/report owner route beyond a service-contact hypothesis: the current university directive assigns dining-BUCard reporting/data-custody duties to the BUCard Office. It is **not** enough to mark any dataset `VERIFIED_EXPORTABLE`, determine report grain, or equate a turnstile/payment event with a physically served meal.
 
@@ -70,7 +74,7 @@ NO row-level personal transaction history
 2. Can cafeteria readers/turnstiles be separated from library/gate/other readers?
 3. What stable reader/campus identifiers exist?
 4. Does one event record have event time, reader, result/status and correction/reversal state?
-5. Is there an existing aggregate report by campus × meal period × service date?
+5. For the existing **BUCard Yemekhane anlık rapor**, **günlük geçiş raporu**, and **personel yemek raporu** surfaces, what are the exact grain, field dictionary, version/finality rules and export options?
 6. Can that aggregate be exported without card/person identifiers?
 7. Does a late correction mutate prior reports or create a new report/version?
 8. What is the authoritative report/export identifier?
