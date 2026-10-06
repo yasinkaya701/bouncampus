@@ -42,6 +42,13 @@ Statuses:
 | A-017 | Boğaziçi official cafeteria visual | https://mediastore.cc.bogazici.edu.tr/web/userfiles/images/ekran_goruntusu_2024-10-16_155309.png | PNG | LINK_ONLY | Official-hosted image; reuse rights not established here | Visual context only; do not infer sensor/workflow geometry |
 | A-018 | İzmir Bakırçay University Akıllı Kampüs Ara Raporu | https://akilliuniversite.bakircay.edu.tr/Yuklenenler/Akilli_Universite/Sonuc%CC%A7_Raporu_20220428.pdf | PDF | LINK_ONLY | Official university-hosted report; verify reuse terms before copying | Smart-campus dining/utilization/planning precedent |
 
+
+| A-019 | Boğaziçi food-waste report 2024 | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2024_bu.pdf | PDF | LINK_ONLY | Official historical university report | Historical aggregate context |
+| A-020 | Boğaziçi food-waste report 2023 | https://impact.bogazici.edu.tr/sites/impact.bogazici.edu.tr/files/food_waste_2023_bu.pdf | PDF | LINK_ONLY | Official historical university report | Historical aggregate context |
+| A-021 | Türkiye food-service food-waste prevention guide | https://www.tarimorman.gov.tr/ABDGM/BelgelerArsiv/Belgeler/Uluslararas%C4%B1%20Kurulu%C5%9Flar/gastro-bakanlik-kilavuzu.pdf | PDF | LINK_ONLY | Ministry/FAO/Metro guide; verify exact reuse terms before copying | Türkiye-specific prevention/measurement context |
+| A-022 | Türkiye national food loss/waste strategy | https://faolex.fao.org/docs/pdf/tur209489.pdf | PDF | LINK_ONLY | Official policy archive/reference | National policy context |
+| A-023 | UI GreenMetric Guideline 2026 | https://uigreenmetric.com/wp-content/uploads/2026/06/2026_Guideline_UI-GreenMetric-SUR-eng-v2.pdf | PDF | LINK_ONLY | First-party guideline; keep as external reference | Sustainability-evidence / governance context |
+
 ## Image-use rule
 
 For figures/graphics in a presentation or application:
