@@ -45,6 +45,9 @@ Source IDs resolve through [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) and [source_ca
 | **Aygül Demir is a relevant control-workflow interview route** | Current university control-organization page lists Aygül Demir among principal dining-control members. | S-BU-014 | Interview occurrence, exact personal responsibilities, decision rights or reported facts. | Only update INTERVIEW_TRACKER after real outreach/scheduling/completion; never fabricate E-INT evidence. |
 | **Procurement and hakediş owner routes are now source-backed** | Official IMID pages identify Procurement and Tahakkuk branches and their current public managers; Tahakkuk explicitly handles hakediş payments. | S-BU-026, S-BU-027, S-BU-028 | Contract-specific ownership, approval chain or product buyer. | Use routes for #358 artifact/referral acquisition and verify each owner in conversation. |
 
+| **Dining BUCard report/data custody is source-backed** | Current university directive assigns dining BUCard system operation/control, reporting to Food Services governance and digital-data retention to BUCard Office/BİDB. | S-BU-031 | Export permission, exact report grain, historical-version semantics, passage-to-served equivalence. | #292 aggregate export + SKS semantic reconciliation. |
+| **Food-service hakediş governance has a food-specific formal actor pair** | Current university directive states the Food Service Executive Board carries out meal hakediş payment orders/accrual together with the Inspection and Acceptance Commission. | S-BU-031 | Payable quantity/unit, exact current signer chain, relation to KİK56.0/H workflow, penalties/freeze/economic-risk semantics. | #358 actual hakediş/acceptance package or source-owner walkthrough. |
+
 ## Promotion rule
 
 A row moves from **secondary-supported hypothesis** to **PMR-supported/contradicted** only when:
