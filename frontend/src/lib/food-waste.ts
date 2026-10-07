@@ -443,12 +443,18 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     ? pilotWasteReductionPct(controlWastePer100, interventionWastePer100)
     : null;
   const normalizedWasteReductionPct = roundMetric(reduction);
-  // Compare the two raw means directly at the target boundary. Recomputing
-  // the percentage can introduce floating-point noise (e.g. 10% -> 9.999...).
-  const wasteReductionTargetMet = reduction == null || controlWastePer100 == null || interventionWastePer100 == null
+  // Compare raw means directly. A few floating-point ULPs are needed for
+  // mathematically exact thresholds (e.g. an average of 0.9 can be stored as
+  // 0.9000000000000001); this is NOT a policy or display-rounding tolerance.
+  const targetWastePer100 = controlWastePer100 == null
     ? null
-    : interventionWastePer100 <= controlWastePer100
-      * (1 - FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct / 100);
+    : controlWastePer100 * (1 - FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct / 100);
+  const machineTolerance = targetWastePer100 == null || interventionWastePer100 == null
+    ? 0
+    : 8 * Number.EPSILON * Math.max(Math.abs(targetWastePer100), Math.abs(interventionWastePer100));
+  const wasteReductionTargetMet = reduction == null || targetWastePer100 == null || interventionWastePer100 == null
+    ? null
+    : interventionWastePer100 <= targetWastePer100 + machineTolerance;
   const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
     ? null
     : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
