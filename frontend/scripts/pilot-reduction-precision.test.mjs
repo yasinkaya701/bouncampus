@@ -55,4 +55,29 @@ const justBelowTarget = scoreFoodWastePilot(matchedFixture(1, 0.9000000001));
 assert.equal(justBelowTarget.gates.wasteReductionTargetMet, false);
 assert.equal(justBelowTarget.status, 'FAILED');
 
+// A physical dining service cannot simultaneously be a CONTROL and an
+// INTERVENTION observation on the same date. Reusing its identity must
+// invalidate evidence even if the arm labels differ.
+const uniqueServices = matchedFixture(2, 1);
+assert.equal(scoreFoodWastePilot(uniqueServices).gates.dataQualityPassed, true);
+
+const reusedService = uniqueServices.map((item, index) => index === 1
+  ? { ...item, serviceId: uniqueServices[0].serviceId }
+  : item);
+const repeated = scoreFoodWastePilot(reusedService);
+assert.equal(repeated.dataQuality.invalidMeasurementCount, 0,
+  'both individual rows are otherwise structurally valid');
+assert.equal(repeated.gates.dataQualityPassed, false,
+  'same-day service identity shared across arms must fail closed');
+assert.equal(repeated.gates.enoughEvidence, false);
+assert.equal(repeated.status, 'INSUFFICIENT_EVIDENCE');
+assert.ok(repeated.dataQuality.duplicateServiceKeys.includes('2026-10-08|CONTROL_0'));
+
+// Preserve historical allowance for local service IDs reused on
+// *different* dates: identity consists of the date and service ID.
+const otherDate = uniqueServices.map((item, index) => index === 1
+  ? { ...item, serviceId: uniqueServices[0].serviceId, date: '2026-10-09' }
+  : item);
+assert.equal(scoreFoodWastePilot(otherDate).gates.dataQualityPassed, true);
+
 console.log('pilot waste-reduction full-precision threshold regression passed');
