@@ -407,7 +407,9 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   const seen = new Set<string>();
   const duplicates = new Set<string>();
   measurements.forEach(item => {
-    const key = `${item.date}|${item.serviceId}|${item.arm}`;
+    // A service has one observed arm; arm is not part of its unique identity.
+    // Reusing the same dated service in both arms must not create two observations.
+    const key = `${item.date}|${item.serviceId}`;
     if (seen.has(key)) duplicates.add(key);
     seen.add(key);
   });
