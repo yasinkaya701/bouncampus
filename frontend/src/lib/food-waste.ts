@@ -432,13 +432,29 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     && control.measuredServices >= minimum
     && intervention.measuredServices >= minimum;
 
-  const reduction = control.meanWasteKgPer100Served != null && intervention.meanWasteKgPer100Served != null
-    ? pilotWasteReductionPct(control.meanWasteKgPer100Served, intervention.meanWasteKgPer100Served)
+  // Display summaries are rounded to two decimals. Never use them as inputs
+  // to a pre-registered evidence-promotion gate: near-threshold pilots can
+  // otherwise be promoted (or rejected) solely because of presentation rounding.
+  const controlWastePer100 = mean(controlMeasurements.map(item =>
+    wasteKgPer100Served(item.wasteKg, item.servedPortions)));
+  const interventionWastePer100 = mean(interventionMeasurements.map(item =>
+    wasteKgPer100Served(item.wasteKg, item.servedPortions)));
+  const reduction = controlWastePer100 != null && interventionWastePer100 != null
+    ? pilotWasteReductionPct(controlWastePer100, interventionWastePer100)
     : null;
   const normalizedWasteReductionPct = roundMetric(reduction);
-  const wasteReductionTargetMet = normalizedWasteReductionPct == null
+  // Compare raw means directly. A few floating-point ULPs are needed for
+  // mathematically exact thresholds (e.g. an average of 0.9 can be stored as
+  // 0.9000000000000001); this is NOT a policy or display-rounding tolerance.
+  const targetWastePer100 = controlWastePer100 == null
     ? null
-    : normalizedWasteReductionPct >= FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct;
+    : controlWastePer100 * (1 - FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct / 100);
+  const machineTolerance = targetWastePer100 == null || interventionWastePer100 == null
+    ? 0
+    : 8 * Number.EPSILON * Math.max(Math.abs(targetWastePer100), Math.abs(interventionWastePer100));
+  const wasteReductionTargetMet = reduction == null || targetWastePer100 == null || interventionWastePer100 == null
+    ? null
+    : interventionWastePer100 <= targetWastePer100 + machineTolerance;
   const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
     ? null
     : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
