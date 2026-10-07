@@ -18,6 +18,7 @@ import {
 } from '@/lib/food-waste';
 import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
 import { hasConfirmedPilotFlags } from '@/lib/pilot-flag-confirmation';
+import { nextPilotRowIdentifiers } from '@/lib/pilot-row-identifiers';
 import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 import { useLocale } from '@/lib/i18n';
 
@@ -44,11 +45,15 @@ type ScoreResponse = {
   validationErrors?: Array<{ index: number; message: string }>;
 };
 
-function createRow(arm: DraftRow['arm'], index: number): DraftRow {
+function createRow(
+  arm: DraftRow['arm'],
+  index: number,
+  identifiers?: { pairId: string; serviceId: string },
+): DraftRow {
   return {
     id: `${arm}-${Date.now()}-${index}`,
-    pairId: `PAIR_${String(Math.floor(index / 2) + 1).padStart(2, '0')}`,
-    serviceId: `${arm}-${String(index + 1).padStart(2, '0')}`,
+    pairId: identifiers?.pairId ?? `PAIR_${String(Math.floor(index / 2) + 1).padStart(2, '0')}`,
+    serviceId: identifiers?.serviceId ?? `${arm}-${String(index + 1).padStart(2, '0')}`,
     arm,
     date: '',
     forecast: '',
@@ -126,7 +131,10 @@ export default function FoodWastePilotPage() {
   };
 
   const addRow = (arm: DraftRow['arm']) => {
-    setRows(current => [...current, createRow(arm, current.length)]);
+    setRows(current => [
+      ...current,
+      createRow(arm, current.length, nextPilotRowIdentifiers(current, arm)),
+    ]);
     setScore(null);
     setNotice(null);
   };
