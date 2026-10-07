@@ -47,11 +47,13 @@ const pair = [control, intervention];
 
 const csv = serializePilotCsv(pair);
 assert.ok(csv.startsWith('pair_id,date,'));
-const parsed = parsePilotCsv('\uFEFF' + csv.replaceAll('\n', '\r\n'));
+const parsed = parsePilotCsv('\uFEFF' + csv);
 assert.deepEqual(parsed.errors, [], 'valid matched pilot CSV should import cleanly');
 assert.deepEqual(parsed.measurements, pair, 'import/export must preserve pair ID and escaped notes');
 assert.equal(analyzeMatchedPilotDesign(parsed.measurements).structurePassed, true);
 assert.deepEqual(parsePilotCsv(serializePilotCsv(parsed.measurements)).measurements, pair);
+const crlf = serializePilotCsv([{ ...control, notes: '' }, intervention]).replaceAll('\n', '\r\n');
+assert.equal(parsePilotCsv(crlf).measurements.length, 2, 'CRLF input should parse');
 
 const fields = {
   pair_id: 'PAIR_01',
