@@ -52,6 +52,13 @@ assert.deepEqual(parsed.errors, [], 'valid matched pilot CSV should import clean
 assert.deepEqual(parsed.measurements, pair, 'import/export must preserve pair ID and escaped notes');
 assert.equal(analyzeMatchedPilotDesign(parsed.measurements).structurePassed, true);
 assert.deepEqual(parsePilotCsv(serializePilotCsv(parsed.measurements)).measurements, pair);
+const whitespaceNote = '  Inspector note, recorded verbatim.  \r\n  Follow-up\t ';
+const annotatedPair = [{ ...control, notes: whitespaceNote }, intervention];
+const annotatedImport = parsePilotCsv(serializePilotCsv(annotatedPair));
+assert.deepEqual(annotatedImport.errors, [], 'CSV should accept annotated notes with whitespace');
+assert.deepEqual(annotatedImport.measurements, annotatedPair,
+  'CSV import/export must not strip spaces, tabs, or CRLF from evidence notes');
+
 const crlf = serializePilotCsv([{ ...control, notes: '' }, intervention]).replaceAll('\n', '\r\n');
 assert.equal(parsePilotCsv(crlf).measurements.length, 2, 'CRLF input should parse');
 
