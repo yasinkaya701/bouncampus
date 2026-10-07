@@ -50,4 +50,9 @@ const exactTarget = scoreFoodWastePilot(matchedFixture(1, 0.9));
 assert.equal(exactTarget.gates.wasteReductionTargetMet, true);
 assert.equal(exactTarget.status, 'PROMISING');
 
+// Do not interpret a genuine sub-threshold value as machine roundoff.
+const justBelowTarget = scoreFoodWastePilot(matchedFixture(1, 0.9000000001));
+assert.equal(justBelowTarget.gates.wasteReductionTargetMet, false);
+assert.equal(justBelowTarget.status, 'FAILED');
+
 console.log('pilot waste-reduction full-precision threshold regression passed');
