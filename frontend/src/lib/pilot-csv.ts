@@ -1,6 +1,7 @@
-import { validatePilotMeasurement, type PilotServiceMeasurement } from '@/lib/food-waste';
+import { validateMatchedPilotMeasurement, type MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 
 export const PILOT_CSV_HEADERS = [
+  'pair_id',
   'date',
   'service_id',
   'arm',
@@ -15,7 +16,7 @@ export const PILOT_CSV_HEADERS = [
 ] as const;
 
 export type PilotCsvParseResult = {
-  measurements: PilotServiceMeasurement[];
+  measurements: MatchedPilotServiceMeasurement[];
   errors: string[];
 };
 
@@ -65,6 +66,7 @@ function parseCsvRows(text: string) {
 function parseNumber(value: string, nullable = false) {
   const trimmed = value.trim();
   if (nullable && trimmed === '') return null;
+  if (trimmed === '') return Number.NaN;
   const parsed = Number(trimmed);
   return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
@@ -72,7 +74,7 @@ function parseNumber(value: string, nullable = false) {
 function parseBoolean(value: string) {
   const normalized = value.trim().toLowerCase();
   if (['true', '1', 'yes', 'y', 'evet'].includes(normalized)) return true;
-  if (['false', '0', 'no', 'n', 'hayır', 'hayir', ''].includes(normalized)) return false;
+  if (['false', '0', 'no', 'n', 'hayır', 'hayir'].includes(normalized)) return false;
   return null;
 }
 
@@ -89,8 +91,13 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
     };
   }
 
+  const duplicateHeaders = [...new Set(headers.filter((header, index) => headers.indexOf(header) !== index))];
+  if (duplicateHeaders.length) {
+    return { measurements: [], errors: [`Duplicate CSV headers: ${duplicateHeaders.join(', ')}`] };
+  }
+
   const indexOf = (name: typeof PILOT_CSV_HEADERS[number]) => headers.indexOf(name);
-  const measurements: PilotServiceMeasurement[] = [];
+  const measurements: MatchedPilotServiceMeasurement[] = [];
   const errors: string[] = [];
 
   rows.slice(1).forEach((values, rowIndex) => {
@@ -104,10 +111,11 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
       return;
     }
 
-    const measurement: PilotServiceMeasurement = {
+    const measurement: MatchedPilotServiceMeasurement = {
+      pairId: value('pair_id').trim(),
       date: value('date').trim(),
       serviceId: value('service_id').trim(),
-      arm: armRaw as PilotServiceMeasurement['arm'],
+      arm: armRaw as MatchedPilotServiceMeasurement['arm'],
       modelForecastMeals: parseNumber(value('model_forecast_meals'), true),
       producedPortions: parseNumber(value('produced_portions')) as number,
       servedPortions: parseNumber(value('served_portions')) as number,
@@ -118,7 +126,7 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
       notes: value('notes').trim(),
     };
 
-    const validationErrors = validatePilotMeasurement(measurement);
+    const validationErrors = validateMatchedPilotMeasurement(measurement);
     if (validationErrors.length) {
       errors.push(`Row ${rowIndex + 2}: ${validationErrors.join('; ')}`);
       return;
@@ -135,10 +143,11 @@ function escapeCsv(value: string | number | boolean | null | undefined) {
   return /[",\n\r]/.test(raw) ? `"${raw.replace(/"/g, '""')}"` : raw;
 }
 
-export function serializePilotCsv(measurements: PilotServiceMeasurement[]) {
+export function serializePilotCsv(measurements: MatchedPilotServiceMeasurement[]) {
   const lines = [PILOT_CSV_HEADERS.join(',')];
   measurements.forEach(item => {
     lines.push([
+      item.pairId,
       item.date,
       item.serviceId,
       item.arm,
