@@ -17,6 +17,7 @@ import {
   type PilotScorecard,
 } from '@/lib/food-waste';
 import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
+import { hasConfirmedPilotFlags } from '@/lib/pilot-flag-confirmation';
 import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 import { useLocale } from '@/lib/i18n';
 
@@ -31,8 +32,8 @@ type DraftRow = {
   served: string;
   surplusKg: string;
   wasteKg: string;
-  earlySellout: boolean;
-  operatorOverride: boolean;
+  earlySellout: boolean | null;
+  operatorOverride: boolean | null;
   notes: string;
 };
 
@@ -55,8 +56,8 @@ function createRow(arm: DraftRow['arm'], index: number): DraftRow {
     served: '',
     surplusKg: '',
     wasteKg: '',
-    earlySellout: false,
-    operatorOverride: false,
+    earlySellout: null,
+    operatorOverride: null,
     notes: '',
   };
 }
@@ -65,7 +66,7 @@ function requiredNumber(value: string) {
   return value.trim() === '' ? Number.NaN : Number(value);
 }
 
-function rowToMeasurement(row: DraftRow): MatchedPilotServiceMeasurement {
+function rowToMeasurement(row: DraftRow & { earlySellout: boolean; operatorOverride: boolean }): MatchedPilotServiceMeasurement {
   return {
     pairId: row.pairId.trim(),
     date: row.date,
@@ -154,6 +155,12 @@ export default function FoodWastePilotPage() {
   };
 
   const exportCsv = () => {
+    if (!hasConfirmedPilotFlags(rows)) {
+      setError(t('Dışa aktarmadan önce her servis için erken tükenme ve operatör müdahalesini Evet/Hayır olarak doğrulayın.', 'Confirm Yes/No for early sell-out and operator override on every service before exporting.'));
+      setNotice(null);
+      return;
+    }
+    setError(null);
     const csv = serializePilotCsv(rows.map(rowToMeasurement));
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -167,6 +174,12 @@ export default function FoodWastePilotPage() {
   };
 
   const scorePilot = async () => {
+    if (!hasConfirmedPilotFlags(rows)) {
+      setScore(null);
+      setNotice(null);
+      setError(t('Skorlamadan önce her servis için erken tükenme ve operatör müdahalesini Evet/Hayır olarak doğrulayın.', 'Confirm Yes/No for early sell-out and operator override on every service before scoring.'));
+      return;
+    }
     setLoading(true);
     setError(null);
     setNotice(null);
@@ -267,8 +280,8 @@ export default function FoodWastePilotPage() {
                 <NumberField label={t('Servis edilen', 'Served portions')} value={row.served} onChange={value => updateRow(row.id, 'served', value)} />
                 <NumberField label={t('Yenilebilir fazla kg', 'Edible surplus kg')} value={row.surplusKg} onChange={value => updateRow(row.id, 'surplusKg', value)} step="0.1" />
                 <NumberField label={t('Atık kg', 'Waste kg')} value={row.wasteKg} onChange={value => updateRow(row.id, 'wasteKg', value)} step="0.1" />
-                <ToggleField label={t('Erken tükenme', 'Early sell-out')} checked={row.earlySellout} onChange={value => updateRow(row.id, 'earlySellout', value)} />
-                <ToggleField label={t('Operatör override', 'Operator override')} checked={row.operatorOverride} onChange={value => updateRow(row.id, 'operatorOverride', value)} />
+                <ToggleField label={t('Erken tükenme', 'Early sell-out')} value={row.earlySellout} onChange={value => updateRow(row.id, 'earlySellout', value)} t={t} />
+                <ToggleField label={t('Operatör override', 'Operator override')} value={row.operatorOverride} onChange={value => updateRow(row.id, 'operatorOverride', value)} t={t} />
               </div>
               <Field label={t('Anomali / not', 'Anomaly / note')} className="mt-3"><input value={row.notes} onChange={event => updateRow(row.id, 'notes', event.target.value)} placeholder={t('Etkinlik, menü sorunu, ölçüm notu…', 'Event, menu issue, measurement note…')} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>
             </article>
@@ -317,8 +330,25 @@ function NumberField({ label, value, onChange, step = '1' }: { label: string; va
   return <Field label={label}><input type="number" min="0" step={step} value={value} onChange={event => onChange(event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>;
 }
 
-function ToggleField({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
-  return <label className="flex items-center justify-between rounded-xl border border-slate-900/10 px-3 py-2"><span className="text-[8px] font-black text-slate-500">{label}</span><input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} className="h-4 w-4 accent-[#173f67]" /></label>;
+function ToggleField({ label, value, onChange, t }: {
+  label: string;
+  value: boolean | null;
+  onChange: (value: boolean | null) => void;
+  t: (tr: string, en: string) => string;
+}) {
+  return <label className="flex items-center justify-between gap-2 rounded-xl border border-slate-900/10 px-3 py-2">
+    <span className="text-[8px] font-black text-slate-500">{label}</span>
+    <select
+      aria-label={label}
+      value={value === null ? '' : String(value)}
+      onChange={event => onChange(event.target.value === '' ? null : event.target.value === 'true')}
+      className="bc-focus-ring min-w-0 rounded-lg border border-slate-900/10 bg-white px-2 py-1 text-[9px] font-bold text-slate-700"
+    >
+      <option value="">{t('Seçin', 'Select')}</option>
+      <option value="true">{t('Evet', 'Yes')}</option>
+      <option value="false">{t('Hayır', 'No')}</option>
+    </select>
+  </label>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

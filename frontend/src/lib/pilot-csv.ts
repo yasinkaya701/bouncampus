@@ -150,7 +150,8 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
       wasteKg: parseNumber(value('waste_kg')) as number,
       earlySellout,
       operatorOverride,
-      notes: value('notes').trim(),
+      // Notes are evidence annotations: preserve their exact CSV contents.
+      notes: value('notes'),
     };
 
     const validationErrors = validateMatchedPilotMeasurement(measurement);

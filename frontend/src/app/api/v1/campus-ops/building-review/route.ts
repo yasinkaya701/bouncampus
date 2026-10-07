@@ -4,23 +4,12 @@ import courseSnapshotMeta from '@/data/course_snapshot_meta.json';
 import { computeBuildingEnergy } from '@/lib/campus-calculations';
 import { fetchBounWeather } from '@/lib/live-sources';
 import { recommendBuildingReview } from '@/lib/decision-intelligence/building-review-policy';
+import { parseIstanbulPlanningDate } from '@/lib/decision-intelligence/istanbul-planning-date';
 
 export const dynamic = 'force-dynamic';
 
-function parseDate(value: string | null): { dateVal: string; weekday: number } | null {
-  const dateVal = value?.trim() || new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Istanbul',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
-  const parsed = new Date(`${dateVal}T12:00:00+03:00`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateVal) || Number.isNaN(parsed.getTime())) return null;
-  return { dateVal, weekday: (parsed.getDay() + 6) % 7 };
-}
-
 export async function GET(request: NextRequest) {
-  const parsed = parseDate(request.nextUrl.searchParams.get('date'));
+  const parsed = parseIstanbulPlanningDate(request.nextUrl.searchParams.get('date'));
   if (!parsed) {
     return NextResponse.json({ error: 'invalid_date', expected: 'YYYY-MM-DD' }, { status: 400 });
   }
