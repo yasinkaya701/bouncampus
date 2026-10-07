@@ -20,47 +20,68 @@ export type PilotCsvParseResult = {
   errors: string[];
 };
 
-function parseCsvRows(text: string) {
+function parseCsvRows(text: string): { rows: string[][]; error: string | null } {
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let quoteClosed = false;
 
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index];
     const next = text[index + 1];
 
-    if (char === '"') {
-      if (quoted && next === '"') {
-        cell += '"';
-        index += 1;
+    if (quoted) {
+      if (char === '"') {
+        if (next === '"') {
+          cell += '"';
+          index += 1;
+        } else {
+          quoted = false;
+          quoteClosed = true;
+        }
       } else {
-        quoted = !quoted;
+        cell += char;
       }
       continue;
     }
 
-    if (char === ',' && !quoted) {
-      row.push(cell);
-      cell = '';
+    if (char === '"') {
+      if (cell !== '' || quoteClosed) {
+        return { rows: [], error: `Unexpected quote at character ${index + 1}.` };
+      }
+      quoted = true;
       continue;
     }
 
-    if ((char === '\n' || char === '\r') && !quoted) {
+    if (quoteClosed && char !== ',' && char !== '\n' && char !== '\r') {
+      return { rows: [], error: `Unexpected text after quoted field at character ${index + 1}.` };
+    }
+
+    if (char === ',') {
+      row.push(cell);
+      cell = '';
+      quoteClosed = false;
+      continue;
+    }
+
+    if (char === '\n' || char === '\r') {
       if (char === '\r' && next === '\n') index += 1;
       row.push(cell);
       if (row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
+      quoteClosed = false;
       continue;
     }
 
     cell += char;
   }
 
+  if (quoted) return { rows: [], error: 'Unterminated quoted field.' };
   row.push(cell);
   if (row.some(value => value.trim() !== '')) rows.push(row);
-  return rows;
+  return { rows, error: null };
 }
 
 function parseNumber(value: string, nullable = false) {
@@ -79,7 +100,9 @@ function parseBoolean(value: string) {
 }
 
 export function parsePilotCsv(text: string): PilotCsvParseResult {
-  const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  const parsed = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  if (parsed.error) return { measurements: [], errors: [`Malformed CSV: ${parsed.error}`] };
+  const { rows } = parsed;
   if (!rows.length) return { measurements: [], errors: ['CSV is empty.'] };
 
   const headers = rows[0].map(value => value.trim().toLowerCase());
@@ -101,6 +124,10 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
   const errors: string[] = [];
 
   rows.slice(1).forEach((values, rowIndex) => {
+    if (values.length !== headers.length) {
+      errors.push(`Row ${rowIndex + 2}: expected ${headers.length} CSV columns, received ${values.length}.`);
+      return;
+    }
     const value = (name: typeof PILOT_CSV_HEADERS[number]) => values[indexOf(name)] ?? '';
     const earlySellout = parseBoolean(value('early_sellout'));
     const operatorOverride = parseBoolean(value('operator_override'));
@@ -135,7 +162,7 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
     measurements.push(measurement);
   });
 
-  return { measurements, errors };
+  return { measurements: errors.length ? [] : measurements, errors };
 }
 
 function escapeCsv(value: string | number | boolean | null | undefined) {
