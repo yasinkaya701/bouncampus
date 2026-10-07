@@ -107,4 +107,40 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+// Malformed records must fail closed rather than silently truncating measurements.
+const validCsv = asCsv(fields);
+const validDataRow = validCsv.trimEnd().split('\n')[1];
+const csvHeader = PILOT_CSV_HEADERS.join(',');
+
+{
+  const result = parsePilotCsv(`${csvHeader}\n${validDataRow},unexpected\n`);
+  assert.match(result.errors.join(' '), /expected 12 CSV columns, received 13/);
+  assert.equal(result.measurements.length, 0, 'extra columns must not be silently discarded');
+}
+{
+  const result = parsePilotCsv(`${csvHeader}\n${validDataRow.slice(0, -1)}\n`);
+  assert.match(result.errors.join(' '), /expected 12 CSV columns, received 11/);
+  assert.equal(result.measurements.length, 0, 'short rows must not be silently padded');
+}
+{
+  const result = parsePilotCsv(`${csvHeader}\n${validDataRow}"unterminated\n`);
+  assert.match(result.errors.join(' '), /unterminated quoted field/);
+  assert.equal(result.measurements.length, 0);
+}
+{
+  const result = parsePilotCsv(`${csvHeader}\n${validDataRow}"closed"trailing\n`);
+  assert.match(result.errors.join(' '), /unexpected characters after closing quote/);
+  assert.equal(result.measurements.length, 0);
+}
+{
+  const result = parsePilotCsv(`${csvHeader}\n${validDataRow}unescaped"quote\n`);
+  assert.match(result.errors.join(' '), /unexpected quote/);
+  assert.equal(result.measurements.length, 0);
+}
+{
+  const result = parsePilotCsv(validCsv + validDataRow + ',unexpected\n');
+  assert.equal(result.errors.length, 1);
+  assert.equal(result.measurements.length, 0, 'one bad row invalidates the whole import');
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
