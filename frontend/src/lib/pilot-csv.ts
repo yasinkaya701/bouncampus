@@ -25,6 +25,7 @@ function parseCsvRows(text: string) {
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let afterClosingQuote = false;
 
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index];
@@ -34,15 +35,25 @@ function parseCsvRows(text: string) {
       if (quoted && next === '"') {
         cell += '"';
         index += 1;
+      } else if (quoted) {
+        quoted = false;
+        afterClosingQuote = true;
+      } else if (!afterClosingQuote && cell === '') {
+        quoted = true;
       } else {
-        quoted = !quoted;
+        throw new Error(`Invalid CSV quoting at character ${index + 1}: unexpected quote.`);
       }
       continue;
+    }
+
+    if (afterClosingQuote && char !== ',' && char !== '\n' && char !== '\r') {
+      throw new Error(`Invalid CSV quoting at character ${index + 1}: unexpected text after closing quote.`);
     }
 
     if (char === ',' && !quoted) {
       row.push(cell);
       cell = '';
+      afterClosingQuote = false;
       continue;
     }
 
@@ -52,12 +63,14 @@ function parseCsvRows(text: string) {
       if (row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
+      afterClosingQuote = false;
       continue;
     }
 
     cell += char;
   }
 
+  if (quoted) throw new Error('Invalid CSV quoting: unterminated quoted field.');
   row.push(cell);
   if (row.some(value => value.trim() !== '')) rows.push(row);
   return rows;
@@ -79,7 +92,15 @@ function parseBoolean(value: string) {
 }
 
 export function parsePilotCsv(text: string): PilotCsvParseResult {
-  const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  let rows: string[][];
+  try {
+    rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  } catch (error) {
+    return {
+      measurements: [],
+      errors: [error instanceof Error ? error.message : 'Invalid CSV quoting.'],
+    };
+  }
   if (!rows.length) return { measurements: [], errors: ['CSV is empty.'] };
 
   const headers = rows[0].map(value => value.trim().toLowerCase());

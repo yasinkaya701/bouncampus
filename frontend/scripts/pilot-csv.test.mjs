@@ -107,4 +107,20 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+
+{
+  const result = parsePilotCsv(asCsv({ ...fields, notes: '"memo, with ""quotes"""' }));
+  assert.deepEqual(result.errors, [], 'valid quoted CSV notes must still import');
+  assert.equal(result.measurements[0].notes, 'memo, with "quotes"');
+}
+for (const notes of [
+  'before"inside"after',
+  '"valid"junk',
+  '"unterminated',
+]) {
+  const result = parsePilotCsv(asCsv({ ...fields, notes }));
+  assert.equal(result.measurements.length, 0, 'malformed CSV must not be partially imported');
+  assert.match(result.errors.join(' '), /Invalid CSV quoting/, 'malformed quotes must fail closed');
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
