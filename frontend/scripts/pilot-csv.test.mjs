@@ -107,4 +107,21 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+// Malformed quoting must fail closed; silently stripping quotes could corrupt field evidence.
+for (const malformedNotes of [
+  '"unterminated',
+  'operator said "stop"',
+  '"closed"trailing',
+]) {
+  const result = parsePilotCsv(asCsv({ ...fields, notes: malformedNotes }));
+  assert.equal(result.measurements.length, 0, 'malformed CSV must not import a measured row');
+  assert.match(result.errors.join(' '), /Malformed CSV quoting/);
+}
+{
+  const notes = 'first, "operator quoted"\nsecond line';
+  const result = parsePilotCsv(serializePilotCsv([{ ...control, notes }, intervention]));
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.measurements[0].notes, notes, 'valid escaped CSV must preserve notes exactly');
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
