@@ -25,6 +25,7 @@ function parseCsvRows(text: string) {
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let quoteClosed = false;
 
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index];
@@ -34,30 +35,47 @@ function parseCsvRows(text: string) {
       if (quoted && next === '"') {
         cell += '"';
         index += 1;
+      } else if (quoted) {
+        quoted = false;
+        quoteClosed = true;
+      } else if (cell === '' && !quoteClosed) {
+        quoted = true;
       } else {
-        quoted = !quoted;
+        throw new Error('Malformed CSV quoting: unexpected quote.');
       }
       continue;
     }
 
-    if (char === ',' && !quoted) {
-      row.push(cell);
-      cell = '';
+    if (quoted) {
+      cell += char;
       continue;
     }
 
-    if ((char === '\n' || char === '\r') && !quoted) {
+    if (quoteClosed && char !== ',' && char !== '\n' && char !== '\r') {
+      throw new Error('Malformed CSV quoting: characters after closing quote.');
+    }
+
+    if (char === ',') {
+      row.push(cell);
+      cell = '';
+      quoteClosed = false;
+      continue;
+    }
+
+    if (char === '\n' || char === '\r') {
       if (char === '\r' && next === '\n') index += 1;
       row.push(cell);
       if (row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
+      quoteClosed = false;
       continue;
     }
 
     cell += char;
   }
 
+  if (quoted) throw new Error('Malformed CSV quoting: unterminated quoted field.');
   row.push(cell);
   if (row.some(value => value.trim() !== '')) rows.push(row);
   return rows;
@@ -79,7 +97,15 @@ function parseBoolean(value: string) {
 }
 
 export function parsePilotCsv(text: string): PilotCsvParseResult {
-  const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  let rows: string[][];
+  try {
+    rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  } catch (error) {
+    return {
+      measurements: [],
+      errors: [error instanceof Error ? error.message : 'Malformed CSV quoting.'],
+    };
+  }
   if (!rows.length) return { measurements: [], errors: ['CSV is empty.'] };
 
   const headers = rows[0].map(value => value.trim().toLowerCase());
