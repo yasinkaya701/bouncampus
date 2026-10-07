@@ -25,6 +25,7 @@ function parseCsvRows(text: string) {
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let afterQuote = false;
 
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index];
@@ -34,15 +35,29 @@ function parseCsvRows(text: string) {
       if (quoted && next === '"') {
         cell += '"';
         index += 1;
+      } else if (quoted) {
+        quoted = false;
+        afterQuote = true;
+      } else if (cell === '' && !afterQuote) {
+        quoted = true;
       } else {
-        quoted = !quoted;
+        throw new Error('Malformed CSV: unexpected quote.');
       }
+      continue;
+    }
+
+    if (afterQuote && char !== ',' && char !== '\n' && char !== '\r') {
+      if (char !== ' ' && char !== '\t') {
+        throw new Error('Malformed CSV: unexpected characters after closing quote.');
+      }
+      cell += char;
       continue;
     }
 
     if (char === ',' && !quoted) {
       row.push(cell);
       cell = '';
+      afterQuote = false;
       continue;
     }
 
@@ -52,11 +67,14 @@ function parseCsvRows(text: string) {
       if (row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
+      afterQuote = false;
       continue;
     }
 
     cell += char;
   }
+
+  if (quoted) throw new Error('Malformed CSV: unterminated quoted field.');
 
   row.push(cell);
   if (row.some(value => value.trim() !== '')) rows.push(row);
@@ -79,7 +97,12 @@ function parseBoolean(value: string) {
 }
 
 export function parsePilotCsv(text: string): PilotCsvParseResult {
-  const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  let rows: string[][];
+  try {
+    rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  } catch (error) {
+    return { measurements: [], errors: [error instanceof Error ? error.message : 'Malformed CSV.'] };
+  }
   if (!rows.length) return { measurements: [], errors: ['CSV is empty.'] };
 
   const headers = rows[0].map(value => value.trim().toLowerCase());
@@ -101,6 +124,10 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
   const errors: string[] = [];
 
   rows.slice(1).forEach((values, rowIndex) => {
+    if (values.length !== headers.length) {
+      errors.push(`Row ${rowIndex + 2}: expected ${headers.length} CSV columns, received ${values.length}.`);
+      return;
+    }
     const value = (name: typeof PILOT_CSV_HEADERS[number]) => values[indexOf(name)] ?? '';
     const earlySellout = parseBoolean(value('early_sellout'));
     const operatorOverride = parseBoolean(value('operator_override'));
@@ -135,7 +162,7 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
     measurements.push(measurement);
   });
 
-  return { measurements, errors };
+  return { measurements: errors.length ? [] : measurements, errors };
 }
 
 function escapeCsv(value: string | number | boolean | null | undefined) {
