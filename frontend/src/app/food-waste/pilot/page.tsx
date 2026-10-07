@@ -61,6 +61,10 @@ function createRow(arm: DraftRow['arm'], index: number): DraftRow {
   };
 }
 
+function requiredNumber(value: string) {
+  return value.trim() === '' ? Number.NaN : Number(value);
+}
+
 function rowToMeasurement(row: DraftRow): MatchedPilotServiceMeasurement {
   return {
     pairId: row.pairId.trim(),
@@ -68,10 +72,10 @@ function rowToMeasurement(row: DraftRow): MatchedPilotServiceMeasurement {
     serviceId: row.serviceId,
     arm: row.arm,
     modelForecastMeals: row.forecast === '' ? null : Number(row.forecast),
-    producedPortions: Number(row.produced),
-    servedPortions: Number(row.served),
-    edibleSurplusKg: Number(row.surplusKg),
-    wasteKg: Number(row.wasteKg),
+    producedPortions: requiredNumber(row.produced),
+    servedPortions: requiredNumber(row.served),
+    edibleSurplusKg: requiredNumber(row.surplusKg),
+    wasteKg: requiredNumber(row.wasteKg),
     earlySellout: row.earlySellout,
     operatorOverride: row.operatorOverride,
     notes: row.notes,
