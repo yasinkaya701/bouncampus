@@ -409,7 +409,7 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   measurements.forEach(item => {
     // A service has one observed arm; arm is not part of its unique identity.
     // Reusing the same dated service in both arms must not create two observations.
-    const key = `${item.date}|${item.serviceId}`;
+    const key = `${item.date}|${item.serviceId.trim()}`;
     if (seen.has(key)) duplicates.add(key);
     seen.add(key);
   });
