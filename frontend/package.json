@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:campus-operations": "node --experimental-strip-types scripts/campus-operations.test.mjs && node --experimental-strip-types scripts/food-menu-demand.test.mjs",
+    "test:campus-operations": "node --experimental-strip-types scripts/campus-operations.test.mjs && node --experimental-strip-types scripts/food-menu-demand.test.mjs && node --experimental-strip-types scripts/pilot-csv.test.mjs",
     "typecheck": "npm run test:campus-operations && tsc --noEmit",
     "verify": "npm run typecheck && npm run lint && npm run build"
   },
