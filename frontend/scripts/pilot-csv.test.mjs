@@ -107,4 +107,31 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+
+{
+  const malformed = parsePilotCsv(asCsv({ ...fields, notes: '"unterminated' }));
+  assert.match(malformed.errors.join(' '), /Unterminated quoted CSV field/);
+  assert.equal(malformed.measurements.length, 0, 'broken quoted records must not enter evidence');
+}
+{
+  const malformed = parsePilotCsv(asCsv({ ...fields, notes: 'stray"quote' }));
+  assert.match(malformed.errors.join(' '), /Invalid CSV quote/);
+  assert.equal(malformed.measurements.length, 0);
+}
+{
+  const malformed = parsePilotCsv(asCsv({ ...fields, notes: '"closed"trailing' }));
+  assert.match(malformed.errors.join(' '), /Unexpected text after CSV closing quote/);
+  assert.equal(malformed.measurements.length, 0);
+}
+{
+  const tooMany = parsePilotCsv(asCsv({ ...fields, notes: 'fine' }).replace(/\\n$/, ',extra\\n'));
+  assert.match(tooMany.errors.join(' '), /expected 12 columns, received 13/);
+  assert.equal(tooMany.measurements.length, 0);
+}
+{
+  const tooFew = parsePilotCsv(asCsv(fields).replace(/,\\n$/, '\\n'));
+  assert.match(tooFew.errors.join(' '), /expected 12 columns, received 11/);
+  assert.equal(tooFew.measurements.length, 0);
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
