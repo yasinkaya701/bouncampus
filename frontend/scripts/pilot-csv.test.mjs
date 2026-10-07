@@ -143,4 +143,20 @@ const csvHeader = PILOT_CSV_HEADERS.join(',');
   assert.equal(result.measurements.length, 0, 'one bad row invalidates the whole import');
 }
 
+{
+  const { hasConfirmedPilotFlags } = await import('../src/lib/pilot-flag-confirmation.ts');
+  assert.equal(hasConfirmedPilotFlags([{ earlySellout: null, operatorOverride: false }]), false,
+    'unanswered sell-out must not be counted as a measured no');
+  assert.equal(hasConfirmedPilotFlags([{ earlySellout: false, operatorOverride: null }]), false,
+    'unanswered operator override must not be counted as a measured no');
+  assert.equal(hasConfirmedPilotFlags([{ earlySellout: false, operatorOverride: false }]), true,
+    'explicit no/no is valid evidence');
+  assert.equal(hasConfirmedPilotFlags([{ earlySellout: true, operatorOverride: false }]), true,
+    'explicit yes/no is valid evidence');
+  assert.equal(hasConfirmedPilotFlags([
+    { earlySellout: true, operatorOverride: true },
+    { earlySellout: null, operatorOverride: false },
+  ]), false, 'one unanswered service must prevent scoring or export for the whole form');
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
