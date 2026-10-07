@@ -443,9 +443,12 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     ? pilotWasteReductionPct(controlWastePer100, interventionWastePer100)
     : null;
   const normalizedWasteReductionPct = roundMetric(reduction);
-  const wasteReductionTargetMet = reduction == null
+  // Compare the two raw means directly at the target boundary. Recomputing
+  // the percentage can introduce floating-point noise (e.g. 10% -> 9.999...).
+  const wasteReductionTargetMet = reduction == null || controlWastePer100 == null || interventionWastePer100 == null
     ? null
-    : reduction >= FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct;
+    : interventionWastePer100 <= controlWastePer100
+      * (1 - FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct / 100);
   const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
     ? null
     : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
