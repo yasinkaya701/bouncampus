@@ -107,4 +107,26 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+// Malformed source records must not be silently transformed into measured evidence.
+{
+  const escaped = { ...control, notes: 'Comma, quote "example"\nand CRLF \r\nretained' };
+  const roundTrip = parsePilotCsv(serializePilotCsv([escaped, intervention]));
+  assert.deepEqual(roundTrip.errors, []);
+  assert.deepEqual(roundTrip.measurements, [escaped, intervention]);
+}
+{
+  const malformed = [
+    [asCsv({ ...fields, service_id: 'CONTROL_"01' }), /unexpected quote/],
+    [asCsv({ ...fields, notes: '"unfinished' }), /unterminated quoted field/],
+    [asCsv({ ...fields, notes: '"closed"garbage' }), /characters after a closing quote/],
+    [asCsv(fields).replace(/\n$/, ',unexpected\n'), /expected 12 CSV columns/],
+    [asCsv(fields).replace(/,\n$/, '\n'), /expected 12 CSV columns/],
+  ];
+  for (const [source, errorPattern] of malformed) {
+    const result = parsePilotCsv(source);
+    assert.equal(result.measurements.length, 0, 'malformed CSV cannot become pilot evidence');
+    assert.match(result.errors.join(' '), errorPattern);
+  }
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
