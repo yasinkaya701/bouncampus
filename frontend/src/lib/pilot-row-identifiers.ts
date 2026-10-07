@@ -39,7 +39,7 @@ export function nextPilotRowIdentifiers(
   })?.pairId.trim();
 
   const maxPairIndex = rows.reduce((max, row) => {
-    const match = /^PAIR_(\\d+)$/.exec(row.pairId.trim());
+    const match = /^PAIR_(\d+)$/.exec(row.pairId.trim());
     return match ? Math.max(max, Number(match[1])) : max;
   }, 0);
   let nextPairIndex = maxPairIndex + 1;
@@ -50,7 +50,7 @@ export function nextPilotRowIdentifiers(
   }
 
   const maxServiceIndex = rows.reduce((max, row) => {
-    const match = /^(?:CONTROL|INTERVENTION)-(\\d+)$/.exec(row.serviceId);
+    const match = /^(?:CONTROL|INTERVENTION)-(\d+)$/.exec(row.serviceId);
     return match ? Math.max(max, Number(match[1])) : max;
   }, 0);
   let nextServiceIndex = maxServiceIndex + 1;
