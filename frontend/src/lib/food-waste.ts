@@ -432,13 +432,20 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     && control.measuredServices >= minimum
     && intervention.measuredServices >= minimum;
 
-  const reduction = control.meanWasteKgPer100Served != null && intervention.meanWasteKgPer100Served != null
-    ? pilotWasteReductionPct(control.meanWasteKgPer100Served, intervention.meanWasteKgPer100Served)
+  // Display summaries are rounded to two decimals. Never use them as inputs
+  // to a pre-registered evidence-promotion gate: near-threshold pilots can
+  // otherwise be promoted (or rejected) solely because of presentation rounding.
+  const controlWastePer100 = mean(controlMeasurements.map(item =>
+    wasteKgPer100Served(item.wasteKg, item.servedPortions)));
+  const interventionWastePer100 = mean(interventionMeasurements.map(item =>
+    wasteKgPer100Served(item.wasteKg, item.servedPortions)));
+  const reduction = controlWastePer100 != null && interventionWastePer100 != null
+    ? pilotWasteReductionPct(controlWastePer100, interventionWastePer100)
     : null;
   const normalizedWasteReductionPct = roundMetric(reduction);
-  const wasteReductionTargetMet = normalizedWasteReductionPct == null
+  const wasteReductionTargetMet = reduction == null
     ? null
-    : normalizedWasteReductionPct >= FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct;
+    : reduction >= FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct;
   const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
     ? null
     : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
