@@ -166,4 +166,28 @@ const csvHeader = PILOT_CSV_HEADERS.join(',');
   ]), false, 'one unanswered service must prevent scoring or export for the whole form');
 }
 
+const { nextPilotRowIdentifiers } = await import('../src/lib/pilot-row-identifiers.ts');
+
+const firstPair = [
+  { pairId: 'PAIR_01', serviceId: 'CONTROL-01', arm: 'CONTROL' },
+  { pairId: 'PAIR_01', serviceId: 'INTERVENTION-02', arm: 'INTERVENTION' },
+];
+const nextControlIdentity = nextPilotRowIdentifiers(firstPair, 'CONTROL');
+assert.deepEqual(nextControlIdentity, { pairId: 'PAIR_02', serviceId: 'CONTROL-03' },
+  'new control service must get its own pair and a unique service ID');
+const incompleteRows = [...firstPair, { ...nextControlIdentity, arm: 'CONTROL' }];
+const nextInterventionIdentity = nextPilotRowIdentifiers(incompleteRows, 'INTERVENTION');
+assert.deepEqual(nextInterventionIdentity, { pairId: 'PAIR_02', serviceId: 'INTERVENTION-04' },
+  'new intervention service must complete the existing unmatched pair');
+const matchedRows = [...incompleteRows, { ...nextInterventionIdentity, arm: 'INTERVENTION' }];
+const afterRemoval = matchedRows.filter(row => row.serviceId !== 'INTERVENTION-02');
+assert.deepEqual(nextPilotRowIdentifiers(afterRemoval, 'INTERVENTION'),
+  { pairId: 'PAIR_01', serviceId: 'INTERVENTION-05' },
+  're-adding after deletion must fill orphan pair without recycling a live service ID');
+const repeatedControl = nextPilotRowIdentifiers(matchedRows, 'CONTROL');
+assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' },
+  'consecutive same-arm additions cannot double-book an existing pair');
+assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
+  'generated service IDs must stay unique');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
