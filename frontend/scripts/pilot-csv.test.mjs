@@ -143,4 +143,23 @@ const csvHeader = PILOT_CSV_HEADERS.join(',');
   assert.equal(result.measurements.length, 0, 'one bad row invalidates the whole import');
 }
 
+
+for (const date of [
+  '2026-02-29', // Not a leap year
+  '2026-04-31', // April has 30 days
+  '2026-13-01',
+  '2026-00-10',
+  '2026-01-00',
+  '2026-2-9',  // Must retain YYYY-MM-DD representation
+]) {
+  const result = parsePilotCsv(asCsv({ ...fields, date }));
+  assert.equal(result.measurements.length, 0, `invalid date ${date} must not be imported`);
+  assert.match(result.errors.join(' '), /date must be YYYY-MM-DD/, `date ${date} must fail validation`);
+}
+{
+  const leapDay = parsePilotCsv(asCsv({ ...fields, date: '2024-02-29' }));
+  assert.deepEqual(leapDay.errors, [], 'a real leap-day service should import');
+  assert.equal(leapDay.measurements[0].date, '2024-02-29');
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
