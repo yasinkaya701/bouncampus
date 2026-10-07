@@ -15,13 +15,14 @@ import {
 import {
   FOOD_WASTE_PILOT_PROTOCOL,
   type PilotScorecard,
-  type PilotServiceMeasurement,
 } from '@/lib/food-waste';
 import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
+import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 import { useLocale } from '@/lib/i18n';
 
 type DraftRow = {
   id: string;
+  pairId: string;
   serviceId: string;
   arm: 'CONTROL' | 'INTERVENTION';
   date: string;
@@ -38,12 +39,14 @@ type DraftRow = {
 type ScoreResponse = {
   scorecard?: PilotScorecard;
   error?: string;
+  detail?: string;
   validationErrors?: Array<{ index: number; message: string }>;
 };
 
 function createRow(arm: DraftRow['arm'], index: number): DraftRow {
   return {
     id: `${arm}-${Date.now()}-${index}`,
+    pairId: `PAIR_${String(Math.floor(index / 2) + 1).padStart(2, '0')}`,
     serviceId: `${arm}-${String(index + 1).padStart(2, '0')}`,
     arm,
     date: '',
@@ -58,8 +61,9 @@ function createRow(arm: DraftRow['arm'], index: number): DraftRow {
   };
 }
 
-function rowToMeasurement(row: DraftRow): PilotServiceMeasurement {
+function rowToMeasurement(row: DraftRow): MatchedPilotServiceMeasurement {
   return {
+    pairId: row.pairId.trim(),
     date: row.date,
     serviceId: row.serviceId,
     arm: row.arm,
@@ -74,9 +78,10 @@ function rowToMeasurement(row: DraftRow): PilotServiceMeasurement {
   };
 }
 
-function measurementToRow(item: PilotServiceMeasurement, index: number): DraftRow {
+function measurementToRow(item: MatchedPilotServiceMeasurement, index: number): DraftRow {
   return {
     id: `import-${item.arm}-${index}-${Date.now()}`,
+    pairId: item.pairId,
     serviceId: item.serviceId,
     arm: item.arm,
     date: item.date,
@@ -172,7 +177,7 @@ export default function FoodWastePilotPage() {
       const payload = await response.json() as ScoreResponse;
       if (!response.ok || !payload.scorecard) {
         const detail = payload.validationErrors?.map(item => `#${item.index + 1}: ${item.message}`).join(' · ');
-        setError(detail || payload.error || t('Ölçümler doğrulanamadı.', 'Measurements could not be validated.'));
+        setError(detail || payload.detail || payload.error || t('Ölçümler doğrulanamadı.', 'Measurements could not be validated.'));
       } else {
         setScore(payload.scorecard);
       }
@@ -207,7 +212,7 @@ export default function FoodWastePilotPage() {
           <div className="max-w-2xl">
             <div className="bc-eyebrow">{t('Saha veri hattı', 'Field data pipeline')}</div>
             <h2 className="mt-2 text-[24px] font-black tracking-[-0.04em] text-slate-950">{t('Boş şablon → gerçek servis ölçümü → aynı CSV → standart skor kartı', 'Blank template → measured services → same CSV → standardized scorecard')}</h2>
-            <p className="mt-2 text-[9px] leading-5 text-slate-500">{t('İçe aktarma katı şema doğrulaması yapar; hatalı satırı “düzeltmiş gibi” kabul etmez.', 'Import uses strict schema validation; malformed rows are not silently repaired or accepted.')}</p>
+            <p className="mt-2 text-[9px] leading-5 text-slate-500">{t('Her eşleştirme ID için bir CONTROL ve bir INTERVENTION servisi girin. Boş ölçüm veya doğrulanmamış evet/hayır alanları reddedilir.', 'Enter one CONTROL and one INTERVENTION service per pair ID. Missing measurements or unconfirmed yes/no values are rejected.')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/api/v1/food/pilot-template" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-900/10 bg-white px-3 py-2 text-[9px] font-black text-slate-700"><Download size={11} /> {t('Boş şablon', 'Blank template')}</a>
@@ -250,6 +255,7 @@ export default function FoodWastePilotPage() {
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <Field label={t('Eşleştirme ID', 'Pair ID')}><input value={row.pairId} onChange={event => updateRow(row.id, 'pairId', event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" placeholder="PAIR_01" /></Field>
                 <Field label={t('Servis ID', 'Service ID')}><input value={row.serviceId} onChange={event => updateRow(row.id, 'serviceId', event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>
                 <Field label={t('Tarih', 'Date')}><input type="date" value={row.date} onChange={event => updateRow(row.id, 'date', event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>
                 <NumberField label={t('Model tahmini', 'Model forecast')} value={row.forecast} onChange={value => updateRow(row.id, 'forecast', value)} />
