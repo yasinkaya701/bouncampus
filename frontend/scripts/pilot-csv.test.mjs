@@ -124,12 +124,12 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.equal(malformed.measurements.length, 0);
 }
 {
-  const tooMany = parsePilotCsv(asCsv({ ...fields, notes: 'fine' }).replace(/\\n$/, ',extra\\n'));
+  const tooMany = parsePilotCsv(asCsv({ ...fields, notes: 'fine' }).trimEnd() + ',extra' + String.fromCharCode(10));
   assert.match(tooMany.errors.join(' '), /expected 12 columns, received 13/);
   assert.equal(tooMany.measurements.length, 0);
 }
 {
-  const tooFew = parsePilotCsv(asCsv(fields).replace(/,\\n$/, '\\n'));
+  const tooFew = parsePilotCsv(asCsv(fields).trimEnd().slice(0, -1) + String.fromCharCode(10));
   assert.match(tooFew.errors.join(' '), /expected 12 columns, received 11/);
   assert.equal(tooFew.measurements.length, 0);
 }
