@@ -107,4 +107,19 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+// Malformed CSV structure must never be interpreted as measured evidence.
+const validRow = PILOT_CSV_HEADERS.map(name => fields[name] ?? '').join(',');
+const malformedRows = [
+  ['unterminated quoted field', validRow.slice(0, validRow.lastIndexOf(',') + 1) + '"unclosed'],
+  ['quote inside an unquoted cell', validRow.replace('CONTROL_01', 'CONTROL_"01')],
+  ['text after a closing quote', validRow.replace('CONTROL_01', '"CONTROL_01"tail')],
+  ['unexpected trailing column', validRow + ',UNEXPECTED'],
+  ['missing final column', validRow.slice(0, validRow.lastIndexOf(','))],
+];
+for (const [description, line] of malformedRows) {
+  const result = parsePilotCsv(PILOT_CSV_HEADERS.join(',') + '\n' + line + '\n');
+  assert.notEqual(result.errors.length, 0, description + ' must be rejected');
+  assert.equal(result.measurements.length, 0, description + ' must never produce an accepted measurement');
+}
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
