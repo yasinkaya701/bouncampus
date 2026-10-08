@@ -20,6 +20,30 @@ export type PilotCsvParseResult = {
   errors: string[];
 };
 
+/** A blank (including whitespace-only) forecast is missing evidence, not zero meals. */
+export function parseOptionalPilotNumber(value: string): number | null {
+  const trimmed = value.trim();
+  return trimmed === '' ? null : Number(trimmed);
+}
+
+/** Block exporting records that the pilot CSV importer would reject on re-import. */
+export function validatePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): string[] {
+  const errors = measurements.flatMap((measurement, index) =>
+    validateMatchedPilotMeasurement(measurement).map(error => `Row ${index + 1}: ${error}`),
+  );
+
+  const seenServices = new Set<string>();
+  measurements.forEach((measurement, index) => {
+    const serviceKey = `${measurement.date}|${measurement.serviceId.trim()}`;
+    if (seenServices.has(serviceKey)) {
+      errors.push(`Row ${index + 1}: duplicate service identity ${serviceKey}`);
+    }
+    seenServices.add(serviceKey);
+  });
+
+  return errors;
+}
+
 function parseCsvRows(text: string) {
   const rows: string[][] = [];
   let row: string[] = [];
