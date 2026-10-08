@@ -190,4 +190,35 @@ assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' }
 assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
   'generated service IDs must stay unique');
 
+// CSV export is an evidence boundary too: the editor must not let users
+// download "measured" files containing unentered or malformed numeric values.
+assert.throws(
+  () => serializePilotCsv([{ ...control, producedPortions: Number.NaN }, intervention]),
+  /Row 1: producedPortions must be >= 0/,
+  'missing browser number input cannot be exported as NaN evidence',
+);
+assert.throws(
+  () => serializePilotCsv([{ ...control, servedPortions: 0 }, intervention]),
+  /Row 1: servedPortions must be > 0/,
+  'zero served portions must fail the export contract',
+);
+assert.throws(
+  () => serializePilotCsv([control, { ...intervention, modelForecastMeals: null }]),
+  /Row 2: INTERVENTION requires modelForecastMeals/,
+  'missing intervention forecast cannot be exported as valid measured data',
+);
+assert.throws(
+  () => serializePilotCsv([{ ...control, earlySellout: null }, intervention]),
+  /Row 1: earlySellout must be boolean/,
+  'unanswered operator flags cannot be exported',
+);
+assert.throws(
+  () => serializePilotCsv([control, { ...intervention, serviceId: `  ${control.serviceId}  ` }]),
+  /Row 2: duplicate service identity/,
+  'padded service aliases must not be exported twice as independent measurements',
+);
+// Saving a partially collected but individually valid pilot is still allowed.
+// Matched-pair completion is separately checked when scoring the design.
+assert.equal(parsePilotCsv(serializePilotCsv([control])).measurements.length, 1);
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
