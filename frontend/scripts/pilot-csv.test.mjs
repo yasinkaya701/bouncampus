@@ -121,6 +121,20 @@ assert.ok(validatePilotMeasurement({ ...control, servedPortions: 100.25 }).lengt
   'JSON/API pilot validation must reject fractional served counts');
 assert.ok(validatePilotMeasurement({ ...control, producedPortions: 110.5 }).length > 0,
   'JSON/API pilot validation must reject fractional production counts');
+const unsafePortions = Number.MAX_SAFE_INTEGER + 1;
+const unsafeServedErrors = validatePilotMeasurement({
+  ...control,
+  producedPortions: unsafePortions,
+  servedPortions: unsafePortions,
+});
+assert.ok(unsafeServedErrors.some(error => error.startsWith('servedPortions must be > 0')),
+  'unsafe JSON/API served portion counts must fail even when produced count is equally large');
+assert.deepEqual(validatePilotMeasurement({
+  ...control,
+  modelForecastMeals: 100.5,
+  edibleSurplusKg: 1.25,
+  wasteKg: 0.75,
+}), [], 'continuous forecast and kilogram metrics remain valid');
 const invalidScore = scoreFoodWastePilot([{ ...control, producedPortions: 110.5 }, intervention]);
 assert.equal(invalidScore.gates.dataQualityPassed, false,
   'fractional counts must never satisfy the pilot evidence gate');
