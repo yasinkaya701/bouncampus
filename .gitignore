@@ -26,6 +26,7 @@ env/
 # Data (generated)
 backend/app/data/db/
 backend/app/data/synthetic/
+/backend/data/models/
 data/synthetic/*.csv
 data/models/
 
