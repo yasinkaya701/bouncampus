@@ -9,15 +9,19 @@ import sys
 from zoneinfo import ZoneInfo
 
 import pandas as pd
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from app.models.food_demand_v2 import (
+    FittedFoodDemandV2,
     build_features,
     evaluate_predictions,
+    fit,
     predict_as_of,
     prepare_snapshot,
 )
+from scripts.food_demand_v2 import _available_prior_oof, _fitted_reproducibility_metadata, _load_chronos_request, chronos2_predictions, load_notices, tabpfn_ts_predictions, load_tabpfn_ts
 
 TZ = ZoneInfo("Europe/Istanbul")
 
@@ -100,6 +104,8 @@ def test_date_only_notice_is_available_next_midnight_and_keeps_provenance_hash()
             "published_date": "2026-03-03",
             "valid_from": "2026-03-05",
             "valid_to": "2026-03-06",
+            "campus": "Hisar",
+            "meal": "DINNER",
             "review_status": "UNREVIEWED",
             "title": "Yemek hizmeti",
             "notice_text": "Yemek hizmeti verilmeyecektir.",
@@ -120,6 +126,8 @@ def test_notice_published_on_cutoff_date_or_outside_valid_window_stays_unknown()
             "published_date": "2026-03-04",
             "valid_from": "2026-03-05",
             "valid_to": "2026-03-05",
+            "campus": "Hisar",
+            "meal": "DINNER",
             "review_status": "UNREVIEWED",
             "title": "Yemek hizmeti",
             "notice_text": "Yemek hizmeti verilmeyecektir.",
@@ -129,6 +137,8 @@ def test_notice_published_on_cutoff_date_or_outside_valid_window_stays_unknown()
             "published_date": "2026-03-03",
             "valid_from": "2026-03-02",
             "valid_to": "2026-03-04",
+            "campus": "Hisar",
+            "meal": "DINNER",
             "review_status": "UNREVIEWED",
             "title": "Yemek hizmeti",
             "notice_text": "Yemek hizmeti verilmeyecektir.",
@@ -147,6 +157,235 @@ def test_cross_campus_total_is_missing_when_campus_coverage_is_partial():
     features = build_features(snapshot, target_date=date(2026, 3, 10), as_of=as_of, campus="Hisar", meal="DINNER")
     assert features["cross_campus_coverage_lag_7"] == 0.5
     assert features["cross_campus_total_lag_7"] is None
+
+
+def test_cross_campus_features_ignore_campuses_first_seen_after_cutoff():
+    as_of = datetime(2026, 3, 9, 16, tzinfo=TZ)
+    base = fixture_rows()
+    with_future_campus = pd.concat([base, pd.DataFrame([{
+        "date": "2026-03-10", "campus": "Future Campus", "meal": "DINNER", "demand": 999,
+    }])], ignore_index=True)
+    before = prepare_snapshot(base, as_of=as_of)
+    after = prepare_snapshot(with_future_campus, as_of=as_of)
+    a = build_features(before, target_date=date(2026, 3, 10), as_of=as_of, campus="Hisar", meal="DINNER")
+    b = build_features(after, target_date=date(2026, 3, 10), as_of=as_of, campus="Hisar", meal="DINNER")
+    assert {key: a[key] for key in a if key.startswith("cross_campus_")} == {key: b[key] for key in b if key.startswith("cross_campus_")}
+    pred_a = predict_as_of(before, cutoff=as_of, target_date=date(2026, 3, 10), groups=[("Hisar", "DINNER")])[0]
+    pred_b = predict_as_of(after, cutoff=as_of, target_date=date(2026, 3, 10), groups=[("Hisar", "DINNER")])[0]
+    assert pred_a["prediction"] == pred_b["prediction"]
+    assert pred_a["input_data_version"] == pred_b["input_data_version"]
+
+
+def test_prior_oof_excludes_previous_block_final_day_label_until_available():
+    rows = [
+        {"date": "2026-03-02", "actual": 10, "baseline": 9},
+        {"date": "2026-03-03", "actual": 20, "baseline": 18},
+    ]
+    # The next block forecasts 2026-03-04 at the 2026-03-03 16:00 cutoff.
+    kept = _available_prior_oof(rows, datetime(2026, 3, 3, 16, tzinfo=TZ))
+    assert [row["date"] for row in kept] == ["2026-03-02"]
+
+
+def test_prediction_rejects_future_trained_fitted_object():
+    fitted = FittedFoodDemandV2(
+        model=object(), feature_names=[], config={}, trained_through="2026-03-03",
+        data_version="train-hash", fit_cutoff="2026-03-05T16:00:00+03:00",
+    )
+    snapshot = prepare_snapshot(fixture_rows(), as_of=datetime(2026, 3, 4, 16, tzinfo=TZ))
+    with pytest.raises(ValueError, match="model cutoff is later"):
+        predict_as_of(snapshot, cutoff=datetime(2026, 3, 4, 16, tzinfo=TZ), target_date=date(2026, 3, 5), groups=[("Hisar", "DINNER")], fitted=fitted)
+
+
+def test_prediction_rejects_training_label_not_yet_available_at_cutoff():
+    fitted = FittedFoodDemandV2(
+        model=object(), feature_names=[], config={}, trained_through="2026-03-04",
+        data_version="train-hash", fit_cutoff="2026-03-03T16:00:00+03:00",
+    )
+    snapshot = prepare_snapshot(fixture_rows(), as_of=datetime(2026, 3, 4, 16, tzinfo=TZ))
+    with pytest.raises(ValueError, match="training label unavailable"):
+        predict_as_of(snapshot, cutoff=datetime(2026, 3, 4, 16, tzinfo=TZ), target_date=date(2026, 3, 5), groups=[("Hisar", "DINNER")], fitted=fitted)
+
+
+def test_sparse_history_residual_fit_keeps_features_and_labels_aligned():
+    start = date(2026, 1, 1)
+    day_indexes = list(range(61)) + [140]
+    rows = pd.DataFrame([
+        {"date": (start + pd.Timedelta(days=index)).isoformat(), "campus": "Hisar", "meal": "ÖĞLE", "demand": 100 + index * index * 0.01 + (index % 7) * 3}
+        for index in day_indexes
+    ])
+    cutoff = datetime.combine(start + pd.Timedelta(days=162), datetime.min.time().replace(hour=16), TZ)
+    snapshot = prepare_snapshot(rows, as_of=cutoff)
+    fitted = fit(snapshot, {"as_of": cutoff, "iterations": 2, "min_training_rows": 1, "target_mode": "residual_to_weekday_median"})
+    assert fitted.config["training_rows"] == 5
+    assert fitted.candidate_status["catboost_residual_to_weekday_median"] == "FIT_CPU"
+    metadata = _fitted_reproducibility_metadata(fitted)
+    assert metadata["model_artifact_sha256"]
+    assert metadata["fit_config_sha256"]
+    assert metadata["data_version_sha256"] == fitted.data_version
+    assert metadata["runner_sha256"] and metadata["model_code_sha256"]
+
+
+def test_failed_catboost_fit_returns_no_model_and_explicit_candidate_status(monkeypatch):
+    from types import SimpleNamespace
+
+    class FailingCatBoost:
+        def __init__(self, **kwargs):
+            pass
+
+        def fit(self, *args, **kwargs):
+            raise RuntimeError("synthetic injected fit failure")
+
+    monkeypatch.setitem(sys.modules, "catboost", SimpleNamespace(CatBoostRegressor=FailingCatBoost))
+    start = date(2026, 1, 1)
+    rows = pd.DataFrame([
+        {"date": (start + pd.Timedelta(days=index)).isoformat(), "campus": "Hisar", "meal": "ÖĞLE", "demand": 100 + index}
+        for index in range(60)
+    ])
+    cutoff = datetime.combine(start + pd.Timedelta(days=61), datetime.min.time().replace(hour=16), TZ)
+    snapshot = prepare_snapshot(rows, as_of=cutoff)
+    fitted = fit(snapshot, {"as_of": cutoff, "min_training_rows": 1})
+    assert fitted.model is None
+    assert fitted.candidate_status["catboost_direct_mae"].startswith("FAILED:RuntimeError:synthetic injected fit failure")
+
+
+def test_notice_loader_preserves_canonical_fields_and_positive_labels_require_food_scope(tmp_path):
+    path = tmp_path / "notices.csv"
+    pd.DataFrame([{
+        "published_at": "2026-03-03T10:00:00+03:00", "published_date": "2026-03-04",
+        "effective_date": "2026-03-05", "valid_from": "2026-03-06", "valid_to": "2026-03-06",
+        "campus": "Hisar", "affected_campuses": "Güney", "meal": "ÖĞLE", "affected_meals": "AKŞAM",
+        "source_hash": "canonical-hash", "source_html_sha256": "alias-hash", "review_status": "UNREVIEWED",
+        "title": "Yemek hizmeti", "notice_text": "Yemek hizmeti verilmeyecektir.",
+    }]).to_csv(path, index=False)
+    loaded = load_notices(path)
+    assert loaded.loc[0, "published_at"] == "2026-03-03T10:00:00+03:00"
+    assert loaded.loc[0, "effective_date"] == "2026-03-05"
+    assert loaded.loc[0, "campus"] == "Hisar"
+    assert loaded.loc[0, "meal"] == "ÖĞLE"
+    assert loaded.loc[0, "source_hash"] == "canonical-hash"
+    snapshot = prepare_snapshot(fixture_rows(), as_of=datetime(2026, 3, 4, 16, tzinfo=TZ), notices=loaded)
+    feature = build_features(snapshot, target_date=date(2026, 3, 5), as_of=datetime(2026, 3, 4, 16, tzinfo=TZ), campus="Hisar", meal="ÖĞLE")
+    assert feature["closure"] is True
+    assert feature["notice_source_hashes"] == ["canonical-hash"]
+
+
+def test_unscoped_kiosk_closure_is_unknown_but_explicit_global_food_scope_is_allowed():
+    as_of = datetime(2026, 3, 4, 16, tzinfo=TZ)
+    notices = pd.DataFrame([
+        {"published_at": "2026-03-03T10:00:00+03:00", "effective_date": "2026-03-05", "title": "Kiosk", "notice_text": "Kiosk kapalıdır."},
+        {"published_at": "2026-03-03T10:00:00+03:00", "effective_date": "2026-03-05", "campus": "all campuses", "meal": "all meals", "title": "Yemek", "notice_text": "Yemek hizmeti verilmeyecektir."},
+    ])
+    snapshot = prepare_snapshot(fixture_rows(), as_of=as_of, notices=notices)
+    feature = build_features(snapshot, target_date=date(2026, 3, 5), as_of=as_of, campus="Hisar", meal="DINNER")
+    assert feature["closure"] is True
+    assert feature["notice_status"] == "RULE_EXTRACTED_UNREVIEWED"
+    unscoped_only = prepare_snapshot(fixture_rows(), as_of=as_of, notices=notices.iloc[[0]])
+    unknown = build_features(unscoped_only, target_date=date(2026, 3, 5), as_of=as_of, campus="Hisar", meal="DINNER")
+    assert unknown["closure"] is None
+    assert unknown["notice_status"] == "UNKNOWN"
+
+
+def test_no_chronos_path_does_not_import_torch(monkeypatch):
+    import builtins
+    from types import SimpleNamespace
+
+    original_import = builtins.__import__
+    def guarded_import(name, *args, **kwargs):
+        if name == "torch":
+            raise AssertionError("torch should not be imported when Chronos is disabled")
+        return original_import(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+    pipeline, status = _load_chronos_request(SimpleNamespace(run_chronos2=False))
+    assert pipeline is None
+    assert status["status"] == "NOT_RUN_BY_REQUEST"
+
+
+def test_chronos_requests_two_step_horizon_and_selects_target_day():
+    class FakePipeline:
+        def predict_df(self, context, *, future_df, id_column, timestamp_column, target, prediction_length, quantile_levels, context_length, cross_learning, freq):
+            assert prediction_length == 2
+            assert len(future_df) == 2
+            assert future_df[timestamp_column].dt.date.tolist() == [date(2026, 3, 4), date(2026, 3, 5)]
+            return pd.DataFrame({
+                id_column: ["Hisar::DINNER", "Hisar::DINNER"],
+                timestamp_column: future_df[timestamp_column].tolist(),
+                "predictions": [10.0, 12.0],
+            })
+
+    rows = pd.DataFrame([
+        {"date": f"2026-03-0{day}", "campus": "Hisar", "meal": "DINNER", "demand": float(day * 10)}
+        for day in (1, 2, 3)
+    ])
+    cutoff = datetime(2026, 3, 4, 16, tzinfo=TZ)
+    snapshot = prepare_snapshot(rows, as_of=cutoff)
+    predictions, status = chronos2_predictions(
+        FakePipeline(), snapshot, target_day=date(2026, 3, 5), cutoff=cutoff,
+        groups=[("Hisar", "DINNER")], context_length=2,
+    )
+    assert status == "SCORED"
+    assert predictions == {("Hisar", "DINNER"): 12.0}
+
+
+def test_tabpfn_local_adapter_selects_second_day_and_never_passes_d_minus_1_actual():
+    class FakePipeline:
+        def predict_df(self, context_df, *, future_df, quantiles):
+            assert quantiles == [0.5]
+            assert context_df.timestamp.max().date() == date(2026, 3, 3)
+            assert future_df.timestamp.dt.date.tolist() == [date(2026, 3, 4), date(2026, 3, 5)]
+            return pd.DataFrame({
+                "item_id": ["Hisar::DINNER", "Hisar::DINNER"],
+                "timestamp": future_df.timestamp.tolist(),
+                "target": [100.0, 120.0],
+            })
+
+    rows = pd.DataFrame([
+        {"date": f"2026-03-{day:02d}", "campus": "Hisar", "meal": "DINNER", "demand": float(day * 10)}
+        for day in range(1, 5)
+    ])
+    cutoff = datetime(2026, 3, 4, 16, tzinfo=TZ)
+    snapshot = prepare_snapshot(rows, as_of=cutoff)
+    predictions, status = tabpfn_ts_predictions(
+        FakePipeline(), snapshot, target_day=date(2026, 3, 5), cutoff=cutoff,
+        groups=[("Hisar", "DINNER")], context_length=2,
+    )
+    assert status == "SCORED"
+    assert predictions == {("Hisar", "DINNER"): 120.0}
+
+
+def test_tabpfn_loader_does_not_import_or_download_without_explicit_checkpoint(tmp_path, monkeypatch):
+    import builtins
+    original_import = builtins.__import__
+
+    def guarded_import(name, *args, **kwargs):
+        if name == "tabpfn_time_series":
+            raise AssertionError("optional TabPFN package must not load without local checkpoint")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+    pipeline, status = load_tabpfn_ts(tmp_path / "missing.safetensors")
+    assert pipeline is None
+    assert status["status"] == "NOT_RUN_CHECKPOINT_ABSENT"
+    assert status["inference_attempted"] is False
+    assert status["telemetry"] == "disabled"
+
+
+def test_chronos_auto_device_dependency_failure_is_nonfatal(monkeypatch):
+    import builtins
+    from types import SimpleNamespace
+    original_import = builtins.__import__
+
+    def guarded_import(name, *args, **kwargs):
+        if name == "torch":
+            raise ImportError("test torch unavailable")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+    pipeline, status = _load_chronos_request(SimpleNamespace(
+        run_chronos2=True, chronos_device="auto", chronos_checkpoint="amazon/chronos-2",
+        allow_chronos_download=False, chronos_revision=None,
+    ))
+    assert pipeline is None
+    assert status["status"].startswith("UNAVAILABLE:ImportError:")
 
 
 def test_source_outage_returns_unavailable_ledger_rows():
@@ -204,7 +443,7 @@ def test_cli_fit_predict_loads_saved_candidate_and_metadata(tmp_path):
     fit_payload = json.loads(fit_result.stdout)
     model_dir = Path(fit_payload["output_dir"])
     assert (model_dir / "catboost.cbm").is_file()
-    assert fit_payload["manifest"]["artifact_schema_version"] == 1
+    assert fit_payload["manifest"]["artifact_schema_version"] == 2
     assert fit_payload["manifest"]["target_mode"] == "direct"
 
     predict_result = subprocess.run(
@@ -221,3 +460,15 @@ def test_cli_fit_predict_loads_saved_candidate_and_metadata(tmp_path):
     assert predict_payload["model_status"]["target_mode"] == "direct"
     assert predict_payload["prediction_ledger"][0]["model_id"] == "catboost_direct_mae"
     assert predict_payload["prediction_ledger"][0]["status"] == "MODEL_ESTIMATE"
+    with (model_dir / "catboost.cbm").open("ab") as handle:
+        handle.write(b"tamper")
+    rejected = subprocess.run(
+        [
+            sys.executable, str(script), "predict", "--data", str(data_path), "--cutoff", cutoff,
+            "--target", "2026-05-01", "--group", "Hisar/ÖĞLE", "--model-dir", str(model_dir),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert rejected.returncode != 0
+    assert "SHA-256 verification failed" in rejected.stderr

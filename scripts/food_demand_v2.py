@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import tempfile
 import uuid
 from zoneinfo import ZoneInfo
 
@@ -26,12 +27,14 @@ if str(BACKEND) not in sys.path:
 from app.models.food_demand_v2 import (  # noqa: E402
     ASSUMPTION,
     FittedFoodDemandV2,
+    _service_available_by,
     build_features,
     evaluate_predictions,
     fit,
     learn_simplex_weights,
     predict_as_of,
     prepare_snapshot,
+    validate_fitted_timing,
     _SNAPSHOT_CACHE,
 )
 
@@ -64,17 +67,22 @@ def _json_safe(value):
 def load_notices(path: Path | None) -> pd.DataFrame | None:
     if path is None:
         return None
-    source = pd.read_csv(path).fillna({})
-    # The source archive has published_date only, with no verified publication time.
-    # Keep source hashes and review state, but do not infer service labels from text.
-    if "source_html_sha256" in source:
-        source["source_hash"] = source["source_html_sha256"]
-    # Date-only publication evidence is made available at next local midnight.
-    # The forecaster therefore excludes any notice published on the cutoff date.
-    source["published_at"] = None
-    source["effective_date"] = source.get("valid_from")
-    source["campus"] = source.get("affected_campuses")
-    source["meal"] = source.get("affected_meals")
+    source = pd.read_csv(path)
+    aliases = {
+        "published_at": ("available_at", "published_date"),
+        "effective_date": ("valid_from",),
+        "campus": ("affected_campuses",),
+        "meal": ("affected_meals",),
+        "source_hash": ("source_html_sha256",),
+    }
+    for canonical, alternatives in aliases.items():
+        if canonical not in source:
+            source[canonical] = None
+        missing = source[canonical].isna() | source[canonical].astype("string").str.strip().eq("").fillna(False)
+        for alias in alternatives:
+            if alias in source:
+                source[canonical] = source[canonical].where(~missing, source[alias])
+                missing = source[canonical].isna() | source[canonical].astype("string").str.strip().eq("").fillna(False)
     return source
 
 
@@ -99,7 +107,31 @@ def _model_direct(fitted, features):
         return None
 
 
-def load_chronos2(checkpoint: str, device: str, allow_download: bool = False):
+def _available_prior_oof(prior_rows, first_cutoff):
+    """Keep only OOF labels actually available by the new block's first cutoff."""
+    cutoff = first_cutoff if isinstance(first_cutoff, datetime) else datetime.fromisoformat(str(first_cutoff))
+    return [
+        row for row in prior_rows
+        if row.get("actual") is not None
+        and _service_available_by(date.fromisoformat(row["date"]), cutoff)
+    ]
+
+
+def _load_chronos_request(args):
+    if not args.run_chronos2:
+        return None, {"status": "NOT_RUN_BY_REQUEST"}
+    try:
+        import torch
+        if args.chronos_device == "auto":
+            device = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            device = args.chronos_device
+        return load_chronos2(args.chronos_checkpoint, device, allow_download=args.allow_chronos_download, revision=args.chronos_revision)
+    except Exception as exc:
+        return None, {"status": f"UNAVAILABLE:{type(exc).__name__}:{str(exc)[:200]}", "checkpoint": args.chronos_checkpoint, "device": args.chronos_device}
+
+
+def load_chronos2(checkpoint: str, device: str, allow_download: bool = False, revision: str | None = None):
     """Load the public Chronos-2 checkpoint once; the pipeline runs locally."""
     try:
         import torch
@@ -107,13 +139,15 @@ def load_chronos2(checkpoint: str, device: str, allow_download: bool = False):
         torch.manual_seed(42)
         if Path(checkpoint).exists():
             model_path = checkpoint
-        elif allow_download:
-            model_path = checkpoint
         else:
             from huggingface_hub import snapshot_download
-            model_path = snapshot_download(repo_id=checkpoint, local_files_only=True)
-        pipeline = Chronos2Pipeline.from_pretrained(model_path, device_map=device, local_files_only=not allow_download)
-        return pipeline, {"status": "READY", "checkpoint": checkpoint, "device": device, "library_version": getattr(__import__("chronos"), "__version__", "unknown"), "seed": 42}
+            model_path = snapshot_download(repo_id=checkpoint, revision=revision, local_files_only=not allow_download)
+        pipeline = Chronos2Pipeline.from_pretrained(model_path, device_map=device, local_files_only=True)
+        path = Path(model_path)
+        relevant_files = sorted(file for file in path.rglob("*") if file.is_file() and (file.name.endswith(".safetensors") or file.name in {"config.json", "generation_config.json"})) if path.is_dir() else [path]
+        checkpoint_files = [{"file": file.name, "bytes": file.stat().st_size, "sha256": sha256_file(file)} for file in relevant_files]
+        revision = path.name if path.parent.name == "snapshots" else None
+        return pipeline, {"status": "READY", "checkpoint": checkpoint, "revision": revision, "resolved_path": str(path), "checkpoint_files": checkpoint_files, "device": device, "library_version": getattr(__import__("chronos"), "__version__", "unknown"), "seed": 42}
     except Exception as exc:
         return None, {"status": f"UNAVAILABLE:{type(exc).__name__}:{str(exc)[:200]}", "checkpoint": checkpoint, "device": device}
 
@@ -165,6 +199,7 @@ def chronos2_predictions(pipeline, snapshot, *, target_day, cutoff, groups, cont
             id_column="item_id",
             timestamp_column="timestamp",
             target="demand",
+            prediction_length=2,
             quantile_levels=[0.5],
             context_length=context_length,
             cross_learning=True,
@@ -175,6 +210,117 @@ def chronos2_predictions(pipeline, snapshot, *, target_day, cutoff, groups, cont
         return values, "SCORED" if values else "NO_VALID_FORECAST"
     except Exception as exc:
         return {}, f"FAILED:{type(exc).__name__}:{str(exc)[:180]}"
+
+
+def load_tabpfn_ts(checkpoint: str | Path, *, context_length: int = 224):
+    """Load the pinned TabPFN-TS API in LOCAL mode from an explicit existing checkpoint.
+
+    This function never downloads weights or accepts a license. A missing local
+    checkpoint is reported before importing the optional package.
+    """
+    os.environ["TABPFN_DISABLE_TELEMETRY"] = "1"
+    path = Path(checkpoint).expanduser().resolve()
+    base = {"package": "tabpfn-time-series==1.3.0", "adapter_status": "IMPLEMENTED_LOCAL_ONLY", "mode": "LOCAL", "telemetry": "disabled", "checkpoint": str(path), "inference_attempted": False}
+    if not path.is_file():
+        return None, {**base, "status": "NOT_RUN_CHECKPOINT_ABSENT", "reason": "explicit local TabPFN-TS 3.5 checkpoint path does not exist; no download or license acceptance attempted"}
+    if "v3.5" not in path.name.casefold():
+        return None, {**base, "status": "NOT_RUN_UNVERIFIED_CHECKPOINT_IDENTITY", "reason": "checkpoint filename does not identify the pinned TabPFN 3.5 weights"}
+    try:
+        from importlib.metadata import version
+        installed = version("tabpfn-time-series")
+        if installed != "1.3.0":
+            return None, {**base, "status": "NOT_RUN_UNSUPPORTED_PACKAGE_VERSION", "installed_version": installed}
+        from tabpfn_time_series import TabPFNMode, TabPFNTSPipeline
+        pipeline = TabPFNTSPipeline(
+            max_context_length=int(context_length),
+            tabpfn_mode=TabPFNMode.LOCAL,
+            tabpfn_output_selection="median",
+            tabpfn_model_config={"model_path": str(path)},
+        )
+        return pipeline, {**base, "status": "READY", "installed_version": installed, "checkpoint_sha256": sha256_file(path), "context_length": int(context_length)}
+    except Exception as exc:
+        return None, {**base, "status": f"UNAVAILABLE:{type(exc).__name__}:{str(exc)[:200]}"}
+
+
+def tabpfn_ts_predictions(pipeline, snapshot, *, target_day, cutoff, groups, context_length):
+    """Run local TabPFN-TS using contiguous history through D-2 and select D from a two-step horizon."""
+    if pipeline is None:
+        return {}, "UNAVAILABLE"
+    histories = []
+    futures = []
+    target_day = pd.Timestamp(target_day).date()
+    cutoff_ts = pd.Timestamp(cutoff)
+    if cutoff_ts.tzinfo is None:
+        cutoff_ts = cutoff_ts.tz_localize(TZ)
+    else:
+        cutoff_ts = cutoff_ts.tz_convert(TZ)
+    if cutoff_ts != pd.Timestamp(datetime.combine(target_day - timedelta(days=1), time(16), TZ)):
+        return {}, "INVALID_FORECAST_CUTOFF"
+    latest_available = target_day - timedelta(days=2)
+    context_start = target_day - timedelta(days=context_length + 1)
+    cache = _SNAPSHOT_CACHE.get(id(snapshot), {})
+    group_rows = cache.get("group_rows", {})
+    for campus, meal in groups:
+        source = group_rows.get((campus, meal), [])
+        window = [(day, value) for day, value in source if context_start <= day <= latest_available]
+        grid = [context_start + timedelta(days=index) for index in range(context_length)]
+        if len(window) != context_length or [day for day, _ in window] != grid:
+            continue
+        if any(value is None for _, value in window) or window[-1][0] != latest_available:
+            continue
+        item_id = f"{campus}::{meal}"
+        histories.extend({"item_id": item_id, "timestamp": pd.Timestamp(day), "target": float(value)} for day, value in window)
+        futures.extend({"item_id": item_id, "timestamp": pd.Timestamp(target_day - timedelta(days=1) + timedelta(days=step))} for step in (0, 1))
+    if not histories:
+        return {}, "INSUFFICIENT_CONTIGUOUS_HISTORY"
+    try:
+        forecasts = pipeline.predict_df(pd.DataFrame(histories), future_df=pd.DataFrame(futures), quantiles=[0.5])
+        if isinstance(forecasts.index, pd.MultiIndex) and {"item_id", "timestamp"}.issubset(forecasts.index.names):
+            forecasts = forecasts.reset_index()
+        selected = forecasts[pd.to_datetime(forecasts["timestamp"]).dt.date == target_day]
+        values = {tuple(str(row.item_id).split("::", 1)): max(0.0, float(row.target)) for row in selected.itertuples(index=False) if np.isfinite(row.target)}
+        return values, "SCORED" if values else "NO_VALID_FORECAST"
+    except Exception as exc:
+        return {}, f"FAILED:{type(exc).__name__}:{str(exc)[:180]}"
+
+
+def _fitted_reproducibility_metadata(fitted, *, script_path: Path | None = None):
+    config_json = json.dumps(_json_safe(fitted.config), sort_keys=True, separators=(",", ":"))
+    config_hash = hashlib.sha256(config_json.encode()).hexdigest()
+    model_hash = None
+    model_status = (fitted.candidate_status or {}).get(fitted.config.get("candidate_id"), "NOT_RECORDED")
+    if fitted.model is not None:
+        try:
+            with tempfile.TemporaryDirectory(prefix="food-demand-v2-hash-") as temp_dir:
+                artifact = Path(temp_dir) / "candidate.cbm"
+                fitted.model.save_model(str(artifact))
+                model_hash = sha256_file(artifact)
+        except Exception as exc:
+            model_status = f"ARTIFACT_HASH_FAILED:{type(exc).__name__}:{str(exc)[:120]}"
+    packages = {}
+    from importlib import metadata
+    for name in ("catboost", "pandas", "numpy", "chronos", "tabpfn-time-series"):
+        try:
+            packages[name] = metadata.version(name)
+        except metadata.PackageNotFoundError:
+            packages[name] = None
+    script_path = script_path or Path(__file__)
+    model_module = Path(__file__).resolve().parents[1] / "backend/app/models/food_demand_v2/__init__.py"
+    return {
+        "candidate_id": fitted.config.get("candidate_id"),
+        "fit_cutoff": fitted.fit_cutoff,
+        "trained_through": fitted.trained_through,
+        "source_dataset_sha256": fitted.config.get("source_dataset_sha256"),
+        "data_version_sha256": fitted.data_version,
+        "fit_config": _json_safe(fitted.config),
+        "fit_config_sha256": config_hash,
+        "model_artifact_sha256": model_hash,
+        "candidate_status": model_status,
+        "packages": packages,
+        "python_version": sys.version.split()[0],
+        "runner_sha256": sha256_file(script_path),
+        "model_code_sha256": sha256_file(model_module),
+    }
 
 
 def workbook_plan_rows(workbooks: list[Path]) -> pd.DataFrame:
@@ -255,7 +401,17 @@ def _bootstrap_wape(actual, predicted, *, clusters=None, seed=42, samples=1000):
     return [float(np.percentile(values, 2.5)), float(np.percentile(values, 97.5))] if values else [None, None]
 
 
-def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: int = 28, iterations: int = 200, seed: int = 42, planned: pd.DataFrame | None = None, chronos_pipeline=None, chronos_status=None, tabpfn_status=None):
+def _candidate_refit_summary(block_records, candidate_id):
+    statuses = [
+        refit.get("candidate_status", {}).get(candidate_id, "NOT_RECORDED")
+        for block in block_records for refit in block.get("weekly_refits", [])
+    ]
+    successes = sum(status == "FIT_CPU" for status in statuses)
+    failures = len(statuses) - successes
+    return {"status": "FIT_CPU" if statuses and failures == 0 else ("PARTIAL_FAILURE" if successes else "FAILED_OR_NOT_FIT"), "refits": len(statuses), "successful_refits": successes, "failed_refits": failures, "failure_statuses": sorted({status for status in statuses if status != "FIT_CPU"})}
+
+
+def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: int = 28, iterations: int = 200, seed: int = 42, planned: pd.DataFrame | None = None, chronos_pipeline=None, chronos_status=None, tabpfn_pipeline=None, tabpfn_status=None):
     dates = sorted(snapshot["date"].unique())
     if not dates:
         raise ValueError("no dated outcomes")
@@ -269,6 +425,8 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
     block_number = 0
     chronos_forecast_counts = {length: 0 for length in (56, 112, 224)}
     chronos_status_counts = {length: {} for length in (56, 112, 224)}
+    tabpfn_forecast_counts = {length: 0 for length in (56, 112, 224)}
+    tabpfn_status_counts = {length: {} for length in (56, 112, 224)}
     while block_start <= last:
         block_end = min(block_start + timedelta(days=block_days - 1), last)
         block_preds = []
@@ -280,6 +438,8 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
                 fit_cutoff = datetime.combine(target_day - timedelta(days=1), time(16), TZ)
                 fitted = fit(snapshot, {"as_of": fit_cutoff, "iterations": iterations, "seed": seed, "min_training_rows": 20, "use_notices": True})
                 residual_fitted = fit(snapshot, {"as_of": fit_cutoff, "iterations": iterations, "seed": seed, "min_training_rows": 20, "use_notices": True, "target_mode": "residual_to_weekday_median"})
+                fitted.config["source_dataset_sha256"] = snapshot.attrs.get("source_hash")
+                residual_fitted.config["source_dataset_sha256"] = snapshot.attrs.get("source_hash")
                 eligible_notices = any(
                     row.get("status") != "UNKNOWN"
                     and row.get("effective_date")
@@ -289,7 +449,12 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
                     for row in snapshot.attrs.get("notice_rows", [])
                 )
                 ablated_notice_model = fit(snapshot, {"as_of": fit_cutoff, "iterations": iterations, "seed": seed, "min_training_rows": 20, "use_notices": False}) if eligible_notices else None
-                weekly_models.append({"trained_through": fitted.trained_through, "training_rows": fitted.config.get("training_rows", 0), "candidate_status": {**fitted.candidate_status, **residual_fitted.candidate_status}})
+                if ablated_notice_model is not None:
+                    ablated_notice_model.config["source_dataset_sha256"] = snapshot.attrs.get("source_hash")
+                refit_status = {**(fitted.candidate_status or {}), **(residual_fitted.candidate_status or {})}
+                if ablated_notice_model is not None:
+                    refit_status["catboost_no_notice"] = (ablated_notice_model.candidate_status or {}).get("catboost_direct_mae", "NOT_RECORDED")
+                weekly_models.append({"fit_cutoff": fit_cutoff.isoformat(), "trained_through": fitted.trained_through, "training_rows": fitted.config.get("training_rows", 0), "residual_training_rows": residual_fitted.config.get("training_rows", 0), "candidate_status": refit_status, "candidate_reproducibility": {"catboost_direct_mae": _fitted_reproducibility_metadata(fitted), "catboost_residual_to_weekday_median": _fitted_reproducibility_metadata(residual_fitted), **({"catboost_no_notice": _fitted_reproducibility_metadata(ablated_notice_model)} if ablated_notice_model is not None else {})}})
             cutoff = datetime.combine(target_day - timedelta(days=1), time(16), TZ)
             actuals = _day_actuals(snapshot, target_day)
             chronos_predictions = {}
@@ -300,6 +465,14 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
                 chronos_forecast_counts[context_length] += len(values)
                 chronos_status_counts[context_length][candidate_status] = chronos_status_counts[context_length].get(candidate_status, 0) + 1
                 chronos_predictions.update({(campus, meal, context_length): value for (campus, meal), value in values.items()})
+            tabpfn_predictions = {}
+            tabpfn_status_by_context = {}
+            for context_length in (56, 112, 224):
+                values, candidate_status = tabpfn_ts_predictions(tabpfn_pipeline, snapshot, target_day=target_day, cutoff=cutoff, groups=groups, context_length=context_length)
+                tabpfn_status_by_context[context_length] = candidate_status
+                tabpfn_forecast_counts[context_length] += len(values)
+                tabpfn_status_counts[context_length][candidate_status] = tabpfn_status_counts[context_length].get(candidate_status, 0) + 1
+                tabpfn_predictions.update({(campus, meal, context_length): value for (campus, meal), value in values.items()})
             for campus, meal in groups:
                 feature = build_features(snapshot, target_date=target_day, as_of=cutoff, campus=campus, meal=meal)
                 baseline = feature["same_weekday_median"]
@@ -309,16 +482,20 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
                 residual_pred = _model_direct(residual_fitted, feature)
                 no_notice_pred = _model_direct(ablated_notice_model, feature) if ablated_notice_model is not None else None
                 actual = actuals.get((campus, meal))
-                row = {"date": target_day.isoformat(), "campus": campus, "meal": meal, "actual": actual, "baseline": baseline, "catboost": model_pred, "catboost_residual": residual_pred, "catboost_no_notice": no_notice_pred, "chronos2_ctx56": chronos_predictions.get((campus, meal, 56)), "chronos2_ctx112": chronos_predictions.get((campus, meal, 112)), "chronos2_ctx224": chronos_predictions.get((campus, meal, 224)), "plan_comparator": None, "block": block_number, "cutoff": cutoff.isoformat(), "status": "EVALUATED" if actual is not None else "MISSING_ACTUAL"}
+                row = {"date": target_day.isoformat(), "campus": campus, "meal": meal, "actual": actual, "baseline": baseline, "catboost": model_pred, "catboost_residual": residual_pred, "catboost_no_notice": no_notice_pred, "chronos2_ctx56": chronos_predictions.get((campus, meal, 56)), "chronos2_ctx112": chronos_predictions.get((campus, meal, 112)), "chronos2_ctx224": chronos_predictions.get((campus, meal, 224)), "tabpfn_ts_ctx56": tabpfn_predictions.get((campus, meal, 56)), "tabpfn_ts_ctx112": tabpfn_predictions.get((campus, meal, 112)), "tabpfn_ts_ctx224": tabpfn_predictions.get((campus, meal, 224)), "plan_comparator": None, "block": block_number, "cutoff": cutoff.isoformat(), "status": "EVALUATED" if actual is not None else "MISSING_ACTUAL"}
                 if planned is not None and not planned.empty:
                     match = planned[(planned["date"] == target_day) & (planned["campus"] == campus) & (planned["meal"] == meal)]
                     row["plan_comparator"] = float(match.iloc[0]["planned"]) if not match.empty else None
                 block_preds.append(row)
             target_day += timedelta(days=1)
+        # Labels from the immediately preceding service day are not yet available
+        # at this new block's first 16:00 D-1 cutoff.
+        first_cutoff = datetime.combine(block_start - timedelta(days=1), time(16), TZ)
+        causal_prior_oof = _available_prior_oof(prior_oof, first_cutoff)
         # Learn weights only from earlier forward blocks. First block defaults to baseline.
-        expert_names = ["baseline", "catboost", "catboost_residual", "catboost_no_notice", "chronos2_ctx56", "chronos2_ctx112", "chronos2_ctx224"]
-        active_experts = [name for name in expert_names if any(row.get(name) is not None for row in prior_oof)]
-        prior_valid = [row for row in prior_oof if row["actual"] is not None and active_experts and all(row.get(name) is not None for name in active_experts)]
+        expert_names = ["baseline", "catboost", "catboost_residual", "catboost_no_notice", "chronos2_ctx56", "chronos2_ctx112", "chronos2_ctx224", "tabpfn_ts_ctx56", "tabpfn_ts_ctx112", "tabpfn_ts_ctx224"]
+        active_experts = [name for name in expert_names if any(row.get(name) is not None for row in causal_prior_oof)]
+        prior_valid = [row for row in causal_prior_oof if active_experts and all(row.get(name) is not None for name in active_experts)]
         if prior_valid:
             weights = learn_simplex_weights([r["actual"] for r in prior_valid], {name: [r[name] for r in prior_valid] for name in active_experts})
         else:
@@ -332,7 +509,7 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
                 row["blend"] = row.get("baseline")
             prediction_rows.append(row)
         eligible = [r for r in block_preds if r["actual"] is not None]
-        block_records.append({"block": block_number, "start": block_start.isoformat(), "end": block_end.isoformat(), "training_rows": fitted.config.get("training_rows", 0), "weekly_refits": weekly_models, "blend_weights": weights, "scored_rows": len(eligible)})
+        block_records.append({"block": block_number, "start": block_start.isoformat(), "end": block_end.isoformat(), "training_rows": fitted.config.get("training_rows", 0), "weekly_refits": weekly_models, "blend_weights": weights, "blend_label_rows_available": len(causal_prior_oof), "blend_labels_max_service_date": max((row["date"] for row in causal_prior_oof), default=None), "scored_rows": len(eligible)})
         prior_oof.extend(block_preds)
         block_number += 1
         block_start = block_end + timedelta(days=1)
@@ -340,11 +517,15 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
     for row in prediction_rows:
         for context_length in (56, 112, 224):
             row[f"blend_chronos2_ctx{context_length}"] = None
+            row[f"blend_tabpfn_ts_ctx{context_length}"] = None
     candidate_names = ["baseline", "catboost", "catboost_residual", "blend"]
     if any(row.get("catboost_no_notice") is not None for row in prediction_rows):
         candidate_names.append("catboost_no_notice")
     for context_length in (56, 112, 224):
         name = f"chronos2_ctx{context_length}"
+        if any(row.get(name) is not None for row in prediction_rows):
+            candidate_names.append(name)
+        name = f"tabpfn_ts_ctx{context_length}"
         if any(row.get(name) is not None for row in prediction_rows):
             candidate_names.append(name)
     candidate_names = tuple(candidate_names)
@@ -393,7 +574,7 @@ def run_backtest(snapshot: pd.DataFrame, *, warmup_days: int = 180, block_days: 
         "predictions": prediction_rows,
         "wape_denominator": denominator,
         "valid_actual_rows": sum(value is not None for value in all_actual),
-        "candidate_status": {"catboost_direct_mae": "FIT_CPU_PER_WEEK", "catboost_residual_to_weekday_median": "FIT_CPU_PER_WEEK", "catboost_no_notice_ablation": "FIT_CPU_PER_WEEK_IF_ELIGIBLE_NOTICE_FIELDS_EXIST", "residual_to_past_same_weekday_median": "BASELINE", "chronos_2": {**(chronos_status or {"status": "NOT_RUN"}), "scored_status": "SCORED" if any(chronos_forecast_counts.values()) else "NO_VALID_FORECASTS", "forecast_rows_by_context": chronos_forecast_counts, "status_counts_by_context": chronos_status_counts}, "tabpfn_ts_3_5": tabpfn_status or {"status": "NOT_RUN"}, "chronos_context_status_last_target": chronos_status_by_context if "chronos_status_by_context" in locals() else {}},
+        "candidate_status": {"catboost_direct_mae": _candidate_refit_summary(block_records, "catboost_direct_mae"), "catboost_residual_to_weekday_median": _candidate_refit_summary(block_records, "catboost_residual_to_weekday_median"), "catboost_no_notice_ablation": "NOT_RUN_NO_ELIGIBLE_NOTICE_FEATURES" if "catboost_no_notice" not in candidate_names else _candidate_refit_summary(block_records, "catboost_no_notice"), "residual_to_past_same_weekday_median": "BASELINE", "chronos_2": {**(chronos_status or {"status": "NOT_RUN"}), "scored_status": "SCORED" if any(chronos_forecast_counts.values()) else "NO_VALID_FORECASTS", "forecast_rows_by_context": chronos_forecast_counts, "status_counts_by_context": chronos_status_counts}, "tabpfn_ts_3_5": {**(tabpfn_status or {"status": "NOT_RUN"}), "adapter_status": "IMPLEMENTED_LOCAL_ONLY", "scored_status": "SCORED" if any(tabpfn_forecast_counts.values()) else "NO_VALID_FORECASTS", "inference_attempted": any(status in {"SCORED", "NO_VALID_FORECAST"} or str(status).startswith("FAILED:") for counts in tabpfn_status_counts.values() for status in counts), "forecast_rows_by_context": tabpfn_forecast_counts, "status_counts_by_context": tabpfn_status_counts}, "chronos_context_status_last_target": chronos_status_by_context if "chronos_status_by_context" in locals() else {}, "tabpfn_context_status_last_target": tabpfn_status_by_context if "tabpfn_status_by_context" in locals() else {}},
         "ablations": {"notices": {"status": "SCORED_CATBOOST_WITH_VS_WITHOUT_NOTICE_FIELDS" if "catboost_no_notice" in candidate_names else "NOT_RUN_NO_ELIGIBLE_NOTICE_FEATURES", "same_support_required": True}, "menu": "NOT_RUN_NO_MENU_PUBLICATION_VINTAGE", "weather": "NOT_RUN_NO_ARCHIVED_FORECAST_VINTAGE", "blend": "SCORED_CAUSAL_PRIOR_BLOCKS"},
     }
 
@@ -448,26 +629,22 @@ def cmd_audit(args):
 
 def cmd_backtest(args):
     data_path = Path(args.data)
+    notices_path = Path(args.notices) if args.notices else None
     start = min(pd.to_datetime(pd.read_csv(data_path, usecols=["date"])["date"]).dt.date)
     as_of = datetime.combine(start + timedelta(days=args.warmup_days + 1), time(16), TZ)
-    snapshot, digest = load_snapshot(data_path, Path(args.notices) if args.notices else None, as_of)
+    snapshot, digest = load_snapshot(data_path, notices_path, as_of)
+    notices_digest = sha256_file(notices_path) if notices_path else None
     planned = workbook_plan_rows([Path(path) for path in args.plan_workbook]) if args.plan_workbook else None
-    device = "mps" if args.chronos_device == "auto" and __import__("torch").backends.mps.is_available() else ("cuda" if args.chronos_device == "auto" and __import__("torch").cuda.is_available() else ("cpu" if args.chronos_device == "auto" else args.chronos_device))
-    chronos_pipeline, chronos_status = load_chronos2(args.chronos_checkpoint, device, allow_download=args.allow_chronos_download) if args.run_chronos2 else (None, {"status": "NOT_RUN_BY_REQUEST"})
-    tabpfn_status = {
-        "status": "NOT_RUN_LICENSE_AND_CHECKPOINT_UNAVAILABLE",
-        "package": "tabpfn-time-series==1.3.0",
-        "package_installed_in_optional_local_venv": (DEFAULT_OUTPUT / "tabpfn-ts-venv").exists(),
-        "mode": "TabPFNMode.LOCAL",
-        "telemetry": "TABPFN_DISABLE_TELEMETRY=1",
-        "checkpoint": "tabpfn-v3.5-20260909.safetensors",
-        "checkpoint_present": (Path.home() / "Library/Caches/tabpfn/tabpfn-v3.5-20260909.safetensors").exists(),
-        "inference_attempted": False,
-        "reason": "LOCAL constructor API verified; checkpoint absent from local cache and upstream requires prior license acceptance. No terms accepted and no inference attempted.",
-    }
-    result = run_backtest(snapshot, warmup_days=args.warmup_days, block_days=args.block_days, iterations=args.iterations, seed=args.seed, planned=planned, chronos_pipeline=chronos_pipeline, chronos_status=chronos_status, tabpfn_status=tabpfn_status)
+    chronos_pipeline, chronos_status = _load_chronos_request(args)
+    tabpfn_checkpoint = Path(args.tabpfn_checkpoint).expanduser()
+    if args.run_tabpfn_ts:
+        tabpfn_pipeline, tabpfn_status = load_tabpfn_ts(tabpfn_checkpoint, context_length=224)
+    else:
+        tabpfn_pipeline = None
+        tabpfn_status = {"status": "NOT_RUN_BY_REQUEST", "adapter_status": "IMPLEMENTED_LOCAL_ONLY", "package": "tabpfn-time-series==1.3.0", "mode": "LOCAL", "telemetry": "disabled", "checkpoint": str(tabpfn_checkpoint), "inference_attempted": False}
+    result = run_backtest(snapshot, warmup_days=args.warmup_days, block_days=args.block_days, iterations=args.iterations, seed=args.seed, planned=planned, chronos_pipeline=chronos_pipeline, chronos_status=chronos_status, tabpfn_pipeline=tabpfn_pipeline, tabpfn_status=tabpfn_status)
     run_id, run_dir = write_run(Path(args.output), "backtest", digest)
-    manifest = {"run_id": run_id, "run_type": "historical_development_backtest", "dataset_sha256": digest, "source_path_label": Path(args.data).name, "generated_at": datetime.now(TZ).isoformat(), "target_scope": "OFFLINE_DEVELOPMENT_ONLY", "realized_demand_claim": "Normalized target rows correspond to workbook 'Gerçekleşen' fields as inspected, but independently verified operational provenance remains NOT_ATTESTED.", "prospective_5pct_gate": "NOT_EVALUATED_NO_56_DAY_PROSPECTIVE_WINDOW", "result": {k: v for k, v in result.items() if k != "predictions"}}
+    manifest = {"run_id": run_id, "run_type": "historical_development_backtest", "dataset_sha256": digest, "notices_sha256": notices_digest, "source_path_label": Path(args.data).name, "generated_at": datetime.now(TZ).isoformat(), "target_scope": "OFFLINE_DEVELOPMENT_ONLY", "realized_demand_claim": "Normalized target rows correspond to workbook 'Gerçekleşen' fields as inspected, but independently verified operational provenance remains NOT_ATTESTED.", "prospective_5pct_gate": "NOT_EVALUATED_NO_56_DAY_PROSPECTIVE_WINDOW", "result": {k: v for k, v in result.items() if k != "predictions"}}
     (run_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     pd.DataFrame(result["predictions"]).to_csv(run_dir / "predictions.csv", index=False)
     print(json.dumps({"run_id": run_id, "output_dir": str(run_dir), "metrics": result["metrics"], "coverage_pct": result["coverage_pct"], "common_candidate_support_n": result["common_candidate_support_n"], "plan_comparator": result["plan_comparator"], "bootstrap_95pct_wape_interval": result["bootstrap_95pct_wape_interval"], "block_count": len(result["blocks"])}, ensure_ascii=False, indent=2))
@@ -475,14 +652,19 @@ def cmd_backtest(args):
 
 def cmd_fit(args):
     data_path = Path(args.data)
+    notices_path = Path(args.notices) if args.notices else None
     as_of = datetime.fromisoformat(args.cutoff)
-    snapshot, digest = load_snapshot(data_path, Path(args.notices) if args.notices else None, as_of)
+    snapshot, digest = load_snapshot(data_path, notices_path, as_of)
+    notices_digest = sha256_file(notices_path) if notices_path else None
     fitted = fit(snapshot, {"as_of": as_of, "iterations": args.iterations, "seed": args.seed, "target_mode": args.target_mode})
     fitted.config["source_dataset_sha256"] = digest
+    fitted.config["source_notices_sha256"] = notices_digest
     run_id, run_dir = write_run(Path(args.output), "fit", digest)
-    manifest = {"artifact_schema_version": 1, "run_id": run_id, "model_version": fitted.model_version, "candidate_id": fitted.config.get("candidate_id"), "target_mode": fitted.config.get("target_mode", "direct"), "dataset_sha256": digest, "data_version": fitted.data_version, "trained_through": fitted.trained_through, "feature_names": fitted.feature_names, "config": _json_safe(fitted.config), "model_file": "catboost.cbm" if fitted.model is not None else None, "candidate_status": fitted.candidate_status, "historical_availability_assumption": ASSUMPTION, "scope": "SHADOW_ONLY_NOT_PROMOTED"}
+    model_file = "catboost.cbm" if fitted.model is not None else None
     if fitted.model is not None:
-        fitted.model.save_model(str(run_dir / "catboost.cbm"))
+        fitted.model.save_model(str(run_dir / model_file))
+    model_hash = sha256_file(run_dir / model_file) if model_file else None
+    manifest = {"artifact_schema_version": 2, "run_id": run_id, "model_version": fitted.model_version, "candidate_id": fitted.config.get("candidate_id"), "target_mode": fitted.config.get("target_mode", "direct"), "dataset_sha256": digest, "notices_sha256": notices_digest, "data_version": fitted.data_version, "fit_cutoff": fitted.fit_cutoff, "trained_through": fitted.trained_through, "feature_names": fitted.feature_names, "config": _json_safe(fitted.config), "model_file": model_file, "model_artifact_sha256": model_hash, "candidate_status": fitted.candidate_status, "historical_availability_assumption": ASSUMPTION, "scope": "SHADOW_ONLY_NOT_PROMOTED"}
     (run_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"run_id": run_id, "output_dir": str(run_dir), "manifest": manifest}, ensure_ascii=False, indent=2))
 
@@ -500,7 +682,7 @@ def cmd_predict(args):
         if not manifest_path.is_file():
             raise FileNotFoundError(f"model artifact manifest not found: {manifest_path}")
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if manifest.get("artifact_schema_version") != 1:
+        if manifest.get("artifact_schema_version") != 2:
             raise ValueError(f"unsupported model artifact schema: {manifest.get('artifact_schema_version')!r}")
         model_filename = manifest.get("model_file")
         if not model_filename:
@@ -508,6 +690,9 @@ def cmd_predict(args):
         model_path = model_dir / model_filename
         if not model_path.is_file():
             raise FileNotFoundError(f"trained model file not found: {model_path}")
+        expected_model_hash = manifest.get("model_artifact_sha256")
+        if not expected_model_hash or sha256_file(model_path) != expected_model_hash:
+            raise ValueError(f"trained model artifact SHA-256 verification failed: {model_path}")
         if manifest.get("target_mode") not in {"direct", "residual_to_weekday_median"}:
             raise ValueError(f"unsupported serialized target mode: {manifest.get('target_mode')!r}")
         from catboost import CatBoostRegressor
@@ -524,8 +709,10 @@ def cmd_predict(args):
             data_version=manifest.get("data_version", manifest.get("dataset_sha256", "UNKNOWN")),
             model_version=manifest.get("model_version", "unknown"),
             candidate_status=manifest.get("candidate_status"),
+            fit_cutoff=manifest.get("fit_cutoff"),
         )
-        model_status = {"status": "LOADED_LOCAL_MODEL", "model_dir": str(model_dir), "candidate_id": manifest.get("candidate_id"), "model_version": fitted.model_version, "training_dataset_sha256": manifest.get("dataset_sha256"), "trained_through": fitted.trained_through, "target_mode": manifest.get("target_mode")}
+        validate_fitted_timing(fitted, cutoff)
+        model_status = {"status": "LOADED_LOCAL_MODEL", "model_dir": str(model_dir), "candidate_id": manifest.get("candidate_id"), "model_version": fitted.model_version, "training_dataset_sha256": manifest.get("dataset_sha256"), "training_notices_sha256": manifest.get("notices_sha256"), "model_artifact_sha256": expected_model_hash, "trained_through": fitted.trained_through, "fit_cutoff": fitted.fit_cutoff, "target_mode": manifest.get("target_mode")}
     predictions = predict_as_of(snapshot, cutoff=cutoff, target_date=date.fromisoformat(args.target), groups=groups, fitted=fitted)
     print(json.dumps({"dataset_sha256": digest, "model_status": model_status, "prediction_ledger": predictions}, ensure_ascii=False, indent=2))
 
@@ -553,9 +740,12 @@ def parser():
             cmd.add_argument("--seed", type=int, default=42)
             cmd.add_argument("--plan-workbook", action="append", default=[], help="optional workbook(s), Planlanan rows only as comparator")
             cmd.add_argument("--chronos-checkpoint", default="amazon/chronos-2")
+            cmd.add_argument("--chronos-revision", help="optional pinned Hugging Face revision; resolved commit is recorded")
             cmd.add_argument("--chronos-device", choices=["auto", "mps", "cuda", "cpu"], default="auto")
             cmd.add_argument("--allow-chronos-download", action="store_true", help="download only the public checkpoint; all inference remains local")
             cmd.add_argument("--no-chronos2", dest="run_chronos2", action="store_false")
+            cmd.add_argument("--run-tabpfn-ts", action="store_true", help="opt in to TabPFN-TS 3.5 LOCAL inference from an already-present checkpoint; never downloads or accepts terms")
+            cmd.add_argument("--tabpfn-checkpoint", default=str(Path.home() / "Library/Caches/tabpfn/tabpfn-v3.5-20260909.safetensors"), help="explicit local TabPFN-TS 3.5 checkpoint path")
             cmd.set_defaults(run_chronos2=True)
             cmd.set_defaults(func=cmd_backtest)
         elif name == "fit":
