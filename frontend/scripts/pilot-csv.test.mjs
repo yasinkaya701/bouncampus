@@ -100,6 +100,40 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   const result = parsePilotCsv(asCsv({ ...fields, produced_portions: '' }));
   assert.match(result.errors.join(' '), /producedPortions must be >= 0/);
 }
+
+// Count fields are observed whole portions; fractional and unsafe integers are invalid evidence.
+for (const [field, value] of [
+  ['produced_portions', '110.5'],
+  ['served_portions', '100.25'],
+  ['produced_portions', '9007199254740992'],
+  ['served_portions', '9007199254740992'],
+]) {
+  const result = parsePilotCsv(asCsv({ ...fields, [field]: value }));
+  assert.match(result.errors.join(' '), /safe integer/,
+    `${field}=${value} must be rejected as an invalid portion count`);
+  assert.equal(result.measurements.length, 0, 'bad counts must reject the whole import');
+}
+
+const { validatePilotMeasurement, scoreFoodWastePilot } =
+  await import('../src/lib/food-waste.ts');
+assert.ok(validatePilotMeasurement({ ...control, servedPortions: 100.25 }).length > 0);
+assert.ok(validatePilotMeasurement({ ...control, producedPortions: 110.5 }).length > 0);
+const unsafePortions = Number.MAX_SAFE_INTEGER + 1;
+const unsafeServedErrors = validatePilotMeasurement({
+  ...control,
+  producedPortions: unsafePortions,
+  servedPortions: unsafePortions,
+});
+assert.ok(unsafeServedErrors.some(error => error.startsWith('servedPortions must be > 0')));
+assert.deepEqual(validatePilotMeasurement({
+  ...control,
+  modelForecastMeals: 100.5,
+  edibleSurplusKg: 1.25,
+  wasteKg: 0.75,
+}), [], 'continuous forecast and kilogram metrics remain valid');
+const invalidScore = scoreFoodWastePilot([{ ...control, producedPortions: 110.5 }, intervention]);
+assert.equal(invalidScore.gates.dataQualityPassed, false);
+assert.equal(invalidScore.status, 'INSUFFICIENT_EVIDENCE');
 {
   const result = parsePilotCsv(asCsv({ ...fields, operator_override: '' }));
   assert.match(result.errors.join(' '), /boolean fields must/);
@@ -110,6 +144,13 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /Duplicate CSV headers: pair_id/);
 }
 {
+  const headers = [...PILOT_CSV_HEADERS, 'operator_signature'];
+  const result = parsePilotCsv(asCsv(fields, headers));
+  assert.match(result.errors.join(' '), /Unexpected CSV headers: operator_signature/);
+  assert.equal(result.measurements.length, 0,
+    'unknown schema columns must fail closed rather than disappear on re-export');
+}
+{
   const result = parsePilotCsv(asCsv({ ...fields, arm: 'INTERVENTION' }));
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
@@ -118,6 +159,25 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
 const validCsv = asCsv(fields);
 const validDataRow = validCsv.trimEnd().split('\n')[1];
 const csvHeader = PILOT_CSV_HEADERS.join(',');
+
+{
+  const emptyCells = ','.repeat(PILOT_CSV_HEADERS.length - 1);
+  const result = parsePilotCsv(`${validCsv}${emptyCells}\n`);
+  assert.match(result.errors.join(' '), /Row 3: boolean fields must/);
+  assert.equal(result.measurements.length, 0,
+    'explicit all-empty measurement rows must invalidate the whole CSV');
+}
+{
+  const result = parsePilotCsv(`${validCsv}""\n`);
+  assert.match(result.errors.join(' '), /Row 3: expected 12 CSV columns, received 1/);
+  assert.equal(result.measurements.length, 0,
+    'quoted empty measurement rows must not disappear');
+}
+{
+  const result = parsePilotCsv(`${validCsv}\n   \n`);
+  assert.deepEqual(result.errors, [], 'ordinary blank physical lines are not records');
+  assert.equal(result.measurements.length, 1);
+}
 
 {
   const result = parsePilotCsv(`${csvHeader}\n${validDataRow},unexpected\n`);
@@ -165,6 +225,21 @@ const csvHeader = PILOT_CSV_HEADERS.join(',');
     { earlySellout: null, operatorOverride: false },
   ]), false, 'one unanswered service must prevent scoring or export for the whole form');
 }
+
+// Stale scoring and file-read responses cannot update newer operator evidence.
+const { createPilotEvidenceRevisionGuard } =
+  await import('../src/lib/pilot-evidence-revision.ts');
+const revisionGuard = createPilotEvidenceRevisionGuard();
+const firstRequest = revisionGuard.invalidate();
+assert.equal(revisionGuard.isCurrent(firstRequest), true);
+revisionGuard.invalidate();
+assert.equal(revisionGuard.isCurrent(firstRequest), false,
+  'late responses must not restore a scorecard for obsolete measurements');
+const secondRequest = revisionGuard.invalidate();
+assert.equal(revisionGuard.isCurrent(secondRequest), true);
+revisionGuard.invalidate();
+assert.equal(revisionGuard.isCurrent(secondRequest), false,
+  'a newer import must invalidate earlier asynchronous work');
 
 const { nextPilotRowIdentifiers } = await import('../src/lib/pilot-row-identifiers.ts');
 
