@@ -52,6 +52,19 @@ assert.deepEqual(parsed.errors, [], 'valid matched pilot CSV should import clean
 assert.deepEqual(parsed.measurements, pair, 'import/export must preserve pair ID and escaped notes');
 assert.equal(analyzeMatchedPilotDesign(parsed.measurements).structurePassed, true);
 assert.deepEqual(parsePilotCsv(serializePilotCsv(parsed.measurements)).measurements, pair);
+
+// Export is an evidence boundary too: incomplete form rows are converted to NaN
+// by the UI draft adapter and must never be emitted as a measured-data CSV.
+assert.throws(
+  () => serializePilotCsv([{ ...control, producedPortions: Number.NaN }, intervention]),
+  /Cannot export invalid pilot measurements: Row 2: producedPortions must be >= 0/,
+  'invalid required numeric fields must fail closed at serialization',
+);
+assert.throws(
+  () => serializePilotCsv([control, { ...intervention, modelForecastMeals: null }]),
+  /INTERVENTION requires modelForecastMeals/,
+  'missing intervention forecast must not be exported as measured evidence',
+);
 const whitespaceNote = '  Inspector note, recorded verbatim.  \r\n  Follow-up\t ';
 const annotatedPair = [{ ...control, notes: whitespaceNote }, intervention];
 const annotatedImport = parsePilotCsv(serializePilotCsv(annotatedPair));
