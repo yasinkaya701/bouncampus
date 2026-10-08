@@ -7,6 +7,7 @@ import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock3, MapPin, Search
 import { useLocale } from '@/lib/i18n';
 import { presentBuilding } from '@/lib/campus-directory';
 import { formatCourseCredit } from '@/lib/course-credit-display';
+import { roomBuilding, selectCourseRoom } from '@/lib/course-room-selection';
 
 interface CourseItem {
   code: string;
@@ -21,18 +22,6 @@ interface CourseItem {
 
 type Campus = 'south' | 'north';
 const SLOT_TO_HOUR: Record<number, number> = { 1: 9, 2: 10, 3: 11, 4: 12, 5: 13, 6: 14, 7: 15, 8: 16, 9: 17, 10: 18, 11: 19, 12: 20, 13: 21 };
-const BUILDING_MAP: Record<string, { id: string; campus: Campus }> = {
-  TB: { id: 'B-SOUTH-TB', campus: 'south' }, İB: { id: 'B-SOUTH-IB', campus: 'south' }, IB: { id: 'B-SOUTH-IB', campus: 'south' },
-  M: { id: 'B-SOUTH-M', campus: 'south' }, HH: { id: 'B-SOUTH-HH', campus: 'south' }, JF: { id: 'B-SOUTH-JF', campus: 'south' }, NB: { id: 'B-SOUTH-NB', campus: 'south' },
-  KB: { id: 'B-NORTH-KB', campus: 'north' }, NH: { id: 'B-NORTH-NH', campus: 'north' }, BM: { id: 'B-NORTH-BM', campus: 'north' }, EF: { id: 'B-NORTH-EF', campus: 'north' },
-  KYD: { id: 'B-NORTH-YD', campus: 'north' }, ET: { id: 'B-NORTH-ETA', campus: 'north' }, KP: { id: 'B-NORTH-KP', campus: 'north' },
-};
-
-function roomBuilding(room?: string) {
-  const prefix = room?.trim().match(/^([A-ZÇĞİÖŞÜa-zçğıöşü]+)/)?.[1]?.toUpperCase();
-  return prefix ? BUILDING_MAP[prefix] : undefined;
-}
-
 export default function CoursesPage() {
   const { locale, t } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,7 +68,7 @@ export default function CoursesPage() {
 
       <section className="divide-y divide-slate-900/10 border-y border-slate-900/10 bg-white">
         {paginated.length === 0 ? <div className="p-10 text-center text-sm font-semibold text-slate-400">{t('Eşleşen ders bulunamadı.', 'No matching course found.')}</div> : paginated.map((course, index) => {
-          const room = course.rooms?.[0];
+          const room = selectCourseRoom(course.rooms, selectedCampus);
           const mapped = roomBuilding(room);
           const buildingLabel = mapped ? presentBuilding({ id: mapped.id, name: room ?? '', code: room?.match(/^[A-Za-zÇĞİÖŞÜçğıöşü]+/)?.[0] ?? '' }, locale).name : null;
           return <article key={`${course.code}-${index}`} className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_260px_240px] lg:items-center"><div><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-[10px] font-black text-[#173f67]">{course.code}</span><span className="text-[9px] text-slate-400">{formatCourseCredit(course.credits, 'CR')} · {formatCourseCredit(course.ects, 'ECTS')}</span></div><h2 className="mt-1 text-[13px] font-black text-slate-900">{course.name}</h2><div className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500"><UserRound size={10} /> {course.instructor || t('Öğretim üyesi belirtilmemiş', 'Instructor not listed')}</div></div><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><Clock3 size={10} /> {t('Program', 'Schedule')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{scheduleText(course)}</div></div><div className="flex items-center justify-between gap-3"><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><MapPin size={10} /> {t('Oda', 'Room')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{(course.rooms ?? []).join(' · ') || '—'}</div></div>{mapped && buildingLabel ? <Link href={`/buildings/${mapped.id}`} className="inline-flex items-center gap-1 text-[9px] font-bold text-[#173f67]">{t('Bina', 'Building')} <ArrowRight size={10} /></Link> : null}</div></article>;
