@@ -16,7 +16,7 @@ import {
   FOOD_WASTE_PILOT_PROTOCOL,
   type PilotScorecard,
 } from '@/lib/food-waste';
-import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
+import { parsePilotCsv, serializeValidatedPilotCsv } from '@/lib/pilot-csv';
 import { hasConfirmedPilotFlags } from '@/lib/pilot-flag-confirmation';
 import { nextPilotRowIdentifiers } from '@/lib/pilot-row-identifiers';
 import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
@@ -168,9 +168,14 @@ export default function FoodWastePilotPage() {
       setNotice(null);
       return;
     }
+    const result = serializeValidatedPilotCsv(rows.map(rowToMeasurement));
+    if (!result.csv) {
+      setError(t('Dışa aktarma engellendi: geçersiz ölçümler.', 'Export blocked: invalid measurements.') + ' ' + result.errors.join(' · '));
+      setNotice(null);
+      return;
+    }
     setError(null);
-    const csv = serializePilotCsv(rows.map(rowToMeasurement));
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob([result.csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
