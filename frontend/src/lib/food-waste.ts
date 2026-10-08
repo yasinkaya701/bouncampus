@@ -354,8 +354,8 @@ export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
   if (!isValidPilotCalendarDate(measurement.date)) errors.push('date must be a valid YYYY-MM-DD calendar date');
   if (!measurement.serviceId.trim()) errors.push('serviceId is required');
   if (measurement.arm !== 'CONTROL' && measurement.arm !== 'INTERVENTION') errors.push('arm must be CONTROL or INTERVENTION');
-  if (!Number.isFinite(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0');
-  if (!Number.isFinite(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0');
+  if (!Number.isSafeInteger(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0 and a safe integer');
+  if (!Number.isSafeInteger(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0 and a safe integer');
   if (
     Number.isFinite(measurement.producedPortions)
     && Number.isFinite(measurement.servedPortions)
