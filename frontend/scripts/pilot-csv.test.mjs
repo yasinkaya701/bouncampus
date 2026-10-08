@@ -190,4 +190,16 @@ assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' }
 assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
   'generated service IDs must stay unique');
 
+// Imported IDs may contain leading/trailing spaces. Scoring normalizes these
+// aliases, so newly generated IDs must not collide with them.
+const paddedImportedRows = [
+  { pairId: 'PAIR_01', serviceId: '  CONTROL-01  ', arm: 'CONTROL' },
+];
+assert.deepEqual(nextPilotRowIdentifiers(paddedImportedRows, 'CONTROL'),
+  { pairId: 'PAIR_02', serviceId: 'CONTROL-02' },
+  'new control IDs must not alias an existing whitespace-padded imported service');
+assert.deepEqual(nextPilotRowIdentifiers(paddedImportedRows, 'INTERVENTION'),
+  { pairId: 'PAIR_01', serviceId: 'INTERVENTION-02' },
+  'cross-arm sequencing must account for padded imported service IDs');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
