@@ -104,6 +104,42 @@ def test_large_capacity_does_not_expand_search_space() -> None:
     )
 
 
+def test_extreme_finite_scenario_weights_keep_nonzero_probabilities() -> None:
+    optimizer = load_optimizer()
+    # These weights are finite independently, but their raw sum overflows.
+    # An overflow silently zeroed every probability and selected 0 portions.
+    scenarios = [
+        {"demand": 40, "weight": 1e308},
+        {"demand": 120, "weight": 1e308},
+    ]
+    result = optimizer.optimize_food_production(
+        demand_scenarios=scenarios,
+        max_capacity=130,
+        waste_weight=1.0,
+        shortage_weight=3.0,
+        method_eligibility="PILOT_ELIGIBLE",
+    )
+    assert result["decision_readiness"] == "REVIEW_REQUIRED"
+    assert result["recommended_production"] == 120
+    assert result["scenario_count"] == 2
+    assert math.isfinite(result["expected_registered_loss"])
+    assert math.isclose(result["expected_registered_loss"], 40.0, abs_tol=1e-12)
+
+    # The weighted probabilities must not depend on a common positive scale.
+    reference = optimizer.optimize_food_production(
+        demand_scenarios=[
+            {"demand": 40, "weight": 1.0},
+            {"demand": 120, "weight": 1.0},
+        ],
+        max_capacity=130,
+        waste_weight=1.0,
+        shortage_weight=3.0,
+        method_eligibility="PILOT_ELIGIBLE",
+    )
+    assert result["recommended_production"] == reference["recommended_production"]
+    assert result["expected_registered_loss"] == reference["expected_registered_loss"]
+
+
 def test_unknown_method_fails_closed_but_keeps_analysis_candidate() -> None:
     optimizer = load_optimizer()
     result = optimizer.optimize_food_production(
@@ -160,6 +196,7 @@ def main() -> int:
     tests = [
         test_breakpoint_search_matches_integer_bruteforce,
         test_large_capacity_does_not_expand_search_space,
+        test_extreme_finite_scenario_weights_keep_nonzero_probabilities,
         test_unknown_method_fails_closed_but_keeps_analysis_candidate,
         test_offline_method_cannot_emit_operator_recommendation,
         test_zero_objective_weights_are_not_actionable,
