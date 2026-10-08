@@ -114,6 +114,20 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
 }
 
+// CSV input must not admit fractional or imprecise physical portion counts.
+for (const [field, invalid] of [
+  ['produced_portions', '110.5'],
+  ['served_portions', '99.5'],
+  ['produced_portions', '9007199254740992'],
+  ['served_portions', '9007199254740992'],
+]) {
+  const result = parsePilotCsv(asCsv({ ...fields, [field]: invalid }));
+  assert.match(result.errors.join(' '), /safe integer/,
+    `${field}=${invalid} must be rejected as an invalid measured count`);
+  assert.equal(result.measurements.length, 0,
+    'malformed counts must invalidate the entire CSV import');
+}
+
 // Malformed records must fail closed rather than silently truncating measurements.
 const validCsv = asCsv(fields);
 const validDataRow = validCsv.trimEnd().split('\n')[1];
