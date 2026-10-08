@@ -169,16 +169,27 @@ export default function FoodWastePilotPage() {
       return;
     }
     setError(null);
-    const csv = serializePilotCsv(rows.map(rowToMeasurement));
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'bouncampus-food-waste-pilot-measurements.csv';
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
+    try {
+      const csv = serializePilotCsv(rows.map(rowToMeasurement));
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'bouncampus-food-waste-pilot-measurements.csv';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (cause) {
+      setNotice(null);
+      const detail = cause instanceof Error ? cause.message : '';
+      setError(
+        `${t(
+          'CSV dışa aktarımı engellendi: bir veya daha fazla ölçüm satırı geçersiz.',
+          'CSV export blocked: one or more measurement rows are invalid.',
+        )}${detail ? ` ${detail}` : ''}`,
+      );
+    }
   };
 
   const scorePilot = async () => {
