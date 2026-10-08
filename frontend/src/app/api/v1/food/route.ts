@@ -13,11 +13,20 @@ import {
   type DemandSignalId,
 } from '@/lib/food-waste';
 import { applyMethodEligibility } from '@/lib/food-decision-eligibility';
+import { parseFoodScenarioRate } from '@/lib/food-scenario-query';
 
 const PLANNING_CANDIDATE_SEMANTICS = 'ADVISORY_MODEL_ESTIMATE_NOT_AUTHORIZED_KITCHEN_ORDER' as const;
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  const preventionRatePct = parseFoodScenarioRate(requestUrl.searchParams.get('prevention_rate_pct'), 15);
+  const recoveryRatePct = parseFoodScenarioRate(requestUrl.searchParams.get('recovery_rate_pct'), 85);
+  if (preventionRatePct === null || recoveryRatePct === null) {
+    return NextResponse.json({
+      error: 'INVALID_SCENARIO_RATE',
+      detail: 'Scenario rate parameters must be finite numeric values.',
+    }, { status: 400 });
+  }
   const dashboardUrl = new URL('/api/v1/dashboard', request.url);
   const dateVal = requestUrl.searchParams.get('date_val');
   if (dateVal) dashboardUrl.searchParams.set('date_val', dateVal);
@@ -54,8 +63,6 @@ export async function GET(request: Request) {
     // Historical public-source context remains usable even if the model dashboard is unavailable.
   }
 
-  const preventionRatePct = Number(requestUrl.searchParams.get('prevention_rate_pct') ?? 15);
-  const recoveryRatePct = Number(requestUrl.searchParams.get('recovery_rate_pct') ?? 85);
   const sourceAssessment = buildProductionBand(predictedMeals, signalAvailability);
   const decisionAssessment = applyMethodEligibility(sourceAssessment, {
     methodEligibility: 'SANDBOX_ONLY',
