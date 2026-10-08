@@ -27,7 +27,8 @@ export function nextPilotRowIdentifiers(
       counts[row.arm] += 1;
       pairArmCounts.set(pairId, counts);
     }
-    usedServiceIds.add(row.serviceId);
+    const serviceId = row.serviceId.trim();
+    if (serviceId) usedServiceIds.add(serviceId);
   }
 
   // Prefer a single unmatched opposite-arm service; never attach another
@@ -50,7 +51,7 @@ export function nextPilotRowIdentifiers(
   }
 
   const maxServiceIndex = rows.reduce((max, row) => {
-    const match = /^(?:CONTROL|INTERVENTION)-(\d+)$/.exec(row.serviceId);
+    const match = /^(?:CONTROL|INTERVENTION)-(\d+)$/.exec(row.serviceId.trim());
     return match ? Math.max(max, Number(match[1])) : max;
   }, 0);
   let nextServiceIndex = maxServiceIndex + 1;
