@@ -64,7 +64,8 @@ function parseCsvRows(text: string) {
     if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') index += 1;
       row.push(cell);
-      if (row.some(value => value.trim() !== '')) rows.push(row);
+      // Keep explicit records even when every cell is blank.
+      if (row.length > 1 || afterQuote || row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
       afterQuote = false;
@@ -77,7 +78,8 @@ function parseCsvRows(text: string) {
   if (quoted) throw new Error('Malformed CSV: unterminated quoted field.');
 
   row.push(cell);
-  if (row.some(value => value.trim() !== '')) rows.push(row);
+  // Skip only truly blank physical lines, not malformed measurements.
+  if (row.length > 1 || afterQuote || row.some(value => value.trim() !== '')) rows.push(row);
   return rows;
 }
 
