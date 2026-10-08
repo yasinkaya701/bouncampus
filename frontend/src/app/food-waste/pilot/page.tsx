@@ -168,8 +168,15 @@ export default function FoodWastePilotPage() {
       setNotice(null);
       return;
     }
+    let csv: string;
+    try {
+      csv = serializePilotCsv(rows.map(rowToMeasurement));
+    } catch (error) {
+      setError(error instanceof Error ? error.message : t('CSV dışa aktarılamadı.', 'CSV could not be exported.'));
+      setNotice(null);
+      return;
+    }
     setError(null);
-    const csv = serializePilotCsv(rows.map(rowToMeasurement));
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
