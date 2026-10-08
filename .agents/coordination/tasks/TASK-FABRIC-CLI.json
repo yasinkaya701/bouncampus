@@ -4,7 +4,7 @@
   "title": "Add mechanical agent task claim and transition CLI",
   "priority": "P0",
   "lane": "quality-release",
-  "state": "READY_FOR_INTEGRATION",
+  "state": "CANCELLED",
   "owner_agent": "execution-systems-engineer",
   "branch": "agent/quality-release/fabric-task-cli",
   "depends_on": [],
@@ -49,6 +49,7 @@
   "notes": [
     "This task intentionally does not touch .agents/FABRIC.md, which remains owned by the blocked direct-push recovery task.",
     "The CLI operates on a checked-out agent-coordination task store and relies on git/GitHub commit conflict semantics for remote atomicity.",
-    "Implementation is merged with latest master through branch head 00a8f4194790d2c67de1f16335bcf1f64a24db8b and is ready for exact-head integration CI."
+    "Implementation is merged with latest master through branch head 00a8f4194790d2c67de1f16335bcf1f64a24db8b and is ready for exact-head integration CI.",
+    "2026-10-08 reconciliation: PR #35 was closed unmerged as superseded; its task lifecycle CLI, tests, and CI wiring were explicitly preserved and merged through PR #38, then evolved by merged Fabric v2 PR #186. Current master a7a8ec8418f775c5e130cb3061631c40648e325c contains scripts/agent_task.py, scripts/test_agent_task.py, and CI execution of the task tests. The original feature branch is deleted; cancel this stale control-plane task rather than integrating divergent historical head 00a8f4194790d2c67de1f16335bcf1f64a24db8b."
   ]
 }
