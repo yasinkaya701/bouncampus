@@ -457,9 +457,13 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   const wasteReductionTargetMet = reduction == null || targetWastePer100 == null || interventionWastePer100 == null
     ? null
     : interventionWastePer100 <= targetWastePer100 + machineTolerance;
-  const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
+  // Display rates are rounded; compare raw event counts with a common denominator
+  // so a genuine increase cannot be hidden by equal two-decimal percentages.
+  const controlSellouts = controlMeasurements.filter(item => item.earlySellout).length;
+  const interventionSellouts = interventionMeasurements.filter(item => item.earlySellout).length;
+  const earlySelloutGuardrailPassed = !controlMeasurements.length || !interventionMeasurements.length
     ? null
-    : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
+    : interventionSellouts * controlMeasurements.length <= controlSellouts * interventionMeasurements.length;
 
   const notes: string[] = [];
   if (invalidMeasurementCount) notes.push(`${invalidMeasurementCount} measurement row(s) fail the pilot measurement contract.`);
