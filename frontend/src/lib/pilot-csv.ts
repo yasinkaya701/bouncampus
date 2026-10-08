@@ -166,12 +166,24 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
   return { measurements: errors.length ? [] : measurements, errors };
 }
 
+export function validatePilotCsvMeasurements(measurements: MatchedPilotServiceMeasurement[]) {
+  return measurements.flatMap((measurement, index) =>
+    validateMatchedPilotMeasurement(measurement)
+      .map(message => `Row ${index + 2}: ${message}`),
+  );
+}
+
 function escapeCsv(value: string | number | boolean | null | undefined) {
   const raw = value == null ? '' : String(value);
   return /[",\n\r]/.test(raw) ? `"${raw.replace(/"/g, '""')}"` : raw;
 }
 
 export function serializePilotCsv(measurements: MatchedPilotServiceMeasurement[]) {
+  const validationErrors = validatePilotCsvMeasurements(measurements);
+  if (validationErrors.length) {
+    throw new Error(`Cannot export invalid pilot measurements: ${validationErrors.join('; ')}`);
+  }
+
   const lines = [PILOT_CSV_HEADERS.join(',')];
   measurements.forEach(item => {
     lines.push([
