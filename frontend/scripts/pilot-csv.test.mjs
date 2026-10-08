@@ -190,4 +190,20 @@ assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' }
 assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
   'generated service IDs must stay unique');
 
+// A padded imported ID and its unpadded spelling identify the same measured
+// service. Generating the unpadded spelling would create a duplicate on export.
+const paddedImportedRow = [
+  { pairId: ' PAIR_07 ', serviceId: ' CONTROL-09 ', arm: 'CONTROL' },
+];
+assert.deepEqual(nextPilotRowIdentifiers(paddedImportedRow, 'CONTROL'),
+  { pairId: 'PAIR_08', serviceId: 'CONTROL-10' },
+  'same-arm addition must not reuse a whitespace-padded imported service ID');
+assert.deepEqual(nextPilotRowIdentifiers(paddedImportedRow, 'INTERVENTION'),
+  { pairId: 'PAIR_07', serviceId: 'INTERVENTION-10' },
+  'opposite-arm addition should complete padded imported pair with a unique ID');
+assert.deepEqual(nextPilotRowIdentifiers([
+  { pairId: 'PAIR_01', serviceId: 'CONTROL-01 ', arm: 'CONTROL' },
+], 'CONTROL'), { pairId: 'PAIR_02', serviceId: 'CONTROL-02' },
+'trailing whitespace must not cause an exact canonical service-ID collision');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
