@@ -6,13 +6,14 @@ import realCoursesData from '@/data/real_boun_courses.json';
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock3, MapPin, Search, UserRound } from 'lucide-react';
 import { useLocale } from '@/lib/i18n';
 import { presentBuilding } from '@/lib/campus-directory';
+import { formatCourseCredit } from '@/lib/course-credit-display';
 
 interface CourseItem {
   code: string;
   name: string;
   instructor?: string;
-  credits: number;
-  ects: number;
+  credits?: number;
+  ects?: number;
   days?: string[];
   hours?: number[];
   rooms?: string[];
@@ -81,7 +82,7 @@ export default function CoursesPage() {
           const room = course.rooms?.[0];
           const mapped = roomBuilding(room);
           const buildingLabel = mapped ? presentBuilding({ id: mapped.id, name: room ?? '', code: room?.match(/^[A-Za-zÇĞİÖŞÜçğıöşü]+/)?.[0] ?? '' }, locale).name : null;
-          return <article key={`${course.code}-${index}`} className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_260px_240px] lg:items-center"><div><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-[10px] font-black text-[#173f67]">{course.code}</span><span className="text-[9px] text-slate-400">{course.credits} CR · {course.ects || 5} ECTS</span></div><h2 className="mt-1 text-[13px] font-black text-slate-900">{course.name}</h2><div className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500"><UserRound size={10} /> {course.instructor || t('Öğretim üyesi belirtilmemiş', 'Instructor not listed')}</div></div><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><Clock3 size={10} /> {t('Program', 'Schedule')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{scheduleText(course)}</div></div><div className="flex items-center justify-between gap-3"><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><MapPin size={10} /> {t('Oda', 'Room')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{(course.rooms ?? []).join(' · ') || '—'}</div></div>{mapped && buildingLabel ? <Link href={`/buildings/${mapped.id}`} className="inline-flex items-center gap-1 text-[9px] font-bold text-[#173f67]">{t('Bina', 'Building')} <ArrowRight size={10} /></Link> : null}</div></article>;
+          return <article key={`${course.code}-${index}`} className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_260px_240px] lg:items-center"><div><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-[10px] font-black text-[#173f67]">{course.code}</span><span className="text-[9px] text-slate-400">{formatCourseCredit(course.credits, 'CR')} · {formatCourseCredit(course.ects, 'ECTS')}</span></div><h2 className="mt-1 text-[13px] font-black text-slate-900">{course.name}</h2><div className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500"><UserRound size={10} /> {course.instructor || t('Öğretim üyesi belirtilmemiş', 'Instructor not listed')}</div></div><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><Clock3 size={10} /> {t('Program', 'Schedule')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{scheduleText(course)}</div></div><div className="flex items-center justify-between gap-3"><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><MapPin size={10} /> {t('Oda', 'Room')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{(course.rooms ?? []).join(' · ') || '—'}</div></div>{mapped && buildingLabel ? <Link href={`/buildings/${mapped.id}`} className="inline-flex items-center gap-1 text-[9px] font-bold text-[#173f67]">{t('Bina', 'Building')} <ArrowRight size={10} /></Link> : null}</div></article>;
         })}
       </section>
 
