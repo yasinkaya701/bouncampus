@@ -18,6 +18,7 @@ import {
 } from '@/lib/food-waste';
 import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
 import { hasConfirmedPilotFlags } from '@/lib/pilot-flag-confirmation';
+import { createPilotEvidenceRevisionGuard } from '@/lib/pilot-evidence-revision';
 import { nextPilotRowIdentifiers } from '@/lib/pilot-row-identifiers';
 import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 import { useLocale } from '@/lib/i18n';
@@ -109,6 +110,7 @@ function measurementToRow(item: MatchedPilotServiceMeasurement, index: number): 
 export default function FoodWastePilotPage() {
   const { locale, t } = useLocale();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const evidenceRevisionRef = useRef(createPilotEvidenceRevisionGuard());
   const [rows, setRows] = useState<DraftRow[]>([
     createRow('CONTROL', 0),
     createRow('INTERVENTION', 1),
@@ -123,9 +125,17 @@ export default function FoodWastePilotPage() {
     intervention: rows.filter(row => row.arm === 'INTERVENTION').length,
   }), [rows]);
 
+  // Ignore late score responses after any measurement edit or newer import.
+  const invalidatePendingScore = () => {
+    const revision = evidenceRevisionRef.current.invalidate();
+    setScore(null);
+    setLoading(false);
+    return revision;
+  };
+
   const updateRow = <K extends keyof DraftRow>(id: string, key: K, value: DraftRow[K]) => {
     setRows(current => current.map(row => row.id === id ? { ...row, [key]: value } : row));
-    setScore(null);
+    invalidatePendingScore();
     setError(null);
     setNotice(null);
   };
@@ -135,21 +145,32 @@ export default function FoodWastePilotPage() {
       ...current,
       createRow(arm, current.length, nextPilotRowIdentifiers(current, arm)),
     ]);
-    setScore(null);
+    invalidatePendingScore();
     setNotice(null);
   };
 
   const removeRow = (id: string) => {
     setRows(current => current.filter(row => row.id !== id));
-    setScore(null);
+    invalidatePendingScore();
     setNotice(null);
   };
 
   const importCsv = async (file: File) => {
+    const revision = invalidatePendingScore();
     setError(null);
     setNotice(null);
-    setScore(null);
-    const parsed = parsePilotCsv(await file.text());
+    let csvText: string;
+    try {
+      csvText = await file.text();
+    } catch {
+      if (evidenceRevisionRef.current.isCurrent(revision)) {
+        setError(t('CSV dosyası okunamadı.', 'Could not read the CSV file.'));
+      }
+      return;
+    }
+    // Edits and newer imports supersede slow file reads.
+    if (!evidenceRevisionRef.current.isCurrent(revision)) return;
+    const parsed = parsePilotCsv(csvText);
     if (parsed.errors.length) {
       setError(parsed.errors.join(' · '));
       return;
@@ -188,6 +209,7 @@ export default function FoodWastePilotPage() {
       setError(t('Skorlamadan önce her servis için erken tükenme ve operatör müdahalesini Evet/Hayır olarak doğrulayın.', 'Confirm Yes/No for early sell-out and operator override on every service before scoring.'));
       return;
     }
+    const requestRevision = evidenceRevisionRef.current.invalidate();
     setLoading(true);
     setError(null);
     setNotice(null);
@@ -200,6 +222,7 @@ export default function FoodWastePilotPage() {
         body: JSON.stringify({ measurements: rows.map(rowToMeasurement) }),
       });
       const payload = await response.json() as ScoreResponse;
+      if (!evidenceRevisionRef.current.isCurrent(requestRevision)) return;
       if (!response.ok || !payload.scorecard) {
         const detail = payload.validationErrors?.map(item => `#${item.index + 1}: ${item.message}`).join(' · ');
         setError(detail || payload.detail || payload.error || t('Ölçümler doğrulanamadı.', 'Measurements could not be validated.'));
@@ -207,9 +230,11 @@ export default function FoodWastePilotPage() {
         setScore(payload.scorecard);
       }
     } catch {
-      setError(t('Skorlama servisine ulaşılamadı.', 'Could not reach the scoring service.'));
+      if (evidenceRevisionRef.current.isCurrent(requestRevision)) {
+        setError(t('Skorlama servisine ulaşılamadı.', 'Could not reach the scoring service.'));
+      }
     } finally {
-      setLoading(false);
+      if (evidenceRevisionRef.current.isCurrent(requestRevision)) setLoading(false);
     }
   };
 
