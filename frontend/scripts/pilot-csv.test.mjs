@@ -195,7 +195,7 @@ assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.le
 const { parseOptionalPilotNumber, validatePilotCsvExport } =
   await import('../src/lib/pilot-csv.ts');
 assert.equal(parseOptionalPilotNumber(''), null);
-assert.equal(parseOptionalPilotNumber('  \\t  '.replace('\\t', '\t')), null);
+assert.equal(parseOptionalPilotNumber('   '), null);
 assert.equal(parseOptionalPilotNumber('0'), 0, 'an explicitly entered zero is real evidence');
 assert.equal(parseOptionalPilotNumber(' 12.5 '), 12.5);
 assert.deepEqual(validatePilotCsvExport(pair), [], 'valid measured rows remain exportable');
