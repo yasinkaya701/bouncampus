@@ -14,6 +14,34 @@ const control = {
   operatorOverride: false,
 };
 
+// Observed service portions represent discrete counts, unlike measured waste kilograms.
+for (const [field, value] of [
+  ['producedPortions', 110.5],
+  ['servedPortions', 99.5],
+  ['producedPortions', Number.MAX_SAFE_INTEGER + 1],
+  ['servedPortions', Number.MAX_SAFE_INTEGER + 1],
+]) {
+  const candidate = { ...control, [field]: value };
+  // For the large served count, also raise production so its only defect is unsafe precision.
+  if (field === 'servedPortions' && value > Number.MAX_SAFE_INTEGER) {
+    candidate.producedPortions = value;
+  }
+  const errors = validatePilotMeasurement(candidate);
+  assert.ok(errors.some(message => message.includes(`${field} must be a safe integer`)),
+    `${field}=${value} must not be promoted as an exact measured portion count`);
+  const score = scoreFoodWastePilot([candidate]);
+  assert.equal(score.gates.dataQualityPassed, false,
+    'invalid portion counts must fail the scorecard data-quality gate');
+}
+
+// Fractional kilograms and fractional model estimates remain valid measurements/estimates.
+assert.deepEqual(validatePilotMeasurement({
+  ...control,
+  edibleSurplusKg: 1.25,
+  wasteKg: 0.375,
+  modelForecastMeals: 100.5,
+}), []);
+
 for (const date of [
   '2026-02-30',
   '2025-02-29',
