@@ -73,6 +73,16 @@ assert.equal(repeated.gates.enoughEvidence, false);
 assert.equal(repeated.status, 'INSUFFICIENT_EVIDENCE');
 assert.ok(repeated.dataQuality.duplicateServiceKeys.includes('2026-10-08|CONTROL_0'));
 
+// Whitespace is not a distinct physical service identity. An operator
+// accidentally padding an identifier must not bypass cross-arm deduplication.
+const paddedService = uniqueServices.map((item, index) => index === 1
+  ? { ...item, serviceId: `  ${uniqueServices[0].serviceId}  ` }
+  : item);
+const paddedScore = scoreFoodWastePilot(paddedService);
+assert.equal(paddedScore.gates.dataQualityPassed, false);
+assert.equal(paddedScore.status, 'INSUFFICIENT_EVIDENCE');
+assert.ok(paddedScore.dataQuality.duplicateServiceKeys.includes('2026-10-08|CONTROL_0'));
+
 // Preserve historical allowance for local service IDs reused on
 // *different* dates: identity consists of the date and service ID.
 const otherDate = uniqueServices.map((item, index) => index === 1
