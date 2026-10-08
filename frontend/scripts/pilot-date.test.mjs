@@ -35,6 +35,26 @@ for (const date of ['2024-02-29', '2000-02-29', '2026-10-08', '2026-12-31']) {
     `valid Gregorian date ${date} should be accepted`);
 }
 
+// Observed portion counts are discrete, safely representable service measurements.
+for (const [field, value] of [
+  ['producedPortions', 110.5],
+  ['servedPortions', 99.5],
+  ['producedPortions', Number.MAX_SAFE_INTEGER + 1],
+  ['servedPortions', Number.MAX_SAFE_INTEGER + 1],
+]) {
+  const errors = validatePilotMeasurement({ ...control, [field]: value });
+  assert.ok(errors.some(message => message.includes(field) && message.includes('safe integer')),
+    `${field}=${value} must fail closed instead of counting fractional/unsafe portions`);
+}
+
+const fractionalScore = scoreFoodWastePilot([
+  { ...control, producedPortions: 110.5 },
+  { ...control, serviceId: 'INTERVENTION_FRACTIONAL', arm: 'INTERVENTION', modelForecastMeals: 100 },
+]);
+assert.equal(fractionalScore.dataQuality.invalidMeasurementCount, 1);
+assert.equal(fractionalScore.gates.dataQualityPassed, false);
+assert.equal(fractionalScore.status, 'INSUFFICIENT_EVIDENCE');
+
 const bad = { ...control, date: '2026-02-30' };
 const intervention = { ...control, serviceId: 'CALENDAR_INTERVENTION',
   arm: 'INTERVENTION', modelForecastMeals: 100 };
