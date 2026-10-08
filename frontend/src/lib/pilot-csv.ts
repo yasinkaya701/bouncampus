@@ -1,6 +1,7 @@
-import { validatePilotMeasurement, type PilotServiceMeasurement } from '@/lib/food-waste';
+import { validateMatchedPilotMeasurement, type MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 
 export const PILOT_CSV_HEADERS = [
+  'pair_id',
   'date',
   'service_id',
   'arm',
@@ -15,15 +16,40 @@ export const PILOT_CSV_HEADERS = [
 ] as const;
 
 export type PilotCsvParseResult = {
-  measurements: PilotServiceMeasurement[];
+  measurements: MatchedPilotServiceMeasurement[];
   errors: string[];
 };
+
+/** A blank (including whitespace-only) forecast is missing evidence, not zero meals. */
+export function parseOptionalPilotNumber(value: string): number | null {
+  const trimmed = value.trim();
+  return trimmed === '' ? null : Number(trimmed);
+}
+
+/** Block exporting records that the pilot CSV importer would reject on re-import. */
+export function validatePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): string[] {
+  const errors = measurements.flatMap((measurement, index) =>
+    validateMatchedPilotMeasurement(measurement).map(error => `Row ${index + 1}: ${error}`),
+  );
+
+  const seenServices = new Set<string>();
+  measurements.forEach((measurement, index) => {
+    const serviceKey = `${measurement.date}|${measurement.serviceId.trim()}`;
+    if (seenServices.has(serviceKey)) {
+      errors.push(`Row ${index + 1}: duplicate service identity ${serviceKey}`);
+    }
+    seenServices.add(serviceKey);
+  });
+
+  return errors;
+}
 
 function parseCsvRows(text: string) {
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let afterQuote = false;
 
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index];
@@ -33,38 +59,58 @@ function parseCsvRows(text: string) {
       if (quoted && next === '"') {
         cell += '"';
         index += 1;
+      } else if (quoted) {
+        quoted = false;
+        afterQuote = true;
+      } else if (cell === '' && !afterQuote) {
+        quoted = true;
       } else {
-        quoted = !quoted;
+        throw new Error('Malformed CSV: unexpected quote.');
       }
+      continue;
+    }
+
+    if (afterQuote && char !== ',' && char !== '\n' && char !== '\r') {
+      if (char !== ' ' && char !== '\t') {
+        throw new Error('Malformed CSV: unexpected characters after closing quote.');
+      }
+      cell += char;
       continue;
     }
 
     if (char === ',' && !quoted) {
       row.push(cell);
       cell = '';
+      afterQuote = false;
       continue;
     }
 
     if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') index += 1;
       row.push(cell);
-      if (row.some(value => value.trim() !== '')) rows.push(row);
+      // Keep explicit records even when every cell is blank.
+      if (row.length > 1 || afterQuote || row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
+      afterQuote = false;
       continue;
     }
 
     cell += char;
   }
 
+  if (quoted) throw new Error('Malformed CSV: unterminated quoted field.');
+
   row.push(cell);
-  if (row.some(value => value.trim() !== '')) rows.push(row);
+  // Skip only truly blank physical lines, not malformed measurements.
+  if (row.length > 1 || afterQuote || row.some(value => value.trim() !== '')) rows.push(row);
   return rows;
 }
 
 function parseNumber(value: string, nullable = false) {
   const trimmed = value.trim();
   if (nullable && trimmed === '') return null;
+  if (trimmed === '') return Number.NaN;
   const parsed = Number(trimmed);
   return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
@@ -72,12 +118,17 @@ function parseNumber(value: string, nullable = false) {
 function parseBoolean(value: string) {
   const normalized = value.trim().toLowerCase();
   if (['true', '1', 'yes', 'y', 'evet'].includes(normalized)) return true;
-  if (['false', '0', 'no', 'n', 'hayır', 'hayir', ''].includes(normalized)) return false;
+  if (['false', '0', 'no', 'n', 'hayır', 'hayir'].includes(normalized)) return false;
   return null;
 }
 
 export function parsePilotCsv(text: string): PilotCsvParseResult {
-  const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  let rows: string[][];
+  try {
+    rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+  } catch (error) {
+    return { measurements: [], errors: [error instanceof Error ? error.message : 'Malformed CSV.'] };
+  }
   if (!rows.length) return { measurements: [], errors: ['CSV is empty.'] };
 
   const headers = rows[0].map(value => value.trim().toLowerCase());
@@ -89,11 +140,27 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
     };
   }
 
+  const duplicateHeaders = [...new Set(headers.filter((header, index) => headers.indexOf(header) !== index))];
+  if (duplicateHeaders.length) {
+    return { measurements: [], errors: [`Duplicate CSV headers: ${duplicateHeaders.join(', ')}`] };
+  }
+
+  const allowedHeaders = new Set<string>(PILOT_CSV_HEADERS);
+  const unexpectedHeaders = [...new Set(headers.filter(header => !allowedHeaders.has(header)))];
+  if (unexpectedHeaders.length) {
+    const labels = unexpectedHeaders.map(header => header || '<blank>');
+    return { measurements: [], errors: [`Unexpected CSV headers: ${labels.join(', ')}`] };
+  }
+
   const indexOf = (name: typeof PILOT_CSV_HEADERS[number]) => headers.indexOf(name);
-  const measurements: PilotServiceMeasurement[] = [];
+  const measurements: MatchedPilotServiceMeasurement[] = [];
   const errors: string[] = [];
 
   rows.slice(1).forEach((values, rowIndex) => {
+    if (values.length !== headers.length) {
+      errors.push(`Row ${rowIndex + 2}: expected ${headers.length} CSV columns, received ${values.length}.`);
+      return;
+    }
     const value = (name: typeof PILOT_CSV_HEADERS[number]) => values[indexOf(name)] ?? '';
     const earlySellout = parseBoolean(value('early_sellout'));
     const operatorOverride = parseBoolean(value('operator_override'));
@@ -104,10 +171,11 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
       return;
     }
 
-    const measurement: PilotServiceMeasurement = {
+    const measurement: MatchedPilotServiceMeasurement = {
+      pairId: value('pair_id').trim(),
       date: value('date').trim(),
       serviceId: value('service_id').trim(),
-      arm: armRaw as PilotServiceMeasurement['arm'],
+      arm: armRaw as MatchedPilotServiceMeasurement['arm'],
       modelForecastMeals: parseNumber(value('model_forecast_meals'), true),
       producedPortions: parseNumber(value('produced_portions')) as number,
       servedPortions: parseNumber(value('served_portions')) as number,
@@ -115,10 +183,11 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
       wasteKg: parseNumber(value('waste_kg')) as number,
       earlySellout,
       operatorOverride,
-      notes: value('notes').trim(),
+      // Notes are evidence annotations: preserve their exact CSV contents.
+      notes: value('notes'),
     };
 
-    const validationErrors = validatePilotMeasurement(measurement);
+    const validationErrors = validateMatchedPilotMeasurement(measurement);
     if (validationErrors.length) {
       errors.push(`Row ${rowIndex + 2}: ${validationErrors.join('; ')}`);
       return;
@@ -127,7 +196,7 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
     measurements.push(measurement);
   });
 
-  return { measurements, errors };
+  return { measurements: errors.length ? [] : measurements, errors };
 }
 
 function escapeCsv(value: string | number | boolean | null | undefined) {
@@ -135,10 +204,11 @@ function escapeCsv(value: string | number | boolean | null | undefined) {
   return /[",\n\r]/.test(raw) ? `"${raw.replace(/"/g, '""')}"` : raw;
 }
 
-export function serializePilotCsv(measurements: PilotServiceMeasurement[]) {
+export function serializePilotCsv(measurements: MatchedPilotServiceMeasurement[]) {
   const lines = [PILOT_CSV_HEADERS.join(',')];
   measurements.forEach(item => {
     lines.push([
+      item.pairId,
       item.date,
       item.serviceId,
       item.arm,

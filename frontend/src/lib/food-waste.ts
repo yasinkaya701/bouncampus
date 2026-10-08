@@ -338,13 +338,24 @@ export function pilotWasteReductionPct(controlWastePer100: number, interventionW
   return ((controlWastePer100 - interventionWastePer100) / controlWastePer100) * 100;
 }
 
+function isValidPilotCalendarDate(value: unknown): boolean {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  if (year < 1 || month < 1 || month > 12 || day < 1) return false;
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysInMonth[month - 1];
+}
+
 export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
   const errors: string[] = [];
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(measurement.date)) errors.push('date must be YYYY-MM-DD');
+  if (!isValidPilotCalendarDate(measurement.date)) errors.push('date must be a valid YYYY-MM-DD calendar date');
   if (!measurement.serviceId.trim()) errors.push('serviceId is required');
   if (measurement.arm !== 'CONTROL' && measurement.arm !== 'INTERVENTION') errors.push('arm must be CONTROL or INTERVENTION');
-  if (!Number.isFinite(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0');
-  if (!Number.isFinite(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0');
+  if (!Number.isSafeInteger(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0 and a safe integer');
+  if (!Number.isSafeInteger(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0 and a safe integer');
   if (
     Number.isFinite(measurement.producedPortions)
     && Number.isFinite(measurement.servedPortions)
@@ -396,7 +407,9 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   const seen = new Set<string>();
   const duplicates = new Set<string>();
   measurements.forEach(item => {
-    const key = `${item.date}|${item.serviceId}|${item.arm}`;
+    // A service has one observed arm; arm is not part of its unique identity.
+    // Reusing the same dated service in both arms must not create two observations.
+    const key = `${item.date}|${item.serviceId.trim()}`;
     if (seen.has(key)) duplicates.add(key);
     seen.add(key);
   });
@@ -421,16 +434,36 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
     && control.measuredServices >= minimum
     && intervention.measuredServices >= minimum;
 
-  const reduction = control.meanWasteKgPer100Served != null && intervention.meanWasteKgPer100Served != null
-    ? pilotWasteReductionPct(control.meanWasteKgPer100Served, intervention.meanWasteKgPer100Served)
+  // Display summaries are rounded to two decimals. Never use them as inputs
+  // to a pre-registered evidence-promotion gate: near-threshold pilots can
+  // otherwise be promoted (or rejected) solely because of presentation rounding.
+  const controlWastePer100 = mean(controlMeasurements.map(item =>
+    wasteKgPer100Served(item.wasteKg, item.servedPortions)));
+  const interventionWastePer100 = mean(interventionMeasurements.map(item =>
+    wasteKgPer100Served(item.wasteKg, item.servedPortions)));
+  const reduction = controlWastePer100 != null && interventionWastePer100 != null
+    ? pilotWasteReductionPct(controlWastePer100, interventionWastePer100)
     : null;
   const normalizedWasteReductionPct = roundMetric(reduction);
-  const wasteReductionTargetMet = normalizedWasteReductionPct == null
+  // Compare raw means directly. A few floating-point ULPs are needed for
+  // mathematically exact thresholds (e.g. an average of 0.9 can be stored as
+  // 0.9000000000000001); this is NOT a policy or display-rounding tolerance.
+  const targetWastePer100 = controlWastePer100 == null
     ? null
-    : normalizedWasteReductionPct >= FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct;
-  const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
+    : controlWastePer100 * (1 - FOOD_WASTE_PILOT_PROTOCOL.successGate.targetWasteReductionPct / 100);
+  const machineTolerance = targetWastePer100 == null || interventionWastePer100 == null
+    ? 0
+    : 8 * Number.EPSILON * Math.max(Math.abs(targetWastePer100), Math.abs(interventionWastePer100));
+  const wasteReductionTargetMet = reduction == null || targetWastePer100 == null || interventionWastePer100 == null
     ? null
-    : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
+    : interventionWastePer100 <= targetWastePer100 + machineTolerance;
+  // Display rates are rounded; compare raw event counts with a common denominator
+  // so a genuine increase cannot be hidden by equal two-decimal percentages.
+  const controlSellouts = controlMeasurements.filter(item => item.earlySellout).length;
+  const interventionSellouts = interventionMeasurements.filter(item => item.earlySellout).length;
+  const earlySelloutGuardrailPassed = !controlMeasurements.length || !interventionMeasurements.length
+    ? null
+    : interventionSellouts * controlMeasurements.length <= controlSellouts * interventionMeasurements.length;
 
   const notes: string[] = [];
   if (invalidMeasurementCount) notes.push(`${invalidMeasurementCount} measurement row(s) fail the pilot measurement contract.`);

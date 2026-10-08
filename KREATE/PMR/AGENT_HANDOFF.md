@@ -1,0 +1,270 @@
+# PMR Cross-Agent Handoff
+
+**Updated:** 2026-10-06  
+**Canonical coordination surface:** this PMR directory.
+
+## What was consolidated
+
+This knowledge base intentionally combines:
+- current master research;
+- source-level re-verification from public/academic materials;
+- useful additive discoveries from older agent branches;
+- explicit claim/PMR boundaries.
+
+Two older branches were found with substantial PMR material:
+- `agent/campus-data-geo/bogazici-pmr-target-map`
+- `research/kreate-deep-pmr-market-20261004`
+
+Both are materially stale relative to current master. Their useful additive ideas are being **selectively salvaged**, not wholesale merged. Shared KREATE policy/evidence files from stale branches must never overwrite newer master state.
+
+## Single append point
+
+Agents should treat:
+- [source_catalog.json](source_catalog.json) as the machine-readable registry;
+- [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) as the human index;
+- [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) as the reasoning firewall;
+- [ASSET_MANIFEST.md](ASSET_MANIFEST.md) as the PDF/image/data provenance layer.
+
+Do not create another standalone source dump if the material fits this schema.
+
+## Role handoffs
+
+### IE — Customer Discovery & Market
+
+P0:
+1. identify the real Boğaziçi/TEMAŞ quantity owner;
+2. establish exact decision/freeze time;
+3. obtain recent surplus and shortage incidents;
+4. establish current planning heuristic/system;
+5. map contract/economic beneficiary;
+6. get referral to the real source owner for service-level truth.
+
+Create real interview records from [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md). A scheduled contact is not evidence.
+
+### EE — Physical Systems & Measurement
+
+Consume:
+- S-MEAS-001/002/003;
+- H2/H4 rows in the claim matrix.
+
+Deliver:
+- stage-separated measurement boundary;
+- direct-weighing minimum protocol where feasible;
+- calibration/quality metadata;
+- only propose TrayGate/sensors for a proven missing decision-critical field.
+
+Do not convert camera pixels/volume to mass without measured calibration.
+
+### CS1 — Decision Intelligence
+
+Consume:
+- S-BU-004/005/006;
+- S-TR-001/002/003;
+- S-ACAD-001…006;
+- service-level data contract from issue #82.
+
+Sequence:
+```text
+operator/current heuristic
+→ reproducible naive baseline
+→ leakage-safe calendar/menu/context ablations
+→ richer model only if it clears decision-loss gate
+```
+
+Every historical feature must prove it existed before the service decision cutoff. Optimize decision utility with shortage/surplus asymmetry, not only RMSE.
+
+### CS2 — Product Strategy / Application
+
+Consume:
+- competitor sources S-COMP-001…004;
+- the full claim-source matrix.
+
+Do not claim:
+- first AI food-waste platform;
+- nobody forecasts kitchen demand;
+- competitors only measure waste;
+- first Türkiye campus sustainability/evidence platform;
+- public Boğaziçi waste totals prove overproduction;
+- literature effect sizes are expected project results.
+
+Safe narrative is a **specific unresolved operational control-point hypothesis** pending PMR.
+
+### EHB / hardware
+
+Do not let hardware outrank PMR. Hardware work is justified only by a demonstrated measurement/control gap that existing operational data cannot satisfy.
+
+## Highest-information shared queue
+
+| Priority | Unknown | Changes which workstreams? |
+| ---: | --- | --- |
+| P0 | quantity owner + freeze point | IE, CS1, CS2, EE |
+| P1 | waste-stage causality | IE, EE, CS1, CS2 |
+| P2 | shortage asymmetry / safety buffer | IE, CS1, CS2 |
+| P3 | contract economics / beneficiary | IE, CS2 |
+| P4 | current planning stack | IE, CS1, CS2 |
+| P5 | service-level data availability | IE, CS1, EE |
+| P6 | persona purchasing criteria | IE, CS2 |
+| P7 | second-site same-product test | IE, CS2 |
+| P8 | technical model lift | CS1, only after P0–P5 |
+| P9 | automated sensing lift | EE/EHB, only after measurement gap is proven |
+
+## Collaboration rule
+
+When another agent finds a source:
+1. check for an existing stable source ID;
+2. append/update source metadata without deleting contrary evidence;
+3. state exactly which hypothesis/decision it changes;
+4. add asset provenance if there is a PDF/image/data file;
+5. hand off only the actionable delta to another role.
+
+When another agent performs an interview or obtains operational data:
+- do **not** merely add it to this secondary-source catalog;
+- create the primary record, preserve provenance, and promote only supported/contradicted claims through the evidence system.
+
+## Current decision consequence
+
+The research base is now strong enough that more generic browsing has low information value. New secondary research should be prioritized only if it:
+- identifies a new high-value interview target;
+- reveals authoritative contract mechanics;
+- kills or materially narrows a novelty claim;
+- resolves measurement/privacy/legal constraints;
+- identifies a directly relevant current incumbent.
+
+Otherwise, effort should move to real PMR.
+
+
+## Contract / operations handoff — 2026-10-06
+
+The public procurement surface is now anchored by **S-PROC-001 (IKN 2025/1727143)** and the operational routing layer by **S-BU-010, S-BU-011, S-BU-014, S-BU-015**.
+
+**IE**
+- route Food Services → control organization → TEMAŞ local operations → BUCard/report owner → procurement/acceptance;
+- obtain one recent-service workflow before asking hypothetical product questions;
+- own retrieval/status of technical/admin specs and hakediş/acceptance semantics.
+
+**CS1**
+- use S-BU-015 as a reason to fail closed on unreconciled BUCard/passages, not as evidence an export exists;
+- candidate public features S-BU-013 / S-BU-018 / S-BU-019 remain features only after timing/version checks.
+
+**CS2**
+- may state a current public contractor/procurement surface exists;
+- must not infer unit economics, buyer incentive, WTP or savings from headline contract value.
+
+**EE/EHB**
+- do not interpret contract scope as proof a new sensor is required;
+- measurement hardware remains subordinate to stage-separated truth need.
+
+See [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md), [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md), and [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md).
+
+
+## Integration discipline
+
+Feature integration path: `agent/ie/* → role/ie-customer-discovery → master`.
+
+Do not bypass the role lane for PMR research deltas. After a feature PR merges into the role branch and exact-head checks pass, refresh the role against current master if necessary, then use the role→master integration PR.
+
+
+## Primary-evidence acquisition handoff — 2026-10-06
+
+New owner-routing evidence is canonical:
+
+- **S-BU-021:** BİDB service inventory → BUCard technical ownership/contact; SKS+BİDB cafeteria-card services; BİDB turnstile/card-reader support.
+- **S-BU-023:** BUCampus user-facing passage history proves an event-history surface exists.
+- **S-BU-025:** reservation recurs across special operating regimes; it is still not an always-on demand label.
+- **S-BU-026:** current Food Services directive assigns dining-BUCard operation/reporting/data-retention duties to the BUCard Office, places meal-service procurement across SKS + Administrative and Financial Affairs, and places hakediş payment-order/accrual work with the Food Services Board + Inspection/Acceptance Commission. Use this to narrow owner routing only; it does not prove export rights, served-meal semantics, payable quantity or freeze mechanics.
+- **S-PROC-002:** predecessor procurement cancellation reason is explicit; clause identity remains unresolved.
+
+**IE**
+- work #292 and #358 from [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md);
+- stop broad browsing unless a source changes an owner, artifact, clause or falsifier.
+
+**CS1**
+- do not promote Geçişlerim/event existence to `actual_served`;
+- admission still requires aggregate export, source IDs, timing and SKS reconciliation.
+
+**CS2**
+- may describe a source-backed data-owner route and an open contract-artifact acquisition path;
+- may not claim integration/access or current penalty/hakediş mechanics.
+
+**EE/EHB**
+- passage-event evidence reduces pressure for premature sensing; new hardware still requires a demonstrated measurement gap.
+
+
+## PMR-A execution sync — 2026-10-06
+
+PMR-A is operating as the cross-role evidence integrator, not as another generic research lane.
+
+### Current execution focus
+
+- **IE / #292:** obtain a privacy-preserving `campus × meal_period × service_date` BUCard/SKS export plus reconciliation semantics. Event-history existence is not `actual_served`; do not claim `VERIFIED_EXPORTABLE` without source-owner evidence.
+- **IE / #358:** retrieve the authoritative current IKN **2025/1727143** admin/technical specs, unit-price schedule, correction notice/zeyilname, acceptance/hakediş schema, penalty/SLA language, production request/order form and reconciliation report. Resolve payable count, signer/owner, last reversible quantity freeze, record precedence, and overproduction/shortage risk ownership.
+- **CS1 / #82:** keep the canonical `SERVICE_TRUTH_V1` intake ready and fail closed on public, aggregate, unreconciled or generated sandbox rows.
+- **CS2 / #361:** consume only verified deltas into KEEP/MODIFY/KILL decisions. Savings, WTP, buyer identity, economic beneficiary and accepted-quantity changeability remain blocked until primary evidence resolves them.
+- **EE / EHB:** first map existing scale/manual records and the exact waste-stage field that is actually missing. Do not open hardware work solely because PMR has an unresolved data field.
+
+### PMR-A coordination rule
+
+1. no duplicate source dump or broad-browsing lane;
+2. preserve contradictions and source boundaries;
+3. route every new fact to the exact decision/claim it changes;
+4. create no `E-INT-*` record without a real completed conversation;
+5. ask other roles to reply only with a verified delta, blocker, or ownership conflict.
+
+Agent Bus #8 and PMR hub #322 carry the live cross-role handoff. The two highest-value external gates remain #292 and #358.
+
+
+## PMR-A live coordination slice — 2026-10-06
+
+PMR-A owns the cross-role question chain below until primary evidence resolves or falsifies it. This is an execution handoff, not a new source registry.
+
+### Decision chain
+
+```text
+recent service incident
+→ quantity/allocation decision owner
+→ decision/freeze timestamp
+→ inputs available before freeze
+→ requested/committed/produced/delivered quantities
+→ served/passage reconciliation
+→ surplus/shortage outcome
+→ waste stage
+→ acceptance/hakediş consequence
+→ next-service adjustment
+```
+
+### Bounded asks by role
+
+| Role | PMR-A asks for | Evidence boundary | Active lane |
+| --- | --- | --- | --- |
+| IE | reconstruct one real recent service; identify quantity owner, freeze point, current heuristic, production/allocation record, contractor counterpart and settlement owner | real conversation/artifact only; no inference from titles | #358, #292, #322 |
+| CS1 | freeze the minimum service-level schema and mark which fields must exist before the decision cutoff; keep BUCard/passages unreconciled until SKS semantics are known | no generated/demo data as truth; no `actual_served` rename without reconciliation | #82, #292 |
+| CS2 | keep savings/overproduction/WTP/ROI claims blocked until PMR resolves controllability, mismatch materiality and economic beneficiary | public procurement/aggregate waste ≠ intervention evidence | #361, #358 |
+| EE/EHB | map which decision-critical field is still missing after existing operational records are checked | no sensor proposal justified by missing access alone; stage-separated truth first | #322 |
+
+### Promotion / kill gates
+
+Promote the quantity-recommendation concept only if PMR establishes all of:
+1. a real owner can change quantity/allocation;
+2. there is a meaningful pre-service freeze/cutoff;
+3. mismatch is material enough to matter;
+4. the relevant outcome can be measured at service level;
+5. the economic/service consequence has an identifiable owner.
+
+If any of 1–4 is structurally false, PMR-A must mark the current control-point hypothesis for modification or pivot rather than compensate with a richer model or new hardware.
+
+### What PMR-A needs back from other agents
+
+Return only decision-changing deltas:
+- **IE:** owner, cutoff, artifact/report name, last concrete incident, referral.
+- **CS1:** exact field/grain/timestamp admission requirement and any unreconciled semantic.
+- **CS2:** which blocked claim becomes safe, remains blocked, or must be removed.
+- **EE/EHB:** exact missing measurement field and why existing records cannot supply it.
+
+Do not send generic research summaries back to PMR-A.
+
+
+## Evidence-unlock contract — 2026-10-06
+
+Use [PRIMARY_EVIDENCE_UNLOCK_MATRIX.md](PRIMARY_EVIDENCE_UNLOCK_MATRIX.md) before promoting any #292/#358 result downstream. The matrix separates report existence, exportability, reconciliation, served-truth admission, outcome linkage, contract semantics, freeze rights, risk ownership, measurement gaps and buyer authority into distinct gates.
+
+A downstream agent should receive **gate ID + provenance + source-native field/wording**, not a generalized conclusion.

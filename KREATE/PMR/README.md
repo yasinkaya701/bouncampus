@@ -9,11 +9,18 @@ This directory is the canonical entry point for KREATE Primary Market Research w
 ## Read first
 
 1. [PMR_KNOWLEDGE_BASE_2026-10-06.md](PMR_KNOWLEDGE_BASE_2026-10-06.md) — current cumulative synthesis, Boğaziçi facts, unresolved questions, and interview priorities.
-2. [SOURCE_REGISTRY_2026-10-06.json](SOURCE_REGISTRY_2026-10-06.json) — machine-readable source/provenance registry.
-3. [ASSET_AND_MEDIA_INDEX_2026-10-06.md](ASSET_AND_MEDIA_INDEX_2026-10-06.md) — direct PDFs, raw data, official images, and external references.
-4. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
-5. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
-6. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
+2. [source_catalog.json](source_catalog.json) — **canonical cumulative machine-readable source catalog**; currently consolidates 53 verified/reference records across parallel PMR agents.
+3. [SOURCE_LIBRARY.md](SOURCE_LIBRARY.md) — human-readable companion to the canonical catalog, including source use and explicit inference boundaries.
+4. [CLAIM_SOURCE_MATRIX.md](CLAIM_SOURCE_MATRIX.md) — hypothesis/claim → secondary support → forbidden inference → exact primary-evidence gap.
+5. [ASSET_MANIFEST.md](ASSET_MANIFEST.md) — canonical PDF/XLSX/image/data provenance and reuse-status manifest.
+6. [AGENT_HANDOFF.md](AGENT_HANDOFF.md) — IE/CS1/CS2/EE/EHB shared append and consumption protocol.
+7. [SOURCE_REGISTRY_2026-10-06.json](SOURCE_REGISTRY_2026-10-06.json) — earlier master snapshot retained for provenance; do not treat it as the append target.
+8. [ASSET_AND_MEDIA_INDEX_2026-10-06.md](ASSET_AND_MEDIA_INDEX_2026-10-06.md) — earlier master asset snapshot retained for provenance.
+9. [HYPOTHESIS_FALSIFICATION_MATRIX.md](HYPOTHESIS_FALSIFICATION_MATRIX.md) — neutral hypothesis tests and reject/support criteria.
+10. [INTERVIEW_TEMPLATE.md](INTERVIEW_TEMPLATE.md) — one copy per real interview.
+11. [INTERVIEW_TRACKER.md](INTERVIEW_TRACKER.md) — interview execution tracker; planned slots are not evidence.
+12. [IE_EXECUTION_PACK_2026-10-06.md](IE_EXECUTION_PACK_2026-10-06.md) — IE decision-rights, incentive, buyer, data-handoff and acceptance-gate execution pack.
+13. [IE_PRIMARY_INTERVIEW_TARGETS_2026-10-06.md](IE_PRIMARY_INTERVIEW_TARGETS_2026-10-06.md) — four non-overlapping, falsifier-driven IE interview missions; planning only, not evidence.
 
 Relevant current-master research:
 - [../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md](../RESEARCH/CS2_CURRENT_MASTER_RECUT_2026-10-06.md)
@@ -44,13 +51,14 @@ A web page, PDF, spreadsheet, tender, benchmark paper, model run, synthetic data
 
 When any agent finds a useful source:
 
-1. Add a stable `SRC-...` record to `SOURCE_REGISTRY_2026-10-06.json`.
-2. Preserve publisher, canonical URL, retrieval date, source class, PMR status, key usable facts, caveats, and direct asset links.
-3. Add the source to `ASSET_AND_MEDIA_INDEX_2026-10-06.md` if it exposes a PDF, raw data file, image, worksheet, standard, or reusable visual.
-4. Update the knowledge base only with claims traceable to one or more source IDs.
-5. Never silently delete a source. Mark it `superseded`, `stale`, or `conflicted` and point to the newer source.
-6. Preserve contradictions. A contradiction is a research result, not a cleanup problem.
-7. For any downloaded binary later added to the repository, record origin URL, retrieval date, license/permission, and checksum. Prefer links when redistribution rights are unclear.
+1. Dedupe by URL/title/DOI against `source_catalog.json`.
+2. Add a stable source record to `source_catalog.json` and a human-readable entry to `SOURCE_LIBRARY.md`.
+3. Preserve publisher, canonical URL, access date, source class, usable facts/supports, limitations, hypothesis mapping and license note.
+4. Add the source to `ASSET_MANIFEST.md` when it exposes a PDF, XLSX, image, dataset, standard or reusable visual.
+5. Update the knowledge base only with claims traceable to one or more source IDs.
+6. Never silently delete a source. Mark it `superseded`, `stale`, or `conflicted` and point to the newer source.
+7. Preserve contradictions. A contradiction is a research result, not a cleanup problem.
+8. For any downloaded binary later added to the repository, record origin URL, retrieval date, license/permission, and checksum. Prefer links when redistribution rights are unclear.
 
 ## Current decision boundary
 
@@ -120,3 +128,39 @@ Prefer, in order:
 6. general articles only as navigation clues.
 
 Every meaningful claim should remain falsifiable and traceable.
+
+
+## Cross-agent consolidation status
+
+On 2026-10-06, parallel PMR agents produced overlapping knowledge-base branches/PRs. The current canonical surfaces above reconcile the master knowledge base from PR #318, the IE-role source library from PR #319, and additional verified unique sources found during the same research wave. Duplicate integration PR #320 was intentionally closed rather than merged. Coordination continues in issue #322.
+
+Do not create a third registry. Extend `source_catalog.json` + `SOURCE_LIBRARY.md` and use `ASSET_MANIFEST.md` for files/media.
+## VPMR verifiable research layer
+
+`KREATE/VPMR/` is the additive verifiable-secondary-research layer for source provenance, data/decision-input boundaries, PDFs/visuals and agent handoff. It complements — and does not replace — this canonical PMR catalog.
+
+- [../VPMR/README.md](../VPMR/README.md) — scope and evidence boundary
+- [../VPMR/SOURCE_REGISTRY.md](../VPMR/SOURCE_REGISTRY.md) / [../VPMR/source_registry.json](../VPMR/source_registry.json) — canonical-link source registry
+- [../VPMR/DATASETS.md](../VPMR/DATASETS.md) — public/reference/private-required data inventory
+- [../VPMR/PMR_GUIDE.md](../VPMR/PMR_GUIDE.md) — research-to-interview conversion
+- [../VPMR/VISUALS_AND_PDFS.md](../VPMR/VISUALS_AND_PDFS.md) — PDF/visual provenance
+- [../VPMR/AGENT_HANDOFF.md](../VPMR/AGENT_HANDOFF.md) — cross-agent recut/dedupe rules
+
+`source_catalog.json` remains the canonical cumulative PMR catalog. VPMR IDs are a provenance-oriented companion namespace; do not create a third registry.
+
+
+Public-data snapshots: [data/README.md](data/README.md) and [data/bogazici_food_waste_public_snapshot.csv](data/bogazici_food_waste_public_snapshot.csv).
+
+- [DATA_SOURCE_INVENTORY.md](DATA_SOURCE_INVENTORY.md) — Public vs pending operational data surfaces; benchmark/admission boundary.
+
+- [PROCUREMENT_CONTRACT_RESEARCH.md](PROCUREMENT_CONTRACT_RESEARCH.md) — 2026–2027 procurement/TEMAŞ context and contract-PMR questions.
+
+- [OPERATIONAL_CONTACT_ROLE_MAP.md](OPERATIONAL_CONTACT_ROLE_MAP.md) — Official routing surfaces for Food Services, control, BUCard and contractor PMR.
+
+- [PRIMARY_EVIDENCE_ACQUISITION.md](PRIMARY_EVIDENCE_ACQUISITION.md) — minimal BUCard/SKS + contract artifact request packet.
+
+
+## IE decision and pilot pre-registrations
+
+- [../EXPERIMENTS/IE_DINING_DECISION_ECONOMICS_V1.md](../EXPERIMENTS/IE_DINING_DECISION_ECONOMICS_V1.md) — asymmetric surplus/shortage decision model with evidence and abstention boundaries.
+- [../EXPERIMENTS/IE_DINING_PILOT_PROTOCOL_V1.md](../EXPERIMENTS/IE_DINING_PILOT_PROTOCOL_V1.md) — stage-specific waste KPI, service guardrails, matched/blocked pilot design and claim firewall.

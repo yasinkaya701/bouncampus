@@ -6,13 +6,14 @@ import realCoursesData from '@/data/real_boun_courses.json';
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock3, MapPin, Search, UserRound } from 'lucide-react';
 import { useLocale } from '@/lib/i18n';
 import { presentBuilding } from '@/lib/campus-directory';
+import { formatCourseCredit } from '@/lib/course-credit-display';
 
 interface CourseItem {
   code: string;
   name: string;
   instructor?: string;
-  credits: number;
-  ects: number;
+  credits?: number;
+  ects?: number;
   days?: string[];
   hours?: number[];
   rooms?: string[];
@@ -71,9 +72,9 @@ export default function CoursesPage() {
       </section>
 
       <section className="grid gap-2 sm:grid-cols-[minmax(260px,1fr)_180px_auto]">
-        <label className="relative"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /><input value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(1); }} placeholder={t('CMPE 150, öğretim üyesi, NH 101…', 'CMPE 150, instructor, NH 101…')} className="bc-focus-ring w-full rounded-lg border border-slate-900/10 bg-white py-2.5 pl-9 pr-3 text-[11px] font-semibold" /></label>
-        <select value={selectedDept} onChange={event => { setSelectedDept(event.target.value); setPage(1); }} className="bc-focus-ring rounded-lg border border-slate-900/10 bg-white px-3 text-[10px] font-semibold"><option value="ALL">{t('Tüm bölümler', 'All departments')}</option>{departments.map(dept => <option key={dept}>{dept}</option>)}</select>
-        <div className="flex rounded-lg border border-slate-900/10 bg-white p-1">{(['ALL', 'south', 'north'] as const).map(campus => <button key={campus} type="button" onClick={() => { setSelectedCampus(campus); setPage(1); }} className={`rounded-md px-3 py-1.5 text-[9px] font-bold ${selectedCampus === campus ? 'bg-[#102a43] text-white' : 'text-slate-500'}`}>{campus === 'ALL' ? t('Tümü', 'All') : campus === 'south' ? t('Güney', 'South') : t('Kuzey', 'North')}</button>)}</div>
+        <label className="relative"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /><input value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(1); }} placeholder={t('CMPE 150, öğretim üyesi, NH 101…', 'CMPE 150, instructor, NH 101…')} aria-label={t('Ders ara', 'Search courses')} className="bc-focus-ring w-full rounded-lg border border-slate-900/10 bg-white py-2.5 pl-9 pr-3 text-[11px] font-semibold" /></label>
+        <select value={selectedDept} aria-label={t('Bölüme göre filtrele', 'Filter by department')} onChange={event => { setSelectedDept(event.target.value); setPage(1); }} className="bc-focus-ring rounded-lg border border-slate-900/10 bg-white px-3 text-[10px] font-semibold"><option value="ALL">{t('Tüm bölümler', 'All departments')}</option>{departments.map(dept => <option key={dept}>{dept}</option>)}</select>
+        <div className="flex rounded-lg border border-slate-900/10 bg-white p-1">{(['ALL', 'south', 'north'] as const).map(campus => <button key={campus} type="button" aria-pressed={selectedCampus === campus} onClick={() => { setSelectedCampus(campus); setPage(1); }} className={`rounded-md px-3 py-1.5 text-[9px] font-bold ${selectedCampus === campus ? 'bg-[#102a43] text-white' : 'text-slate-500'}`}>{campus === 'ALL' ? t('Tümü', 'All') : campus === 'south' ? t('Güney', 'South') : t('Kuzey', 'North')}</button>)}</div>
       </section>
 
       <section className="divide-y divide-slate-900/10 border-y border-slate-900/10 bg-white">
@@ -81,11 +82,11 @@ export default function CoursesPage() {
           const room = course.rooms?.[0];
           const mapped = roomBuilding(room);
           const buildingLabel = mapped ? presentBuilding({ id: mapped.id, name: room ?? '', code: room?.match(/^[A-Za-zÇĞİÖŞÜçğıöşü]+/)?.[0] ?? '' }, locale).name : null;
-          return <article key={`${course.code}-${index}`} className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_260px_240px] lg:items-center"><div><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-[10px] font-black text-[#173f67]">{course.code}</span><span className="text-[9px] text-slate-400">{course.credits} CR · {course.ects || 5} ECTS</span></div><h2 className="mt-1 text-[13px] font-black text-slate-900">{course.name}</h2><div className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500"><UserRound size={10} /> {course.instructor || t('Öğretim üyesi belirtilmemiş', 'Instructor not listed')}</div></div><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><Clock3 size={10} /> {t('Program', 'Schedule')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{scheduleText(course)}</div></div><div className="flex items-center justify-between gap-3"><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><MapPin size={10} /> {t('Oda', 'Room')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{(course.rooms ?? []).join(' · ') || '—'}</div></div>{mapped && buildingLabel ? <Link href={`/buildings/${mapped.id}`} className="inline-flex items-center gap-1 text-[9px] font-bold text-[#173f67]">{t('Bina', 'Building')} <ArrowRight size={10} /></Link> : null}</div></article>;
+          return <article key={`${course.code}-${index}`} className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_260px_240px] lg:items-center"><div><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-[10px] font-black text-[#173f67]">{course.code}</span><span className="text-[9px] text-slate-400">{formatCourseCredit(course.credits, 'CR')} · {formatCourseCredit(course.ects, 'ECTS')}</span></div><h2 className="mt-1 text-[13px] font-black text-slate-900">{course.name}</h2><div className="mt-1 inline-flex items-center gap-1 text-[10px] text-slate-500"><UserRound size={10} /> {course.instructor || t('Öğretim üyesi belirtilmemiş', 'Instructor not listed')}</div></div><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><Clock3 size={10} /> {t('Program', 'Schedule')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{scheduleText(course)}</div></div><div className="flex items-center justify-between gap-3"><div><div className="flex items-center gap-1 text-[9px] font-bold text-slate-400"><MapPin size={10} /> {t('Oda', 'Room')}</div><div className="mt-1 text-[10px] font-semibold text-slate-700">{(course.rooms ?? []).join(' · ') || '—'}</div></div>{mapped && buildingLabel ? <Link href={`/buildings/${mapped.id}`} className="inline-flex items-center gap-1 text-[9px] font-bold text-[#173f67]">{t('Bina', 'Building')} <ArrowRight size={10} /></Link> : null}</div></article>;
         })}
       </section>
 
-      {totalPages > 1 && <div className="flex items-center justify-between text-[10px] text-slate-500"><span>{t('Sayfa', 'Page')} {currentPage} / {totalPages}</span><div className="flex gap-1"><button disabled={currentPage <= 1} onClick={() => setPage(value => Math.max(1, value - 1))} className="rounded-lg border border-slate-900/10 bg-white p-2 disabled:opacity-30"><ChevronLeft size={12} /></button><button disabled={currentPage >= totalPages} onClick={() => setPage(value => Math.min(totalPages, value + 1))} className="rounded-lg border border-slate-900/10 bg-white p-2 disabled:opacity-30"><ChevronRight size={12} /></button></div></div>}
+      {totalPages > 1 && <div className="flex items-center justify-between text-[10px] text-slate-500"><span aria-live="polite">{t('Sayfa', 'Page')} {currentPage} / {totalPages}</span><div className="flex gap-1"><button type="button" aria-label={t('Önceki sayfa', 'Previous page')} disabled={currentPage <= 1} onClick={() => setPage(value => Math.max(1, value - 1))} className="rounded-lg border border-slate-900/10 bg-white p-2 disabled:opacity-30"><ChevronLeft size={12} /></button><button type="button" aria-label={t('Sonraki sayfa', 'Next page')} disabled={currentPage >= totalPages} onClick={() => setPage(value => Math.min(totalPages, value + 1))} className="rounded-lg border border-slate-900/10 bg-white p-2 disabled:opacity-30"><ChevronRight size={12} /></button></div></div>}
     </div>
   );
 }

@@ -2,170 +2,198 @@
 
 ## One-line product
 
-**BOUNCAMPUS turns measured institutional food waste into an uncertainty-aware, human-approved production decision, then uses a controlled pilot to prove whether the intervention actually reduced waste.**
+**BOUNCAMPUS is testing whether a human-reviewed, evidence-traceable decision layer can improve a reachable pre-service institutional dining decision and reduce avoidable food waste without increasing service risk.**
 
 ## Problem
 
-Boğaziçi University publicly reports **48,251 kg of food waste for 2025**. A meaningful part of the campus sustainability challenge therefore sits before composting or recovery: how much food should be prepared for the next service when demand is uncertain?
+Boğaziçi University publicly reports **48,251 kg of food waste for 2025**. That establishes a real institutional food-waste baseline, but it does **not** establish why the waste occurred or which intervention point is most important.
 
-Today the operational decision can be made with incomplete context. A quiet service can make raw waste kilograms look artificially good, while overproduction can increase waste and aggressive underproduction can increase early sell-out risk. The missing layer is a decision system that combines campus context, exposes uncertainty, keeps the operator in control, and measures whether the intervention worked.
+Our current hypothesis is narrower: some avoidable waste may be linked to decisions made before service, such as production quantity, batch release or campus allocation, when actual demand is still uncertain. We are actively testing whether such a decision is reachable, when it freezes, who controls it, and whether demand mismatch is material compared with alternatives such as plate waste, menu/quality effects, preparation loss or other operational causes.
 
-## Solution
+## Solution hypothesis
 
-BOUNCAMPUS is a food-waste prevention decision layer for campus dining operations.
+BOUNCAMPUS is being developed as a food-waste prevention decision-and-evidence layer for institutional dining operations.
 
-The release follows this loop:
+The current product contract is:
 
-1. **Official baseline** — start from the university's public food-waste history.
-2. **Context health** — verify course schedule, weather, menu and academic-calendar availability.
-3. **Demand band** — produce a planning band rather than a false single-number certainty.
-4. **Decision readiness** — classify the recommendation as `PILOT_READY`, `REVIEW_REQUIRED`, or `WITHHOLD`.
-5. **Human gate** — an operator reviews the recommendation; automatic kitchen dispatch is disabled.
-6. **Controlled pilot** — compare matched CONTROL and INTERVENTION services over 14 days.
-7. **Measured scorecard** — use normalized waste, early-sellout and operational guardrails.
-8. **Learn** — only measured evidence is allowed to support impact claims.
+1. **Context and source health** — only use signals whose provenance and timing are known.
+2. **Reachable decision** — target a quantity/batch/allocation decision only if PMR shows it can still be changed before a practical freeze point.
+3. **Transparent baseline** — compare against the operator/status-quo heuristic and simple reproducible baselines before adding model complexity.
+4. **Bounded recommendation** — expose uncertainty and service-risk tradeoffs rather than a false single-number certainty.
+5. **Human gate** — an operator approves, modifies or rejects the recommendation; automatic kitchen dispatch is disabled.
+6. **Prospective measurement** — measure the relevant outcome at service level with explicit waste-stage and shortage guardrails.
+7. **Claim firewall** — only measured local evidence may support local impact claims.
+8. **Learn / modify / kill** — if the hypothesized control point or causal mechanism is wrong, the product changes with the evidence.
 
-## Why it is climate tech
+## Why it can become climate tech
 
-Food waste embeds agricultural inputs, water, energy, logistics and disposal impacts. BOUNCAMPUS targets **prevention at the production-decision stage**, before waste is created. It does not count recovery or composting as equivalent to prevention.
+Food waste embeds agricultural inputs, water, energy, logistics and disposal impacts. Prevention can therefore have climate relevance, but the causal chain has to be earned:
 
-The product deliberately does **not** claim CO2 or water savings before a measured pilot exists. Climate accounting is a second step after the operational effect is measured.
+reachable operational decision → less avoidable excess → measured waste reduction → transparent impact conversion
 
-## Innovation
+BOUNCAMPUS does **not** currently claim local CO2, water or cost savings. Climate accounting comes only after local operational effect is measured.
 
-The novelty is not another dashboard or a more complex forecasting model. It is the **closed-loop decision and evidence contract**:
+## Innovation / differentiation hypothesis
 
-- source health is visible,
-- uncertainty changes the operating band,
-- missing critical context can force `WITHHOLD`,
-- human approval is mandatory,
-- success criteria are pre-registered,
-- normalized waste is measured against a control arm,
-- an intervention can fail,
-- the AI cannot declare its own success.
+The defensible current wedge is **not** “AI predicts cafeteria demand,” generic food-waste tracking, computer vision, or another sustainability dashboard. Those capability classes already exist in research and commercial products.
+
+The working differentiation hypothesis is the **decision-and-verification contract**:
+
+- only decision-time-valid signals are admitted;
+- signal semantics are reconciled against operational truth;
+- uncertainty can force WITHHOLD;
+- human approval is mandatory;
+- the current operator baseline remains visible;
+- surplus and shortage are measured together;
+- evidence quality controls what claims can be promoted;
+- a pilot can fail and force a product change.
+
+Whether this workflow is valuable enough to adopt is still a PMR question.
 
 ## Current evidence
 
-What is real now:
+### What is real now
 
-- 2024 and 2025 public food-waste totals,
-- 2025 monthly food-waste/recovery history,
-- public dining-service context,
-- a working decision-readiness engine,
-- a human approval gate,
-- a measured-pilot score engine,
-- a strict CSV field-measurement workflow,
-- a fail-safe jury/demo mode that withholds operational advice if live context is unavailable.
+- official Boğaziçi public food-waste reporting, including the 2025 annual total;
+- public dining-service, menu, calendar and procurement context;
+- a current public food-service contractor/procurement surface;
+- repository implementations for decision readiness, abstention/human review, baselines and pilot-evidence handling;
+- a falsifiable pilot protocol and explicit claim/evidence boundaries;
+- a cumulative PMR/source registry that distinguishes secondary research from real primary evidence.
 
-What is **not** claimed yet:
+### What remains unverified / blocked
 
-- actual food waste saved by BOUNCAMPUS,
-- actual CO2 saved,
-- actual water saved,
-- actual cafeteria production optimized,
-- validated POS-level demand accuracy.
+- whether demand mismatch is a material cause of avoidable Boğaziçi food waste;
+- the exact operational quantity/batch/allocation owner and freeze point;
+- service-level produced/served/surplus/waste truth and its semantics;
+- whether BUCard/turnstile/reservation signals can be exported and reconciled safely;
+- contractor/payment/hakediş incentive mechanics;
+- operator willingness to act on a recommendation;
+- any local waste-reduction, cost, carbon or water impact;
+- repeatability of the same product workflow at a second site.
 
-## Pilot design
+## Proposed pilot design
 
-**Duration:** 14 days  
+The repository contains a **proposed**, falsifiable pilot design. It is not evidence that a pilot has occurred.
+
+**Illustrative duration:** 14 days  
 **Design:** matched CONTROL vs INTERVENTION services  
-**Primary KPI:** `waste kg / 100 served meals`  
-**Minimum evidence:** at least 5 measured services per arm  
-**Pre-registered target:** at least 10% lower normalized waste in INTERVENTION vs CONTROL  
+**Primary KPI:** waste kg / 100 served meals, if the served-meal denominator and waste boundary are verified  
+**Minimum evidence concept:** at least 5 measured services per arm  
+**Illustrative pre-registered target:** at least 10% lower normalized waste in INTERVENTION vs CONTROL  
 **Service guardrail:** early-sellout incidence must not increase  
 **Safety guardrail:** no food-safety process may be bypassed  
-**Privacy:** no personal/student-level data is required
+**Privacy:** prefer aggregate service-level data; no personal/student-level data is required for the intended analysis
 
-The 10% figure is a **pilot target, not an achieved result**.
+The 10% figure is a **pilot target / protocol parameter, not an achieved or expected result**.
 
 ## Why normalize by served meals?
 
-Raw kilograms per service are confounded by service volume. A low-attendance day may show fewer kilograms of waste without any operational improvement. The primary KPI therefore normalizes waste by the number of served meals.
+If served-meal semantics are verified, normalization can reduce service-volume confounding: a low-attendance day may show fewer kilograms of waste without any operational improvement. Until the denominator is reconciled, the metric remains a proposed measurement contract rather than a validated local KPI.
 
 ## Technical approach
 
-The hackathon release uses a transparent signal-weight contract:
+The repository currently contains a transparent policy-heuristic prototype using candidate context classes such as:
 
-- course schedule: 50%
-- weather: 20%
-- menu context: 20%
-- academic calendar: 10%
+- course schedule,
+- weather,
+- menu context,
+- academic calendar.
 
-The course schedule is the backbone signal. Context coverage controls readiness and band width. When the backbone or sufficient context is missing, the system can refuse to recommend a production number.
+Any existing fixed signal weights are **policy heuristics for prototype behavior**, not learned causal importance and not evidence of local predictive value.
 
-This is intentionally more defensible than describing an unvalidated black-box model as production-ready.
+After admitted real service labels exist, CS1 should evaluate in this order:
 
-## Target users
+operator/status-quo baseline → reproducible naive baseline → timing-safe single-signal ablations → richer model only if it clears the registered decision-loss gate
 
-Initial operator:
+Forecast accuracy is not the product KPI by itself. Decision utility, coverage, overrides, shortage risk and physical outcome matter.
 
-- university dining-service operations,
-- sustainability offices,
-- campus facility/operations teams.
+## Target user hypothesis
 
-The first user is **not** an individual student. BOUNCAMPUS is an institutional decision layer.
+The current user/persona hypothesis is an institutional dining role that can actually change or approve the relevant pre-service decision.
 
-## Scalability
+Candidate stakeholders include:
+- Food Services / dining operations,
+- contractor production or local operations,
+- operational data / acceptance owners,
+- procurement or pilot approvers.
 
-The core contract is portable to other institutional kitchens:
+“Sustainability office” alone is not treated as the validated operational persona. The actual user, influencer, buyer and veto roles remain to be established through PMR.
 
-`historical waste + service context + operator gate + matched pilot + normalized measurement`
+## Beachhead / scalability hypothesis
 
-The model adapters can change by institution while the safety and evidence contract remains stable.
+Boğaziçi is the current learning environment, not automatically a validated market segment.
 
-Expansion modules already exist for energy, mobility and campus spatial context, but they are intentionally secondary to the food-waste wedge during KREATE.
+The institutional-dining beachhead becomes defensible only if:
+1. a reachable control point is confirmed;
+2. the problem is material and repeated;
+3. the buyer/approval path is coherent;
+4. the same product boundary repeats at another site.
 
-## Why BOUNCAMPUS can win KREATE
+Expansion to other universities or institutional kitchens is therefore a **repeatability hypothesis**, not a current scalability fact.
 
-BOUNCAMPUS combines four properties that are often separated:
+## Why this can be a strong KREATE project
 
-1. **A real, quantified climate problem** backed by the institution's own data.
-2. **A working technology product** rather than a slide-only idea.
-3. **Operational safety** through uncertainty and human approval.
-4. **Falsifiability** through a pilot capable of returning `FAILED`.
+The current strength is not a fabricated claim of market validation. It is the combination of:
+
+1. **A real public institutional baseline** that justifies investigation.
+2. **A falsifiable product thesis** with explicit kill/modify conditions.
+3. **A working technical prototype** whose limitations are visible.
+4. **Human control and abstention** rather than pretending an unvalidated model should automate production.
+5. **An evidence discipline** that keeps public sources, PMR, technical tests, model outputs and measured impact separate.
+
+The project becomes materially stronger only as primary evidence closes the current unknowns.
 
 ## What we want from the accelerator
 
-The next milestones are not “more dashboard features.” They are:
+The next milestones are:
 
-1. secure a dining-operation pilot partner,
-2. connect actual production/served-meal telemetry where available,
-3. execute the 14-day matched pilot,
-4. audit measurement quality and food-safety workflow,
-5. calibrate demand bands against measured service data,
-6. calculate climate impact only after waste reduction is measured,
-7. replicate the operating contract at a second campus.
+1. reconstruct one real service from initial planning through final outcome;
+2. verify the actual decision owner, freeze point and revision rights;
+3. obtain privacy-safe service-level truth or establish a minimal prospective measurement path;
+4. resolve current contract/acceptance/hakediş mechanics and the economic beneficiary;
+5. benchmark the operator/status-quo heuristic before richer modeling;
+6. run a bounded shadow/advisory pilot only after data and workflow gates are satisfied;
+7. measure surplus and shortage together;
+8. calculate climate impact only after local waste reduction is measured;
+9. test the same product boundary at a second institutional site.
 
 ## 15-second answer
 
-> BOUNCAMPUS starts from a real 48-ton food-waste baseline, turns campus context into an uncertainty-aware production band, keeps a human in control, and has a pre-registered 14-day pilot that can prove the product wrong. We are building the decision layer before the waste happens, not another dashboard after it does.
+> Boğaziçi publicly reports 48,251 kilograms of food waste for 2025. We are testing a narrower question: is there a reachable pre-service dining decision where better, semantically verified context can reduce avoidable excess without increasing shortages? BOUNCAMPUS keeps the operator in control and only promotes claims after prospective measurement.
 
 ## 45-second answer
 
-> Boğaziçi University publicly reported 48,251 kilograms of food waste in 2025. We focus on a decision made before that waste exists: how much should be prepared for the next meal service? BOUNCAMPUS combines course schedules, weather, menu and academic-calendar context into a demand band, but it also scores whether the context is good enough to act. If it is not, the system says WITHHOLD. A human operator always remains in control. Then we run a matched 14-day CONTROL versus INTERVENTION pilot using waste kilograms per 100 served meals, with a pre-registered 10% target and an early-sellout guardrail. The model cannot declare victory; measured evidence does.
+> Boğaziçi University publicly reported 48,251 kilograms of food waste in 2025, but that number does not tell us the cause. Our current hypothesis is that part of avoidable waste may be linked to a reachable pre-service production, batch or allocation decision. BOUNCAMPUS is designed to combine only decision-time-valid signals, compare against simple operator baselines, expose uncertainty, and let a human approve or reject the recommendation. The important part is the evidence loop: we want to measure surplus and shortage prospectively and change or kill the product thesis if the control point or causal mechanism is wrong. We are not claiming local savings or model impact before that evidence exists.
 
 ## Common judge questions
 
 ### “Is this just forecasting?”
-No. Forecasting is one component. The product value is the operating contract around the forecast: source health, uncertainty, readiness, human approval, pilot measurement and a claim firewall.
+No. Generic forecasting already exists. Our hypothesis is that value comes from integrating a reachable decision, reconciled operational truth, a baseline, human approval, prospective outcome measurement and a strict evidence gate. PMR still has to prove that workflow matters locally.
 
 ### “Why not just use last week's meal count?”
-That is a valid baseline and should be compared in pilot calibration. BOUNCAMPUS earns its place only if context-aware decisions outperform a simpler baseline without increasing service risk.
+That may be the best baseline. We will not add model complexity unless timing-safe context improves decision utility against the operator/status-quo and simple baselines without increasing service risk.
 
 ### “Where is the AI?”
-The product converts heterogeneous campus signals into an operational demand estimate and decision band. We intentionally keep the current method transparent until measured cafeteria data justifies a more complex model.
+The current repository contains transparent decision logic and candidate contextual signals. We are deliberately not presenting an unvalidated black-box model as production-ready. Richer ML is downstream of real chronological service labels and a baseline it must beat.
 
 ### “Why do you need a human?”
-Because an unvalidated model should not autonomously change food production. Human approval is a product feature, not a temporary weakness.
+Because the operational and causal assumptions are still being tested, and shortage/food-safety/contract constraints matter. Human approval is part of the intended operating contract.
 
-### “What happens when APIs fail during the demo or in production?”
-The official historical baseline remains available, but operational advice falls back to `WITHHOLD`. The system does not fabricate live context or silently reuse stale values as if they were current.
+### “Do BUCard or turnstile counts give you actual demand?”
+Not yet. They are candidate aggregate signals whose event semantics, corrections, duplicates, refunds, second-meal handling and relation to physically served meals must be reconciled with the source owner before they can become labels.
 
 ### “Have you already reduced waste by 10%?”
-No. Ten percent is the pre-registered pilot target. The product explicitly labels it `TARGET_NOT_RESULT`.
+No. Ten percent appears only as an illustrative pre-registered pilot target in the current protocol. It is not an achieved or expected result.
+
+### “Does the contractor save money if production falls?”
+Unknown. We need authoritative acceptance/hakediş and cost-responsibility evidence before making that claim.
 
 ### “How do you stop the model gaming waste by underproducing?”
-The pilot has an early-sellout guardrail. Waste reduction cannot be called promising if service availability deteriorates.
+Any pilot must measure shortage/early-sellout alongside waste. A lower waste number is not success if service deteriorates.
 
 ### “What would prove you wrong?”
-If the intervention does not reduce normalized waste by the pre-registered threshold, increases early sell-outs, violates food-safety review, or fails to outperform a simpler baseline, we should not scale it.
+Any of these would force a material change: no reachable control point; demand mismatch is not a material cause; reliable outcome truth is unavailable at acceptable burden; operators cannot safely act before freeze; the current baseline is already good enough; or prospective measurement shows no useful improvement or worse service.
+
+### “Why should this scale beyond Boğaziçi?”
+We are not claiming that yet. We need at least one second-site reconstruction showing the same owner/freeze/signal/action/buyer topology. If that topology differs materially, we should segment more narrowly instead of claiming broad institutional portability.

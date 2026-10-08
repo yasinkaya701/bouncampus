@@ -15,13 +15,17 @@ import {
 import {
   FOOD_WASTE_PILOT_PROTOCOL,
   type PilotScorecard,
-  type PilotServiceMeasurement,
 } from '@/lib/food-waste';
-import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
+import { parseOptionalPilotNumber, parsePilotCsv, serializePilotCsv, validatePilotCsvExport } from '@/lib/pilot-csv';
+import { hasConfirmedPilotFlags } from '@/lib/pilot-flag-confirmation';
+import { createPilotEvidenceRevisionGuard } from '@/lib/pilot-evidence-revision';
+import { nextPilotRowIdentifiers } from '@/lib/pilot-row-identifiers';
+import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
 import { useLocale } from '@/lib/i18n';
 
 type DraftRow = {
   id: string;
+  pairId: string;
   serviceId: string;
   arm: 'CONTROL' | 'INTERVENTION';
   date: string;
@@ -30,21 +34,27 @@ type DraftRow = {
   served: string;
   surplusKg: string;
   wasteKg: string;
-  earlySellout: boolean;
-  operatorOverride: boolean;
+  earlySellout: boolean | null;
+  operatorOverride: boolean | null;
   notes: string;
 };
 
 type ScoreResponse = {
   scorecard?: PilotScorecard;
   error?: string;
+  detail?: string;
   validationErrors?: Array<{ index: number; message: string }>;
 };
 
-function createRow(arm: DraftRow['arm'], index: number): DraftRow {
+function createRow(
+  arm: DraftRow['arm'],
+  index: number,
+  identifiers?: { pairId: string; serviceId: string },
+): DraftRow {
   return {
     id: `${arm}-${Date.now()}-${index}`,
-    serviceId: `${arm}-${String(index + 1).padStart(2, '0')}`,
+    pairId: identifiers?.pairId ?? `PAIR_${String(Math.floor(index / 2) + 1).padStart(2, '0')}`,
+    serviceId: identifiers?.serviceId ?? `${arm}-${String(index + 1).padStart(2, '0')}`,
     arm,
     date: '',
     forecast: '',
@@ -52,31 +62,37 @@ function createRow(arm: DraftRow['arm'], index: number): DraftRow {
     served: '',
     surplusKg: '',
     wasteKg: '',
-    earlySellout: false,
-    operatorOverride: false,
+    earlySellout: null,
+    operatorOverride: null,
     notes: '',
   };
 }
 
-function rowToMeasurement(row: DraftRow): PilotServiceMeasurement {
+function requiredNumber(value: string) {
+  return value.trim() === '' ? Number.NaN : Number(value);
+}
+
+function rowToMeasurement(row: DraftRow & { earlySellout: boolean; operatorOverride: boolean }): MatchedPilotServiceMeasurement {
   return {
+    pairId: row.pairId.trim(),
     date: row.date,
     serviceId: row.serviceId,
     arm: row.arm,
-    modelForecastMeals: row.forecast === '' ? null : Number(row.forecast),
-    producedPortions: Number(row.produced),
-    servedPortions: Number(row.served),
-    edibleSurplusKg: Number(row.surplusKg),
-    wasteKg: Number(row.wasteKg),
+    modelForecastMeals: parseOptionalPilotNumber(row.forecast),
+    producedPortions: requiredNumber(row.produced),
+    servedPortions: requiredNumber(row.served),
+    edibleSurplusKg: requiredNumber(row.surplusKg),
+    wasteKg: requiredNumber(row.wasteKg),
     earlySellout: row.earlySellout,
     operatorOverride: row.operatorOverride,
     notes: row.notes,
   };
 }
 
-function measurementToRow(item: PilotServiceMeasurement, index: number): DraftRow {
+function measurementToRow(item: MatchedPilotServiceMeasurement, index: number): DraftRow {
   return {
     id: `import-${item.arm}-${index}-${Date.now()}`,
+    pairId: item.pairId,
     serviceId: item.serviceId,
     arm: item.arm,
     date: item.date,
@@ -94,6 +110,7 @@ function measurementToRow(item: PilotServiceMeasurement, index: number): DraftRo
 export default function FoodWastePilotPage() {
   const { locale, t } = useLocale();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const evidenceRevisionRef = useRef(createPilotEvidenceRevisionGuard());
   const [rows, setRows] = useState<DraftRow[]>([
     createRow('CONTROL', 0),
     createRow('INTERVENTION', 1),
@@ -108,30 +125,52 @@ export default function FoodWastePilotPage() {
     intervention: rows.filter(row => row.arm === 'INTERVENTION').length,
   }), [rows]);
 
+  // Ignore late score responses after any measurement edit or newer import.
+  const invalidatePendingScore = () => {
+    const revision = evidenceRevisionRef.current.invalidate();
+    setScore(null);
+    setLoading(false);
+    return revision;
+  };
+
   const updateRow = <K extends keyof DraftRow>(id: string, key: K, value: DraftRow[K]) => {
     setRows(current => current.map(row => row.id === id ? { ...row, [key]: value } : row));
-    setScore(null);
+    invalidatePendingScore();
     setError(null);
     setNotice(null);
   };
 
   const addRow = (arm: DraftRow['arm']) => {
-    setRows(current => [...current, createRow(arm, current.length)]);
-    setScore(null);
+    setRows(current => [
+      ...current,
+      createRow(arm, current.length, nextPilotRowIdentifiers(current, arm)),
+    ]);
+    invalidatePendingScore();
     setNotice(null);
   };
 
   const removeRow = (id: string) => {
     setRows(current => current.filter(row => row.id !== id));
-    setScore(null);
+    invalidatePendingScore();
     setNotice(null);
   };
 
   const importCsv = async (file: File) => {
+    const revision = invalidatePendingScore();
     setError(null);
     setNotice(null);
-    setScore(null);
-    const parsed = parsePilotCsv(await file.text());
+    let csvText: string;
+    try {
+      csvText = await file.text();
+    } catch {
+      if (evidenceRevisionRef.current.isCurrent(revision)) {
+        setError(t('CSV dosyası okunamadı.', 'Could not read the CSV file.'));
+      }
+      return;
+    }
+    // Edits and newer imports supersede slow file reads.
+    if (!evidenceRevisionRef.current.isCurrent(revision)) return;
+    const parsed = parsePilotCsv(csvText);
     if (parsed.errors.length) {
       setError(parsed.errors.join(' · '));
       return;
@@ -145,7 +184,20 @@ export default function FoodWastePilotPage() {
   };
 
   const exportCsv = () => {
-    const csv = serializePilotCsv(rows.map(rowToMeasurement));
+    if (!hasConfirmedPilotFlags(rows)) {
+      setError(t('Dışa aktarmadan önce her servis için erken tükenme ve operatör müdahalesini Evet/Hayır olarak doğrulayın.', 'Confirm Yes/No for early sell-out and operator override on every service before exporting.'));
+      setNotice(null);
+      return;
+    }
+    const measurements = rows.map(rowToMeasurement);
+    const validationErrors = validatePilotCsvExport(measurements);
+    if (validationErrors.length) {
+      setError(t('Geçersiz ölçümler dışa aktarılamaz:', 'Invalid measurements cannot be exported:') + ' ' + validationErrors.join(' · '));
+      setNotice(null);
+      return;
+    }
+    setError(null);
+    const csv = serializePilotCsv(measurements);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -158,6 +210,13 @@ export default function FoodWastePilotPage() {
   };
 
   const scorePilot = async () => {
+    if (!hasConfirmedPilotFlags(rows)) {
+      setScore(null);
+      setNotice(null);
+      setError(t('Skorlamadan önce her servis için erken tükenme ve operatör müdahalesini Evet/Hayır olarak doğrulayın.', 'Confirm Yes/No for early sell-out and operator override on every service before scoring.'));
+      return;
+    }
+    const requestRevision = evidenceRevisionRef.current.invalidate();
     setLoading(true);
     setError(null);
     setNotice(null);
@@ -170,16 +229,19 @@ export default function FoodWastePilotPage() {
         body: JSON.stringify({ measurements: rows.map(rowToMeasurement) }),
       });
       const payload = await response.json() as ScoreResponse;
+      if (!evidenceRevisionRef.current.isCurrent(requestRevision)) return;
       if (!response.ok || !payload.scorecard) {
         const detail = payload.validationErrors?.map(item => `#${item.index + 1}: ${item.message}`).join(' · ');
-        setError(detail || payload.error || t('Ölçümler doğrulanamadı.', 'Measurements could not be validated.'));
+        setError(detail || payload.detail || payload.error || t('Ölçümler doğrulanamadı.', 'Measurements could not be validated.'));
       } else {
         setScore(payload.scorecard);
       }
     } catch {
-      setError(t('Skorlama servisine ulaşılamadı.', 'Could not reach the scoring service.'));
+      if (evidenceRevisionRef.current.isCurrent(requestRevision)) {
+        setError(t('Skorlama servisine ulaşılamadı.', 'Could not reach the scoring service.'));
+      }
     } finally {
-      setLoading(false);
+      if (evidenceRevisionRef.current.isCurrent(requestRevision)) setLoading(false);
     }
   };
 
@@ -207,7 +269,7 @@ export default function FoodWastePilotPage() {
           <div className="max-w-2xl">
             <div className="bc-eyebrow">{t('Saha veri hattı', 'Field data pipeline')}</div>
             <h2 className="mt-2 text-[24px] font-black tracking-[-0.04em] text-slate-950">{t('Boş şablon → gerçek servis ölçümü → aynı CSV → standart skor kartı', 'Blank template → measured services → same CSV → standardized scorecard')}</h2>
-            <p className="mt-2 text-[9px] leading-5 text-slate-500">{t('İçe aktarma katı şema doğrulaması yapar; hatalı satırı “düzeltmiş gibi” kabul etmez.', 'Import uses strict schema validation; malformed rows are not silently repaired or accepted.')}</p>
+            <p className="mt-2 text-[9px] leading-5 text-slate-500">{t('Her eşleştirme ID için bir CONTROL ve bir INTERVENTION servisi girin. Boş ölçüm veya doğrulanmamış evet/hayır alanları reddedilir.', 'Enter one CONTROL and one INTERVENTION service per pair ID. Missing measurements or unconfirmed yes/no values are rejected.')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/api/v1/food/pilot-template" className="inline-flex items-center gap-1.5 rounded-xl border border-slate-900/10 bg-white px-3 py-2 text-[9px] font-black text-slate-700"><Download size={11} /> {t('Boş şablon', 'Blank template')}</a>
@@ -250,6 +312,7 @@ export default function FoodWastePilotPage() {
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <Field label={t('Eşleştirme ID', 'Pair ID')}><input value={row.pairId} onChange={event => updateRow(row.id, 'pairId', event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" placeholder="PAIR_01" /></Field>
                 <Field label={t('Servis ID', 'Service ID')}><input value={row.serviceId} onChange={event => updateRow(row.id, 'serviceId', event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>
                 <Field label={t('Tarih', 'Date')}><input type="date" value={row.date} onChange={event => updateRow(row.id, 'date', event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>
                 <NumberField label={t('Model tahmini', 'Model forecast')} value={row.forecast} onChange={value => updateRow(row.id, 'forecast', value)} />
@@ -257,8 +320,8 @@ export default function FoodWastePilotPage() {
                 <NumberField label={t('Servis edilen', 'Served portions')} value={row.served} onChange={value => updateRow(row.id, 'served', value)} />
                 <NumberField label={t('Yenilebilir fazla kg', 'Edible surplus kg')} value={row.surplusKg} onChange={value => updateRow(row.id, 'surplusKg', value)} step="0.1" />
                 <NumberField label={t('Atık kg', 'Waste kg')} value={row.wasteKg} onChange={value => updateRow(row.id, 'wasteKg', value)} step="0.1" />
-                <ToggleField label={t('Erken tükenme', 'Early sell-out')} checked={row.earlySellout} onChange={value => updateRow(row.id, 'earlySellout', value)} />
-                <ToggleField label={t('Operatör override', 'Operator override')} checked={row.operatorOverride} onChange={value => updateRow(row.id, 'operatorOverride', value)} />
+                <ToggleField label={t('Erken tükenme', 'Early sell-out')} value={row.earlySellout} onChange={value => updateRow(row.id, 'earlySellout', value)} t={t} />
+                <ToggleField label={t('Operatör override', 'Operator override')} value={row.operatorOverride} onChange={value => updateRow(row.id, 'operatorOverride', value)} t={t} />
               </div>
               <Field label={t('Anomali / not', 'Anomaly / note')} className="mt-3"><input value={row.notes} onChange={event => updateRow(row.id, 'notes', event.target.value)} placeholder={t('Etkinlik, menü sorunu, ölçüm notu…', 'Event, menu issue, measurement note…')} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>
             </article>
@@ -307,8 +370,25 @@ function NumberField({ label, value, onChange, step = '1' }: { label: string; va
   return <Field label={label}><input type="number" min="0" step={step} value={value} onChange={event => onChange(event.target.value)} className="bc-focus-ring w-full rounded-xl border border-slate-900/10 px-3 py-2 text-[10px]" /></Field>;
 }
 
-function ToggleField({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
-  return <label className="flex items-center justify-between rounded-xl border border-slate-900/10 px-3 py-2"><span className="text-[8px] font-black text-slate-500">{label}</span><input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} className="h-4 w-4 accent-[#173f67]" /></label>;
+function ToggleField({ label, value, onChange, t }: {
+  label: string;
+  value: boolean | null;
+  onChange: (value: boolean | null) => void;
+  t: (tr: string, en: string) => string;
+}) {
+  return <label className="flex items-center justify-between gap-2 rounded-xl border border-slate-900/10 px-3 py-2">
+    <span className="text-[8px] font-black text-slate-500">{label}</span>
+    <select
+      aria-label={label}
+      value={value === null ? '' : String(value)}
+      onChange={event => onChange(event.target.value === '' ? null : event.target.value === 'true')}
+      className="bc-focus-ring min-w-0 rounded-lg border border-slate-900/10 bg-white px-2 py-1 text-[9px] font-bold text-slate-700"
+    >
+      <option value="">{t('Seçin', 'Select')}</option>
+      <option value="true">{t('Evet', 'Yes')}</option>
+      <option value="false">{t('Hayır', 'No')}</option>
+    </select>
+  </label>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

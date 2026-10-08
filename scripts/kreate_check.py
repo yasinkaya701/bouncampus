@@ -9,6 +9,7 @@ October 8 application gate.
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -594,6 +595,72 @@ def check_food_decision_integrity(errors: list[str]) -> None:
         errors.append("food decision integrity: food API lost explicit food-waste claim boundary context")
 
 
+
+def check_pmr_source_integrity(errors: list[str]) -> None:
+    """Keep PMR source IDs unique and acquisition-tracker routes resolvable."""
+
+    catalog_path = "KREATE/PMR/source_catalog.json"
+    tracker_path = "KREATE/PMR/ie_acquisition_tracker.json"
+    if not (ROOT / catalog_path).is_file() or not (ROOT / tracker_path).is_file():
+        return
+
+    try:
+        catalog = json.loads(read(catalog_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"{catalog_path}: invalid JSON: {exc}")
+        return
+    try:
+        tracker = json.loads(read(tracker_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"{tracker_path}: invalid JSON: {exc}")
+        return
+
+    sources = catalog.get("sources")
+    if not isinstance(sources, list):
+        errors.append(f"{catalog_path}: top-level 'sources' must be a list")
+        return
+
+    source_ids: list[str] = []
+    for index, source in enumerate(sources):
+        if not isinstance(source, dict):
+            errors.append(f"{catalog_path}: sources[{index}] must be an object")
+            continue
+        source_id = source.get("id")
+        if not isinstance(source_id, str) or not source_id.strip():
+            errors.append(f"{catalog_path}: sources[{index}] has missing/invalid id")
+            continue
+        source_ids.append(source_id)
+
+    seen: set[str] = set()
+    duplicate_ids: set[str] = set()
+    for source_id in source_ids:
+        if source_id in seen:
+            duplicate_ids.add(source_id)
+        seen.add(source_id)
+    if duplicate_ids:
+        errors.append(f"{catalog_path}: duplicate source IDs: {sorted(duplicate_ids)}")
+
+    workstreams = tracker.get("workstreams")
+    if not isinstance(workstreams, list):
+        errors.append(f"{tracker_path}: top-level 'workstreams' must be a list")
+        return
+
+    known_ids = set(source_ids)
+    for index, workstream in enumerate(workstreams):
+        if not isinstance(workstream, dict):
+            errors.append(f"{tracker_path}: workstreams[{index}] must be an object")
+            continue
+        issue = workstream.get("issue", "?")
+        routes = workstream.get("routes", [])
+        if not isinstance(routes, list):
+            errors.append(f"{tracker_path}: issue {issue} routes must be a list")
+            continue
+        for route in routes:
+            if not isinstance(route, str) or not route.strip():
+                errors.append(f"{tracker_path}: issue {issue} has invalid route reference {route!r}")
+            elif route not in known_ids:
+                errors.append(f"{tracker_path}: issue {issue} references unknown source ID {route}")
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -618,6 +685,7 @@ def main() -> int:
     check_template_headings(errors)
     check_local_markdown_links(errors)
     check_github_templates(errors)
+    check_pmr_source_integrity(errors)
     check_food_decision_integrity(errors)
 
     mode = "SUBMISSION" if args.submission else "CI"
@@ -641,6 +709,7 @@ def main() -> int:
     print("- mandatory template/application headings are present and non-empty")
     print("- local KREATE markdown links resolve")
     print("- GitHub task/PR anti-slop review gates are present")
+    print("- PMR source IDs are unique and IE acquisition routes resolve")
     print("- food decision policy, abstention, provenance, baseline scope, active-surface firewall, and pilot evidence gates are intact")
     if args.submission:
         print("- hard minimum PMR count and final submission gates are satisfied")

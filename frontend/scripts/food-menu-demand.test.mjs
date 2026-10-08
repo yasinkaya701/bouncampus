@@ -58,7 +58,21 @@ assert.match(dashboardRoute, /buildMenuDemandAdjustment/);
 assert.match(dashboardRoute, /food_demand_baseline_meals/);
 assert.match(dashboardRoute, /food_menu_adjustment/);
 
+import { parseFoodScenarioRate } from '../src/lib/food-scenario-query.ts';
+
+assert.equal(parseFoodScenarioRate(null, 15), 15, 'omitted prevention rate uses the documented default');
+assert.equal(parseFoodScenarioRate(null, 85), 85, 'omitted recovery rate uses the documented default');
+assert.equal(parseFoodScenarioRate('0', 15), 0, 'explicit zero remains valid');
+assert.equal(parseFoodScenarioRate('  22.5  ', 15), 22.5, 'finite fractional rates stay valid');
+assert.equal(parseFoodScenarioRate('-10', 15), -10, 'existing scenario clamp still handles out-of-range finite inputs');
+for (const invalid of ['', '   ', 'not-a-number', 'NaN', 'Infinity', '-Infinity', '1e309']) {
+  assert.equal(parseFoodScenarioRate(invalid, 15), null,
+    `invalid scenario query value ${JSON.stringify(invalid)} must be rejected`);
+}
+
 const foodRoute = readFileSync(resolve(frontendRoot, 'src/app/api/v1/food/route.ts'), 'utf8');
+assert.match(foodRoute, /parseFoodScenarioRate/);
+assert.match(foodRoute, /INVALID_SCENARIO_RATE/);
 assert.match(foodRoute, /planningCandidate/);
 assert.match(foodRoute, /diagnosticProductionBand/);
 assert.match(foodRoute, /recommendedTarget:\s*sourceAssessment\.predictedMeals/);

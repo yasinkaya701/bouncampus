@@ -1,0 +1,111 @@
+{
+  "schema": "BOUNCAMPUS_IE_ACQUISITION_TRACKER_V1",
+  "updated_at": "2026-10-06",
+  "evidence_boundary": "Tracker state is operational coordination only. It does not claim outreach, access, interviews, artifacts, customer validation, measured outcomes or contract interpretation.",
+  "workstreams": [
+    {
+      "issue": 292,
+      "name": "BUCard/SKS aggregate service truth",
+      "state": "REQUEST_READY",
+      "routes": [
+        "S-BU-010",
+        "S-BU-011",
+        "S-BU-015",
+        "S-BU-021",
+        "S-BU-022",
+        "S-BU-023",
+        "S-BU-026"
+      ],
+      "required_grain": "campus_id x meal_period x service_date",
+      "required_outputs": [
+        "source-native aggregate passage/meal count",
+        "report_generated_at",
+        "source_report_id",
+        "reconciliation semantics",
+        "production/outcome record owner",
+        "export/access decision",
+        "existing BUCard dining report name/schema and aggregate-export capability",
+        "historical report/version retention semantics"
+      ],
+      "downstream": [
+        "CS1 #82"
+      ],
+      "forbidden_inference": [
+        "passage_count == actual_served without reconciliation",
+        "generated sandbox data as service truth",
+        "person/card/student/staff identifiers"
+      ]
+    },
+    {
+      "issue": 358,
+      "name": "IKN 2025/1727143 contract and hakediş semantics",
+      "state": "REQUEST_READY",
+      "routes": [
+        "S-PROC-001",
+        "S-BU-010",
+        "S-BU-014",
+        "S-BU-026",
+        "S-BU-030",
+        "S-BU-027",
+        "S-BU-028",
+        "S-BU-029"
+      ],
+      "required_outputs": [
+        "authoritative current admin/technical spec retrieval status",
+        "unit-price schedule retrieval status",
+        "payable/accepted quantity semantics",
+        "quantity freeze/change rights",
+        "acceptance/hakediş owner",
+        "excess/shortage economic-risk owner",
+        "production/reconciliation artifact owner",
+        "exact food-contract Spending Authority or explicit unresolved state",
+        "KİK56.0/H / hakediş package field semantics"
+      ],
+      "downstream": [
+        "CS2",
+        "CS1",
+        "EE",
+        "EHB"
+      ],
+      "forbidden_inference": [
+        "headline contract value / listed meals == unit meal price",
+        "historical clauses == current clauses",
+        "unit-price contract form == payable operational count"
+      ]
+    },
+    {
+      "issue": 322,
+      "name": "IE-04 second-site repeatability falsifier",
+      "state": "REQUEST_READY",
+      "routes": [
+        "S-TR-011",
+        "S-TR-012",
+        "S-TR-013"
+      ],
+      "priority_targets": [
+        "P0 BAIBU mature multi-site contracted operation",
+        "P0 BANU reservation-first off-central-campus vocational-school scope",
+        "P1 Kayseri University own-kitchen vs procured-meal migration backup"
+      ],
+      "required_outputs": [
+        "verified quantity decision owner",
+        "last reversible production/allocation cutoff",
+        "reservation-to-production coupling",
+        "recent surplus and shortage incident",
+        "current baseline/system",
+        "economic beneficiary/buyer path",
+        "same-product and same-sales-motion verdict"
+      ],
+      "downstream": [
+        "CS2",
+        "CS1"
+      ],
+      "forbidden_inference": [
+        "prepared Gmail draft == outreach",
+        "public reservation policy == measured waste reduction",
+        "second-site public workflow == Boğaziçi service truth",
+        "stated planning goal == verified reservation-to-production coupling"
+      ]
+    }
+  ]
+}
