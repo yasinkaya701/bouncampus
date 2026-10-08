@@ -166,6 +166,31 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
   return { measurements: errors.length ? [] : measurements, errors };
 }
 
+export type PilotCsvExportResult = {
+  csv: string | null;
+  errors: string[];
+};
+
+/**
+ * The editor must never export rows that its own importer or the score API
+ * would reject. An incomplete (but valid) matched pair may still be exported
+ * for later data collection; pair completeness is enforced during scoring.
+ */
+export function serializeValidatedPilotCsv(
+  measurements: MatchedPilotServiceMeasurement[],
+): PilotCsvExportResult {
+  if (!measurements.length) {
+    return { csv: null, errors: ['CSV contains no measured service rows.'] };
+  }
+  const csv = serializePilotCsv(measurements);
+  const parsed = parsePilotCsv(csv);
+  if (parsed.errors.length) return { csv: null, errors: parsed.errors };
+  if (parsed.measurements.length !== measurements.length) {
+    return { csv: null, errors: ['CSV round-trip lost measurement rows.'] };
+  }
+  return { csv, errors: [] };
+}
+
 function escapeCsv(value: string | number | boolean | null | undefined) {
   const raw = value == null ? '' : String(value);
   return /[",\n\r]/.test(raw) ? `"${raw.replace(/"/g, '""')}"` : raw;
