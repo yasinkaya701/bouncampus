@@ -88,7 +88,8 @@ function parseCsvRows(text: string) {
     if ((char === '\n' || char === '\r') && !quoted) {
       if (char === '\r' && next === '\n') index += 1;
       row.push(cell);
-      if (row.some(value => value.trim() !== '')) rows.push(row);
+      // Keep explicit records even when every cell is blank.
+      if (row.length > 1 || afterQuote || row.some(value => value.trim() !== '')) rows.push(row);
       row = [];
       cell = '';
       afterQuote = false;
@@ -101,7 +102,8 @@ function parseCsvRows(text: string) {
   if (quoted) throw new Error('Malformed CSV: unterminated quoted field.');
 
   row.push(cell);
-  if (row.some(value => value.trim() !== '')) rows.push(row);
+  // Skip only truly blank physical lines, not malformed measurements.
+  if (row.length > 1 || afterQuote || row.some(value => value.trim() !== '')) rows.push(row);
   return rows;
 }
 
@@ -141,6 +143,13 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
   const duplicateHeaders = [...new Set(headers.filter((header, index) => headers.indexOf(header) !== index))];
   if (duplicateHeaders.length) {
     return { measurements: [], errors: [`Duplicate CSV headers: ${duplicateHeaders.join(', ')}`] };
+  }
+
+  const allowedHeaders = new Set<string>(PILOT_CSV_HEADERS);
+  const unexpectedHeaders = [...new Set(headers.filter(header => !allowedHeaders.has(header)))];
+  if (unexpectedHeaders.length) {
+    const labels = unexpectedHeaders.map(header => header || '<blank>');
+    return { measurements: [], errors: [`Unexpected CSV headers: ${labels.join(', ')}`] };
   }
 
   const indexOf = (name: typeof PILOT_CSV_HEADERS[number]) => headers.indexOf(name);
