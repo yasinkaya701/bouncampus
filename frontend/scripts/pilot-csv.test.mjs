@@ -190,4 +190,20 @@ assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' }
 assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
   'generated service IDs must stay unique');
 
+// Form-generated IDs must use the same whitespace-normalized service identity
+// as evidence deduplication; otherwise a padded manually entered ID can be reused.
+const paddedFormRows = [
+  { pairId: 'PAIR_01', serviceId: 'CONTROL-08 ', arm: 'CONTROL' },
+  { pairId: 'PAIR_01', serviceId: 'INTERVENTION-02', arm: 'INTERVENTION' },
+];
+assert.deepEqual(nextPilotRowIdentifiers(paddedFormRows, 'CONTROL'), {
+  pairId: 'PAIR_02',
+  serviceId: 'CONTROL-09',
+}, 'new IDs should exceed the maximum normalized existing service identifier');
+assert.deepEqual(nextPilotRowIdentifiers([
+  { pairId: 'PAIR_01', serviceId: 'CONTROL-03 ', arm: 'CONTROL' },
+  { pairId: 'PAIR_01', serviceId: 'INTERVENTION-02', arm: 'INTERVENTION' },
+], 'CONTROL').serviceId, 'CONTROL-04',
+'new service IDs must never alias a padded existing identifier');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
