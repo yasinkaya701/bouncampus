@@ -90,4 +90,36 @@ const otherDate = uniqueServices.map((item, index) => index === 1
   : item);
 assert.equal(scoreFoodWastePilot(otherDate).gates.dataQualityPassed, true);
 
+// The sell-out guardrail is a strict incidence comparison. Rounding both
+// displayed arm percentages to 0.10% previously hid a real (small) increase
+// and incorrectly promoted the result to PROMISING.
+const lowSelloutControl = Array.from({ length: 1001 }, (_, index) => ({
+  date: '2026-10-08',
+  serviceId: `SELL_CTRL_${index}`,
+  arm: 'CONTROL',
+  modelForecastMeals: null,
+  producedPortions: 110,
+  servedPortions: 100,
+  edibleSurplusKg: 0,
+  wasteKg: 2,
+  earlySellout: index === 0,
+  operatorOverride: false,
+}));
+const higherSelloutIntervention = Array.from({ length: 1000 }, (_, index) => ({
+  ...lowSelloutControl[0],
+  serviceId: `SELL_TEST_${index}`,
+  arm: 'INTERVENTION',
+  modelForecastMeals: 100,
+  wasteKg: 1,
+  earlySellout: index === 0,
+}));
+const guardedScore = scoreFoodWastePilot([...lowSelloutControl, ...higherSelloutIntervention]);
+assert.equal(guardedScore.gates.enoughEvidence, true);
+assert.equal(guardedScore.gates.wasteReductionTargetMet, true);
+assert.equal(guardedScore.control.earlySelloutRatePct, 0.1);
+assert.equal(guardedScore.intervention.earlySelloutRatePct, 0.1);
+assert.equal(guardedScore.gates.earlySelloutGuardrailPassed, false,
+  'a real increased incidence cannot pass through display rounding');
+assert.equal(guardedScore.status, 'FAILED');
+
 console.log('pilot waste-reduction full-precision threshold regression passed');
