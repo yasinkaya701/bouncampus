@@ -209,4 +209,10 @@ assert.match(validatePilotCsvExport([
 ]).join(' '), /servedPortions must be > 0/,
 'missing numeric measurements must not produce irrecoverable CSV exports');
 
+assert.match(validatePilotCsvExport([
+  control,
+  { ...intervention, serviceId: `  ${control.serviceId}  ` },
+]).join(' '), /duplicate service identity/,
+'padded aliases of the same dated service must not be exported twice');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
