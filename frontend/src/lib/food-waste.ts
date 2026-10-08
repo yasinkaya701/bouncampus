@@ -355,7 +355,9 @@ export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
   if (!measurement.serviceId.trim()) errors.push('serviceId is required');
   if (measurement.arm !== 'CONTROL' && measurement.arm !== 'INTERVENTION') errors.push('arm must be CONTROL or INTERVENTION');
   if (!Number.isFinite(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0');
+  else if (!Number.isSafeInteger(measurement.producedPortions)) errors.push('producedPortions must be a safe integer');
   if (!Number.isFinite(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0');
+  else if (!Number.isSafeInteger(measurement.servedPortions)) errors.push('servedPortions must be a safe integer');
   if (
     Number.isFinite(measurement.producedPortions)
     && Number.isFinite(measurement.servedPortions)
