@@ -101,6 +101,16 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /producedPortions must be >= 0/);
 }
 {
+  const result = parsePilotCsv(asCsv({ ...fields, produced_portions: '110.5' }));
+  assert.match(result.errors.join(' '), /producedPortions must be >= 0 and an integer/);
+  assert.equal(result.measurements.length, 0, 'fractional produced portions must fail closed');
+}
+{
+  const result = parsePilotCsv(asCsv({ ...fields, served_portions: '99.5' }));
+  assert.match(result.errors.join(' '), /servedPortions must be > 0 and an integer/);
+  assert.equal(result.measurements.length, 0, 'fractional served portions must fail closed');
+}
+{
   const result = parsePilotCsv(asCsv({ ...fields, operator_override: '' }));
   assert.match(result.errors.join(' '), /boolean fields must/);
 }
