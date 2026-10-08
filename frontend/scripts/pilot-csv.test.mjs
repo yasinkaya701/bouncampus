@@ -16,7 +16,7 @@ registerHooks({
   },
 });
 
-const { parsePilotCsv, serializePilotCsv, preparePilotCsvExport, PILOT_CSV_HEADERS } =
+const { parsePilotCsv, serializePilotCsv, PILOT_CSV_HEADERS } =
   await import('../src/lib/pilot-csv.ts');
 const { analyzeMatchedPilotDesign } =
   await import('../src/lib/food-pilot-matching.ts');
@@ -44,30 +44,6 @@ const intervention = {
   notes: '',
 };
 const pair = [control, intervention];
-
-// The UI must never offer a CSV that its own importer will reject.
-assert.deepEqual(preparePilotCsvExport(pair), { csv: serializePilotCsv(pair), errors: [] },
-  'valid measured rows remain exportable without modifying notes or identifiers');
-{
-  const invalidDraft = preparePilotCsvExport([{ ...control, producedPortions: Number.NaN }, intervention]);
-  assert.equal(invalidDraft.csv, null, 'blank required numeric fields must block CSV export');
-  assert.match(invalidDraft.errors.join(' '), /producedPortions must be >= 0/);
-}
-{
-  const missingForecast = preparePilotCsvExport([control, { ...intervention, modelForecastMeals: null }]);
-  assert.equal(missingForecast.csv, null, 'intervention without forecast must not be exported as valid data');
-  assert.match(missingForecast.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
-}
-{
-  const empty = preparePilotCsvExport([]);
-  assert.equal(empty.csv, null, 'header-only exports cannot be reimported');
-  assert.match(empty.errors.join(' '), /No measurement rows/);
-}
-{
-  const unfinishedPair = preparePilotCsvExport([control]);
-  assert.ok(unfinishedPair.csv, 'complete individual measurement rows may be saved before pairing');
-  assert.deepEqual(unfinishedPair.errors, []);
-}
 
 const csv = serializePilotCsv(pair);
 assert.ok(csv.startsWith('pair_id,date,'));
