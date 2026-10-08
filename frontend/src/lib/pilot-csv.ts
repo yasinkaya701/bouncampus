@@ -172,6 +172,29 @@ function escapeCsv(value: string | number | boolean | null | undefined) {
 }
 
 export function serializePilotCsv(measurements: MatchedPilotServiceMeasurement[]) {
+  // Exported CSV is presented as measured pilot data. Refuse incomplete or
+  // malformed measurements rather than writing invalid numeric evidence (NaN)
+  // that the import and scoring contracts would reject later.
+  const errors = measurements.flatMap((measurement, index) =>
+    validateMatchedPilotMeasurement(measurement)
+      .map(message => `Row ${index + 1}: ${message}`)
+  );
+
+  // The same dated service cannot be both a control and an intervention
+  // observation, even when the original IDs differ only by surrounding spaces.
+  const seenServices = new Set<string>();
+  measurements.forEach((measurement, index) => {
+    const serviceKey = `${measurement.date}|${measurement.serviceId.trim()}`;
+    if (seenServices.has(serviceKey)) {
+      errors.push(`Row ${index + 1}: duplicate service identity ${serviceKey}`);
+    }
+    seenServices.add(serviceKey);
+  });
+
+  if (errors.length) {
+    throw new Error(`Pilot CSV export blocked: ${errors.join('; ')}`);
+  }
+
   const lines = [PILOT_CSV_HEADERS.join(',')];
   measurements.forEach(item => {
     lines.push([
