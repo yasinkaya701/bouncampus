@@ -88,8 +88,9 @@ export default function FoodWastePage() {
   const { locale, t } = useLocale();
   const numberLocale = locale === 'tr' ? 'tr-TR' : 'en-US';
   const [food, setFood] = useState<FoodApi | null>(null);
+  const [requestState, setRequestState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [operatorDecision, setOperatorDecision] = useState<OperatorDecision>('HOLD');
-  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [loadedAt, setLoadedAt] = useState<Date | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
@@ -97,9 +98,17 @@ export default function FoodWastePage() {
       .then(response => (response.ok ? response.json() : null))
       .then((payload: FoodApi | null) => {
         setFood(payload);
-        if (payload) setUpdatedAt(new Date());
+        if (payload) {
+          setLoadedAt(new Date());
+          setRequestState('ready');
+        } else {
+          setRequestState('error');
+        }
       })
-      .catch(() => setFood(null));
+      .catch(() => {
+        setFood(null);
+        setRequestState('error');
+      });
   }, []);
 
   const planningCandidate = food?.demandContext.planningCandidate ?? null;
@@ -137,7 +146,7 @@ export default function FoodWastePage() {
 
           <nav className="flex-1 px-3 py-5">
             <div className="space-y-1">
-              <SidebarItem active icon={ClipboardCheck} label={t('Sonraki servis', 'Next service')} detail={t('Öğle · Bugün', 'Lunch · Today')} />
+              <SidebarItem active icon={ClipboardCheck} label={t('Servis planlaması', 'Service planning')} detail={t('Öğle · Planlama', 'Lunch · Planning')} />
               <SidebarItem icon={Gauge} label={t('Kontrol paneli', 'Dashboard')} />
               <SidebarItem icon={Activity} label={t('Sinyaller', 'Signals')} detail={t('Veri kaynakları ve sağlık', 'Data sources & health')} />
               <SidebarItem icon={Database} label={t('Kanıt defteri', 'Evidence ledger')} detail={t('Resmi veri ve provenance', 'Official data & provenance')} />
@@ -180,16 +189,20 @@ export default function FoodWastePage() {
               <div className="hidden h-7 w-7 place-items-center rounded-md bg-[#f0f2f0] text-[#435047] sm:grid">
                 <SlidersHorizontal size={13} />
               </div>
-              <span className="truncate text-[11px] font-medium text-[#475049]">{t('Sonraki servis', 'Next service')}</span>
+              <span className="truncate text-[11px] font-medium text-[#475049]">{t('Servis planlaması', 'Service planning')}</span>
               <ChevronRight size={12} className="hidden text-[#a0a6a1] sm:block" />
               <span className="hidden truncate text-[11px] font-medium text-[#475049] sm:block">{t('Öğle kararı', 'Lunch decision')}</span>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="hidden items-center gap-2 text-[9px] text-[#697169] md:flex">
-                <span className={`h-1.5 w-1.5 rounded-full ${food ? 'bg-[#15a34a]' : 'bg-[#c69035]'}`} />
-                {food ? t('Veri güncel', 'Data updated') : t('Veri bekleniyor', 'Waiting for data')}
-                {updatedAt ? <span>· {updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' })}</span> : null}
+                <span className={`h-1.5 w-1.5 rounded-full ${requestState === 'ready' ? 'bg-[#15a34a]' : requestState === 'error' ? 'bg-[#dc2626]' : 'bg-[#c69035]'}`} />
+                {requestState === 'ready'
+                  ? t('Planlama verisi · canlı servis ölçümü değil', 'Planning data · not live service measurements')
+                  : requestState === 'error'
+                    ? t('API yanıtı alınamadı', 'API response unavailable')
+                    : t('API yanıtı bekleniyor', 'Loading API response')}
+                {loadedAt ? <span>· {loadedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' })}</span> : null}
               </div>
               <button type="button" className="hidden h-8 items-center gap-2 rounded-lg border border-[#dfe3df] bg-white px-3 text-[10px] font-semibold text-[#2b332d] shadow-[0_1px_2px_rgba(14,22,17,0.03)] sm:flex">
                 <Users size={13} /> {t('Jüri modu', 'Jury mode')}
@@ -200,7 +213,7 @@ export default function FoodWastePage() {
 
           {mobileNavOpen ? (
             <div className="absolute inset-x-3 top-[68px] z-30 rounded-xl border border-[#dce1dc] bg-[#071d18] p-2 text-white shadow-xl lg:hidden">
-              <SidebarItem active icon={ClipboardCheck} label={t('Sonraki servis', 'Next service')} detail={t('Öğle · Bugün', 'Lunch · Today')} />
+              <SidebarItem active icon={ClipboardCheck} label={t('Servis planlaması', 'Service planning')} detail={t('Öğle · Planlama', 'Lunch · Planning')} />
               <SidebarItem icon={Activity} label={t('Sinyaller', 'Signals')} />
               <SidebarItem icon={Database} label={t('Kanıt defteri', 'Evidence ledger')} />
               <SidebarItem icon={History} label={t('Karar geçmişi', 'Decision history')} />
@@ -212,17 +225,17 @@ export default function FoodWastePage() {
               <section className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.04em] text-[#121814] sm:text-[30px]">
-                    {t('Sonraki öğle kararı', 'Next lunch decision')}
+                    {t('Öğle servisi planlaması', 'Lunch service planning')}
                   </h1>
                   <p className="mt-1.5 text-[11px] text-[#68716a] sm:text-[12px]">
-                    {t('Bugün · Kuzey Kampüs · Ana Yemekhane', 'Today · North Campus · Main Dining Hall')}
+                    {t('Planlama senaryosu · doğrulanmış servis ölçümü yok', 'Planning scenario · no verified service measurements')}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 sm:justify-end">
                   <ReadinessBadge readiness={readinessLabel} t={t} />
                   <div className="hidden border-l border-[#dde2dd] pl-3 text-right text-[8px] leading-4 text-[#727a73] sm:block">
-                    <div>{t('Son güncelleme', 'Last updated')}</div>
-                    <div className="font-medium text-[#384139]">{updatedAt ? updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'}</div>
+                    <div>{t('Yüklenme saati', 'Loaded at')}</div>
+                    <div className="font-medium text-[#384139]">{loadedAt ? loadedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'}</div>
                   </div>
                 </div>
               </section>
@@ -401,8 +414,8 @@ export default function FoodWastePage() {
                       <span className="flex items-center gap-1 text-[9px] font-medium text-[#2d6b50]">{t('Geçmiş', 'View history')} <ArrowRight size={10} /></span>
                     </div>
                     <div className="mt-4 space-y-0">
-                      <TimelineRow done={Boolean(band)} time={updatedAt ? updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'} title={t('Sinyaller yakalandı', 'Signals captured')} detail={signals.length ? `${healthySignals} / ${signals.length} ${t('girdi mevcut', 'inputs available')}` : t('Bekleniyor', 'Pending')} />
-                      <TimelineRow done={Boolean(band)} time={updatedAt ? updatedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'} title={t('Model çalışması tamamlandı', 'Model run completed')} detail={band ? `${band.recommendedTarget.toLocaleString(numberLocale)} · ${band.signalCoveragePct}%` : t('Bekleniyor', 'Pending')} />
+                      <TimelineRow done={Boolean(band)} time={loadedAt ? loadedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'} title={t('Sinyaller yakalandı', 'Signals captured')} detail={signals.length ? `${healthySignals} / ${signals.length} ${t('girdi mevcut', 'inputs available')}` : t('Bekleniyor', 'Pending')} />
+                      <TimelineRow done={Boolean(band)} time={loadedAt ? loadedAt.toLocaleTimeString(numberLocale, { hour: '2-digit', minute: '2-digit' }) : '—'} title={t('Model çalışması tamamlandı', 'Model run completed')} detail={band ? `${band.recommendedTarget.toLocaleString(numberLocale)} · ${band.signalCoveragePct}%` : t('Bekleniyor', 'Pending')} />
                       <TimelineRow done={operatorDecision !== 'HOLD'} time={operatorDecision === 'HOLD' ? t('Bekliyor', 'Pending') : '—'} title={t('Operatör incelemesi', 'Operator review')} detail={operatorDecision === 'PILOT_APPROVED' ? t('Danışmanlık senaryosu hazır işaretlendi', 'Advisory scenario marked ready') : operatorDecision === 'EDIT_REQUIRED' ? t('Düzenleme istendi', 'Edit requested') : t('İlerlemek için inceleme gerekli', 'Review required to proceed')} />
                       <TimelineRow last done={false} time="—" title={t('Mutfak dispatch', 'Kitchen dispatch')} detail={t('Otomatik dispatch kapalı; kurumsal pilot onayı anlamına gelmez', 'Automatic dispatch is disabled; this does not imply institutional pilot approval')} />
                     </div>
