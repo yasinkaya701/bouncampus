@@ -190,4 +190,23 @@ assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' }
 assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
   'generated service IDs must stay unique');
 
+// UI export must not turn whitespace-only forecasts into measured zeroes or
+// emit CSV rows that the import validator would reject on re-import.
+const { parseOptionalPilotNumber, validatePilotCsvExport } =
+  await import('../src/lib/pilot-csv.ts');
+assert.equal(parseOptionalPilotNumber(''), null);
+assert.equal(parseOptionalPilotNumber('  \\t  '.replace('\\t', '\t')), null);
+assert.equal(parseOptionalPilotNumber('0'), 0, 'an explicitly entered zero is real evidence');
+assert.equal(parseOptionalPilotNumber(' 12.5 '), 12.5);
+assert.deepEqual(validatePilotCsvExport(pair), [], 'valid measured rows remain exportable');
+assert.match(validatePilotCsvExport([
+  control,
+  { ...intervention, modelForecastMeals: parseOptionalPilotNumber('  ') },
+]).join(' '), /INTERVENTION requires modelForecastMeals/,
+'blank intervention forecasts must not be exported as measured zero');
+assert.match(validatePilotCsvExport([
+  { ...control, servedPortions: Number.NaN }, intervention,
+]).join(' '), /servedPortions must be > 0/,
+'missing numeric measurements must not produce irrecoverable CSV exports');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
