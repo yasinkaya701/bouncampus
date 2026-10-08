@@ -16,7 +16,7 @@ import {
   FOOD_WASTE_PILOT_PROTOCOL,
   type PilotScorecard,
 } from '@/lib/food-waste';
-import { parsePilotCsv, serializePilotCsv } from '@/lib/pilot-csv';
+import { parseOptionalPilotNumber, parsePilotCsv, serializePilotCsv, validatePilotCsvExport } from '@/lib/pilot-csv';
 import { hasConfirmedPilotFlags } from '@/lib/pilot-flag-confirmation';
 import { nextPilotRowIdentifiers } from '@/lib/pilot-row-identifiers';
 import type { MatchedPilotServiceMeasurement } from '@/lib/food-pilot-matching';
@@ -77,7 +77,7 @@ function rowToMeasurement(row: DraftRow & { earlySellout: boolean; operatorOverr
     date: row.date,
     serviceId: row.serviceId,
     arm: row.arm,
-    modelForecastMeals: row.forecast === '' ? null : Number(row.forecast),
+    modelForecastMeals: parseOptionalPilotNumber(row.forecast),
     producedPortions: requiredNumber(row.produced),
     servedPortions: requiredNumber(row.served),
     edibleSurplusKg: requiredNumber(row.surplusKg),
@@ -168,8 +168,15 @@ export default function FoodWastePilotPage() {
       setNotice(null);
       return;
     }
+    const measurements = rows.map(rowToMeasurement);
+    const validationErrors = validatePilotCsvExport(measurements);
+    if (validationErrors.length) {
+      setError(t('Geçersiz ölçümler dışa aktarılamaz:', 'Invalid measurements cannot be exported:') + ' ' + validationErrors.join(' · '));
+      setNotice(null);
+      return;
+    }
     setError(null);
-    const csv = serializePilotCsv(rows.map(rowToMeasurement));
+    const csv = serializePilotCsv(measurements);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
