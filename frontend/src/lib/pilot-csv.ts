@@ -20,6 +20,19 @@ export type PilotCsvParseResult = {
   errors: string[];
 };
 
+/** A blank (including whitespace-only) forecast is missing evidence, not zero meals. */
+export function parseOptionalPilotNumber(value: string): number | null {
+  const trimmed = value.trim();
+  return trimmed === '' ? null : Number(trimmed);
+}
+
+/** Block exporting records that the pilot CSV importer would reject on re-import. */
+export function validatePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): string[] {
+  return measurements.flatMap((measurement, index) =>
+    validateMatchedPilotMeasurement(measurement).map(error => `Row ${index + 1}: ${error}`),
+  );
+}
+
 function parseCsvRows(text: string) {
   const rows: string[][] = [];
   let row: string[] = [];
