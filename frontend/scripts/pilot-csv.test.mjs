@@ -59,6 +59,35 @@ assert.deepEqual(annotatedImport.errors, [], 'CSV should accept annotated notes 
 assert.deepEqual(annotatedImport.measurements, annotatedPair,
   'CSV import/export must not strip spaces, tabs, or CRLF from evidence notes');
 
+const { serializeValidatedPilotCsv } = await import('../src/lib/pilot-csv.ts');
+assert.deepEqual(serializeValidatedPilotCsv(pair), { csv, errors: [] },
+  'validated export must preserve valid pilot rows');
+{
+  const result = serializeValidatedPilotCsv([{ ...control, producedPortions: Number.NaN }, intervention]);
+  assert.equal(result.csv, null, 'invalid required numbers must never be exported');
+  assert.match(result.errors.join(' '), /producedPortions must be >= 0/);
+}
+{
+  const result = serializeValidatedPilotCsv([{ ...control, date: '' }, intervention]);
+  assert.equal(result.csv, null, 'incomplete measurement dates must never be exported');
+  assert.match(result.errors.join(' '), /date must be a valid/);
+}
+{
+  const result = serializeValidatedPilotCsv([{ ...control, pairId: '' }, intervention]);
+  assert.equal(result.csv, null, 'missing pair IDs must never be exported');
+  assert.match(result.errors.join(' '), /pairId is required/);
+}
+{
+  const result = serializeValidatedPilotCsv([{ ...intervention, modelForecastMeals: null }]);
+  assert.equal(result.csv, null, 'intervention without its forecast must never be exported');
+  assert.match(result.errors.join(' '), /INTERVENTION requires modelForecastMeals/);
+}
+assert.equal(serializeValidatedPilotCsv([]).csv, null, 'empty pilot cannot be exported');
+assert.deepEqual(serializeValidatedPilotCsv([control]), {
+  csv: serializePilotCsv([control]),
+  errors: [],
+}, 'an individually valid but incomplete pair may be exported for later completion');
+
 const crlf = serializePilotCsv([{ ...control, notes: '' }, intervention]).replaceAll('\n', '\r\n');
 assert.equal(parsePilotCsv(crlf).measurements.length, 2, 'CRLF input should parse');
 
