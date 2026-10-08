@@ -1,0 +1,9 @@
+# Optional model candidates
+
+The core shadow pipeline depends only on the repository's normal backend environment. CatBoost is the required learned candidate; Chronos-2 and TabPFN-TS are optional, and an unavailable checkpoint never blocks core forecasting.
+
+Chronos-2 uses `chronos==2.3.2` with the public `amazon/chronos-2` checkpoint. Checkpoint downloads are initiated explicitly by the local runner; all inference remains local. The adapter requires a complete contiguous daily context and evaluates two steps ahead from D-2, selecting D. Missing dates are not filled with invented demand.
+
+TabPFN-TS is an optional `tabpfn-time-series==1.3.0` candidate using TabPFN-TS 3.5. It is not a hard dependency. The v2 runner exposes `load_tabpfn_ts` and `tabpfn_ts_predictions` through the same backtest candidate path as Chronos. The verified API uses `TabPFNTSPipeline(tabpfn_mode=TabPFNMode.LOCAL, tabpfn_output_selection="median", tabpfn_model_config={"model_path": <explicit path>}, max_context_length=...)`; set `TABPFN_DISABLE_TELEMETRY=1` before importing or initializing the package. The CLI requires `--run-tabpfn-ts` and accepts `--tabpfn-checkpoint`; it refuses a missing checkpoint before importing the optional package. It never downloads weights or accepts terms. Do not use `TabPFNMode.CLIENT` or send operational records to a hosted service. Local use requires the v3.5 checkpoint and applicable license acceptance. The installed 1.3.0 source makes the local adapter straightforward, but the isolated environment's checkpoint is absent and no license was accepted, so TabPFN remains `NOT_RUN` and unscored in the preserved historical run.
+
+Candidate statuses distinguish package/checkpoint readiness from scored forecasts. A loaded model with no valid context has no score and cannot enter the blend. Historical model scores remain development evidence; the prospective 56-day gate is documented in [PROSPECTIVE_VALIDATION.md](PROSPECTIVE_VALIDATION.md).
