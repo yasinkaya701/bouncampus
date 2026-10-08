@@ -191,3 +191,24 @@ export function serializePilotCsv(measurements: MatchedPilotServiceMeasurement[]
   });
   return `${lines.join('\n')}\n`;
 }
+
+
+/**
+ * Only export a CSV that the measurement importer will accept again.
+ * This is a format/row-contract check, not evidence promotion: incomplete
+ * matched pairs may still be saved for later completion.
+ */
+export function preparePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): {
+  csv: string | null;
+  errors: string[];
+} {
+  if (measurements.length === 0) {
+    return { csv: null, errors: ['No measurement rows to export.'] };
+  }
+
+  const csv = serializePilotCsv(measurements);
+  const parsed = parsePilotCsv(csv);
+  return parsed.errors.length
+    ? { csv: null, errors: parsed.errors }
+    : { csv, errors: [] };
+}
