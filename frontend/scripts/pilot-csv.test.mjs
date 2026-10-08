@@ -101,29 +101,30 @@ const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   assert.match(result.errors.join(' '), /producedPortions must be >= 0/);
 }
 
- // Count fields represent observed whole portions, not continuous kilograms.
- // Fractional or beyond-safe-integer counts must never enter pilot evidence.
- for (const [field, value] of [
-   ['produced_portions', '110.5'],
-   ['served_portions', '100.25'],
-   ['produced_portions', '9007199254740992'],
- ]) {
-   const result = parsePilotCsv(asCsv({ ...fields, [field]: value }));
-   assert.match(result.errors.join(' '), /safe integer/,
-     `${field}=${value} must be rejected as an invalid portion count`);
-   assert.equal(result.measurements.length, 0, 'bad counts must reject the whole import');
- }
- 
- const { validatePilotMeasurement, scoreFoodWastePilot } =
-   await import('../src/lib/food-waste.ts');
- assert.ok(validatePilotMeasurement({ ...control, servedPortions: 100.25 }).length > 0,
-   'JSON/API pilot validation must reject fractional served counts');
- assert.ok(validatePilotMeasurement({ ...control, producedPortions: 110.5 }).length > 0,
-   'JSON/API pilot validation must reject fractional production counts');
- const invalidScore = scoreFoodWastePilot([{ ...control, producedPortions: 110.5 }, intervention]);
- assert.equal(invalidScore.gates.dataQualityPassed, false,
-   'fractional counts must never satisfy the pilot evidence gate');
- assert.equal(invalidScore.status, 'INSUFFICIENT_EVIDENCE');
+
+// Count fields represent observed whole portions, not continuous kilograms.
+// Fractional or beyond-safe-integer counts must never enter pilot evidence.
+for (const [field, value] of [
+  ['produced_portions', '110.5'],
+  ['served_portions', '100.25'],
+  ['produced_portions', '9007199254740992'],
+]) {
+  const result = parsePilotCsv(asCsv({ ...fields, [field]: value }));
+  assert.match(result.errors.join(' '), /safe integer/,
+    `${field}=${value} must be rejected as an invalid portion count`);
+  assert.equal(result.measurements.length, 0, 'bad counts must reject the whole import');
+}
+
+const { validatePilotMeasurement, scoreFoodWastePilot } =
+  await import('../src/lib/food-waste.ts');
+assert.ok(validatePilotMeasurement({ ...control, servedPortions: 100.25 }).length > 0,
+  'JSON/API pilot validation must reject fractional served counts');
+assert.ok(validatePilotMeasurement({ ...control, producedPortions: 110.5 }).length > 0,
+  'JSON/API pilot validation must reject fractional production counts');
+const invalidScore = scoreFoodWastePilot([{ ...control, producedPortions: 110.5 }, intervention]);
+assert.equal(invalidScore.gates.dataQualityPassed, false,
+  'fractional counts must never satisfy the pilot evidence gate');
+assert.equal(invalidScore.status, 'INSUFFICIENT_EVIDENCE');
 {
   const result = parsePilotCsv(asCsv({ ...fields, operator_override: '' }));
   assert.match(result.errors.join(' '), /boolean fields must/);
