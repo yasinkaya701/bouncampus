@@ -54,10 +54,15 @@ def _normalize_scenarios(
             return None
         if weight > 0:
             normalized.append((demand, weight))
-    total = sum(weight for _, weight in normalized)
-    if not normalized or total <= 0:
+    if not normalized:
         return None
-    return [(demand, weight / total) for demand, weight in normalized]
+    # Summing finite but very large weights can overflow to infinity. Dividing
+    # by that infinity would silently assign zero probability to every scenario,
+    # making every candidate appear to have zero expected loss.
+    max_weight = max(weight for _, weight in normalized)
+    scaled = [(demand, weight / max_weight) for demand, weight in normalized]
+    total_scaled = sum(weight for _, weight in scaled)
+    return [(demand, weight / total_scaled) for demand, weight in scaled]
 
 
 def _candidate_quantities(
