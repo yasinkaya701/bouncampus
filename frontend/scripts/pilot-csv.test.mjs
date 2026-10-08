@@ -166,6 +166,22 @@ const csvHeader = PILOT_CSV_HEADERS.join(',');
   ]), false, 'one unanswered service must prevent scoring or export for the whole form');
 }
 
+// Stale scoring and file-read responses cannot update newer operator evidence.
+const { createPilotEvidenceRevisionGuard } =
+  await import('../src/lib/pilot-evidence-revision.ts');
+const revisionGuard = createPilotEvidenceRevisionGuard();
+const firstRequest = revisionGuard.invalidate();
+assert.equal(revisionGuard.isCurrent(firstRequest), true);
+revisionGuard.invalidate(); // Operator edits measurements while scoring is pending.
+assert.equal(revisionGuard.isCurrent(firstRequest), false,
+  'late responses must not restore a scorecard for obsolete measurements');
+const secondRequest = revisionGuard.invalidate();
+assert.equal(revisionGuard.isCurrent(secondRequest), true,
+  'a new request should be permitted after the edit');
+revisionGuard.invalidate(); // New CSV import supersedes the previous response.
+assert.equal(revisionGuard.isCurrent(secondRequest), false,
+  'an asynchronous import must invalidate all earlier scoring requests');
+
 const { nextPilotRowIdentifiers } = await import('../src/lib/pilot-row-identifiers.ts');
 
 const firstPair = [
