@@ -354,8 +354,8 @@ export function validatePilotMeasurement(measurement: PilotServiceMeasurement) {
   if (!isValidPilotCalendarDate(measurement.date)) errors.push('date must be a valid YYYY-MM-DD calendar date');
   if (!measurement.serviceId.trim()) errors.push('serviceId is required');
   if (measurement.arm !== 'CONTROL' && measurement.arm !== 'INTERVENTION') errors.push('arm must be CONTROL or INTERVENTION');
-  if (!Number.isFinite(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0');
-  if (!Number.isFinite(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0');
+  if (!Number.isSafeInteger(measurement.producedPortions) || measurement.producedPortions < 0) errors.push('producedPortions must be >= 0 and a safe integer');
+  if (!Number.isSafeInteger(measurement.servedPortions) || measurement.servedPortions <= 0) errors.push('servedPortions must be > 0 and a safe integer');
   if (
     Number.isFinite(measurement.producedPortions)
     && Number.isFinite(measurement.servedPortions)
@@ -457,9 +457,13 @@ export function scoreFoodWastePilot(measurements: PilotServiceMeasurement[]): Pi
   const wasteReductionTargetMet = reduction == null || targetWastePer100 == null || interventionWastePer100 == null
     ? null
     : interventionWastePer100 <= targetWastePer100 + machineTolerance;
-  const earlySelloutGuardrailPassed = control.earlySelloutRatePct == null || intervention.earlySelloutRatePct == null
+  // Display rates are rounded; compare raw event counts with a common denominator
+  // so a genuine increase cannot be hidden by equal two-decimal percentages.
+  const controlSellouts = controlMeasurements.filter(item => item.earlySellout).length;
+  const interventionSellouts = interventionMeasurements.filter(item => item.earlySellout).length;
+  const earlySelloutGuardrailPassed = !controlMeasurements.length || !interventionMeasurements.length
     ? null
-    : intervention.earlySelloutRatePct <= control.earlySelloutRatePct;
+    : interventionSellouts * controlMeasurements.length <= controlSellouts * interventionMeasurements.length;
 
   const notes: string[] = [];
   if (invalidMeasurementCount) notes.push(`${invalidMeasurementCount} measurement row(s) fail the pilot measurement contract.`);
