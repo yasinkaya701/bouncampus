@@ -120,6 +120,27 @@ const validDataRow = validCsv.trimEnd().split('\n')[1];
 const csvHeader = PILOT_CSV_HEADERS.join(',');
 
 {
+  // A comma-delimited record with twelve empty cells is not a blank line.
+  // Silently omitting it could turn an invalid measured dataset into a valid import.
+  const emptyCells = ','.repeat(PILOT_CSV_HEADERS.length - 1);
+  const result = parsePilotCsv(`${validCsv}${emptyCells}\n`);
+  assert.match(result.errors.join(' '), /Row 3: boolean fields must/);
+  assert.equal(result.measurements.length, 0,
+    'explicit all-empty measurement rows must invalidate the whole CSV');
+}
+{
+  const result = parsePilotCsv(`${validCsv}""\n`);
+  assert.match(result.errors.join(' '), /Row 3: expected 12 CSV columns, received 1/);
+  assert.equal(result.measurements.length, 0,
+    'quoted empty measurement rows must not disappear');
+}
+{
+  const result = parsePilotCsv(`${validCsv}\n   \n`);
+  assert.deepEqual(result.errors, [], 'ordinary blank physical lines are not records');
+  assert.equal(result.measurements.length, 1);
+}
+
+{
   const result = parsePilotCsv(`${csvHeader}\n${validDataRow},unexpected\n`);
   assert.match(result.errors.join(' '), /expected 12 CSV columns, received 13/);
   assert.equal(result.measurements.length, 0, 'extra columns must not be silently discarded');
