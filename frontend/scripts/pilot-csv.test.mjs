@@ -190,4 +190,17 @@ assert.deepEqual(repeatedControl, { pairId: 'PAIR_03', serviceId: 'CONTROL-05' }
 assert.equal(new Set(matchedRows.map(row => row.serviceId)).size, matchedRows.length,
   'generated service IDs must stay unique');
 
+// Imported IDs may include accidental surrounding whitespace. The editor must
+// never allocate the same physical service identifier after normalization.
+const paddedExistingService = [
+  { pairId: 'PAIR_01', serviceId: ' CONTROL-02 ', arm: 'CONTROL' },
+  { pairId: 'PAIR_01', serviceId: 'INTERVENTION-01', arm: 'INTERVENTION' },
+];
+const nextAfterPadded = nextPilotRowIdentifiers(paddedExistingService, 'CONTROL');
+assert.deepEqual(nextAfterPadded,
+  { pairId: 'PAIR_02', serviceId: 'CONTROL-03' },
+  'new service IDs must account for whitespace-padded imported IDs');
+assert.notEqual(nextAfterPadded.serviceId, paddedExistingService[0].serviceId.trim(),
+  'the allocator must not create an ID that collides after scoring normalization');
+
 console.log('pilot CSV matched-pair round-trip and fail-closed validation passed');
