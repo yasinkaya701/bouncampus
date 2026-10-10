@@ -45,6 +45,7 @@ function duplicateServiceIdentityErrors(
 
 /** Block exporting records that the pilot CSV importer would reject on re-import. */
 export function validatePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): string[] {
+  if (measurements.length === 0) return ['CSV has no measurement rows.'];
   return [
     ...measurements.flatMap((measurement, index) =>
       validateMatchedPilotMeasurement(measurement).map(error => `Row ${index + 1}: ${error}`),
