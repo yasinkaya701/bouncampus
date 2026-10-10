@@ -26,22 +26,32 @@ export function parseOptionalPilotNumber(value: string): number | null {
   return trimmed === '' ? null : Number(trimmed);
 }
 
-/** Block exporting records that the pilot CSV importer would reject on re-import. */
-export function validatePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): string[] {
-  const errors = measurements.flatMap((measurement, index) =>
-    validateMatchedPilotMeasurement(measurement).map(error => `Row ${index + 1}: ${error}`),
-  );
-
+/** A dated service can be observed only once, regardless of pilot arm or pair. */
+function duplicateServiceIdentityErrors(
+  measurements: readonly MatchedPilotServiceMeasurement[],
+  firstRowNumber: number,
+): string[] {
+  const errors: string[] = [];
   const seenServices = new Set<string>();
   measurements.forEach((measurement, index) => {
     const serviceKey = `${measurement.date}|${measurement.serviceId.trim()}`;
     if (seenServices.has(serviceKey)) {
-      errors.push(`Row ${index + 1}: duplicate service identity ${serviceKey}`);
+      errors.push(`Row ${firstRowNumber + index}: duplicate service identity ${serviceKey}`);
     }
     seenServices.add(serviceKey);
   });
-
   return errors;
+}
+
+/** Block exporting records that the pilot CSV importer would reject on re-import. */
+export function validatePilotCsvExport(measurements: MatchedPilotServiceMeasurement[]): string[] {
+  if (measurements.length === 0) return ['CSV has no measurement rows.'];
+  return [
+    ...measurements.flatMap((measurement, index) =>
+      validateMatchedPilotMeasurement(measurement).map(error => `Row ${index + 1}: ${error}`),
+    ),
+    ...duplicateServiceIdentityErrors(measurements, 1),
+  ];
 }
 
 function parseCsvRows(text: string) {
@@ -195,6 +205,11 @@ export function parsePilotCsv(text: string): PilotCsvParseResult {
 
     measurements.push(measurement);
   });
+
+  if (!errors.length && measurements.length === 0) {
+    errors.push('CSV has no measurement rows.');
+  }
+  errors.push(...duplicateServiceIdentityErrors(measurements, 2));
 
   return { measurements: errors.length ? [] : measurements, errors };
 }
