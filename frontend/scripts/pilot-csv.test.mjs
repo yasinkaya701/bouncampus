@@ -297,6 +297,8 @@ assert.equal(parseOptionalPilotNumber('   '), null);
 assert.equal(parseOptionalPilotNumber('0'), 0, 'an explicitly entered zero is real evidence');
 assert.equal(parseOptionalPilotNumber(' 12.5 '), 12.5);
 assert.deepEqual(validatePilotCsvExport(pair), [], 'valid measured rows remain exportable');
+assert.match(validatePilotCsvExport([]).join(' '), /no measurement rows/,
+  'do not export a header-only CSV that the importer correctly refuses');
 assert.match(validatePilotCsvExport([
   control,
   { ...intervention, modelForecastMeals: parseOptionalPilotNumber('  ') },
