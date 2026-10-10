@@ -79,6 +79,29 @@ const fields = {
 const asCsv = (values, names = PILOT_CSV_HEADERS) =>
   names.join(',') + '\n' + names.map(name => values[name] ?? '').join(',') + '\n';
 
+// An empty/header-only import must not masquerade as an accepted evidence file.
+{
+  const result = parsePilotCsv(PILOT_CSV_HEADERS.join(',') + '\n');
+  assert.match(result.errors.join(' '), /no measurement rows/);
+  assert.deepEqual(result.measurements, []);
+}
+
+// Import and export must enforce the same unique dated-service identity rule.
+{
+  const reusedService = { ...intervention, serviceId: `  ${control.serviceId}  ` };
+  const result = parsePilotCsv(serializePilotCsv([control, reusedService]));
+  assert.match(result.errors.join(' '), /Row 3: duplicate service identity/);
+  assert.deepEqual(result.measurements, [],
+    'a service reused across arms must invalidate the entire imported pilot');
+}
+{
+  const laterService = { ...intervention, serviceId: control.serviceId, date: '2026-10-08' };
+  const result = parsePilotCsv(serializePilotCsv([control, laterService]));
+  assert.deepEqual(result.errors, [],
+    'the same service identifier on a different date is not a duplicate observation');
+  assert.equal(result.measurements.length, 2);
+}
+
 {
   const result = parsePilotCsv(asCsv({ ...fields, pair_id: '' }));
   assert.match(result.errors.join(' '), /pairId is required/);
